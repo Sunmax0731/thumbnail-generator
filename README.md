@@ -7,11 +7,15 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 ## Current MVP
 
 - Canvas-based thumbnail preview and export.
+- Direct canvas editing for the selected layer: drag move, corner resize, and rotation handle.
 - Image import with position, size, rotation, opacity, and effects.
-- Text layers with font size, font family, color, rotation, and outline stroke.
+- Text layers with font size, font dropdown, color, rotation, and outline stroke.
 - Shape layers with fill/stroke, size, and rotation.
 - CSV layout importer.
 - HTML layout importer using `data-layer` attributes.
+- Generated CSV/HTML layout text from the current canvas state.
+- Named browser-local templates stored in `localStorage`, with load and delete controls.
+- Drag-and-drop layer ordering in the Layers panel.
 - Resolution presets for common video platforms and custom output size.
 - Browser-only static deployment.
 
@@ -46,7 +50,7 @@ Latest local gate:
 
 - URL: `http://127.0.0.1:4173/thumbnail-generator/`
 - Browser: Playwright headless Chromium. Browser plugin fallback reason: in-app Browser returned `Browser is not available: iab`.
-- Passed: nonblank canvas, primary UI visible, CSV import, HTML import, inspector edit, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
+- Passed: nonblank canvas, primary UI visible, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, layer drag-and-drop ordering, font dropdown, named template save/load/delete, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
 
 Latest remote deploy:
 

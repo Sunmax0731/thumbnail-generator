@@ -51,3 +51,13 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Complete release checklist.
 - [x] Create docs ZIP.
 - [x] Commit and push if validation passes.
+
+## 7. Direct Editing and Templates
+
+- [x] Add direct canvas move, resize, and rotate controls for the selected layer.
+- [x] Add drag-and-drop layer order editing in the Layers panel.
+- [x] Change text font editing from free text to a dropdown list.
+- [x] Generate CSV and HTML layout text from the current canvas state.
+- [x] Save generated layouts as named browser-local templates.
+- [x] Support multiple saved templates with load and delete controls.
+- [x] Validate new interactions with automated tests and browser runtime gate.

@@ -1,10 +1,13 @@
-import { Code2, FileText, ImagePlus, LayoutTemplate, Shapes, Type } from "lucide-react";
+import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Shapes, Trash2, Type } from "lucide-react";
+import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
 interface LeftPanelProps {
   csvText: string;
   htmlText: string;
   assets: ImageAsset[];
+  templateName: string;
+  templates: SavedTemplate[];
   onCsvTextChange: (value: string) => void;
   onHtmlTextChange: (value: string) => void;
   onApplyCsv: () => void;
@@ -13,12 +16,19 @@ interface LeftPanelProps {
   onAddText: () => void;
   onAddShape: () => void;
   onResetTemplate: () => void;
+  onTemplateNameChange: (value: string) => void;
+  onSyncLayoutText: () => void;
+  onSaveTemplate: () => void;
+  onLoadTemplate: (id: string) => void;
+  onDeleteTemplate: (id: string) => void;
 }
 
 export function LeftPanel({
   csvText,
   htmlText,
   assets,
+  templateName,
+  templates,
   onCsvTextChange,
   onHtmlTextChange,
   onApplyCsv,
@@ -27,6 +37,11 @@ export function LeftPanel({
   onAddText,
   onAddShape,
   onResetTemplate,
+  onTemplateNameChange,
+  onSyncLayoutText,
+  onSaveTemplate,
+  onLoadTemplate,
+  onDeleteTemplate,
 }: LeftPanelProps) {
   return (
     <aside className="side-panel left-panel" aria-label="Imports and layout sources">
@@ -73,6 +88,51 @@ export function LeftPanel({
         </button>
       </section>
 
+      <section className="panel-section template-section">
+        <div className="section-heading">
+          <Save size={16} />
+          <h2>Browser templates</h2>
+        </div>
+        <label className="field">
+          <span>Template name</span>
+          <input
+            type="text"
+            value={templateName}
+            onChange={(event) => onTemplateNameChange(event.currentTarget.value)}
+          />
+        </label>
+        <div className="button-grid">
+          <button type="button" className="secondary-button icon-text" onClick={onSyncLayoutText}>
+            <RefreshCw size={16} /> Generate
+          </button>
+          <button type="button" className="primary-button icon-text" onClick={onSaveTemplate}>
+            <Save size={16} /> Save
+          </button>
+        </div>
+        <div className="template-list" aria-label="Saved templates">
+          {templates.length === 0 ? (
+            <p className="empty-note">No saved templates yet.</p>
+          ) : (
+            templates.map((template) => (
+              <div className="template-row" key={template.id}>
+                <button type="button" className="template-load" onClick={() => onLoadTemplate(template.id)}>
+                  <FolderOpen size={15} />
+                  <span>{template.name}</span>
+                </button>
+                <button
+                  type="button"
+                  className="icon-button danger"
+                  title={`Delete ${template.name}`}
+                  onClick={() => onDeleteTemplate(template.id)}
+                >
+                  <Trash2 size={14} />
+                </button>
+              </div>
+            ))
+          )}
+        </div>
+      </section>
+
       <section className="panel-section grow-section">
         <div className="section-heading">
           <FileText size={16} />
@@ -109,4 +169,3 @@ export function LeftPanel({
     </aside>
   );
 }
-

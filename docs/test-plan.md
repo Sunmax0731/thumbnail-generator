@@ -15,6 +15,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Layer inspector edits position, size, rotation, color, stroke, and effects.
+- Canvas direct editing supports drag move, corner resize, and rotation handle drag.
+- Layers panel supports drag-and-drop stacking order edits.
+- Text font selector changes the rendered text font family.
+- Named templates can be saved to browser storage, loaded, and deleted.
 - Image import accepts a local image and creates an image layer.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
@@ -25,7 +29,7 @@ Completed on 2026-06-06.
 
 ### Automated
 
-- `npm test`: pass. 3 test files, 6 tests.
+- `npm test`: pass. 6 test files, 15 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 - `npm audit --audit-level=high`: pass. 0 vulnerabilities.
 
@@ -41,6 +45,8 @@ Completed on 2026-06-06.
   - `docs/assets/runtime-desktop.png`
   - `docs/assets/runtime-mobile.png`
   - `docs/assets/runtime-mobile-canvas.png`
+  - `docs/assets/runtime-direct-editing.png`
+  - `docs/assets/runtime-direct-editing-mobile.png`
 
 Passed checks:
 
@@ -50,6 +56,10 @@ Passed checks:
 - CSV import: pass, status reported `CSV applied: 3 layers.`
 - HTML import: pass, status reported `HTML applied: 3 layers.`
 - Inspector edit: pass, selected text updated to `QA INSPECTOR TITLE`
+- Canvas direct editing: pass, selected text layer moved, resized, and rotated with pointer controls
+- Layer ordering: pass, Layers panel drag-and-drop changed stacking order
+- Font dropdown: pass, selected text layer font family changed through the dropdown
+- Named templates: pass, current CSV/HTML layout saved to browser storage, loaded, and deleted
 - Image import: pass, local PNG file imported and created an image layer
 - Export: pass, WebP download created (`thumbnail-1280x720-...webp`)
 - Mobile: pass, no horizontal overflow (`0`)
@@ -57,7 +67,7 @@ Passed checks:
 Console health:
 
 - No app errors or page errors.
-- One warning was produced by the QA script's repeated `getImageData` pixel-read check: Canvas readback performance warning. This is not an application runtime error.
+- The latest direct-editing runtime gate produced no app errors, page errors, or app warnings.
 
 ### GitHub Pages
 

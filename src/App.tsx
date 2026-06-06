@@ -4,27 +4,56 @@ import { InspectorPanel } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
 import { StatusBar } from "./components/StatusBar";
 import { TopToolbar } from "./components/TopToolbar";
+import {
+  getLayerInteractionAt,
+  moveLayer as moveCanvasLayer,
+  pointToCanvas,
+  resizeLayer,
+  rotateLayer,
+  type CanvasInteractionMode,
+  type CanvasPoint,
+} from "./lib/canvasInteraction";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
 import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerAt } from "./lib/hitTest";
+import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
+import {
+  createTemplateSnapshot,
+  readSavedTemplates,
+  type SavedTemplate,
+  upsertTemplate,
+  writeSavedTemplates,
+} from "./lib/templates";
 import type { ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+
+interface ActiveCanvasInteraction {
+  mode: CanvasInteractionMode;
+  layer: ThumbnailLayer;
+  start: CanvasPoint;
+}
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
+  const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
   const [settings, setSettings] = useState<OutputSettings>(defaultOutputSettings);
   const [assets, setAssets] = useState<ImageAsset[]>(() => initialAssets(import.meta.env.BASE_URL));
   const [layers, setLayers] = useState<ThumbnailLayer[]>(() => createInitialLayers());
   const [selectedId, setSelectedId] = useState<string>("");
   const [csvText, setCsvText] = useState(sampleCsv);
   const [htmlText, setHtmlText] = useState(sampleHtml);
+  const [templateName, setTemplateName] = useState("My thumbnail template");
+  const [templates, setTemplates] = useState<SavedTemplate[]>(() =>
+    typeof window === "undefined" ? [] : readSavedTemplates(),
+  );
   const [status, setStatus] = useState("Ready. Edit the sample, import CSV/HTML, or add local images.");
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
+  const [canvasCursor, setCanvasCursor] = useState("default");
 
   const selectedLayer = useMemo(
     () => layers.find((layer) => layer.id === selectedId) ?? layers.at(-1),
@@ -200,23 +229,141 @@ function App() {
     });
   }, []);
 
+  const reorderLayer = useCallback((draggedId: string, targetId: string) => {
+    setLayers((current) => {
+      if (draggedId === targetId) return current;
+      const displayOrder = [...current].reverse();
+      const draggedIndex = displayOrder.findIndex((layer) => layer.id === draggedId);
+      const targetIndex = displayOrder.findIndex((layer) => layer.id === targetId);
+      if (draggedIndex < 0 || targetIndex < 0) return current;
+      const [dragged] = displayOrder.splice(draggedIndex, 1);
+      displayOrder.splice(targetIndex, 0, dragged);
+      setSelectedId(draggedId);
+      setStatus("Layer order updated by drag and drop.");
+      return displayOrder.reverse();
+    });
+  }, []);
+
   const handlePresetChange = useCallback((presetId: string) => {
     setSettings((current) => applyPreset(current, presetId));
   }, []);
 
-  const handleCanvasClick = useCallback(
-    (event: React.MouseEvent<HTMLCanvasElement>) => {
+  const handleCanvasPointerDown = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = event.currentTarget;
-      const rect = canvas.getBoundingClientRect();
-      const x = ((event.clientX - rect.left) / rect.width) * settings.width;
-      const y = ((event.clientY - rect.top) / rect.height) * settings.height;
-      const picked = pickLayerAt(layers, x, y);
+      const point = pointToCanvas(canvas, event.clientX, event.clientY);
+      const selectedMode = selectedLayer ? getLayerInteractionAt(selectedLayer, point) : null;
+
+      if (selectedLayer && selectedMode) {
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
+        activeCanvasInteraction.current = { mode: selectedMode, layer: selectedLayer, start: point };
+        setCanvasCursor(cursorForMode(selectedMode));
+        setStatus(`${labelForMode(selectedMode)} ${selectedLayer.name}.`);
+        return;
+      }
+
+      const picked = pickLayerAt(layers, point.x, point.y);
       if (picked) {
+        event.preventDefault();
+        canvas.setPointerCapture(event.pointerId);
         setSelectedId(picked.id);
-        setStatus(`Selected ${picked.name}.`);
+        activeCanvasInteraction.current = { mode: "move", layer: picked, start: point };
+        setCanvasCursor("grabbing");
+        setStatus(`Selected ${picked.name}. Dragging to move.`);
+      } else {
+        setCanvasCursor("default");
       }
     },
-    [layers, settings.height, settings.width],
+    [layers, selectedLayer],
+  );
+
+  const handleCanvasPointerMove = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
+      const canvas = event.currentTarget;
+      const point = pointToCanvas(canvas, event.clientX, event.clientY);
+      const active = activeCanvasInteraction.current;
+
+      if (active) {
+        event.preventDefault();
+        const nextLayer = transformLayerFromPointer(active, point);
+        setLayers((current) => current.map((layer) => (layer.id === active.layer.id ? nextLayer : layer)));
+        return;
+      }
+
+      const selectedMode = selectedLayer ? getLayerInteractionAt(selectedLayer, point) : null;
+      if (selectedMode) {
+        setCanvasCursor(cursorForMode(selectedMode));
+        return;
+      }
+
+      const picked = pickLayerAt(layers, point.x, point.y);
+      setCanvasCursor(picked ? "pointer" : "default");
+    },
+    [layers, selectedLayer],
+  );
+
+  const handleCanvasPointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
+    const active = activeCanvasInteraction.current;
+    if (!active) return;
+    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+      event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    activeCanvasInteraction.current = null;
+    setCanvasCursor("default");
+    setStatus(`${labelForMode(active.mode)} complete.`);
+  }, []);
+
+  const syncLayoutTextFromLayers = useCallback(() => {
+    setCsvText(layersToCsv(layers));
+    setHtmlText(layersToHtml(layers));
+    setStatus("Generated CSV and HTML layout text from the current canvas.");
+  }, [layers]);
+
+  const saveCurrentTemplate = useCallback(() => {
+    const snapshot = createTemplateSnapshot(templateName, layers, assets, settings);
+    const next = upsertTemplate(templates, snapshot);
+    try {
+      writeSavedTemplates(next);
+      setTemplates(next);
+      setTemplateName(snapshot.name);
+      setCsvText(snapshot.csv);
+      setHtmlText(snapshot.html);
+      setStatus(`Saved template "${snapshot.name}" in browser storage.`);
+    } catch (error) {
+      setStatus(`Template save failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, [assets, layers, settings, templateName, templates]);
+
+  const loadTemplate = useCallback(
+    (templateId: string) => {
+      const template = templates.find((candidate) => candidate.id === templateId);
+      if (!template) return;
+      setSettings(template.settings);
+      setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
+      setLayers(template.layers);
+      setSelectedId(template.layers.at(-1)?.id ?? "");
+      setCsvText(template.csv || layersToCsv(template.layers));
+      setHtmlText(template.html || layersToHtml(template.layers));
+      setTemplateName(template.name);
+      setStatus(`Loaded template "${template.name}".`);
+    },
+    [templates],
+  );
+
+  const deleteTemplate = useCallback(
+    (templateId: string) => {
+      const template = templates.find((candidate) => candidate.id === templateId);
+      const next = templates.filter((candidate) => candidate.id !== templateId);
+      try {
+        writeSavedTemplates(next);
+        setTemplates(next);
+        setStatus(template ? `Deleted template "${template.name}".` : "Template deleted.");
+      } catch (error) {
+        setStatus(`Template delete failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [templates],
   );
 
   const handleExport = useCallback(
@@ -258,6 +405,13 @@ function App() {
           onAddText={addTextLayer}
           onAddShape={addShapeLayer}
           onResetTemplate={resetTemplate}
+          templateName={templateName}
+          templates={templates}
+          onTemplateNameChange={setTemplateName}
+          onSyncLayoutText={syncLayoutTextFromLayers}
+          onSaveTemplate={saveCurrentTemplate}
+          onLoadTemplate={loadTemplate}
+          onDeleteTemplate={deleteTemplate}
           assets={assets}
         />
         <CanvasStage
@@ -266,8 +420,11 @@ function App() {
           layerCount={layers.length}
           selectedLayerName={selectedLayer?.name ?? "None"}
           zoom={zoom}
+          cursor={canvasCursor}
           onZoomChange={setZoom}
-          onCanvasClick={handleCanvasClick}
+          onPointerDown={handleCanvasPointerDown}
+          onPointerMove={handleCanvasPointerMove}
+          onPointerUp={handleCanvasPointerUp}
         />
         <InspectorPanel
           assets={assets}
@@ -278,11 +435,31 @@ function App() {
           onDelete={deleteLayer}
           onDuplicate={duplicateLayer}
           onMove={moveLayer}
+          onReorderLayer={reorderLayer}
         />
       </main>
       <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} />
     </div>
   );
+}
+
+function transformLayerFromPointer(active: ActiveCanvasInteraction, point: CanvasPoint): ThumbnailLayer {
+  if (active.mode === "move") return moveCanvasLayer(active.layer, active.start, point);
+  if (active.mode === "rotate") return rotateLayer(active.layer, active.start, point);
+  return resizeLayer(active.layer, active.mode, point);
+}
+
+function cursorForMode(mode: CanvasInteractionMode): string {
+  if (mode === "move") return "grab";
+  if (mode === "rotate") return "crosshair";
+  if (mode === "resize-nw" || mode === "resize-se") return "nwse-resize";
+  return "nesw-resize";
+}
+
+function labelForMode(mode: CanvasInteractionMode): string {
+  if (mode === "move") return "Move";
+  if (mode === "rotate") return "Rotate";
+  return "Resize";
 }
 
 function readImageFile(file: File): Promise<ImageAsset> {

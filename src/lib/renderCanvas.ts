@@ -1,3 +1,4 @@
+import { rotateHandleOffset, selectionHandleRadius } from "./canvasInteraction";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
@@ -174,15 +175,20 @@ function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer)
   context.setLineDash([16, 10]);
   context.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
   context.setLineDash([]);
+  context.beginPath();
+  context.moveTo(0, -layer.height / 2);
+  context.lineTo(0, -layer.height / 2 - rotateHandleOffset);
+  context.stroke();
   context.fillStyle = "#10b6d7";
   for (const [x, y] of [
     [-layer.width / 2, -layer.height / 2],
     [layer.width / 2, -layer.height / 2],
     [layer.width / 2, layer.height / 2],
     [-layer.width / 2, layer.height / 2],
+    [0, -layer.height / 2 - rotateHandleOffset],
   ]) {
     context.beginPath();
-    context.arc(x, y, 8, 0, Math.PI * 2);
+    context.arc(x, y, selectionHandleRadius, 0, Math.PI * 2);
     context.fill();
   }
   context.restore();
@@ -202,4 +208,3 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   imageCache.set(src, promise);
   return promise;
 }
-

@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A-",
-    "rationale": "MVP functionality is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Advanced editing and cross-browser coverage remain future work."
+    "rationale": "MVP functionality is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Direct canvas editing, layer D&D, font dropdown, and named templates are included. Cross-browser coverage remains future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A-",
-    "rationale": "Primary requested workflow passed: CSV/HTML import, image import, inspector edits, effects controls, and PNG/JPEG/WebP export path. Broader template variety remains future work."
+    "rationale": "Primary requested workflow passed: CSV/HTML import, image import, inspector edits, direct canvas move/resize/rotate, layer ordering, font dropdown, named template save/load/delete, effects controls, and PNG/JPEG/WebP export path. Broader template variety remains future work."
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -33,6 +33,14 @@
       "CSV import",
       "HTML import",
       "inspector edit",
+      "canvas direct move",
+      "canvas direct resize",
+      "canvas direct rotate",
+      "layer drag-and-drop order",
+      "font dropdown",
+      "named template save",
+      "named template load",
+      "named template delete",
       "image import",
       "WebP export download",
       "desktop viewport",

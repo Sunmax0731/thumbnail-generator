@@ -7,8 +7,11 @@ interface CanvasStageProps {
   layerCount: number;
   selectedLayerName: string;
   zoom: number;
+  cursor: string;
   onZoomChange: (zoom: number) => void;
-  onCanvasClick: (event: React.MouseEvent<HTMLCanvasElement>) => void;
+  onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
+  onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
+  onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
 }
 
 export function CanvasStage({
@@ -17,8 +20,11 @@ export function CanvasStage({
   layerCount,
   selectedLayerName,
   zoom,
+  cursor,
   onZoomChange,
-  onCanvasClick,
+  onPointerDown,
+  onPointerMove,
+  onPointerUp,
 }: CanvasStageProps) {
   return (
     <section className="stage-panel" aria-label="Canvas preview">
@@ -69,7 +75,11 @@ export function CanvasStage({
             ref={canvasRef}
             className="thumbnail-canvas"
             aria-label="Thumbnail preview canvas"
-            onClick={onCanvasClick}
+            style={{ cursor }}
+            onPointerDown={onPointerDown}
+            onPointerMove={onPointerMove}
+            onPointerUp={onPointerUp}
+            onPointerCancel={onPointerUp}
           />
         </div>
       </div>

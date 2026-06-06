@@ -91,3 +91,32 @@ Presets:
 - Portrait short: `1080x1920`
 - Custom width and height
 
+## Direct Canvas Editing
+
+The selected layer can be edited directly on the canvas:
+
+- Drag inside the selected layer to move it.
+- Drag corner handles to resize it.
+- Drag the rotation handle above the layer to rotate it.
+- Inspector numeric fields remain the source of precise values.
+
+## Layer Ordering
+
+The Layers panel displays the topmost layer first. Dragging a row in the list changes the canvas stacking order.
+
+## Font Choices
+
+Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
+
+## Browser Templates
+
+Templates are saved in browser `localStorage` under a repository-specific key. A template stores:
+
+- Template id and user-provided name.
+- Saved timestamp.
+- Output settings.
+- Layer list.
+- Imported image assets, including data URLs when the browser storage quota allows it.
+- Generated CSV and HTML layout text.
+
+Multiple templates can be saved, loaded, and deleted.

@@ -1,14 +1,17 @@
+import { useState } from "react";
 import {
   ArrowDown,
   ArrowUp,
   Copy,
   Eye,
   EyeOff,
+  GripVertical,
   Layers,
   RotateCw,
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
+import { fontLabelFor, fontOptions } from "../lib/fonts";
 import type { ImageAsset, ImageEffects, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
 interface InspectorPanelProps {
@@ -20,6 +23,7 @@ interface InspectorPanelProps {
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, direction: -1 | 1) => void;
+  onReorderLayer: (draggedId: string, targetId: string) => void;
 }
 
 export function InspectorPanel({
@@ -31,8 +35,10 @@ export function InspectorPanel({
   onDelete,
   onDuplicate,
   onMove,
+  onReorderLayer,
 }: InspectorPanelProps) {
   const selected = layers.find((layer) => layer.id === selectedId) ?? layers.at(-1);
+  const [draggingId, setDraggingId] = useState<string | null>(null);
 
   return (
     <aside className="side-panel inspector-panel" aria-label="Layer inspector">
@@ -46,9 +52,30 @@ export function InspectorPanel({
             <button
               key={layer.id}
               type="button"
-              className={`layer-row ${layer.id === selected?.id ? "selected" : ""}`}
+              draggable
+              className={`layer-row ${layer.id === selected?.id ? "selected" : ""} ${
+                draggingId === layer.id ? "dragging" : ""
+              }`}
               onClick={() => onSelect(layer.id)}
+              onDragStart={(event) => {
+                event.dataTransfer.effectAllowed = "move";
+                event.dataTransfer.setData("text/plain", layer.id);
+                setDraggingId(layer.id);
+                onSelect(layer.id);
+              }}
+              onDragOver={(event) => {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = "move";
+              }}
+              onDrop={(event) => {
+                event.preventDefault();
+                const dragged = event.dataTransfer.getData("text/plain") || draggingId;
+                if (dragged) onReorderLayer(dragged, layer.id);
+                setDraggingId(null);
+              }}
+              onDragEnd={() => setDraggingId(null)}
             >
+              <GripVertical size={14} className="drag-grip" />
               <span className={`layer-type ${layer.type}`}>{layer.type}</span>
               <span className="layer-name">{layer.name}</span>
               {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
@@ -212,11 +239,22 @@ function TextControls({
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
       </div>
-      <TextInput
-        label="Font"
-        value={selected.fontFamily}
-        onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontFamily: value }))}
-      />
+      <label className="field">
+        <span>Font</span>
+        <select
+          value={selected.fontFamily}
+          onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontFamily: event.target.value }))}
+        >
+          {!fontOptions.some((option) => option.value === selected.fontFamily) ? (
+            <option value={selected.fontFamily}>{fontLabelFor(selected.fontFamily)}</option>
+          ) : null}
+          {fontOptions.map((option) => (
+            <option key={option.value} value={option.value}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
       <div className="field-grid two">
         <ColorInput
           label="Fill"
@@ -376,4 +414,3 @@ function updateNumber(
 function round(value: number): number {
   return Math.round(value * 100) / 100;
 }
-
