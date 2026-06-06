@@ -17,7 +17,8 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 - Text layers with font size, font dropdown, color, rotation, and outline stroke.
 - Shape layers with fill/stroke, size, and rotation.
 - Browser-local color palette with quick apply for text, shape fill, and stroke/outline colors.
-- Layer visibility and selectable/editable lock controls.
+- Named browser-local color palette entries with Fill/Stroke targets.
+- Layer visibility, selectable/editable lock controls, Delete-key removal, and delete confirmation.
 - CSV layout importer.
 - HTML layout importer using `data-layer` attributes.
 - Generated CSV/HTML layout text from the current canvas state.
@@ -57,7 +58,7 @@ Latest local gate:
 
 - URL: `http://127.0.0.1:4173/thumbnail-generator/`
 - Browser: Playwright headless Chromium. Browser plugin fallback reason: in-app Browser returned `Browser is not available: iab`.
-- Passed: nonblank canvas, primary UI visible, left task tabs, right inspector tabs, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, multi-select alignment, single-layer canvas alignment, palette registration/apply, layer lock, layer drag-and-drop ordering, font dropdown, multiple named template saves, Image Lab modal workspace with Rect/Circle drag selection and chroma key, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
+- Passed: nonblank canvas, primary UI visible, left task tabs, right inspector tabs, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, multi-select alignment, single-layer canvas alignment, named Fill/Stroke palette registration/apply, layer lock, layer Delete-key removal, delete confirmation modal cancel/confirm, layer drag-and-drop ordering, Adjust controls without duplicate numeric readouts, font dropdown, multiple named template saves, Image Lab modal workspace with Rect/Circle drag selection and chroma key, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
 
 Latest remote deploy:
 

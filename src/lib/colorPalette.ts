@@ -1,18 +1,28 @@
 export interface PaletteColor {
   id: string;
+  name: string;
   value: string;
+  target: PaletteTarget;
 }
+
+export type PaletteTarget = "fill" | "stroke";
 
 export const colorPaletteStorageKey = "thumbnail-generator.colorPalette.v1";
 
 export const defaultPaletteColors: PaletteColor[] = [
-  { id: "palette-white", value: "#ffffff" },
-  { id: "palette-ink", value: "#111827" },
-  { id: "palette-coral", value: "#ff4f5f" },
-  { id: "palette-cyan", value: "#10b6d7" },
-  { id: "palette-yellow", value: "#ffd166" },
-  { id: "palette-purple", value: "#7c3aed" },
+  { id: "palette-white", name: "White fill", value: "#ffffff", target: "fill" },
+  { id: "palette-ink", name: "Ink stroke", value: "#111827", target: "stroke" },
+  { id: "palette-coral", name: "Coral fill", value: "#ff4f5f", target: "fill" },
+  { id: "palette-cyan", name: "Cyan fill", value: "#10b6d7", target: "fill" },
+  { id: "palette-yellow", name: "Yellow fill", value: "#ffd166", target: "fill" },
+  { id: "palette-purple", name: "Purple fill", value: "#7c3aed", target: "fill" },
 ];
+
+export interface AddPaletteColorInput {
+  value: string;
+  name?: string;
+  target?: PaletteTarget;
+}
 
 export function normalizeColor(input: string): string | null {
   const value = input.trim();
@@ -24,11 +34,31 @@ export function normalizeColor(input: string): string | null {
   return null;
 }
 
-export function addPaletteColor(colors: PaletteColor[], value: string, now = Date.now()): PaletteColor[] {
-  const normalized = normalizeColor(value);
+export function normalizePaletteName(input: string | undefined, fallback: string): string {
+  const value = input?.trim() ?? "";
+  return value.length > 0 ? value.slice(0, 48) : fallback;
+}
+
+export function addPaletteColor(
+  colors: PaletteColor[],
+  input: AddPaletteColorInput | string,
+  now = Date.now(),
+): PaletteColor[] {
+  const draft = typeof input === "string" ? { value: input } : input;
+  const normalized = normalizeColor(draft.value);
   if (!normalized) return colors;
-  if (colors.some((color) => color.value === normalized)) return colors;
-  return [{ id: `palette-${now.toString(36)}`, value: normalized }, ...colors];
+  const target = draft.target ?? "fill";
+  if (colors.some((color) => color.value === normalized && color.target === target)) return colors;
+  const fallbackName = `${target === "fill" ? "Fill" : "Stroke"} ${normalized}`;
+  return [
+    {
+      id: `palette-${target}-${now.toString(36)}`,
+      name: normalizePaletteName(draft.name, fallbackName),
+      value: normalized,
+      target,
+    },
+    ...colors,
+  ];
 }
 
 export function removePaletteColor(colors: PaletteColor[], id: string): PaletteColor[] {
@@ -41,7 +71,10 @@ export function readColorPalette(storage: Pick<Storage, "getItem"> = window.loca
   try {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return defaultPaletteColors;
-    const colors = parsed.filter(isPaletteColor);
+    const colors = parsed.flatMap((value) => {
+      const color = coercePaletteColor(value);
+      return color ? [color] : [];
+    });
     return colors.length > 0 ? colors : defaultPaletteColors;
   } catch {
     return defaultPaletteColors;
@@ -52,8 +85,17 @@ export function writeColorPalette(colors: PaletteColor[], storage: Pick<Storage,
   storage.setItem(colorPaletteStorageKey, JSON.stringify(colors));
 }
 
-function isPaletteColor(value: unknown): value is PaletteColor {
-  if (!value || typeof value !== "object") return false;
+function coercePaletteColor(value: unknown): PaletteColor | null {
+  if (!value || typeof value !== "object") return null;
   const candidate = value as Partial<PaletteColor>;
-  return typeof candidate.id === "string" && typeof candidate.value === "string" && Boolean(normalizeColor(candidate.value));
+  if (typeof candidate.id !== "string" || typeof candidate.value !== "string") return null;
+  const normalized = normalizeColor(candidate.value);
+  if (!normalized) return null;
+  const target = candidate.target === "stroke" ? "stroke" : "fill";
+  return {
+    id: candidate.id,
+    name: normalizePaletteName(candidate.name, `${target === "fill" ? "Fill" : "Stroke"} ${normalized}`),
+    value: normalized,
+    target,
+  };
 }

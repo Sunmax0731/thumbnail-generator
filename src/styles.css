@@ -350,6 +350,11 @@ button:disabled {
   box-shadow: 0 10px 22px rgba(255, 79, 95, 0.24);
 }
 
+.primary-button.danger-button {
+  background: var(--danger);
+  box-shadow: 0 10px 22px rgba(217, 45, 32, 0.22);
+}
+
 .secondary-button {
   min-height: 36px;
   padding: 0 11px;
@@ -610,7 +615,7 @@ button:disabled {
 
 .layer-row {
   display: grid;
-  grid-template-columns: 15px 52px minmax(0, 1fr) 28px 28px;
+  grid-template-columns: 15px 52px minmax(0, 1fr) 28px 28px 28px;
   align-items: center;
   gap: 7px;
   min-height: 38px;
@@ -752,6 +757,13 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.range-field .field-unit {
+  display: inline-flex;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 850;
+}
+
 .slider-number input[type="range"],
 .compact-range input[type="range"] {
   min-width: 0;
@@ -800,9 +812,13 @@ button:disabled {
 
 .palette-register {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 58px;
+  grid-template-columns: minmax(0, 1fr) 92px 58px;
   align-items: end;
   gap: 8px;
+}
+
+.palette-name-field {
+  grid-column: 1 / -1;
 }
 
 .palette-register .secondary-button {
@@ -812,13 +828,13 @@ button:disabled {
 .swatch-grid {
   display: grid;
   gap: 6px;
-  max-height: 132px;
+  max-height: 184px;
   overflow: auto;
 }
 
 .swatch-row {
   display: grid;
-  grid-template-columns: 34px minmax(0, 1fr) 26px;
+  grid-template-columns: 34px 58px minmax(0, 1fr) 26px;
   gap: 6px;
   align-items: center;
 }
@@ -835,6 +851,31 @@ button:disabled {
   min-height: 30px;
   padding: 0 7px;
   font-size: 11px;
+}
+
+.swatch-meta {
+  display: grid;
+  min-width: 0;
+  gap: 1px;
+}
+
+.swatch-name,
+.swatch-value {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.swatch-name {
+  color: var(--text);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.swatch-value {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
 }
 
 .modal-backdrop {
@@ -879,6 +920,34 @@ button:disabled {
 
 .modal-close {
   flex: 0 0 auto;
+}
+
+.confirm-backdrop {
+  z-index: 70;
+}
+
+.confirm-dialog {
+  display: grid;
+  width: min(360px, calc(100vw - 32px));
+  gap: 12px;
+  padding: 16px;
+  border: 1px solid rgba(216, 224, 231, 0.82);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
+}
+
+.confirm-dialog p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.confirm-actions {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
 .image-lab {
@@ -1041,6 +1110,10 @@ button:disabled {
   .button-grid,
   .align-grid,
   .panel-tabs {
+    grid-template-columns: 1fr;
+  }
+
+  .palette-register {
     grid-template-columns: 1fr;
   }
 

@@ -5,6 +5,8 @@
 - CSV parser handles quoted fields, numeric defaults, image references, and effect strings.
 - HTML parser handles text, image, and shape layers.
 - Export presets resolve to expected width/height/format settings.
+- Layer deletion selection helpers keep selection on valid selectable layers.
+- Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
 
 ## Manual Browser Runtime Gate
 
@@ -23,8 +25,11 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Selection handles remain visible in preview padding outside the thumbnail document area.
 - Layers panel supports drag-and-drop stacking order edits.
 - Layers panel supports visibility and selectable/editable lock toggles.
+- Layers panel supports Delete-key removal for a focused editable row.
+- Layers panel delete buttons open a confirmation dialog; cancel preserves the layer and confirm removes it.
 - Text font selector changes the rendered text font family.
-- Registered palette colors apply to text/shape fill and stroke colors.
+- Registered palette colors save names and Fill/Stroke targets, then apply to text/shape fill and stroke colors.
+- Adjust tab numeric controls edit through paired range/number inputs without duplicated value readouts in labels.
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
 - Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
@@ -41,7 +46,7 @@ Completed on 2026-06-06.
 
 ### Automated
 
-- `npm test`: pass. 9 test files, 22 tests.
+- `npm test`: pass. 10 test files, 26 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 - `npm audit --audit-level=high`: pass. 0 vulnerabilities.
 
@@ -66,6 +71,10 @@ Completed on 2026-06-06.
   - `docs/assets/runtime-ux-refresh-desktop.png`
   - `docs/assets/runtime-ux-refresh-mobile.png`
   - `docs/assets/runtime-image-lab-rect-circle-drag.png`
+  - `docs/assets/runtime-layers-colors-adjust-desktop.png`
+  - `docs/assets/runtime-layer-delete-modal.png`
+  - `docs/assets/runtime-layers-colors-adjust-after.png`
+  - `docs/assets/runtime-layers-colors-adjust-mobile.png`
 
 Passed checks:
 
@@ -74,8 +83,8 @@ Passed checks:
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button
 - Left task tabs: pass, Assets, Layouts, and Templates sections opened and exposed the expected controls
 - Right task tabs: pass, Layers, Adjust, and Colors sections opened and exposed layer list, inspector fields, and palette registration
-- CSV import: pass, generated layout was applied and status reported `CSV applied: 7 layers.`
-- HTML import: pass, status reported `HTML applied: 3 layers.`
+- CSV import: pass, generated layout was applied and status reported `CSV applied`.
+- HTML import: pass, status reported `HTML applied: 5 layers.`
 - Inspector edit: pass, selected text updated to `QA INSPECTOR TITLE`
 - Canvas direct editing: pass, selected text layer moved, resized, and rotated with pointer controls
 - Multi-selection alignment: pass, `Main title` and `Subtitle` selected together and center-aligned
@@ -83,8 +92,11 @@ Passed checks:
 - Preview padding handles: pass, preview canvas rendered at `1456x896` for a `1280x720` document so outside handles are not clipped
 - Layer ordering: pass, Layers panel drag-and-drop changed stacking order
 - Layer lock: pass, selected layer changed to locked/unselectable and was excluded from editing
+- Layer Delete key: pass, focused editable row was removed, layer count changed from `7` to `6`, and one valid row remained selected
+- Layer delete modal: pass, delete button opened a confirmation dialog, Cancel preserved the layer, and Delete removed it
 - Font dropdown: pass, selected text layer font family changed through the dropdown
-- Color palette: pass, registered `#123abc` and applied it to a selected layer
+- Color palette: pass, registered named `QA fill` and `QA stroke` entries, saved Fill/Stroke targets to localStorage, applied `#123abc` to shape Fill, and applied `#456def` to shape Stroke
+- Adjust controls: pass, slider labels no longer repeated numeric values; values remained editable through range/number inputs
 - Named templates: pass, current CSV/HTML layout saved to browser storage, loaded, and deleted
 - Multiple template saves: pass, saving `Duplicate OK` twice produced two saved entries
 - Image Lab modal: pass, sidebar launcher opened a modal workspace at `1220x865` with an `832x518` Image Lab preview canvas
@@ -96,7 +108,7 @@ Passed checks:
 - Sliders: pass, output size sliders were present and layer/Image Lab slider controls were visible
 - Image import: pass, local PNG file imported and created an image layer
 - Export: pass, WebP download created (`thumbnail-1280x720-...webp`)
-- Mobile: pass, task tabs and Image Lab modal had no horizontal overflow (`0`)
+- Mobile: pass, task tabs had no horizontal overflow (`0`)
 
 Console health:
 

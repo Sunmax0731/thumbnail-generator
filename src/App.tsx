@@ -21,6 +21,7 @@ import {
   readColorPalette,
   removePaletteColor,
   type PaletteColor,
+  type PaletteTarget,
   writeColorPalette,
 } from "./lib/colorPalette";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
@@ -28,6 +29,7 @@ import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
 import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerAt } from "./lib/hitTest";
+import { selectLayerIdsAfterDelete, selectTopSelectableLayerIds } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
@@ -71,6 +73,8 @@ function App() {
     typeof window === "undefined" ? [] : readColorPalette(),
   );
   const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
+  const [paletteNameDraft, setPaletteNameDraft] = useState("Accent fill");
+  const [paletteTargetDraft, setPaletteTargetDraft] = useState<PaletteTarget>("fill");
   const [isImageLabOpen, setIsImageLabOpen] = useState(false);
 
   const selectedLayers = useMemo(
@@ -89,8 +93,7 @@ function App() {
     setSelectedIds((current) => {
       const valid = current.filter((id) => layers.some((layer) => layer.id === id && layer.selectable));
       if (valid.length > 0) return valid.length === current.length ? current : valid;
-      const next = [...layers].reverse().find((layer) => layer.selectable);
-      return next ? [next.id] : [];
+      return selectTopSelectableLayerIds(layers);
     });
   }, [layers]);
 
@@ -161,7 +164,7 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedIds(selectTopLayerIds(result.layers));
+      setSelectedIds(selectTopSelectableLayerIds(result.layers));
       setStatus(`CSV applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`CSV not applied. ${result.warnings.join(" ")}`);
@@ -176,7 +179,7 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedIds(selectTopLayerIds(result.layers));
+      setSelectedIds(selectTopSelectableLayerIds(result.layers));
       setStatus(`HTML applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`HTML not applied. ${result.warnings.join(" ")}`);
@@ -201,7 +204,7 @@ function App() {
         }),
       );
       setLayers((current) => [...current, ...newLayers]);
-      setSelectedIds(selectTopLayerIds(newLayers));
+      setSelectedIds(selectTopSelectableLayerIds(newLayers));
       setStatus(`Imported ${loaded.length} image file${loaded.length === 1 ? "" : "s"}.`);
     },
     [settings.height, settings.width],
@@ -239,7 +242,7 @@ function App() {
   const resetTemplate = useCallback(() => {
     const next = createInitialLayers();
     setLayers(next);
-    setSelectedIds(selectTopLayerIds(next));
+    setSelectedIds(selectTopSelectableLayerIds(next));
     setCsvText(sampleCsv);
     setHtmlText(sampleHtml);
     setStatus("Sample creator template restored.");
@@ -263,12 +266,11 @@ function App() {
         setStatus("At least one layer is required.");
         return current;
       }
+      const target = current.find((layer) => layer.id === id);
+      if (!target) return current;
       const next = current.filter((layer) => layer.id !== id);
-      setSelectedIds((selected) => {
-        const filtered = selected.filter((selectedId) => selectedId !== id);
-        return filtered.length > 0 ? filtered : selectTopLayerIds(next);
-      });
-      setStatus("Layer removed.");
+      setSelectedIds((selected) => selectLayerIdsAfterDelete(next, selected, id));
+      setStatus(`Deleted ${target.name}.`);
       return next;
     });
   }, []);
@@ -321,11 +323,19 @@ function App() {
   );
 
   const addPaletteColor = useCallback(() => {
-    const next = appendPaletteColor(paletteColors, paletteDraft);
+    const next = appendPaletteColor(paletteColors, {
+      value: paletteDraft,
+      name: paletteNameDraft,
+      target: paletteTargetDraft,
+    });
     writeColorPalette(next);
     setPaletteColors(next);
-    setStatus(next.length === paletteColors.length ? "Palette color already exists or is invalid." : "Palette color registered.");
-  }, [paletteColors, paletteDraft]);
+    setStatus(
+      next.length === paletteColors.length
+        ? "Palette color already exists for that target or is invalid."
+        : `Palette color registered for ${paletteTargetDraft === "fill" ? "Fill" : "Stroke"}.`,
+    );
+  }, [paletteColors, paletteDraft, paletteNameDraft, paletteTargetDraft]);
 
   const deletePaletteColor = useCallback(
     (id: string) => {
@@ -338,20 +348,20 @@ function App() {
   );
 
   const applyPaletteColor = useCallback(
-    (color: string, target: "primary" | "stroke") => {
+    (color: string, target: PaletteTarget) => {
       setLayers((current) =>
         current.map((layer) => {
           if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
           if (layer.type === "text") {
-            return target === "primary" ? { ...layer, color } : { ...layer, strokeColor: color };
+            return target === "fill" ? { ...layer, color } : { ...layer, strokeColor: color };
           }
           if (layer.type === "shape") {
-            return target === "primary" ? { ...layer, fill: color } : { ...layer, strokeColor: color };
+            return target === "fill" ? { ...layer, fill: color } : { ...layer, strokeColor: color };
           }
           return layer;
         }),
       );
-      setStatus(target === "primary" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
+      setStatus(target === "fill" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
     },
     [selectedIds],
   );
@@ -484,7 +494,7 @@ function App() {
       setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
       const nextLayers = template.layers.map((layer) => ({ ...layer, selectable: layer.selectable !== false }));
       setLayers(nextLayers);
-      setSelectedIds(selectTopLayerIds(nextLayers));
+      setSelectedIds(selectTopSelectableLayerIds(nextLayers));
       setCsvText(template.csv || layersToCsv(template.layers));
       setHtmlText(template.html || layersToHtml(template.layers));
       setTemplateName(template.name);
@@ -577,7 +587,11 @@ function App() {
           settings={settings}
           paletteColors={paletteColors}
           paletteDraft={paletteDraft}
+          paletteNameDraft={paletteNameDraft}
+          paletteTargetDraft={paletteTargetDraft}
           onPaletteDraftChange={setPaletteDraft}
+          onPaletteNameDraftChange={setPaletteNameDraft}
+          onPaletteTargetDraftChange={setPaletteTargetDraft}
           onAddPaletteColor={addPaletteColor}
           onDeletePaletteColor={deletePaletteColor}
           onApplyPaletteColor={applyPaletteColor}
@@ -646,11 +660,6 @@ function labelForMode(mode: CanvasInteractionMode): string {
   if (mode === "move") return "Move";
   if (mode === "rotate") return "Rotate";
   return "Resize";
-}
-
-function selectTopLayerIds(layers: ThumbnailLayer[]): string[] {
-  const top = [...layers].reverse().find((layer) => layer.selectable);
-  return top ? [top.id] : [];
 }
 
 function safelySetPointerCapture(element: HTMLElement, pointerId: number): void {

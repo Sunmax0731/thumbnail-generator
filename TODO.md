@@ -94,3 +94,6 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Reorganize the right inspector into clearer Layers, Adjust, and Colors sections.
 - [x] Update design/spec/test/QCDS docs for the refreshed information architecture.
 - [x] Validate desktop and mobile layout, Image Lab Rect/Circle drag selection, and existing primary workflows.
+
+## Work Items
+- [x] [P2] [Phase:05-test] Layers削除とColors/Adjust改善 [Issue](Issues/0001-layers-colors-adjust.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]

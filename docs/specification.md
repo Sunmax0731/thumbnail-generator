@@ -120,6 +120,7 @@ Layer rows also include:
 
 - Visibility toggle.
 - Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
+- Delete button. Button deletion opens a confirmation dialog; keyboard Delete/Backspace on a focused editable layer row removes that row directly and moves selection to another selectable layer when needed.
 
 ## Editor Information Architecture
 
@@ -132,8 +133,8 @@ The left sidebar is grouped by task:
 The right inspector is grouped by task:
 
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
-- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects.
-- Colors: browser-local color palette registration and quick application.
+- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels.
+- Colors: browser-local color palette registration and quick application with saved names and Fill/Stroke targets.
 
 ## Font Choices
 
@@ -156,7 +157,16 @@ Saving a template always creates a new saved entry, so repeated saves with the s
 
 ## Color Palette
 
-The color palette is stored in browser `localStorage` under `thumbnail-generator.colorPalette.v1`. Registered colors can be applied to:
+The color palette is stored in browser `localStorage` under `thumbnail-generator.colorPalette.v1`. A registered palette entry stores:
+
+- Palette id.
+- User-provided display name.
+- Hex color value.
+- Apply target: `fill` or `stroke`.
+
+Legacy stored entries that only include `id` and `value` are read as Fill entries with generated names.
+
+Registered colors can be applied to:
 
 - Text fill color.
 - Text outline color.

@@ -23,10 +23,9 @@ import {
 } from "lucide-react";
 import type { AlignmentMode } from "../lib/alignment";
 import { fontLabelFor, fontOptions } from "../lib/fonts";
-import type { PaletteColor } from "../lib/colorPalette";
+import type { PaletteColor, PaletteTarget } from "../lib/colorPalette";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
-type PaletteApplyTarget = "primary" | "stroke";
 type InspectorSection = "layers" | "edit" | "colors";
 
 interface InspectorPanelProps {
@@ -36,10 +35,14 @@ interface InspectorPanelProps {
   settings: OutputSettings;
   paletteColors: PaletteColor[];
   paletteDraft: string;
+  paletteNameDraft: string;
+  paletteTargetDraft: PaletteTarget;
   onPaletteDraftChange: (value: string) => void;
+  onPaletteNameDraftChange: (value: string) => void;
+  onPaletteTargetDraftChange: (value: PaletteTarget) => void;
   onAddPaletteColor: () => void;
   onDeletePaletteColor: (id: string) => void;
-  onApplyPaletteColor: (color: string, target: PaletteApplyTarget) => void;
+  onApplyPaletteColor: (color: string, target: PaletteTarget) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   onDelete: (id: string) => void;
@@ -58,7 +61,11 @@ export function InspectorPanel({
   settings,
   paletteColors,
   paletteDraft,
+  paletteNameDraft,
+  paletteTargetDraft,
   onPaletteDraftChange,
+  onPaletteNameDraftChange,
+  onPaletteTargetDraftChange,
   onAddPaletteColor,
   onDeletePaletteColor,
   onApplyPaletteColor,
@@ -76,6 +83,8 @@ export function InspectorPanel({
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
+  const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
+  const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
 
   return (
     <aside className="side-panel inspector-panel" aria-label="Layer inspector">
@@ -130,7 +139,14 @@ export function InspectorPanel({
                   } ${!layer.selectable ? "locked" : ""}`}
                   onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
                   onKeyDown={(event) => {
-                    if (event.key === "Enter" || event.key === " ") onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                    if (event.key === "Enter" || event.key === " ") {
+                      event.preventDefault();
+                      onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                    }
+                    if ((event.key === "Delete" || event.key === "Backspace") && layer.selectable) {
+                      event.preventDefault();
+                      onDelete(layer.id);
+                    }
                   }}
                   onDragStart={(event) => {
                     event.dataTransfer.effectAllowed = "move";
@@ -156,6 +172,7 @@ export function InspectorPanel({
                   <button
                     type="button"
                     className="mini-icon-button"
+                    aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
                     title={layer.visible ? "Hide layer" : "Show layer"}
                     onClick={(event) => {
                       event.stopPropagation();
@@ -167,6 +184,7 @@ export function InspectorPanel({
                   <button
                     type="button"
                     className="mini-icon-button"
+                    aria-label={layer.selectable ? `Lock ${layer.name}` : `Unlock ${layer.name}`}
                     title={layer.selectable ? "Lock selection and editing" : "Unlock selection and editing"}
                     onClick={(event) => {
                       event.stopPropagation();
@@ -174,6 +192,18 @@ export function InspectorPanel({
                     }}
                   >
                     {layer.selectable ? <Unlock size={14} /> : <Lock size={14} />}
+                  </button>
+                  <button
+                    type="button"
+                    className="mini-icon-button danger"
+                    aria-label={`Delete ${layer.name}`}
+                    title="Delete layer"
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      setDeleteCandidateId(layer.id);
+                    }}
+                  >
+                    <Trash2 size={14} />
                   </button>
                 </div>
               ))}
@@ -220,8 +250,12 @@ export function InspectorPanel({
         <PaletteControls
           colors={paletteColors}
           draft={paletteDraft}
+          nameDraft={paletteNameDraft}
+          targetDraft={paletteTargetDraft}
           selectedCount={selectedLayers.length}
           onDraftChange={onPaletteDraftChange}
+          onNameDraftChange={onPaletteNameDraftChange}
+          onTargetDraftChange={onPaletteTargetDraftChange}
           onAdd={onAddPaletteColor}
           onDelete={onDeletePaletteColor}
           onApply={onApplyPaletteColor}
@@ -245,7 +279,7 @@ export function InspectorPanel({
             <button className="icon-button" type="button" title="Duplicate layer" onClick={() => onDuplicate(selected.id)}>
               <Copy size={16} />
             </button>
-            <button className="icon-button danger" type="button" title="Delete layer" onClick={() => onDelete(selected.id)}>
+            <button className="icon-button danger" type="button" title="Delete layer" onClick={() => setDeleteCandidateId(selected.id)}>
               <Trash2 size={16} />
             </button>
           </div>
@@ -327,6 +361,16 @@ export function InspectorPanel({
           </section>
         )
       ) : null}
+      {deleteCandidate ? (
+        <DeleteLayerDialog
+          layer={deleteCandidate}
+          onCancel={() => setDeleteCandidateId(null)}
+          onConfirm={() => {
+            onDelete(deleteCandidate.id);
+            setDeleteCandidateId(null);
+          }}
+        />
+      ) : null}
     </aside>
   );
 }
@@ -355,19 +399,27 @@ function AlignButton({
 function PaletteControls({
   colors,
   draft,
+  nameDraft,
+  targetDraft,
   selectedCount,
   onDraftChange,
+  onNameDraftChange,
+  onTargetDraftChange,
   onAdd,
   onDelete,
   onApply,
 }: {
   colors: PaletteColor[];
   draft: string;
+  nameDraft: string;
+  targetDraft: PaletteTarget;
   selectedCount: number;
   onDraftChange: (value: string) => void;
+  onNameDraftChange: (value: string) => void;
+  onTargetDraftChange: (value: PaletteTarget) => void;
   onAdd: () => void;
   onDelete: (id: string) => void;
-  onApply: (color: string, target: PaletteApplyTarget) => void;
+  onApply: (color: string, target: PaletteTarget) => void;
 }) {
   return (
     <section className="panel-section palette-section">
@@ -376,10 +428,21 @@ function PaletteControls({
         <h2>Color palette</h2>
       </div>
       <div className="palette-register">
+        <label className="field palette-name-field">
+          <span>Name</span>
+          <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
+        </label>
         <label className="field color-field">
-          <span>Register</span>
+          <span>Color</span>
           <input type="color" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
           <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+        </label>
+        <label className="field palette-target-field">
+          <span>Target</span>
+          <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
+            <option value="fill">Fill</option>
+            <option value="stroke">Stroke</option>
+          </select>
         </label>
         <button type="button" className="secondary-button" onClick={onAdd}>
           Add
@@ -391,15 +454,25 @@ function PaletteControls({
             <button
               type="button"
               className="swatch"
-              title={`Apply ${color.value}`}
+              aria-label={`Apply ${color.name} to ${paletteTargetLabel(color.target)}`}
+              title={`Apply ${color.name} to ${paletteTargetLabel(color.target)}`}
               style={{ background: color.value }}
               disabled={selectedCount === 0}
-              onClick={() => onApply(color.value, "primary")}
+              onClick={() => onApply(color.value, color.target)}
             />
-            <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color.value, "stroke")}>
-              Stroke
+            <button
+              type="button"
+              className="ghost-button swatch-apply-button"
+              disabled={selectedCount === 0}
+              onClick={() => onApply(color.value, color.target)}
+            >
+              {paletteTargetLabel(color.target)}
             </button>
-            <button type="button" className="mini-icon-button danger" title={`Delete ${color.value}`} onClick={() => onDelete(color.id)}>
+            <div className="swatch-meta">
+              <span className="swatch-name">{color.name}</span>
+              <span className="swatch-value">{color.value}</span>
+            </div>
+            <button type="button" className="mini-icon-button danger" title={`Delete ${color.name}`} onClick={() => onDelete(color.id)}>
               <Trash2 size={13} />
             </button>
           </div>
@@ -407,6 +480,41 @@ function PaletteControls({
       </div>
     </section>
   );
+}
+
+function DeleteLayerDialog({
+  layer,
+  onCancel,
+  onConfirm,
+}: {
+  layer: ThumbnailLayer;
+  onCancel: () => void;
+  onConfirm: () => void;
+}) {
+  return (
+    <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-layer-title">
+        <div className="modal-title-block">
+          <h2 id="delete-layer-title">Delete layer?</h2>
+        </div>
+        <p>
+          Remove <strong>{layer.name}</strong> from the thumbnail.
+        </p>
+        <div className="confirm-actions">
+          <button type="button" className="secondary-button" onClick={onCancel}>
+            Cancel
+          </button>
+          <button type="button" className="primary-button danger-button" onClick={onConfirm}>
+            Delete
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function paletteTargetLabel(target: PaletteTarget): string {
+  return target === "fill" ? "Fill" : "Stroke";
 }
 
 function ImageControls({
@@ -644,8 +752,8 @@ function SliderNumberInput({
     <label className="range-field slider-number">
       <span>
         {icon}
-        {label} {rounded}
-        {suffix}
+        {label}
+        {suffix ? <span className="field-unit"> {suffix}</span> : null}
       </span>
       <input type="range" min={min} max={max} step={step} value={rounded} onChange={(event) => onChange(Number(event.currentTarget.value))} />
       <input

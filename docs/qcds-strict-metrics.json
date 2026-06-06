@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A-",
-    "rationale": "MVP functionality is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Direct canvas editing, multi-selection alignment, canvas alignment, layer D&D, layer locking, color palette, task-tab information architecture, Image Lab modal Rect/Circle drag cutouts and chroma key, font dropdown, sliders, and named templates are included. Cross-browser coverage remains future work."
+    "rationale": "MVP functionality is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Direct canvas editing, multi-selection alignment, canvas alignment, layer D&D, layer locking and deletion, named color palette entries with Fill/Stroke targets, task-tab information architecture, Image Lab modal Rect/Circle drag cutouts and chroma key, font dropdown, sliders, and named templates are included. Cross-browser coverage remains future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A-",
-    "rationale": "Primary requested workflow passed: CSV/HTML import, image import, left Assets/Layouts/Templates tabs, right Layers/Adjust/Colors tabs, inspector edits, direct canvas move/resize/rotate, multi-select alignment, canvas alignment, palette registration/apply, lock toggles, layer ordering, font dropdown, multiple template saves, Image Lab modal workspace, Image Lab Rect/Circle drag selection, Image Lab drag/polygon cutouts with chroma key, effects controls, sliders, and PNG/JPEG/WebP export path. Broader template variety and cross-browser checks remain future work."
+    "rationale": "Primary requested workflow passed: CSV/HTML import, image import, left Assets/Layouts/Templates tabs, right Layers/Adjust/Colors tabs, inspector edits, direct canvas move/resize/rotate, multi-select alignment, canvas alignment, named Fill/Stroke palette registration/apply, lock toggles, layer ordering, Delete-key removal, delete confirmation modal cancel/confirm, Adjust controls without duplicated numeric readouts, font dropdown, multiple template saves, Image Lab modal workspace, Image Lab Rect/Circle drag selection, Image Lab drag/polygon cutouts with chroma key, effects controls, sliders, and PNG/JPEG/WebP export path. Broader template variety and cross-browser checks remain future work."
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -43,8 +43,12 @@
       "preview padding handles",
       "layer drag-and-drop order",
       "layer lock toggle",
-      "color palette registration",
-      "color palette apply",
+      "layer Delete key removal",
+      "layer delete confirmation modal",
+      "color palette named registration",
+      "color palette fill target apply",
+      "color palette stroke target apply",
+      "Adjust labels without duplicate numeric readouts",
       "font dropdown",
       "named template save",
       "named template load",
