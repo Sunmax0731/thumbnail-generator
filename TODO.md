@@ -118,3 +118,5 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] 複数選択時の角度合わせ機能 [Issue](Issues/0019-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] 機能一覧と使い方ドキュメント作成 [Issue](Issues/0020-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] サムネイル作成ツール改善タスク化 [Issue](Issues/0021-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:06-release] READMEを利用者向け内容に更新する [Issue](Issues/0022-readme.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:05-test] Codex Work DashboardのQCDS再評価と改善 [Issue](Issues/0023-codex-work-dashboard-qcds.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]

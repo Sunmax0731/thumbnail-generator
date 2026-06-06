@@ -82,27 +82,28 @@ Completed on 2026-06-07.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-edit-state-rotation-desktop.png`
-  - `docs/assets/runtime-edit-state-rotation-mobile.png`
+  - `docs/assets/runtime-dashboard-qcds-desktop.png`
+  - `docs/assets/runtime-dashboard-qcds-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 4 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 3 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
-- Edit state save: pass. Save state wrote `thumbnail-generator.editState.v1` in localStorage.
-- Autosave toggle: pass. Enabling Autosave current edit state and adding a text layer saved `New text` after the debounce.
-- Reload restore: pass. Reload restored the saved edit state and `New text` appeared in the layer list.
-- Multi-select angle match: pass. `Main title` and `Subtitle` were selected, Match angle to first selected was run, and generated CSV showed both rotations as `-3`.
 - CSV import: pass. Status reported `CSV applied`.
 - HTML import: pass. Status reported `HTML applied`.
-- Inspector layer editing: pass. Changing the HTML-imported layer X value to `144` was reflected in generated CSV.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-06T15-57-31-979Z.webp`).
+- Inspector layer editing: pass. Changing the HTML-imported `HTML Bar` layer X value to `144` was reflected in generated CSV as `HTML Bar,144,310`.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-06T16-19-02-226Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`; task tabs remained visible.
 
 Console health:
 
 - No app errors or page errors. Chromium emitted one canvas readback performance warning caused by the runtime gate pixel sampling.
+
+Documentation release evidence:
+
+- README user-facing release guidance: pass.
+- Codex Work Dashboard QCDS re-evaluation: pass. See `docs/codex-work-dashboard-qcds.md`.
 
 ### GitHub Pages
 

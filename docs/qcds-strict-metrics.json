@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes current edit state save, autosave toggle, reload restore, multi-select angle matching, CSV/HTML import, inspector layer editing, WebP export, and mobile no-overflow. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes current edit state save, autosave toggle, reload restore, multi-select angle matching, CSV/HTML import, inspector layer editing, WebP export, mobile no-overflow, user-facing README guidance, and Codex Work Dashboard QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -11,11 +11,26 @@
   },
   "delivery": {
     "rating": "A+",
-    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, user guide is present, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README and user guide are present, Codex Work Dashboard QCDS re-evaluation is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: current edit state save, autosave toggle, reload restore, multi-select angle matching, feature/usage documentation, improvement taskization, CSV/HTML import, inspector editing, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, template variety, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: current edit state save, autosave toggle, reload restore, multi-select angle matching, feature/usage documentation, README user-facing release guidance, Codex Work Dashboard QCDS re-evaluation, improvement taskization, CSV/HTML import, inspector editing, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, template variety, and non-Chromium browser coverage."
+  },
+  "codexWorkDashboard": {
+    "status": "passed",
+    "source": "docs/codex-work-dashboard-qcds.md",
+    "openItemsBeforeReview": [
+      "README user-facing release update",
+      "Codex Work Dashboard QCDS re-evaluation and improvement"
+    ],
+    "closedByReview": true,
+    "ratingsAfterReview": {
+      "quality": "A+",
+      "cost": "A+",
+      "delivery": "A+",
+      "satisfaction": "A+"
+    }
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -31,7 +46,9 @@
     "mobileViewport": "390x844",
     "screenshots": [
       "docs/assets/runtime-edit-state-rotation-desktop.png",
-      "docs/assets/runtime-edit-state-rotation-mobile.png"
+      "docs/assets/runtime-edit-state-rotation-mobile.png",
+      "docs/assets/runtime-dashboard-qcds-desktop.png",
+      "docs/assets/runtime-dashboard-qcds-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -48,7 +65,9 @@
       "inspector edit",
       "WebP export download",
       "mobile viewport",
-      "mobile no horizontal overflow"
+      "mobile no horizontal overflow",
+      "README user-facing guidance",
+      "Codex Work Dashboard QCDS evidence"
     ]
   },
   "followUpCandidates": [
