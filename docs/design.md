@@ -24,9 +24,9 @@ The editor keeps the established three-column structure, but dense controls are 
 
 This keeps the first viewport focused on the current editing task while retaining one-click access to layout text, template storage, layer ordering, layer adjustment, and color registration.
 
-The Colors tab reserves a larger vertical swatch area inside the inspector so named Fill/Stroke entries can be scanned without compressing the rest of the editor. The Adjust tab keeps custom font import adjacent to the text font dropdown so font addition and selection remain one workflow.
+The Layers and Colors tabs use visible vertical resize handles so users can allocate more inspector height to the list they are reviewing. Colors uses layer-like rows for named Fill/Stroke entries, so palette entries scan consistently with layer rows. The Adjust tab keeps custom font import adjacent to the text font dropdown so font addition and selection remain one workflow.
 
-The Adjust tab changes by selection scope: a single selected layer shows absolute layer properties, while multiple selected layers show relative movement and rotation controls. This avoids implying that group editing overwrites each layer with one absolute value.
+The Adjust tab changes by selection scope: a single selected layer shows absolute layer properties, while multiple selected layers show live relative movement and rotation controls. Text alignment is a direct three-button control for Left, Center, and Right. This avoids implying that group editing overwrites each layer with one absolute value.
 
 ## UI Principles
 
@@ -69,5 +69,5 @@ The Adjust tab changes by selection scope: a single selected layer shows absolut
 - Layout: implemented the same left input rail, center canvas, right layer/inspector, top export toolbar, and bottom status structure, with task tabs added to reduce always-visible control density.
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
-- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, blank-click deselection, multi-layer relative movement/rotation, canvas selection, Image Lab modal processing, text fit-to-box, and PNG/JPEG/WebP export.
-- Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, expands the Colors tab swatch area, fits tall presets in the visible stage, lets users add browser-local custom fonts from the Adjust tab, shows off-canvas layers during editing, and supports Japanese/English UI switching.
+- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, blank-click deselection, live multi-layer relative movement/rotation, canvas selection, Image Lab modal processing, text fit-to-box, text alignment buttons, resizable inspector lists, and PNG/JPEG/WebP export.
+- Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, lets users resize Layers and Colors list areas, fits tall presets in the visible stage, lets users add browser-local custom fonts from the Adjust tab, shows off-canvas layers during editing, and supports Japanese/English UI switching.

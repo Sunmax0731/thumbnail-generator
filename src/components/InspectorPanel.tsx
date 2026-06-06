@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import type { ReactNode } from "react";
 import {
   AlignHorizontalJustifyCenter,
@@ -12,6 +12,7 @@ import {
   Copy,
   Eye,
   EyeOff,
+  GripHorizontal,
   GripVertical,
   Layers,
   Lock,
@@ -29,6 +30,12 @@ import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
 import type { PaletteColor, PaletteTarget } from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
+import {
+  emptyLiveRelativeTransformState,
+  hasLiveRelativeTransformDelta,
+  updateLiveRelativeTransformState,
+  type LiveRelativeTransformAxis,
+} from "../lib/liveRelativeTransform";
 import type { RelativeLayerTransform } from "../lib/layerTransform";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
@@ -100,10 +107,21 @@ export function InspectorPanel({
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
-  const [relativeMoveX, setRelativeMoveX] = useState(0);
-  const [relativeMoveY, setRelativeMoveY] = useState(0);
-  const [relativeRotation, setRelativeRotation] = useState(0);
+  const [relativeTransform, setRelativeTransform] = useState(emptyLiveRelativeTransformState);
+  const [layerListHeight, setLayerListHeight] = useState(360);
+  const [colorListHeight, setColorListHeight] = useState(320);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
+  const selectedIdsKey = selectedIds.join("|");
+
+  useEffect(() => {
+    setRelativeTransform(emptyLiveRelativeTransformState);
+  }, [selectedIdsKey]);
+
+  const updateLiveRelativeTransform = (axis: LiveRelativeTransformAxis, value: number) => {
+    const { nextState, transform } = updateLiveRelativeTransformState(relativeTransform, axis, value);
+    setRelativeTransform(nextState);
+    if (hasLiveRelativeTransformDelta(transform)) onTransformSelection(transform);
+  };
 
   return (
     <aside className="side-panel inspector-panel" aria-label={t("inspector.aria")}>
@@ -145,7 +163,7 @@ export function InspectorPanel({
               <h2>{t("inspector.layers")}</h2>
               <span className="section-count">{layers.length}</span>
             </div>
-            <div className="layer-list" aria-label={t("inspector.layerList")}>
+            <div className="layer-list" aria-label={t("inspector.layerList")} style={{ height: layerListHeight }}>
               {[...layers].reverse().map((layer) => (
                 <div
                   key={layer.id}
@@ -227,6 +245,10 @@ export function InspectorPanel({
                 </div>
               ))}
             </div>
+            <ResizeHandle
+              label={t("inspector.resizeLayerList")}
+              onResize={(delta) => setLayerListHeight((height) => clampPanelHeight(height + delta))}
+            />
           </section>
 
           <section className="panel-section">
@@ -278,6 +300,8 @@ export function InspectorPanel({
           onAdd={onAddPaletteColor}
           onDelete={onDeletePaletteColor}
           onApply={onApplyPaletteColor}
+          listHeight={colorListHeight}
+          onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
         />
       ) : null}
@@ -388,21 +412,12 @@ export function InspectorPanel({
         ) : selectedLayers.length > 1 ? (
           <GroupTransformControls
             selectedCount={selectedLayers.length}
-            moveX={relativeMoveX}
-            moveY={relativeMoveY}
-            rotation={relativeRotation}
-            onMoveXChange={setRelativeMoveX}
-            onMoveYChange={setRelativeMoveY}
-            onRotationChange={setRelativeRotation}
-            onApplyMove={() => {
-              onTransformSelection({ deltaX: relativeMoveX, deltaY: relativeMoveY });
-              setRelativeMoveX(0);
-              setRelativeMoveY(0);
-            }}
-            onApplyRotation={() => {
-              onTransformSelection({ deltaRotation: relativeRotation });
-              setRelativeRotation(0);
-            }}
+            moveX={relativeTransform.moveX}
+            moveY={relativeTransform.moveY}
+            rotation={relativeTransform.rotation}
+            onMoveXChange={(value) => updateLiveRelativeTransform("moveX", value)}
+            onMoveYChange={(value) => updateLiveRelativeTransform("moveY", value)}
+            onRotationChange={(value) => updateLiveRelativeTransform("rotation", value)}
             t={t}
           />
         ) : (
@@ -451,18 +466,58 @@ function AlignButton({
   );
 }
 
+function ResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: number) => void }) {
+  return (
+    <div
+      className="panel-resize-handle"
+      role="separator"
+      aria-label={label}
+      aria-orientation="horizontal"
+      tabIndex={0}
+      onPointerDown={(event) => {
+        event.preventDefault();
+        let lastY = event.clientY;
+        const handlePointerMove = (moveEvent: PointerEvent) => {
+          onResize(moveEvent.clientY - lastY);
+          lastY = moveEvent.clientY;
+        };
+        const handlePointerUp = () => {
+          window.removeEventListener("pointermove", handlePointerMove);
+          window.removeEventListener("pointerup", handlePointerUp);
+        };
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          onResize(24);
+        }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          onResize(-24);
+        }
+      }}
+    >
+      <GripHorizontal size={16} />
+    </div>
+  );
+}
+
 function PaletteControls({
   colors,
   draft,
   nameDraft,
   targetDraft,
   selectedCount,
+  listHeight,
   onDraftChange,
   onNameDraftChange,
   onTargetDraftChange,
   onAdd,
   onDelete,
   onApply,
+  onResizeList,
   t,
 }: {
   colors: PaletteColor[];
@@ -470,12 +525,14 @@ function PaletteControls({
   nameDraft: string;
   targetDraft: PaletteTarget;
   selectedCount: number;
+  listHeight: number;
   onDraftChange: (value: string) => void;
   onNameDraftChange: (value: string) => void;
   onTargetDraftChange: (value: PaletteTarget) => void;
   onAdd: () => void;
   onDelete: (id: string) => void;
   onApply: (color: string, target: PaletteTarget) => void;
+  onResizeList: (deltaY: number) => void;
   t: Translator;
 }) {
   return (
@@ -505,7 +562,7 @@ function PaletteControls({
           {t("inspector.addColor")}
         </button>
       </div>
-      <div className="swatch-grid" aria-label={t("inspector.registeredColors")}>
+      <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
         {colors.map((color) => (
           <div className="swatch-row" key={color.id}>
             <button
@@ -535,6 +592,7 @@ function PaletteControls({
           </div>
         ))}
       </div>
+      <ResizeHandle label={t("inspector.resizeColorList")} onResize={onResizeList} />
     </section>
   );
 }
@@ -547,8 +605,6 @@ function GroupTransformControls({
   onMoveXChange,
   onMoveYChange,
   onRotationChange,
-  onApplyMove,
-  onApplyRotation,
   t,
 }: {
   selectedCount: number;
@@ -558,8 +614,6 @@ function GroupTransformControls({
   onMoveXChange: (value: number) => void;
   onMoveYChange: (value: number) => void;
   onRotationChange: (value: number) => void;
-  onApplyMove: () => void;
-  onApplyRotation: () => void;
   t: Translator;
 }) {
   return (
@@ -589,9 +643,6 @@ function GroupTransformControls({
             onChange={onMoveYChange}
           />
         </div>
-        <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyMove}>
-          <Move size={16} /> {t("inspector.applyMove")}
-        </button>
         <SliderNumberInput
           label={t("inspector.rotationDelta")}
           value={rotation}
@@ -602,9 +653,6 @@ function GroupTransformControls({
           icon={<RotateCw size={14} />}
           onChange={onRotationChange}
         />
-        <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyRotation}>
-          <RotateCw size={16} /> {t("inspector.applyRotation")}
-        </button>
       </div>
     </section>
   );
@@ -779,20 +827,65 @@ function TextControls({
         decimals={2}
         onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, lineHeight: value }))}
       />
-      <label className="field">
+      <div className="field">
         <span>{t("inspector.textAlign")}</span>
-        <select
-          value={selected.align}
-          onChange={(event) =>
-            onUpdateLayer(selected.id, (layer) => ({ ...layer, align: event.target.value as TextAlign }))
-          }
-        >
-          <option value="left">{t("inspector.left")}</option>
-          <option value="center">{t("inspector.center")}</option>
-          <option value="right">{t("inspector.right")}</option>
-        </select>
-      </label>
+        <div className="segmented-control text-align-control" role="radiogroup" aria-label={t("inspector.textAlign")}>
+          <TextAlignButton
+            align="left"
+            current={selected.align}
+            label={t("inspector.left")}
+            onSelect={(align) => onUpdateLayer(selected.id, (layer) => ({ ...layer, align }))}
+          >
+            <AlignHorizontalJustifyStart size={16} />
+          </TextAlignButton>
+          <TextAlignButton
+            align="center"
+            current={selected.align}
+            label={t("inspector.center")}
+            onSelect={(align) => onUpdateLayer(selected.id, (layer) => ({ ...layer, align }))}
+          >
+            <AlignHorizontalJustifyCenter size={16} />
+          </TextAlignButton>
+          <TextAlignButton
+            align="right"
+            current={selected.align}
+            label={t("inspector.right")}
+            onSelect={(align) => onUpdateLayer(selected.id, (layer) => ({ ...layer, align }))}
+          >
+            <AlignHorizontalJustifyEnd size={16} />
+          </TextAlignButton>
+        </div>
+      </div>
     </>
+  );
+}
+
+function TextAlignButton({
+  align,
+  current,
+  label,
+  children,
+  onSelect,
+}: {
+  align: TextAlign;
+  current: TextAlign;
+  label: string;
+  children: ReactNode;
+  onSelect: (align: TextAlign) => void;
+}) {
+  const selected = align === current;
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={selected}
+      className={selected ? "selected" : ""}
+      title={label}
+      onClick={() => onSelect(align)}
+    >
+      {children}
+      <span>{label}</span>
+    </button>
   );
 }
 
@@ -956,4 +1049,8 @@ function updateNumber(
 function round(value: number, decimals = 0): number {
   const multiplier = 10 ** decimals;
   return Math.round(value * multiplier) / multiplier;
+}
+
+function clampPanelHeight(value: number): number {
+  return Math.min(720, Math.max(220, Math.round(value)));
 }

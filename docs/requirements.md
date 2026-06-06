@@ -13,7 +13,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Import browser-local custom font files for text layers.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Clear the current selection by clicking non-layer blank space in the preview.
-- Edit selected layer groups with relative X/Y movement and relative rotation deltas.
+- Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
+- Select text alignment with direct Left, Center, and Right buttons.
 - Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
 - Make the direct rotation handle visually recognizable through cursor and handle states.
 - Switch major UI labels between Japanese and English, auto-selecting from browser/OS language when supported and falling back clearly when unsupported.
@@ -22,6 +23,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
 - Provide common presets and custom output dimensions.
 - Automatically fit the preview when preset aspect ratio changes would otherwise push the canvas outside the visible stage.
+- Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
 
 ## Non-Functional Requirements
 

@@ -109,3 +109,7 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:03-design] キャンバス外要素の表示対応 [Issue](Issues/0010-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] 文字列を設定範囲いっぱいに表示する機能追加 [Issue](Issues/0011-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] 回転ハンドルの操作性改善 [Issue](Issues/0012-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 複数選択の移動・回転をリアルタイム反映 [Issue](Issues/0013-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 複数選択の移動・回転をリアルタイム反映 [Issue](Issues/0014-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 文字揃えを3択ボタン化 [Issue](Issues/0015-3.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] LayersとColorsの表示領域を可変化する [Issue](Issues/0016-layers-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]

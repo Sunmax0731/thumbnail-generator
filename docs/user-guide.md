@@ -21,9 +21,9 @@ npm run preview
 - Assets: import image files, open Image Lab, add text/shape layers, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Templates: save, load, and delete browser-local templates.
-- Layers: reorder, lock, hide/show, select, align, duplicate, and delete layers.
-- Adjust: edit the selected layer's position, size, rotation, opacity, text, font, shape, and image effects.
-- Colors: register named Fill or Stroke colors and apply them to selected text or shape layers.
+- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, and resize the list area with the handle below the list.
+- Adjust: edit the selected layer's position, size, rotation, opacity, text, font, text alignment, shape, and image effects.
+- Colors: register named Fill or Stroke colors, apply them to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -38,8 +38,12 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Drag a corner handle to resize it.
 - Drag the top rotation handle to rotate it. The rotation handle shows a rotate mark and changes to a grab cursor on hover.
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
-- With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta.
+- With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta. Changes apply live as you edit the values; there is no Apply button.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
+
+## Text Alignment
+
+Select a text layer, open Adjust, and choose Left, Center, or Right from the three alignment buttons. The selected alignment stays highlighted.
 
 ## Fit Text
 

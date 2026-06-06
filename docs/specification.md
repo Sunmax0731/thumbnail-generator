@@ -105,7 +105,7 @@ The selected layer can be edited directly on the canvas:
 - Handles are rendered in preview padding, so controls remain visible even when they extend outside the thumbnail document bounds.
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
-- The Adjust tab exposes Relative edit controls for multi-selection. Move X and Move Y apply the same coordinate delta to each selected editable layer. Rotation delta adds the same degree delta to each selected editable layer's current rotation.
+- The Adjust tab exposes live Relative edit controls for multi-selection. Move X and Move Y apply coordinate deltas to each selected editable layer as the control value changes. Rotation delta adds the same degree delta to each selected editable layer's current rotation as the control value changes. The UI tracks incremental deltas, so changing a live value from `12` to `5` applies `-7` rather than another absolute `5`.
 - Inspector numeric fields remain the source of precise values.
 - When multiple visible editable layers overlap under the pointer, body clicks select the frontmost layer in the current render order.
 - Clicking preview space that is not a selectable layer or active handle clears the current selection.
@@ -141,8 +141,10 @@ The left sidebar is grouped by task:
 The right inspector is grouped by task:
 
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
-- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels.
-- Colors: browser-local color palette registration and quick application with saved names and Fill/Stroke targets.
+- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
+- Colors: browser-local color palette registration and quick application with saved names and Fill/Stroke targets. Saved colors are displayed in list rows similar to layer rows.
+
+The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
 ## Font Choices
 
