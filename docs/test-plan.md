@@ -12,6 +12,8 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 - Nonblank app render.
 - Header, left import panel, canvas, layer list, inspector, and export controls are visible.
+- Left sidebar task tabs expose Assets, Layouts, and Templates without crowding the first viewport.
+- Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Layer inspector edits position, size, rotation, color, stroke, and effects.
@@ -26,6 +28,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
 - Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
+- Image Lab Rect and Circle modes support direct drag selection on the preview.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
@@ -60,13 +63,18 @@ Completed on 2026-06-06.
   - `docs/assets/runtime-advanced-editing-mobile.png`
   - `docs/assets/runtime-image-lab-modal.png`
   - `docs/assets/runtime-image-lab-modal-mobile.png`
+  - `docs/assets/runtime-ux-refresh-desktop.png`
+  - `docs/assets/runtime-ux-refresh-mobile.png`
+  - `docs/assets/runtime-image-lab-rect-circle-drag.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`
 - Nonblank canvas pixel check: pass (`1280x720`, varied sampled pixels)
-- Primary UI visible: app title, CSV layout, HTML layout, inspector, layers, WebP export button
-- CSV import: pass, status reported `CSV applied: 3 layers.`
+- Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button
+- Left task tabs: pass, Assets, Layouts, and Templates sections opened and exposed the expected controls
+- Right task tabs: pass, Layers, Adjust, and Colors sections opened and exposed layer list, inspector fields, and palette registration
+- CSV import: pass, generated layout was applied and status reported `CSV applied: 7 layers.`
 - HTML import: pass, status reported `HTML applied: 3 layers.`
 - Inspector edit: pass, selected text updated to `QA INSPECTOR TITLE`
 - Canvas direct editing: pass, selected text layer moved, resized, and rotated with pointer controls
@@ -81,13 +89,14 @@ Passed checks:
 - Multiple template saves: pass, saving `Duplicate OK` twice produced two saved entries
 - Image Lab modal: pass, sidebar launcher opened a modal workspace at `1220x865` with an `832x518` Image Lab preview canvas
 - Image Lab processing: pass, drag-range cutout with chroma key created a processed image layer
+- Image Lab Rect/Circle drag selection: pass, Rect drag changed crop values from `0,0,320,180` to `186,130,718,362`; Circle drag changed them to `426,151,958,638`
 - Image Lab close controls: pass, Escape key, close button, and backdrop click dismissed the modal
 - Image Lab mobile modal: pass, `390x844` viewport opened the modal at `374px` width with horizontal overflow `0`
 - Image Lab polygon: pass, three free-cut points enabled processing and created a processed image layer
 - Sliders: pass, output size sliders were present and layer/Image Lab slider controls were visible
 - Image import: pass, local PNG file imported and created an image layer
 - Export: pass, WebP download created (`thumbnail-1280x720-...webp`)
-- Mobile: pass, no horizontal overflow (`0`)
+- Mobile: pass, task tabs and Image Lab modal had no horizontal overflow (`0`)
 
 Console health:
 

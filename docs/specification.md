@@ -121,6 +121,20 @@ Layer rows also include:
 - Visibility toggle.
 - Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
 
+## Editor Information Architecture
+
+The left sidebar is grouped by task:
+
+- Assets: local image import, Image Lab launch, imported asset list, text/shape creation, and sample restoration.
+- Layouts: generated CSV/HTML text, CSV import, and HTML import.
+- Templates: browser-local template naming, saving, loading, and deletion.
+
+The right inspector is grouped by task:
+
+- Layers: layer ordering, visibility, selectable/editable lock, and alignment.
+- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects.
+- Colors: browser-local color palette registration and quick application.
+
 ## Font Choices
 
 Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
@@ -154,8 +168,8 @@ The color palette is stored in browser `localStorage` under `thumbnail-generator
 The Image Lab modal workspace opens from the Images section in the sidebar. It processes imported or bundled images in the browser and creates a processed image asset plus a new image layer. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
-- Rectangular cutout.
-- Circular/elliptical cutout.
+- Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.
+- Circular/elliptical cutout, with the ellipse bounds set by dragging on the preview or by sliders.
 - Polygon/free cutout by placing three or more points.
 - Drag-range rectangular cutout.
 

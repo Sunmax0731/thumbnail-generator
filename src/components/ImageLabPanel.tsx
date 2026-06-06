@@ -99,7 +99,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
         setPolygonPoints((current) => [...current, point]);
         return;
       }
-      if (mode === "drag") {
+      if (isDragSelectionMode(mode)) {
         safelySetPointerCapture(event.currentTarget, event.pointerId);
         dragStart.current = point;
         setCropRect({ x: point.x, y: point.y, width: 1, height: 1 });
@@ -110,7 +110,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
 
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      if (mode !== "drag" || !dragStart.current) return;
+      if (!isDragSelectionMode(mode) || !dragStart.current) return;
       const point = pointerToImage(event);
       setCropRect({
         x: dragStart.current.x,
@@ -122,12 +122,19 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
     [mode, pointerToImage],
   );
 
-  const handlePointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
-    dragStart.current = null;
-    if (event.currentTarget.hasPointerCapture(event.pointerId)) {
-      event.currentTarget.releasePointerCapture(event.pointerId);
-    }
-  }, []);
+  const handlePointerUp = useCallback(
+    (event: React.PointerEvent<HTMLCanvasElement>) => {
+      const hadDragSelection = Boolean(dragStart.current) && isDragSelectionMode(mode);
+      dragStart.current = null;
+      if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+        event.currentTarget.releasePointerCapture(event.pointerId);
+      }
+      if (hadDragSelection) {
+        setCropRect((rect) => fitRect(rect, imageSize.width, imageSize.height));
+      }
+    },
+    [imageSize.height, imageSize.width, mode],
+  );
 
   const applyProcessing = useCallback(async () => {
     if (!selectedAsset) return;
@@ -380,6 +387,10 @@ function normalizeRect(rect: RectSelection): RectSelection {
   const x = Math.min(rect.x, rect.x + rect.width);
   const y = Math.min(rect.y, rect.y + rect.height);
   return { x, y, width: Math.abs(rect.width), height: Math.abs(rect.height) };
+}
+
+function isDragSelectionMode(mode: LabMode): mode is "rect" | "ellipse" | "drag" {
+  return mode === "rect" || mode === "ellipse" || mode === "drag";
 }
 
 function clamp(value: number, min: number, max: number): number {

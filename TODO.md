@@ -85,3 +85,12 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Provide close controls, backdrop/Escape dismissal, and responsive modal layout.
 - [x] Increase the Image Lab preview workspace for precise crop, polygon, and chroma-key work.
 - [x] Validate the modal workspace with automated tests and browser runtime gate.
+
+## 10. Image Lab Drag Selection and UI/UX Refresh
+
+- [x] Make Rect and Circle cutout modes directly selectable by dragging on the Image Lab preview.
+- [x] Keep Drag mode compatible with existing rectangular drag-range processing.
+- [x] Reorganize the left sidebar into clearer Assets, Layouts, and Templates sections.
+- [x] Reorganize the right inspector into clearer Layers, Adjust, and Colors sections.
+- [x] Update design/spec/test/QCDS docs for the refreshed information architecture.
+- [x] Validate desktop and mobile layout, Image Lab Rect/Circle drag selection, and existing primary workflows.

@@ -15,6 +15,7 @@ import {
   GripVertical,
   Layers,
   Lock,
+  Palette,
   RotateCw,
   SlidersHorizontal,
   Trash2,
@@ -26,6 +27,7 @@ import type { PaletteColor } from "../lib/colorPalette";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
 type PaletteApplyTarget = "primary" | "stroke";
+type InspectorSection = "layers" | "edit" | "colors";
 
 interface InspectorPanelProps {
   assets: ImageAsset[];
@@ -73,122 +75,161 @@ export function InspectorPanel({
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const [draggingId, setDraggingId] = useState<string | null>(null);
+  const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
 
   return (
     <aside className="side-panel inspector-panel" aria-label="Layer inspector">
-      <section className="panel-section layer-section">
-        <div className="section-heading">
-          <Layers size={16} />
-          <h2>Layers</h2>
-        </div>
-        <div className="layer-list" aria-label="Layer list">
-          {[...layers].reverse().map((layer) => (
-            <div
-              key={layer.id}
-              draggable
-              role="button"
-              tabIndex={0}
-              aria-disabled={!layer.selectable}
-              className={`layer-row ${selectedIds.includes(layer.id) ? "selected" : ""} ${
-                draggingId === layer.id ? "dragging" : ""
-              } ${!layer.selectable ? "locked" : ""}`}
-              onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
-              onKeyDown={(event) => {
-                if (event.key === "Enter" || event.key === " ") onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
-              }}
-              onDragStart={(event) => {
-                event.dataTransfer.effectAllowed = "move";
-                event.dataTransfer.setData("text/plain", layer.id);
-                setDraggingId(layer.id);
-                if (layer.selectable) onSelect(layer.id);
-              }}
-              onDragOver={(event) => {
-                event.preventDefault();
-                event.dataTransfer.dropEffect = "move";
-              }}
-              onDrop={(event) => {
-                event.preventDefault();
-                const dragged = event.dataTransfer.getData("text/plain") || draggingId;
-                if (dragged) onReorderLayer(dragged, layer.id);
-                setDraggingId(null);
-              }}
-              onDragEnd={() => setDraggingId(null)}
-            >
-              <GripVertical size={14} className="drag-grip" />
-              <span className={`layer-type ${layer.type}`}>{layer.type}</span>
-              <span className="layer-name">{layer.name}</span>
-              <button
-                type="button"
-                className="mini-icon-button"
-                title={layer.visible ? "Hide layer" : "Show layer"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onToggleVisible(layer.id);
-                }}
-              >
-                {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-              </button>
-              <button
-                type="button"
-                className="mini-icon-button"
-                title={layer.selectable ? "Lock selection and editing" : "Unlock selection and editing"}
-                onClick={(event) => {
-                  event.stopPropagation();
-                  onToggleSelectable(layer.id);
-                }}
-              >
-                {layer.selectable ? <Unlock size={14} /> : <Lock size={14} />}
-              </button>
+      <div className="panel-tabs inspector-tabs" role="tablist" aria-label="Inspector sections">
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "layers"}
+          className={activeSection === "layers" ? "selected" : ""}
+          onClick={() => setActiveSection("layers")}
+        >
+          <Layers size={15} /> Layers
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "edit"}
+          className={activeSection === "edit" ? "selected" : ""}
+          onClick={() => setActiveSection("edit")}
+        >
+          <SlidersHorizontal size={15} /> Adjust
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "colors"}
+          className={activeSection === "colors" ? "selected" : ""}
+          onClick={() => setActiveSection("colors")}
+        >
+          <Palette size={15} /> Colors
+        </button>
+      </div>
+
+      {activeSection === "layers" ? (
+        <>
+          <section className="panel-section layer-section">
+            <div className="section-heading">
+              <Layers size={16} />
+              <h2>Layers</h2>
+              <span className="section-count">{layers.length}</span>
             </div>
-          ))}
-        </div>
-      </section>
+            <div className="layer-list" aria-label="Layer list">
+              {[...layers].reverse().map((layer) => (
+                <div
+                  key={layer.id}
+                  draggable
+                  role="button"
+                  tabIndex={0}
+                  aria-disabled={!layer.selectable}
+                  className={`layer-row ${selectedIds.includes(layer.id) ? "selected" : ""} ${
+                    draggingId === layer.id ? "dragging" : ""
+                  } ${!layer.selectable ? "locked" : ""}`}
+                  onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+                  onKeyDown={(event) => {
+                    if (event.key === "Enter" || event.key === " ") onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                  }}
+                  onDragStart={(event) => {
+                    event.dataTransfer.effectAllowed = "move";
+                    event.dataTransfer.setData("text/plain", layer.id);
+                    setDraggingId(layer.id);
+                    if (layer.selectable) onSelect(layer.id);
+                  }}
+                  onDragOver={(event) => {
+                    event.preventDefault();
+                    event.dataTransfer.dropEffect = "move";
+                  }}
+                  onDrop={(event) => {
+                    event.preventDefault();
+                    const dragged = event.dataTransfer.getData("text/plain") || draggingId;
+                    if (dragged) onReorderLayer(dragged, layer.id);
+                    setDraggingId(null);
+                  }}
+                  onDragEnd={() => setDraggingId(null)}
+                >
+                  <GripVertical size={14} className="drag-grip" />
+                  <span className={`layer-type ${layer.type}`}>{layer.type}</span>
+                  <span className="layer-name">{layer.name}</span>
+                  <button
+                    type="button"
+                    className="mini-icon-button"
+                    title={layer.visible ? "Hide layer" : "Show layer"}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onToggleVisible(layer.id);
+                    }}
+                  >
+                    {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+                  </button>
+                  <button
+                    type="button"
+                    className="mini-icon-button"
+                    title={layer.selectable ? "Lock selection and editing" : "Unlock selection and editing"}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      onToggleSelectable(layer.id);
+                    }}
+                  >
+                    {layer.selectable ? <Unlock size={14} /> : <Lock size={14} />}
+                  </button>
+                </div>
+              ))}
+            </div>
+          </section>
 
-      <section className="panel-section">
-        <div className="section-heading">
-          <AlignHorizontalJustifyCenter size={16} />
-          <h2>Align</h2>
-        </div>
-        <p className="selection-note">
-          {selectedLayers.length === 0
-            ? "No editable layer selected."
-            : selectedLayers.length === 1
-              ? "Single layer aligns to the canvas."
-              : `${selectedLayers.length} layers align to the selection bounds.`}
-        </p>
-        <div className="align-grid" aria-label="Alignment controls">
-          <AlignButton label="Left" mode="left" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignHorizontalJustifyStart size={16} />
-          </AlignButton>
-          <AlignButton label="Center" mode="center" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignHorizontalJustifyCenter size={16} />
-          </AlignButton>
-          <AlignButton label="Right" mode="right" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignHorizontalJustifyEnd size={16} />
-          </AlignButton>
-          <AlignButton label="Top" mode="top" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignVerticalJustifyStart size={16} />
-          </AlignButton>
-          <AlignButton label="Middle" mode="middle" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignVerticalJustifyCenter size={16} />
-          </AlignButton>
-          <AlignButton label="Bottom" mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
-            <AlignVerticalJustifyEnd size={16} />
-          </AlignButton>
-        </div>
-      </section>
+          <section className="panel-section">
+            <div className="section-heading">
+              <AlignHorizontalJustifyCenter size={16} />
+              <h2>Align</h2>
+            </div>
+            <p className="selection-note">
+              {selectedLayers.length === 0
+                ? "No editable layer selected."
+                : selectedLayers.length === 1
+                  ? "Single layer aligns to the canvas."
+                  : `${selectedLayers.length} layers align to the selection bounds.`}
+            </p>
+            <div className="align-grid" aria-label="Alignment controls">
+              <AlignButton label="Left" mode="left" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignHorizontalJustifyStart size={16} />
+              </AlignButton>
+              <AlignButton label="Center" mode="center" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignHorizontalJustifyCenter size={16} />
+              </AlignButton>
+              <AlignButton label="Right" mode="right" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignHorizontalJustifyEnd size={16} />
+              </AlignButton>
+              <AlignButton label="Top" mode="top" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignVerticalJustifyStart size={16} />
+              </AlignButton>
+              <AlignButton label="Middle" mode="middle" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignVerticalJustifyCenter size={16} />
+              </AlignButton>
+              <AlignButton label="Bottom" mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+                <AlignVerticalJustifyEnd size={16} />
+              </AlignButton>
+            </div>
+          </section>
+        </>
+      ) : null}
 
-      <PaletteControls
-        colors={paletteColors}
-        draft={paletteDraft}
-        selectedCount={selectedLayers.length}
-        onDraftChange={onPaletteDraftChange}
-        onAdd={onAddPaletteColor}
-        onDelete={onDeletePaletteColor}
-        onApply={onApplyPaletteColor}
-      />
+      {activeSection === "colors" ? (
+        <PaletteControls
+          colors={paletteColors}
+          draft={paletteDraft}
+          selectedCount={selectedLayers.length}
+          onDraftChange={onPaletteDraftChange}
+          onAdd={onAddPaletteColor}
+          onDelete={onDeletePaletteColor}
+          onApply={onApplyPaletteColor}
+        />
+      ) : null}
 
-      {selected ? (
+      {activeSection === "edit" ? (
+        selected ? (
         <section className="panel-section inspector-section">
           <div className="section-heading">
             <SlidersHorizontal size={16} />
@@ -276,6 +317,15 @@ export function InspectorPanel({
             {selected.type === "shape" && <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} />}
           </div>
         </section>
+        ) : (
+          <section className="panel-section inspector-section">
+            <div className="section-heading">
+              <SlidersHorizontal size={16} />
+              <h2>Inspector</h2>
+            </div>
+            <p className="empty-note">No editable layer selected.</p>
+          </section>
+        )
       ) : null}
     </aside>
   );
