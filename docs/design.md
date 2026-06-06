@@ -11,6 +11,7 @@ The concept uses a functional editor as the first screen:
 - Top toolbar for output size and export format.
 - Right inspector for layer order and selected layer properties.
 - Bottom status row for validation, zoom, and export state.
+- Image Lab opens as a modal workspace from the left rail for precise image cutout work.
 
 ## UI Principles
 
@@ -40,6 +41,7 @@ The concept uses a functional editor as the first screen:
 
 - Desktop: three-column editor with canvas centered.
 - Tablet/mobile: stack tools above the canvas and inspector below it.
+- Image Lab modal uses a two-column workspace on desktop and a single-column workspace on mobile.
 - Canvas preserves aspect ratio and never overlaps controls.
 - Text and controls must not overflow their containers.
 
@@ -49,4 +51,4 @@ The concept uses a functional editor as the first screen:
 - Layout: implemented the same left input rail, center canvas, right layer/inspector, top export toolbar, and bottom status structure.
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
-- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, canvas selection, and PNG/JPEG/WebP export.
+- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, canvas selection, Image Lab modal processing, and PNG/JPEG/WebP export.

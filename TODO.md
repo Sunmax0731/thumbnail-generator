@@ -70,10 +70,18 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Render selection resize and rotation handles outside the canvas document bounds without clipping.
 - [x] Add layer selectable/editable lock toggle and exclude locked layers from canvas selection and inspector edits.
 - [x] Confirm named templates continue to support multiple saved entries after model changes.
-- [x] Add an Image Lab tab for imported-image processing.
+- [x] Add Image Lab for imported-image processing.
 - [x] Implement chroma-key transparency.
 - [x] Implement rectangular and circular image cutouts.
 - [x] Implement polygon/free cutout by placing points.
 - [x] Implement mouse-drag range cutout.
 - [x] Add sliders for numeric controls with practical min/max bounds.
 - [x] Validate new interactions with automated tests and browser runtime gate.
+
+## 9. Image Lab Workspace Modal
+
+- [x] Move Image Lab processing out of the sidebar tab into a larger modal workspace.
+- [x] Keep the sidebar as the Image Lab launcher and image import context.
+- [x] Provide close controls, backdrop/Escape dismissal, and responsive modal layout.
+- [x] Increase the Image Lab preview workspace for precise crop, polygon, and chroma-key work.
+- [x] Validate the modal workspace with automated tests and browser runtime gate.

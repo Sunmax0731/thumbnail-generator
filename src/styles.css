@@ -811,15 +811,91 @@ button:disabled {
   font-size: 11px;
 }
 
+.modal-backdrop {
+  position: fixed;
+  z-index: 50;
+  inset: 0;
+  display: grid;
+  padding: 16px;
+  background: rgba(15, 23, 42, 0.54);
+  place-items: center;
+}
+
+.image-lab-modal {
+  display: flex;
+  width: min(1220px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  flex-direction: column;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(216, 224, 231, 0.78);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--line);
+}
+
+.modal-title-block h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.modal-close {
+  flex: 0 0 auto;
+}
+
 .image-lab {
-  display: contents;
+  display: grid;
+  align-items: start;
+  grid-template-areas:
+    "source cutout"
+    "chroma cutout";
+  grid-template-columns: minmax(250px, 320px) minmax(520px, 1fr);
+  gap: 12px;
+}
+
+.image-lab .panel-section {
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.image-lab .panel-section + .panel-section {
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.image-source-section {
+  grid-area: source;
+}
+
+.image-cutout-section {
+  grid-area: cutout;
+}
+
+.image-chroma-section {
+  grid-area: chroma;
 }
 
 .image-lab-canvas {
   display: block;
   width: 100%;
   height: auto;
-  aspect-ratio: 420 / 260;
+  max-height: min(62vh, 620px);
+  aspect-ratio: 900 / 560;
   border: 1px solid var(--line);
   border-radius: 8px;
   background: #111827;
@@ -891,6 +967,18 @@ button:disabled {
   .stage-panel {
     min-height: 560px;
   }
+
+  .image-lab {
+    grid-template-areas:
+      "source"
+      "cutout"
+      "chroma";
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .image-lab-canvas {
+    max-height: 54vh;
+  }
 }
 
 @media (max-width: 720px) {
@@ -923,6 +1011,18 @@ button:disabled {
   .align-grid,
   .panel-tabs {
     grid-template-columns: 1fr;
+  }
+
+  .modal-backdrop {
+    align-items: start;
+    overflow: auto;
+    padding: 8px;
+  }
+
+  .image-lab-modal {
+    width: calc(100vw - 16px);
+    max-height: none;
+    padding: 10px;
   }
 
   .stage-toolbar,

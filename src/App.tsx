@@ -1,5 +1,7 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { X } from "lucide-react";
 import { CanvasStage } from "./components/CanvasStage";
+import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
 import { StatusBar } from "./components/StatusBar";
@@ -69,6 +71,7 @@ function App() {
     typeof window === "undefined" ? [] : readColorPalette(),
   );
   const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
+  const [isImageLabOpen, setIsImageLabOpen] = useState(false);
 
   const selectedLayers = useMemo(
     () => layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable),
@@ -116,6 +119,15 @@ function App() {
       cancelled = true;
     };
   }, [assets, layers, selectedIds, settings]);
+
+  useEffect(() => {
+    if (!isImageLabOpen) return;
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsImageLabOpen(false);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [isImageLabOpen]);
 
   const updateSettings = useCallback((next: Partial<OutputSettings>) => {
     setSettings((current) => ({ ...current, ...next }));
@@ -542,7 +554,7 @@ function App() {
           onSaveTemplate={saveCurrentTemplate}
           onLoadTemplate={loadTemplate}
           onDeleteTemplate={deleteTemplate}
-          onCreateProcessedAsset={createProcessedAsset}
+          onOpenImageLab={() => setIsImageLabOpen(true)}
           assets={assets}
         />
         <CanvasStage
@@ -580,6 +592,37 @@ function App() {
           onAlignSelection={alignSelection}
         />
       </main>
+      {isImageLabOpen ? (
+        <div
+          className="modal-backdrop image-lab-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) setIsImageLabOpen(false);
+          }}
+        >
+          <section
+            className="image-lab-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-lab-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div className="modal-title-block">
+                <h2 id="image-lab-title">Image Lab</h2>
+              </div>
+              <button
+                type="button"
+                className="icon-button modal-close"
+                aria-label="Close Image Lab"
+                onClick={() => setIsImageLabOpen(false)}
+              >
+                <X size={18} />
+              </button>
+            </div>
+            <ImageLabPanel assets={assets} onImageFiles={handleImageFiles} onCreateProcessedAsset={createProcessedAsset} />
+          </section>
+        </div>
+      ) : null}
       <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} />
     </div>
   );

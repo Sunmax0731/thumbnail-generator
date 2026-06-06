@@ -25,7 +25,8 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Registered palette colors apply to text/shape fill and stroke colors.
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
-- Image Lab supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
+- Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
+- Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
 - Export path creates a data URL/download for the selected format.
@@ -57,6 +58,8 @@ Completed on 2026-06-06.
   - `docs/assets/runtime-direct-editing-mobile.png`
   - `docs/assets/runtime-advanced-editing.png`
   - `docs/assets/runtime-advanced-editing-mobile.png`
+  - `docs/assets/runtime-image-lab-modal.png`
+  - `docs/assets/runtime-image-lab-modal-mobile.png`
 
 Passed checks:
 
@@ -76,7 +79,10 @@ Passed checks:
 - Color palette: pass, registered `#123abc` and applied it to a selected layer
 - Named templates: pass, current CSV/HTML layout saved to browser storage, loaded, and deleted
 - Multiple template saves: pass, saving `Duplicate OK` twice produced two saved entries
-- Image Lab: pass, drag-range cutout with chroma key created a processed image layer
+- Image Lab modal: pass, sidebar launcher opened a modal workspace at `1220x865` with an `832x518` Image Lab preview canvas
+- Image Lab processing: pass, drag-range cutout with chroma key created a processed image layer
+- Image Lab close controls: pass, Escape key, close button, and backdrop click dismissed the modal
+- Image Lab mobile modal: pass, `390x844` viewport opened the modal at `374px` width with horizontal overflow `0`
 - Image Lab polygon: pass, three free-cut points enabled processing and created a processed image layer
 - Sliders: pass, output size sliders were present and layer/Image Lab slider controls were visible
 - Image import: pass, local PNG file imported and created an image layer

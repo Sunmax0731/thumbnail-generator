@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
 import { ImagePlus, MousePointer2, Scissors, Sparkles } from "lucide-react";
 import {
   processImageAsset,
@@ -24,8 +24,8 @@ interface PreviewRect {
   scale: number;
 }
 
-const previewWidth = 420;
-const previewHeight = 260;
+const previewWidth = 900;
+const previewHeight = 560;
 
 export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: ImageLabPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -160,7 +160,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
 
   return (
     <div className="image-lab" aria-label="Image Lab">
-      <section className="panel-section">
+      <section className="panel-section image-source-section">
         <div className="section-heading">
           <ImagePlus size={16} />
           <h2>Image source</h2>
@@ -182,7 +182,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
         </label>
       </section>
 
-      <section className="panel-section">
+      <section className="panel-section image-cutout-section">
         <div className="section-heading">
           <Scissors size={16} />
           <h2>Cutout</h2>
@@ -249,7 +249,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
         </div>
       </section>
 
-      <section className="panel-section">
+      <section className="panel-section image-chroma-section">
         <div className="section-heading">
           <Sparkles size={16} />
           <h2>Chroma key</h2>
@@ -284,7 +284,7 @@ function drawPreview(
   cropRect: RectSelection,
   polygonPoints: ImagePoint[],
   mode: LabMode,
-  previewRef: React.MutableRefObject<PreviewRect>,
+  previewRef: MutableRefObject<PreviewRect>,
   canvas: HTMLCanvasElement | null,
 ) {
   if (!canvas) return;

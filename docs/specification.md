@@ -151,7 +151,7 @@ The color palette is stored in browser `localStorage` under `thumbnail-generator
 
 ## Image Lab
 
-The Image Lab tab processes imported or bundled images in the browser and creates a processed image asset plus a new image layer. Supported operations:
+The Image Lab modal workspace opens from the Images section in the sidebar. It processes imported or bundled images in the browser and creates a processed image asset plus a new image layer. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
 - Rectangular cutout.
@@ -160,6 +160,8 @@ The Image Lab tab processes imported or bundled images in the browser and create
 - Drag-range rectangular cutout.
 
 Processing outputs PNG data URLs and remains browser-only.
+
+The modal workspace provides a larger preview canvas than the sidebar, plus close button, backdrop dismissal, and Escape-key dismissal. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 
 ## Slider Controls
 

@@ -11,7 +11,7 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 - Multi-layer selection, group movement, and alignment controls. Single-layer alignment targets the canvas.
 - Selection handles render in preview padding outside the thumbnail document area.
 - Image import with position, size, rotation, opacity, and effects.
-- Image Lab tab for chroma-key transparency and rectangle, circle, polygon, or drag-range cutouts.
+- Image Lab modal workspace for chroma-key transparency and rectangle, circle, polygon, or drag-range cutouts.
 - Text layers with font size, font dropdown, color, rotation, and outline stroke.
 - Shape layers with fill/stroke, size, and rotation.
 - Browser-local color palette with quick apply for text, shape fill, and stroke/outline colors.
@@ -55,7 +55,7 @@ Latest local gate:
 
 - URL: `http://127.0.0.1:4173/thumbnail-generator/`
 - Browser: Playwright headless Chromium. Browser plugin fallback reason: in-app Browser returned `Browser is not available: iab`.
-- Passed: nonblank canvas, primary UI visible, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, multi-select alignment, single-layer canvas alignment, palette registration/apply, layer lock, layer drag-and-drop ordering, font dropdown, multiple named template saves, Image Lab drag/polygon cutouts with chroma key, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
+- Passed: nonblank canvas, primary UI visible, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, multi-select alignment, single-layer canvas alignment, palette registration/apply, layer lock, layer drag-and-drop ordering, font dropdown, multiple named template saves, Image Lab modal workspace with drag cutout and chroma key, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
 
 Latest remote deploy:
 
