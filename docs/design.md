@@ -19,11 +19,14 @@ The editor keeps the established three-column structure, but dense controls are 
 
 - Left rail: Assets, Layouts, and Templates.
 - Right rail: Layers, Adjust, and Colors.
+- Top toolbar: output settings, export actions, and a compact language selector.
 - Image Lab modal: Image source and chroma key stay in the side column; cutout mode, preview, and crop sliders stay in the main workspace.
 
 This keeps the first viewport focused on the current editing task while retaining one-click access to layout text, template storage, layer ordering, layer adjustment, and color registration.
 
 The Colors tab reserves a larger vertical swatch area inside the inspector so named Fill/Stroke entries can be scanned without compressing the rest of the editor. The Adjust tab keeps custom font import adjacent to the text font dropdown so font addition and selection remain one workflow.
+
+The Adjust tab changes by selection scope: a single selected layer shows absolute layer properties, while multiple selected layers show relative movement and rotation controls. This avoids implying that group editing overwrites each layer with one absolute value.
 
 ## UI Principles
 
@@ -56,6 +59,7 @@ The Colors tab reserves a larger vertical swatch area inside the inspector so na
 - Image Lab modal uses a two-column workspace on desktop and a single-column workspace on mobile.
 - Left and right task tabs remain visible at the top of their panels and collapse without horizontal overflow on mobile.
 - Canvas preserves aspect ratio and never overlaps controls.
+- Canvas edit padding can expand when layers extend beyond the document bounds; the padded area uses a subtle checker pattern to distinguish edit-only space from exported content.
 - Preset changes recompute preview fit so tall documents such as Shorts fit inside the desktop canvas stage without expanding the whole app shell.
 - Text and controls must not overflow their containers.
 
@@ -65,5 +69,5 @@ The Colors tab reserves a larger vertical swatch area inside the inspector so na
 - Layout: implemented the same left input rail, center canvas, right layer/inspector, top export toolbar, and bottom status structure, with task tabs added to reduce always-visible control density.
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
-- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, canvas selection, Image Lab modal processing, and PNG/JPEG/WebP export.
-- Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, expands the Colors tab swatch area, fits tall presets in the visible stage, and lets users add browser-local custom fonts from the Adjust tab.
+- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, blank-click deselection, multi-layer relative movement/rotation, canvas selection, Image Lab modal processing, text fit-to-box, and PNG/JPEG/WebP export.
+- Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, expands the Colors tab swatch area, fits tall presets in the visible stage, lets users add browser-local custom fonts from the Adjust tab, shows off-canvas layers during editing, and supports Japanese/English UI switching.

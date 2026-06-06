@@ -17,6 +17,7 @@ npm run preview
 
 ## Editor Layout
 
+- Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Assets: import image files, open Image Lab, add text/shape layers, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Templates: save, load, and delete browser-local templates.
@@ -31,11 +32,22 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 ## Edit The Canvas
 
 - Click a visible editable layer in the preview to select it.
+- Click blank preview space to clear the current selection.
 - If layers overlap, the frontmost visible editable layer is selected.
 - Drag inside the selected layer to move it.
 - Drag a corner handle to resize it.
-- Drag the top rotation handle to rotate it.
+- Drag the top rotation handle to rotate it. The rotation handle shows a rotate mark and changes to a grab cursor on hover.
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
+- With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta.
+- Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
+
+## Fit Text
+
+1. Select a text layer.
+2. Open Adjust.
+3. Select Fit text to box.
+
+The app picks the largest font size that fits the layer width and height while respecting line height and stroke width.
 
 ## Add Custom Fonts
 

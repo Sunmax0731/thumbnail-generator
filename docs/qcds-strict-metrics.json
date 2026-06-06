@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes CSV/HTML import, z-order-aware preview selection, Colors tab vertical expansion, custom WOFF2/WOFF/TTF/OTF font import through FontFace, portrait preset preview fitting, layer editing, and WebP export. Cross-browser, real-device, and very large font storage edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes CSV/HTML import, preview blank-click deselection, multi-select relative X/Y movement and relative rotation, Japanese/English UI switching with browser-language detection and English fallback, off-canvas edit preview visibility with clipped export, text fit-to-box, rotation handle hover/drag affordance, image import, layer editing, and WebP export. Cross-browser, real-device, and very large font storage edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: Colors tab vertical expansion, preview z-order selection, preset fit for Shorts/portrait, arbitrary font import/load/apply/export, and QCDS evidence update. Remaining satisfaction risk is broader real-user font files, template variety, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: blank-click deselection, relative multi-layer movement/rotation, Japanese/English UI switching, off-canvas edit visibility, text fit-to-box, rotation handle affordance, and QCDS evidence update. Remaining satisfaction risk is broader real-user font files, template variety, and non-Chromium browser coverage."
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -30,26 +30,27 @@
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-work-items-font.png",
-      "docs/assets/runtime-work-items-colors.png",
-      "docs/assets/runtime-work-items-preset.png",
-      "docs/assets/runtime-work-items-mobile.png"
+      "docs/assets/runtime-p2-work-items-japanese.png",
+      "docs/assets/runtime-p2-work-items-desktop.png",
+      "docs/assets/runtime-p2-work-items-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
+      "initial Japanese UI detection",
+      "English language switch",
+      "preview blank-click deselection",
+      "text fit-to-box",
+      "multi-select relative move and rotation",
+      "generated CSV evidence for relative edits",
+      "off-canvas edit preview expansion",
+      "rotation handle cursor and drag",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
-      "Colors tab vertical swatch area",
       "CSV import",
       "HTML import",
-      "z-order canvas selection",
       "inspector edit",
-      "custom font import",
-      "custom font localStorage",
-      "custom font FontFace load",
-      "custom font apply to text layer",
-      "portrait preset fit",
+      "image import",
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"

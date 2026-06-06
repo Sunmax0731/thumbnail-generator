@@ -8,13 +8,17 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 
 - Canvas-based thumbnail preview and export.
 - Direct canvas editing for the selected layer: drag move, corner resize, and rotation handle.
-- Multi-layer selection, group movement, and alignment controls. Single-layer alignment targets the canvas.
-- Selection handles render in preview padding outside the thumbnail document area.
+- Preview blank-click deselection that clears the inspector and selection highlight.
+- Multi-layer selection, group movement, relative X/Y movement, relative rotation, and alignment controls. Single-layer alignment targets the canvas.
+- Selection handles render in preview padding outside the thumbnail document area, and off-canvas layer overflow remains visible while editing.
+- Rotation handles show normal, hover, and drag states with a rotate glyph and grab cursor.
 - Left sidebar is organized by Assets, Layouts, and Templates task tabs.
 - Right inspector is organized by Layers, Adjust, and Colors task tabs.
+- UI language toggle for Japanese and English, with browser-language detection and English fallback for unsupported languages.
 - Image import with position, size, rotation, opacity, and effects.
 - Image Lab modal workspace for chroma-key transparency and rectangle, circle, polygon, or drag-range cutouts. Rect and circle areas can be set by dragging on the preview.
 - Text layers with font size, font dropdown, color, rotation, and outline stroke.
+- Text layers can be fit to their layer bounds with a one-click Fit text to box action.
 - Shape layers with fill/stroke, size, and rotation.
 - Browser-local color palette with quick apply for text, shape fill, and stroke/outline colors.
 - Named browser-local color palette entries with Fill/Stroke targets.
@@ -62,12 +66,11 @@ Latest local gate:
 
 - URL: `http://127.0.0.1:4173/thumbnail-generator/`
 - Browser: Playwright headless Chromium. Browser plugin fallback reason: in-app Browser returned `Browser is not available: iab`.
-- Passed: nonblank canvas, primary UI visible, left task tabs, right inspector tabs, CSV import, HTML import, inspector edit, direct canvas move/resize/rotate, z-order-aware preview selection, multi-select alignment, single-layer canvas alignment, Colors tab vertical expansion, named Fill/Stroke palette registration/apply, custom TTF font import/load/apply/storage, portrait preset fit at 56% zoom, layer lock, layer Delete-key removal, delete confirmation modal cancel/confirm, layer drag-and-drop ordering, Adjust controls without duplicate numeric readouts, multiple named template saves, Image Lab modal workspace with Rect/Circle drag selection and chroma key, image import, WebP export download, desktop viewport, mobile viewport, and mobile canvas viewport.
+- Passed: nonblank canvas, primary UI visible, initial Japanese UI detection, English language switch, preview blank-click deselection, Fit text to box, multi-select relative move/rotation, generated CSV evidence for relative edits, off-canvas edit preview expansion, rotation handle cursor/drag, left task tabs, right inspector tabs, CSV import, HTML import, inspector edit, image import, WebP export download, desktop viewport, mobile viewport, and mobile no-overflow check.
 - Latest work-item screenshots:
-  - `docs/assets/runtime-work-items-font.png`
-  - `docs/assets/runtime-work-items-colors.png`
-  - `docs/assets/runtime-work-items-preset.png`
-  - `docs/assets/runtime-work-items-mobile.png`
+  - `docs/assets/runtime-p2-work-items-japanese.png`
+  - `docs/assets/runtime-p2-work-items-desktop.png`
+  - `docs/assets/runtime-p2-work-items-mobile.png`
 
 Latest remote deploy:
 

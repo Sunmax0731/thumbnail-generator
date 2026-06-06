@@ -39,6 +39,8 @@ Text layers include:
 - `align`: `left`, `center`, or `right`
 - `lineHeight`
 
+Text layers can run a Fit text to box action. The action measures each line with the selected font, line height, and stroke width, then chooses the largest integer font size that fits within the layer width and height.
+
 ## Shape Layers
 
 Shape layers include:
@@ -103,9 +105,13 @@ The selected layer can be edited directly on the canvas:
 - Handles are rendered in preview padding, so controls remain visible even when they extend outside the thumbnail document bounds.
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
+- The Adjust tab exposes Relative edit controls for multi-selection. Move X and Move Y apply the same coordinate delta to each selected editable layer. Rotation delta adds the same degree delta to each selected editable layer's current rotation.
 - Inspector numeric fields remain the source of precise values.
 - When multiple visible editable layers overlap under the pointer, body clicks select the frontmost layer in the current render order.
+- Clicking preview space that is not a selectable layer or active handle clears the current selection.
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
+- The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
+- Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
 
 ## Alignment
 
@@ -163,6 +169,12 @@ Export waits for `document.fonts.ready` before drawing so custom fonts are refle
 ## Preview Fit
 
 The canvas preview keeps a user-controlled zoom value, but preset or output size changes recompute a fit zoom from the visible canvas stage and the document aspect ratio. Tall presets such as Shorts shrink the preview so the complete document and preview padding fit inside the desktop stage instead of forcing the editor shell to grow vertically.
+
+The edit preview includes dynamic padding around the document. Padding expands to include visible off-canvas layer bounds and selection handles. Export rendering does not use this edit padding, so downloaded PNG/JPEG/WebP files remain clipped to the configured output width and height.
+
+## Localization
+
+The app supports English and Japanese UI labels. Initial language is detected from `navigator.languages`/`navigator.language`; tags beginning with `ja` use Japanese, tags beginning with `en` use English, and unsupported tags fall back to English. The top toolbar language selector can switch language during the session.
 
 ## Browser Templates
 

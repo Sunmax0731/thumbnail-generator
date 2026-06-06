@@ -1,6 +1,7 @@
 import { useCallback, useEffect, useRef } from "react";
 import { Maximize2, MousePointer2, ZoomIn, ZoomOut } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
+import type { Translator } from "../lib/i18n";
 import type { OutputSettings } from "../lib/types";
 
 interface CanvasStageProps {
@@ -15,6 +16,7 @@ interface CanvasStageProps {
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
+  t: Translator;
 }
 
 export function CanvasStage({
@@ -29,6 +31,7 @@ export function CanvasStage({
   onPointerDown,
   onPointerMove,
   onPointerUp,
+  t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
   const fitCanvas = useCallback(() => {
@@ -58,23 +61,23 @@ export function CanvasStage({
   }, [fitCanvas]);
 
   return (
-    <section className="stage-panel" aria-label="Canvas preview">
+    <section className="stage-panel" aria-label={t("stage.aria")}>
       <div className="stage-toolbar">
         <div className="stage-title">
           <MousePointer2 size={16} />
           <span>{selectedLayerName}</span>
         </div>
         <div className="stage-meta">
-          <span>{layerCount} layers</span>
+          <span>{layerCount === 1 ? t("stage.layerCount.one") : t("stage.layerCount", { count: layerCount })}</span>
           <span>
             {settings.width} x {settings.height}
           </span>
         </div>
-        <div className="zoom-controls" aria-label="Canvas zoom">
+        <div className="zoom-controls" aria-label={t("stage.zoom")}>
           <button
             type="button"
             className="icon-button"
-            title="Zoom out"
+            title={t("stage.zoomOut")}
             onClick={() => onZoomChange(Math.max(0.25, zoom - 0.08))}
           >
             <ZoomOut size={16} />
@@ -83,12 +86,12 @@ export function CanvasStage({
           <button
             type="button"
             className="icon-button"
-            title="Zoom in"
+            title={t("stage.zoomIn")}
             onClick={() => onZoomChange(Math.min(1, zoom + 0.08))}
           >
             <ZoomIn size={16} />
           </button>
-          <button type="button" className="icon-button" title="Fit canvas" onClick={fitCanvas}>
+          <button type="button" className="icon-button" title={t("stage.fitCanvas")} onClick={fitCanvas}>
             <Maximize2 size={16} />
           </button>
         </div>
@@ -105,7 +108,7 @@ export function CanvasStage({
           <canvas
             ref={canvasRef}
             className="thumbnail-canvas"
-            aria-label="Thumbnail preview canvas"
+            aria-label={t("stage.canvasLabel")}
             style={{ cursor }}
             onPointerDown={onPointerDown}
             onPointerMove={onPointerMove}

@@ -15,10 +15,12 @@ import {
   GripVertical,
   Layers,
   Lock,
+  Move,
   Palette,
   RotateCw,
   SlidersHorizontal,
   Trash2,
+  Type,
   Unlock,
   Upload,
 } from "lucide-react";
@@ -26,6 +28,8 @@ import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
 import type { PaletteColor, PaletteTarget } from "../lib/colorPalette";
+import type { Translator } from "../lib/i18n";
+import type { RelativeLayerTransform } from "../lib/layerTransform";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
 type InspectorSection = "layers" | "edit" | "colors";
@@ -55,7 +59,10 @@ interface InspectorPanelProps {
   onToggleVisible: (id: string) => void;
   onToggleSelectable: (id: string) => void;
   onAlignSelection: (mode: AlignmentMode) => void;
+  onTransformSelection: (transform: RelativeLayerTransform) => void;
   onCustomFontFiles: (files: FileList | null) => void;
+  onFitTextToBounds: (id: string) => void;
+  t: Translator;
 }
 
 export function InspectorPanel({
@@ -83,18 +90,24 @@ export function InspectorPanel({
   onToggleVisible,
   onToggleSelectable,
   onAlignSelection,
+  onTransformSelection,
   onCustomFontFiles,
+  onFitTextToBounds,
+  t,
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
+  const [relativeMoveX, setRelativeMoveX] = useState(0);
+  const [relativeMoveY, setRelativeMoveY] = useState(0);
+  const [relativeRotation, setRelativeRotation] = useState(0);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
 
   return (
-    <aside className="side-panel inspector-panel" aria-label="Layer inspector">
-      <div className="panel-tabs inspector-tabs" role="tablist" aria-label="Inspector sections">
+    <aside className="side-panel inspector-panel" aria-label={t("inspector.aria")}>
+      <div className="panel-tabs inspector-tabs" role="tablist" aria-label={t("inspector.tabs")}>
         <button
           type="button"
           role="tab"
@@ -102,7 +115,7 @@ export function InspectorPanel({
           className={activeSection === "layers" ? "selected" : ""}
           onClick={() => setActiveSection("layers")}
         >
-          <Layers size={15} /> Layers
+          <Layers size={15} /> {t("inspector.layers")}
         </button>
         <button
           type="button"
@@ -111,7 +124,7 @@ export function InspectorPanel({
           className={activeSection === "edit" ? "selected" : ""}
           onClick={() => setActiveSection("edit")}
         >
-          <SlidersHorizontal size={15} /> Adjust
+          <SlidersHorizontal size={15} /> {t("inspector.adjust")}
         </button>
         <button
           type="button"
@@ -120,7 +133,7 @@ export function InspectorPanel({
           className={activeSection === "colors" ? "selected" : ""}
           onClick={() => setActiveSection("colors")}
         >
-          <Palette size={15} /> Colors
+          <Palette size={15} /> {t("inspector.colors")}
         </button>
       </div>
 
@@ -129,10 +142,10 @@ export function InspectorPanel({
           <section className="panel-section layer-section">
             <div className="section-heading">
               <Layers size={16} />
-              <h2>Layers</h2>
+              <h2>{t("inspector.layers")}</h2>
               <span className="section-count">{layers.length}</span>
             </div>
-            <div className="layer-list" aria-label="Layer list">
+            <div className="layer-list" aria-label={t("inspector.layerList")}>
               {[...layers].reverse().map((layer) => (
                 <div
                   key={layer.id}
@@ -178,8 +191,8 @@ export function InspectorPanel({
                   <button
                     type="button"
                     className="mini-icon-button"
-                    aria-label={layer.visible ? `Hide ${layer.name}` : `Show ${layer.name}`}
-                    title={layer.visible ? "Hide layer" : "Show layer"}
+                    aria-label={layer.visible ? t("inspector.hideLayer", { name: layer.name }) : t("inspector.showLayer", { name: layer.name })}
+                    title={layer.visible ? t("inspector.hideLayerTitle") : t("inspector.showLayerTitle")}
                     onClick={(event) => {
                       event.stopPropagation();
                       onToggleVisible(layer.id);
@@ -190,8 +203,8 @@ export function InspectorPanel({
                   <button
                     type="button"
                     className="mini-icon-button"
-                    aria-label={layer.selectable ? `Lock ${layer.name}` : `Unlock ${layer.name}`}
-                    title={layer.selectable ? "Lock selection and editing" : "Unlock selection and editing"}
+                    aria-label={layer.selectable ? t("inspector.lockLayer", { name: layer.name }) : t("inspector.unlockLayer", { name: layer.name })}
+                    title={layer.selectable ? t("inspector.lockLayerTitle") : t("inspector.unlockLayerTitle")}
                     onClick={(event) => {
                       event.stopPropagation();
                       onToggleSelectable(layer.id);
@@ -202,8 +215,8 @@ export function InspectorPanel({
                   <button
                     type="button"
                     className="mini-icon-button danger"
-                    aria-label={`Delete ${layer.name}`}
-                    title="Delete layer"
+                    aria-label={t("inspector.deleteLayer", { name: layer.name })}
+                    title={t("inspector.deleteLayerTitle")}
                     onClick={(event) => {
                       event.stopPropagation();
                       setDeleteCandidateId(layer.id);
@@ -219,32 +232,32 @@ export function InspectorPanel({
           <section className="panel-section">
             <div className="section-heading">
               <AlignHorizontalJustifyCenter size={16} />
-              <h2>Align</h2>
+              <h2>{t("inspector.align")}</h2>
             </div>
             <p className="selection-note">
               {selectedLayers.length === 0
-                ? "No editable layer selected."
+                ? t("inspector.noEditableSelection")
                 : selectedLayers.length === 1
-                  ? "Single layer aligns to the canvas."
-                  : `${selectedLayers.length} layers align to the selection bounds.`}
+                  ? t("inspector.singleAlign")
+                  : t("inspector.multiAlign", { count: selectedLayers.length })}
             </p>
-            <div className="align-grid" aria-label="Alignment controls">
-              <AlignButton label="Left" mode="left" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <div className="align-grid" aria-label={t("inspector.alignControls")}>
+              <AlignButton label={t("inspector.left")} mode="left" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignHorizontalJustifyStart size={16} />
               </AlignButton>
-              <AlignButton label="Center" mode="center" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+              <AlignButton label={t("inspector.center")} mode="center" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignHorizontalJustifyCenter size={16} />
               </AlignButton>
-              <AlignButton label="Right" mode="right" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+              <AlignButton label={t("inspector.right")} mode="right" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignHorizontalJustifyEnd size={16} />
               </AlignButton>
-              <AlignButton label="Top" mode="top" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+              <AlignButton label={t("inspector.top")} mode="top" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignVerticalJustifyStart size={16} />
               </AlignButton>
-              <AlignButton label="Middle" mode="middle" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+              <AlignButton label={t("inspector.middle")} mode="middle" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignVerticalJustifyCenter size={16} />
               </AlignButton>
-              <AlignButton label="Bottom" mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+              <AlignButton label={t("inspector.bottom")} mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignVerticalJustifyEnd size={16} />
               </AlignButton>
             </div>
@@ -265,112 +278,140 @@ export function InspectorPanel({
           onAdd={onAddPaletteColor}
           onDelete={onDeletePaletteColor}
           onApply={onApplyPaletteColor}
+          t={t}
         />
       ) : null}
 
       {activeSection === "edit" ? (
         selected ? (
-        <section className="panel-section inspector-section">
-          <div className="section-heading">
-            <SlidersHorizontal size={16} />
-            <h2>Inspector</h2>
-          </div>
-          <div className="inspector-actions">
-            <button className="icon-button" type="button" title="Move layer up" onClick={() => onMove(selected.id, 1)}>
-              <ArrowUp size={16} />
-            </button>
-            <button className="icon-button" type="button" title="Move layer down" onClick={() => onMove(selected.id, -1)}>
-              <ArrowDown size={16} />
-            </button>
-            <button className="icon-button" type="button" title="Duplicate layer" onClick={() => onDuplicate(selected.id)}>
-              <Copy size={16} />
-            </button>
-            <button className="icon-button danger" type="button" title="Delete layer" onClick={() => setDeleteCandidateId(selected.id)}>
-              <Trash2 size={16} />
-            </button>
-          </div>
-
-          <div className="field-stack">
-            <TextInput
-              label="Name"
-              value={selected.name}
-              onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, name: value }))}
-            />
-            <div className="field-grid two">
-              <SliderNumberInput
-                label="X"
-                value={selected.x}
-                min={-settings.width}
-                max={settings.width * 2}
-                step={1}
-                onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)}
-              />
-              <SliderNumberInput
-                label="Y"
-                value={selected.y}
-                min={-settings.height}
-                max={settings.height * 2}
-                step={1}
-                onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)}
-              />
-              <SliderNumberInput
-                label="Width"
-                value={selected.width}
-                min={16}
-                max={settings.width * 2}
-                step={1}
-                onChange={(value) => updateNumber(selected, "width", value, onUpdateLayer)}
-              />
-              <SliderNumberInput
-                label="Height"
-                value={selected.height}
-                min={16}
-                max={settings.height * 2}
-                step={1}
-                onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
-              />
+          <section className="panel-section inspector-section">
+            <div className="section-heading">
+              <SlidersHorizontal size={16} />
+              <h2>{t("inspector.inspector")}</h2>
             </div>
-            <SliderNumberInput
-              label="Rotation"
-              value={selected.rotation}
-              min={-180}
-              max={180}
-              step={1}
-              icon={<RotateCw size={14} />}
-              suffix="deg"
-              onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
-            />
-            <SliderNumberInput
-              label="Opacity"
-              value={selected.opacity}
-              min={0}
-              max={1}
-              step={0.01}
-              decimals={2}
-              onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
-            />
+            <div className="inspector-actions">
+              <button className="icon-button" type="button" title={t("inspector.moveUp")} onClick={() => onMove(selected.id, 1)}>
+                <ArrowUp size={16} />
+              </button>
+              <button className="icon-button" type="button" title={t("inspector.moveDown")} onClick={() => onMove(selected.id, -1)}>
+                <ArrowDown size={16} />
+              </button>
+              <button className="icon-button" type="button" title={t("inspector.duplicate")} onClick={() => onDuplicate(selected.id)}>
+                <Copy size={16} />
+              </button>
+              <button
+                className="icon-button danger"
+                type="button"
+                title={t("inspector.deleteLayerTitle")}
+                onClick={() => setDeleteCandidateId(selected.id)}
+              >
+                <Trash2 size={16} />
+              </button>
+            </div>
 
-            {selected.type === "image" && (
-              <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} />
-            )}
-            {selected.type === "text" && (
-              <TextControls
-                selected={selected}
-                fontOptions={fontOptions}
-                onUpdateLayer={onUpdateLayer}
-                onCustomFontFiles={onCustomFontFiles}
+            <div className="field-stack">
+              <TextInput
+                label={t("inspector.name")}
+                value={selected.name}
+                onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, name: value }))}
               />
-            )}
-            {selected.type === "shape" && <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} />}
-          </div>
-        </section>
+              <div className="field-grid two">
+                <SliderNumberInput
+                  label={t("inspector.x")}
+                  value={selected.x}
+                  min={-settings.width}
+                  max={settings.width * 2}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)}
+                />
+                <SliderNumberInput
+                  label={t("inspector.y")}
+                  value={selected.y}
+                  min={-settings.height}
+                  max={settings.height * 2}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)}
+                />
+                <SliderNumberInput
+                  label={t("inspector.width")}
+                  value={selected.width}
+                  min={16}
+                  max={settings.width * 2}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "width", value, onUpdateLayer)}
+                />
+                <SliderNumberInput
+                  label={t("inspector.height")}
+                  value={selected.height}
+                  min={16}
+                  max={settings.height * 2}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
+                />
+              </div>
+              <SliderNumberInput
+                label={t("inspector.rotation")}
+                value={selected.rotation}
+                min={-180}
+                max={180}
+                step={1}
+                icon={<RotateCw size={14} />}
+                suffix="deg"
+                onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
+              />
+              <SliderNumberInput
+                label={t("inspector.opacity")}
+                value={selected.opacity}
+                min={0}
+                max={1}
+                step={0.01}
+                decimals={2}
+                onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
+              />
+
+              {selected.type === "image" && (
+                <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
+              )}
+              {selected.type === "text" && (
+                <TextControls
+                  selected={selected}
+                  fontOptions={fontOptions}
+                  onUpdateLayer={onUpdateLayer}
+                  onCustomFontFiles={onCustomFontFiles}
+                  onFitTextToBounds={onFitTextToBounds}
+                  t={t}
+                />
+              )}
+              {selected.type === "shape" && <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />}
+            </div>
+          </section>
+        ) : selectedLayers.length > 1 ? (
+          <GroupTransformControls
+            selectedCount={selectedLayers.length}
+            moveX={relativeMoveX}
+            moveY={relativeMoveY}
+            rotation={relativeRotation}
+            onMoveXChange={setRelativeMoveX}
+            onMoveYChange={setRelativeMoveY}
+            onRotationChange={setRelativeRotation}
+            onApplyMove={() => {
+              onTransformSelection({ deltaX: relativeMoveX, deltaY: relativeMoveY });
+              setRelativeMoveX(0);
+              setRelativeMoveY(0);
+            }}
+            onApplyRotation={() => {
+              onTransformSelection({ deltaRotation: relativeRotation });
+              setRelativeRotation(0);
+            }}
+            t={t}
+          />
         ) : (
           <section className="panel-section inspector-section">
             <div className="section-heading">
               <SlidersHorizontal size={16} />
-              <h2>Inspector</h2>
+              <h2>{t("inspector.inspector")}</h2>
             </div>
-            <p className="empty-note">No editable layer selected.</p>
+            <p className="empty-note">{t("inspector.noEditableSelection")}</p>
           </section>
         )
       ) : null}
@@ -382,6 +423,7 @@ export function InspectorPanel({
             onDelete(deleteCandidate.id);
             setDeleteCandidateId(null);
           }}
+          t={t}
         />
       ) : null}
     </aside>
@@ -421,6 +463,7 @@ function PaletteControls({
   onAdd,
   onDelete,
   onApply,
+  t,
 }: {
   colors: PaletteColor[];
   draft: string;
@@ -433,42 +476,43 @@ function PaletteControls({
   onAdd: () => void;
   onDelete: (id: string) => void;
   onApply: (color: string, target: PaletteTarget) => void;
+  t: Translator;
 }) {
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
         <SlidersHorizontal size={16} />
-        <h2>Color palette</h2>
+        <h2>{t("inspector.palette")}</h2>
       </div>
       <div className="palette-register">
         <label className="field palette-name-field">
-          <span>Name</span>
+          <span>{t("inspector.paletteName")}</span>
           <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
         </label>
         <label className="field color-field">
-          <span>Color</span>
+          <span>{t("inspector.paletteColor")}</span>
           <input type="color" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
           <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
         </label>
         <label className="field palette-target-field">
-          <span>Target</span>
+          <span>{t("inspector.paletteTarget")}</span>
           <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
-            <option value="fill">Fill</option>
-            <option value="stroke">Stroke</option>
+            <option value="fill">{t("inspector.fill")}</option>
+            <option value="stroke">{t("inspector.stroke")}</option>
           </select>
         </label>
         <button type="button" className="secondary-button" onClick={onAdd}>
-          Add
+          {t("inspector.addColor")}
         </button>
       </div>
-      <div className="swatch-grid" aria-label="Registered colors">
+      <div className="swatch-grid" aria-label={t("inspector.registeredColors")}>
         {colors.map((color) => (
           <div className="swatch-row" key={color.id}>
             <button
               type="button"
               className="swatch"
-              aria-label={`Apply ${color.name} to ${paletteTargetLabel(color.target)}`}
-              title={`Apply ${color.name} to ${paletteTargetLabel(color.target)}`}
+              aria-label={t("inspector.applyColor", { name: color.name, target: paletteTargetLabel(color.target, t) })}
+              title={t("inspector.applyColor", { name: color.name, target: paletteTargetLabel(color.target, t) })}
               style={{ background: color.value }}
               disabled={selectedCount === 0}
               onClick={() => onApply(color.value, color.target)}
@@ -479,13 +523,13 @@ function PaletteControls({
               disabled={selectedCount === 0}
               onClick={() => onApply(color.value, color.target)}
             >
-              {paletteTargetLabel(color.target)}
+              {paletteTargetLabel(color.target, t)}
             </button>
             <div className="swatch-meta">
               <span className="swatch-name">{color.name}</span>
               <span className="swatch-value">{color.value}</span>
             </div>
-            <button type="button" className="mini-icon-button danger" title={`Delete ${color.name}`} onClick={() => onDelete(color.id)}>
+            <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
               <Trash2 size={13} />
             </button>
           </div>
@@ -495,30 +539,103 @@ function PaletteControls({
   );
 }
 
+function GroupTransformControls({
+  selectedCount,
+  moveX,
+  moveY,
+  rotation,
+  onMoveXChange,
+  onMoveYChange,
+  onRotationChange,
+  onApplyMove,
+  onApplyRotation,
+  t,
+}: {
+  selectedCount: number;
+  moveX: number;
+  moveY: number;
+  rotation: number;
+  onMoveXChange: (value: number) => void;
+  onMoveYChange: (value: number) => void;
+  onRotationChange: (value: number) => void;
+  onApplyMove: () => void;
+  onApplyRotation: () => void;
+  t: Translator;
+}) {
+  return (
+    <section className="panel-section inspector-section">
+      <div className="section-heading">
+        <Move size={16} />
+        <h2>{t("inspector.relativeEdit")}</h2>
+        <span className="section-count">{selectedCount}</span>
+      </div>
+      <p className="selection-note">{t("inspector.relativeNote")}</p>
+      <div className="field-stack">
+        <div className="field-grid two">
+          <SliderNumberInput
+            label={t("inspector.moveX")}
+            value={moveX}
+            min={-640}
+            max={640}
+            step={1}
+            onChange={onMoveXChange}
+          />
+          <SliderNumberInput
+            label={t("inspector.moveY")}
+            value={moveY}
+            min={-640}
+            max={640}
+            step={1}
+            onChange={onMoveYChange}
+          />
+        </div>
+        <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyMove}>
+          <Move size={16} /> {t("inspector.applyMove")}
+        </button>
+        <SliderNumberInput
+          label={t("inspector.rotationDelta")}
+          value={rotation}
+          min={-180}
+          max={180}
+          step={1}
+          suffix="deg"
+          icon={<RotateCw size={14} />}
+          onChange={onRotationChange}
+        />
+        <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyRotation}>
+          <RotateCw size={16} /> {t("inspector.applyRotation")}
+        </button>
+      </div>
+    </section>
+  );
+}
+
 function DeleteLayerDialog({
   layer,
   onCancel,
   onConfirm,
+  t,
 }: {
   layer: ThumbnailLayer;
   onCancel: () => void;
   onConfirm: () => void;
+  t: Translator;
 }) {
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="delete-layer-title">
         <div className="modal-title-block">
-          <h2 id="delete-layer-title">Delete layer?</h2>
+          <h2 id="delete-layer-title">{t("inspector.deleteQuestion")}</h2>
         </div>
         <p>
-          Remove <strong>{layer.name}</strong> from the thumbnail.
+          {t("inspector.deleteCopy", { name: layer.name })}
         </p>
         <div className="confirm-actions">
           <button type="button" className="secondary-button" onClick={onCancel}>
-            Cancel
+            {t("inspector.cancel")}
           </button>
           <button type="button" className="primary-button danger-button" onClick={onConfirm}>
-            Delete
+            {t("inspector.delete")}
           </button>
         </div>
       </section>
@@ -526,23 +643,25 @@ function DeleteLayerDialog({
   );
 }
 
-function paletteTargetLabel(target: PaletteTarget): string {
-  return target === "fill" ? "Fill" : "Stroke";
+function paletteTargetLabel(target: PaletteTarget, t: Translator): string {
+  return target === "fill" ? t("inspector.fill") : t("inspector.stroke");
 }
 
 function ImageControls({
   selected,
   assets,
   onUpdateLayer,
+  t,
 }: {
   selected: Extract<ThumbnailLayer, { type: "image" }>;
   assets: ImageAsset[];
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  t: Translator;
 }) {
   return (
     <>
       <label className="field">
-        <span>Image key</span>
+        <span>{t("inspector.imageKey")}</span>
         <select
           value={selected.imageKey}
           onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, imageKey: event.target.value }))}
@@ -555,11 +674,11 @@ function ImageControls({
         </select>
       </label>
       <div className="field-grid two">
-        <EffectInput selected={selected} effect="grayscale" label="Gray" min={0} max={1} step={0.05} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="blur" label="Blur" min={0} max={24} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="brightness" label="Bright" min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="contrast" label="Contrast" min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="mosaic" label="Mosaic" min={0} max={48} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="grayscale" label={t("inspector.gray")} min={0} max={1} step={0.05} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="blur" label={t("inspector.blur")} min={0} max={24} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="brightness" label={t("inspector.bright")} min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="contrast" label={t("inspector.contrast")} min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="mosaic" label={t("inspector.mosaic")} min={0} max={48} step={1} onUpdateLayer={onUpdateLayer} />
       </div>
     </>
   );
@@ -570,16 +689,20 @@ function TextControls({
   fontOptions,
   onUpdateLayer,
   onCustomFontFiles,
+  onFitTextToBounds,
+  t,
 }: {
   selected: Extract<ThumbnailLayer, { type: "text" }>;
   fontOptions: FontOption[];
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
   onCustomFontFiles: InspectorPanelProps["onCustomFontFiles"];
+  onFitTextToBounds: InspectorPanelProps["onFitTextToBounds"];
+  t: Translator;
 }) {
   return (
     <>
       <label className="field">
-        <span>Text</span>
+        <span>{t("inspector.text")}</span>
         <textarea
           className="mini-textarea"
           value={selected.text}
@@ -588,7 +711,7 @@ function TextControls({
       </label>
       <div className="field-grid two">
         <SliderNumberInput
-          label="Font size"
+          label={t("inspector.fontSize")}
           value={selected.fontSize}
           min={8}
           max={240}
@@ -596,7 +719,7 @@ function TextControls({
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontSize: value }))}
         />
         <SliderNumberInput
-          label="Stroke"
+          label={t("inspector.stroke")}
           value={selected.strokeWidth}
           min={0}
           max={48}
@@ -604,8 +727,11 @@ function TextControls({
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
       </div>
+      <button type="button" className="secondary-button icon-text wide-button" onClick={() => onFitTextToBounds(selected.id)}>
+        <Type size={16} /> {t("inspector.fitText")}
+      </button>
       <label className="field">
-        <span>Font</span>
+        <span>{t("inspector.font")}</span>
         <select
           value={selected.fontFamily}
           onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontFamily: event.target.value }))}
@@ -622,7 +748,7 @@ function TextControls({
       </label>
       <label className="file-drop compact-drop custom-font-drop" title="WOFF2, WOFF, TTF, or OTF">
         <Upload size={15} />
-        <span>Add font</span>
+        <span>{t("inspector.addFont")}</span>
         <input
           type="file"
           accept={acceptedFontFileTypes}
@@ -634,18 +760,18 @@ function TextControls({
       </label>
       <div className="field-grid two">
         <ColorInput
-          label="Fill"
+          label={t("inspector.fill")}
           value={selected.color}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, color: value }))}
         />
         <ColorInput
-          label="Outline"
+          label={t("inspector.outline")}
           value={selected.strokeColor}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
       </div>
       <SliderNumberInput
-        label="Line height"
+        label={t("inspector.lineHeight")}
         value={selected.lineHeight}
         min={0.5}
         max={2}
@@ -654,16 +780,16 @@ function TextControls({
         onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, lineHeight: value }))}
       />
       <label className="field">
-        <span>Text align</span>
+        <span>{t("inspector.textAlign")}</span>
         <select
           value={selected.align}
           onChange={(event) =>
             onUpdateLayer(selected.id, (layer) => ({ ...layer, align: event.target.value as TextAlign }))
           }
         >
-          <option value="left">Left</option>
-          <option value="center">Center</option>
-          <option value="right">Right</option>
+          <option value="left">{t("inspector.left")}</option>
+          <option value="center">{t("inspector.center")}</option>
+          <option value="right">{t("inspector.right")}</option>
         </select>
       </label>
     </>
@@ -673,38 +799,40 @@ function TextControls({
 function ShapeControls({
   selected,
   onUpdateLayer,
+  t,
 }: {
   selected: Extract<ThumbnailLayer, { type: "shape" }>;
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  t: Translator;
 }) {
   return (
     <>
       <label className="field">
-        <span>Shape</span>
+        <span>{t("inspector.shape")}</span>
         <select
           value={selected.shape}
           onChange={(event) =>
             onUpdateLayer(selected.id, (layer) => ({ ...layer, shape: event.target.value as ShapeKind }))
           }
         >
-          <option value="rect">Rect</option>
-          <option value="ellipse">Ellipse</option>
-          <option value="triangle">Triangle</option>
+          <option value="rect">{t("inspector.rect")}</option>
+          <option value="ellipse">{t("inspector.ellipse")}</option>
+          <option value="triangle">{t("inspector.triangle")}</option>
         </select>
       </label>
       <div className="field-grid two">
         <ColorInput
-          label="Fill"
+          label={t("inspector.fill")}
           value={selected.fill}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fill: value }))}
         />
         <ColorInput
-          label="Stroke"
+          label={t("inspector.stroke")}
           value={selected.strokeColor}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
         <SliderNumberInput
-          label="Stroke width"
+          label={t("inspector.strokeWidth")}
           value={selected.strokeWidth}
           min={0}
           max={48}

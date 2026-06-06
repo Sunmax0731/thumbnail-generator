@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Scissors, Shapes, Trash2, Type } from "lucide-react";
+import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
@@ -25,6 +26,7 @@ interface LeftPanelProps {
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
   onOpenImageLab: () => void;
+  t: Translator;
 }
 
 export function LeftPanel({
@@ -47,12 +49,13 @@ export function LeftPanel({
   onLoadTemplate,
   onDeleteTemplate,
   onOpenImageLab,
+  t,
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("assets");
 
   return (
-    <aside className="side-panel left-panel" aria-label="Imports and layout sources">
-      <div className="panel-tabs source-tabs" role="tablist" aria-label="Source sections">
+    <aside className="side-panel left-panel" aria-label={t("left.aria")}>
+      <div className="panel-tabs source-tabs" role="tablist" aria-label={t("left.tabs")}>
         <button
           type="button"
           role="tab"
@@ -60,7 +63,7 @@ export function LeftPanel({
           className={activeSection === "assets" ? "selected" : ""}
           onClick={() => setActiveSection("assets")}
         >
-          <ImagePlus size={15} /> Assets
+          <ImagePlus size={15} /> {t("left.assets")}
         </button>
         <button
           type="button"
@@ -69,7 +72,7 @@ export function LeftPanel({
           className={activeSection === "layouts" ? "selected" : ""}
           onClick={() => setActiveSection("layouts")}
         >
-          <Code2 size={15} /> Layouts
+          <Code2 size={15} /> {t("left.layouts")}
         </button>
         <button
           type="button"
@@ -78,7 +81,7 @@ export function LeftPanel({
           className={activeSection === "templates" ? "selected" : ""}
           onClick={() => setActiveSection("templates")}
         >
-          <Save size={15} /> Templates
+          <Save size={15} /> {t("left.templates")}
         </button>
       </div>
 
@@ -87,12 +90,12 @@ export function LeftPanel({
           <section className="panel-section">
             <div className="section-heading">
               <ImagePlus size={16} />
-              <h2>Images</h2>
+              <h2>{t("left.images")}</h2>
               <span className="section-count">{assets.length}</span>
             </div>
             <label className="file-drop">
               <ImagePlus size={19} />
-              <span>Import image files</span>
+              <span>{t("left.importImages")}</span>
               <input
                 type="file"
                 accept="image/*"
@@ -101,9 +104,9 @@ export function LeftPanel({
               />
             </label>
             <button type="button" className="secondary-button icon-text wide-button" onClick={onOpenImageLab}>
-              <Scissors size={16} /> Open Image Lab
+              <Scissors size={16} /> {t("left.openImageLab")}
             </button>
-            <div className="asset-list" aria-label="Imported assets">
+            <div className="asset-list" aria-label={t("left.assetsList")}>
               {assets.map((asset) => (
                 <div className="asset-row" key={asset.key}>
                   <img src={asset.src} alt="" />
@@ -116,18 +119,18 @@ export function LeftPanel({
           <section className="panel-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
-              <h2>Quick layers</h2>
+              <h2>{t("left.quickLayers")}</h2>
             </div>
             <div className="button-grid">
               <button type="button" className="secondary-button icon-text" onClick={onAddText}>
-                <Type size={16} /> Text
+                <Type size={16} /> {t("left.text")}
               </button>
               <button type="button" className="secondary-button icon-text" onClick={onAddShape}>
-                <Shapes size={16} /> Shape
+                <Shapes size={16} /> {t("left.shape")}
               </button>
             </div>
             <button type="button" className="ghost-button wide-button" onClick={onResetTemplate}>
-              Restore sample template
+              {t("left.restoreSample")}
             </button>
           </section>
         </>
@@ -138,44 +141,44 @@ export function LeftPanel({
           <section className="panel-section">
             <div className="section-heading">
               <RefreshCw size={16} />
-              <h2>Generated layout</h2>
+              <h2>{t("left.generatedLayout")}</h2>
             </div>
             <button type="button" className="secondary-button icon-text wide-button" onClick={onSyncLayoutText}>
-              <RefreshCw size={16} /> Generate current CSV / HTML
+              <RefreshCw size={16} /> {t("left.generateLayout")}
             </button>
           </section>
 
           <section className="panel-section grow-section">
             <div className="section-heading">
               <FileText size={16} />
-              <h2>CSV layout</h2>
+              <h2>{t("left.csvLayout")}</h2>
             </div>
             <textarea
               className="layout-textarea"
               spellCheck={false}
               value={csvText}
               onChange={(event) => onCsvTextChange(event.target.value)}
-              aria-label="CSV layout editor"
+              aria-label={t("left.csvEditor")}
             />
             <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyCsv}>
-              <FileText size={16} /> Apply CSV
+              <FileText size={16} /> {t("left.applyCsv")}
             </button>
           </section>
 
           <section className="panel-section grow-section">
             <div className="section-heading">
               <Code2 size={16} />
-              <h2>HTML layout</h2>
+              <h2>{t("left.htmlLayout")}</h2>
             </div>
             <textarea
               className="layout-textarea"
               spellCheck={false}
               value={htmlText}
               onChange={(event) => onHtmlTextChange(event.target.value)}
-              aria-label="HTML layout editor"
+              aria-label={t("left.htmlEditor")}
             />
             <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyHtml}>
-              <Code2 size={16} /> Apply HTML
+              <Code2 size={16} /> {t("left.applyHtml")}
             </button>
           </section>
         </>
@@ -185,11 +188,11 @@ export function LeftPanel({
         <section className="panel-section template-section">
           <div className="section-heading">
             <Save size={16} />
-            <h2>Browser templates</h2>
+            <h2>{t("left.browserTemplates")}</h2>
             <span className="section-count">{templates.length}</span>
           </div>
           <label className="field">
-            <span>Template name</span>
+            <span>{t("left.templateName")}</span>
             <input
               type="text"
               value={templateName}
@@ -197,11 +200,11 @@ export function LeftPanel({
             />
           </label>
           <button type="button" className="primary-button icon-text wide-button" onClick={onSaveTemplate}>
-            <Save size={16} /> Save template
+            <Save size={16} /> {t("left.saveTemplate")}
           </button>
-          <div className="template-list" aria-label="Saved templates">
+          <div className="template-list" aria-label={t("left.savedTemplates")}>
             {templates.length === 0 ? (
-              <p className="empty-note">No saved templates yet.</p>
+              <p className="empty-note">{t("left.noTemplates")}</p>
             ) : (
               templates.map((template) => (
                 <div className="template-row" key={template.id}>
@@ -212,7 +215,7 @@ export function LeftPanel({
                   <button
                     type="button"
                     className="icon-button danger"
-                    title={`Delete ${template.name}`}
+                    title={t("left.deleteTemplate", { name: template.name })}
                     onClick={() => onDeleteTemplate(template.id)}
                   >
                     <Trash2 size={14} />

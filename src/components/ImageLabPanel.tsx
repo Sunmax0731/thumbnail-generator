@@ -6,6 +6,7 @@ import {
   type ImagePoint,
   type RectSelection,
 } from "../lib/imageProcessing";
+import type { Translator } from "../lib/i18n";
 import type { ImageAsset } from "../lib/types";
 
 type LabMode = CropMode | "drag";
@@ -14,6 +15,7 @@ interface ImageLabPanelProps {
   assets: ImageAsset[];
   onImageFiles: (files: FileList | null) => void;
   onCreateProcessedAsset: (asset: ImageAsset) => void;
+  t: Translator;
 }
 
 interface PreviewRect {
@@ -27,7 +29,7 @@ interface PreviewRect {
 const previewWidth = 900;
 const previewHeight = 560;
 
-export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: ImageLabPanelProps) {
+export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset, t }: ImageLabPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previewRect = useRef<PreviewRect>({ x: 0, y: 0, width: 0, height: 0, scale: 1 });
   const dragStart = useRef<ImagePoint | null>(null);
@@ -166,19 +168,19 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
   ]);
 
   return (
-    <div className="image-lab" aria-label="Image Lab">
+    <div className="image-lab" aria-label={t("imageLab.aria")}>
       <section className="panel-section image-source-section">
         <div className="section-heading">
           <ImagePlus size={16} />
-          <h2>Image source</h2>
+          <h2>{t("imageLab.source")}</h2>
         </div>
         <label className="file-drop compact-drop">
           <ImagePlus size={18} />
-          <span>Import image files</span>
+          <span>{t("left.importImages")}</span>
           <input type="file" accept="image/*" multiple onChange={(event) => onImageFiles(event.currentTarget.files)} />
         </label>
         <label className="field">
-          <span>Asset</span>
+          <span>{t("imageLab.asset")}</span>
           <select value={selectedAsset?.key ?? ""} onChange={(event) => setAssetKey(event.currentTarget.value)}>
             {assets.map((asset) => (
               <option key={asset.key} value={asset.key}>
@@ -192,14 +194,14 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
       <section className="panel-section image-cutout-section">
         <div className="section-heading">
           <Scissors size={16} />
-          <h2>Cutout</h2>
+          <h2>{t("imageLab.cutout")}</h2>
         </div>
-        <div className="segmented-control" aria-label="Cutout mode">
+        <div className="segmented-control" aria-label={t("imageLab.cutoutMode")}>
           {[
-            ["rect", "Rect"],
-            ["ellipse", "Circle"],
-            ["polygon", "Free"],
-            ["drag", "Drag"],
+            ["rect", t("imageLab.rect")],
+            ["ellipse", t("imageLab.circle")],
+            ["polygon", t("imageLab.free")],
+            ["drag", t("imageLab.drag")],
           ].map(([value, label]) => (
             <button
               key={value}
@@ -216,7 +218,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
           width={previewWidth}
           height={previewHeight}
           className="image-lab-canvas"
-          aria-label="Image processing preview"
+          aria-label={t("imageLab.preview")}
           onPointerDown={handlePointerDown}
           onPointerMove={handlePointerMove}
           onPointerUp={handlePointerUp}
@@ -225,14 +227,14 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
         {mode === "polygon" ? (
           <div className="button-grid">
             <button type="button" className="secondary-button icon-text" onClick={() => setPolygonPoints([])}>
-              <MousePointer2 size={16} /> Clear points
+              <MousePointer2 size={16} /> {t("imageLab.clearPoints")}
             </button>
             <button
               type="button"
               className="secondary-button icon-text"
               onClick={() => setPolygonPoints((current) => current.slice(0, -1))}
             >
-              Undo point
+              {t("imageLab.undoPoint")}
             </button>
           </div>
         ) : null}
@@ -259,19 +261,19 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
       <section className="panel-section image-chroma-section">
         <div className="section-heading">
           <Sparkles size={16} />
-          <h2>Chroma key</h2>
+          <h2>{t("imageLab.chroma")}</h2>
         </div>
         <label className="checkbox-row">
           <input type="checkbox" checked={chromaEnabled} onChange={(event) => setChromaEnabled(event.currentTarget.checked)} />
-          Enable transparent key
+          {t("imageLab.enableTransparent")}
         </label>
         <div className="field-grid two">
           <label className="field color-field">
-            <span>Key color</span>
+            <span>{t("imageLab.keyColor")}</span>
             <input type="color" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
             <input type="text" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
           </label>
-          <LabSlider label="Tolerance" value={chromaTolerance} min={0} max={180} onChange={setChromaTolerance} />
+          <LabSlider label={t("imageLab.tolerance")} value={chromaTolerance} min={0} max={180} onChange={setChromaTolerance} />
         </div>
         <button
           type="button"
@@ -279,7 +281,7 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset }: 
           onClick={applyProcessing}
           disabled={!selectedAsset || isProcessing || (mode === "polygon" && polygonPoints.length < 3)}
         >
-          <Scissors size={16} /> {isProcessing ? "Processing..." : "Create processed layer"}
+          <Scissors size={16} /> {isProcessing ? t("imageLab.processing") : t("imageLab.createLayer")}
         </button>
       </section>
     </div>

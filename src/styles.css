@@ -301,6 +301,10 @@ button:disabled {
   min-width: 220px;
 }
 
+.language-field {
+  width: 118px;
+}
+
 .size-field {
   width: 128px;
 }
@@ -1127,6 +1131,7 @@ button:disabled {
   }
 
   .compact-field,
+  .language-field,
   .size-field,
   .format-field,
   .quality-field {

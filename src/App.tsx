@@ -39,9 +39,12 @@ import { downloadThumbnail } from "./lib/exportThumbnail";
 import { fontOptions as defaultFontOptions } from "./lib/fonts";
 import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
+import { createTranslator, detectInitialLanguage, type Language } from "./lib/i18n";
+import { applyRelativeLayerTransform, type RelativeLayerTransform } from "./lib/layerTransform";
 import { selectLayerIdsAfterDelete, selectTopSelectableLayerIds } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
+import { calculatePreviewPadding } from "./lib/previewPadding";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
 import {
@@ -51,6 +54,7 @@ import {
   upsertTemplate,
   writeSavedTemplates,
 } from "./lib/templates";
+import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
 import type { ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 
 interface ActiveCanvasInteraction {
@@ -60,11 +64,13 @@ interface ActiveCanvasInteraction {
   start: CanvasPoint;
 }
 
-const previewPadding = 88;
-
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
+  const didInitializeSelection = useRef(false);
+  const initialLanguage = useMemo(() => detectInitialLanguage(), []);
+  const [language, setLanguage] = useState<Language>(initialLanguage);
+  const t = useMemo(() => createTranslator(language), [language]);
   const [settings, setSettings] = useState<OutputSettings>(defaultOutputSettings);
   const [assets, setAssets] = useState<ImageAsset[]>(() => initialAssets(import.meta.env.BASE_URL));
   const [layers, setLayers] = useState<ThumbnailLayer[]>(() => createInitialLayers());
@@ -75,10 +81,12 @@ function App() {
   const [templates, setTemplates] = useState<SavedTemplate[]>(() =>
     typeof window === "undefined" ? [] : readSavedTemplates(),
   );
-  const [status, setStatus] = useState("Ready. Edit the sample, import CSV/HTML, or add local images.");
+  const [status, setStatus] = useState(() => createTranslator(initialLanguage)("status.ready"));
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
   const [canvasCursor, setCanvasCursor] = useState("default");
+  const [hoverInteractionMode, setHoverInteractionMode] = useState<CanvasInteractionMode | null>(null);
+  const [activeInteractionMode, setActiveInteractionMode] = useState<CanvasInteractionMode | null>(null);
   const [paletteColors, setPaletteColors] = useState<PaletteColor[]>(() =>
     typeof window === "undefined" ? [] : readColorPalette(),
   );
@@ -100,18 +108,26 @@ function App() {
     () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
     [customFonts],
   );
+  const previewPadding = useMemo(
+    () => calculatePreviewPadding(layers, settings, { minimum: 88, margin: 40 }),
+    [layers, settings],
+  );
   const selectionLabel =
     selectedLayers.length === 0
-      ? "None"
+      ? t("selection.none")
       : selectedLayers.length === 1
         ? selectedLayers[0].name
-        : `${selectedLayers.length} layers selected`;
+        : t("selection.multiple", { count: selectedLayers.length });
 
   useEffect(() => {
     setSelectedIds((current) => {
       const valid = current.filter((id) => layers.some((layer) => layer.id === id && layer.selectable));
-      if (valid.length > 0) return valid.length === current.length ? current : valid;
-      return selectTopSelectableLayerIds(layers);
+      if (!didInitializeSelection.current && current.length === 0) {
+        didInitializeSelection.current = true;
+        return selectTopSelectableLayerIds(layers);
+      }
+      didInitializeSelection.current = true;
+      return valid.length === current.length ? current : valid;
     });
   }, [layers]);
 
@@ -124,6 +140,8 @@ function App() {
       selectedLayerIds: selectedIds,
       drawSelection: true,
       previewPadding,
+      hoverInteractionMode,
+      activeInteractionMode,
     })
       .then(() => {
         if (!cancelled) {
@@ -139,7 +157,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [assets, fontReadyRevision, layers, selectedIds, settings]);
+  }, [activeInteractionMode, assets, fontReadyRevision, hoverInteractionMode, layers, previewPadding, selectedIds, settings]);
 
   useEffect(() => {
     if (customFonts.length === 0) return;
@@ -401,6 +419,19 @@ function App() {
     [selectedIds, settings],
   );
 
+  const transformSelection = useCallback(
+    (transform: RelativeLayerTransform) => {
+      setLayers((current) => applyRelativeLayerTransform(current, selectedIds, transform));
+      const selectedCount = selectedLayers.length;
+      if (transform.deltaRotation) {
+        setStatus(`Rotated ${selectedCount} selected layers by ${transform.deltaRotation} degrees.`);
+      } else {
+        setStatus(`Moved ${selectedCount} selected layers by ${transform.deltaX ?? 0}, ${transform.deltaY ?? 0}.`);
+      }
+    },
+    [selectedIds, selectedLayers.length],
+  );
+
   const addPaletteColor = useCallback(() => {
     const next = appendPaletteColor(paletteColors, {
       value: paletteDraft,
@@ -470,6 +501,21 @@ function App() {
     setSettings((current) => applyPreset(current, presetId));
   }, []);
 
+  const fitTextToBounds = useCallback((id: string) => {
+    const measureTextWidth = createCanvasTextMeasurer();
+    setLayers((current) => {
+      let message: string | null = null;
+      const next = current.map((layer) => {
+        if (layer.id !== id || layer.type !== "text" || !layer.selectable) return layer;
+        const fitted = fitTextLayerToBounds(layer, { measureTextWidth });
+        message = `Fit ${layer.name} text to its box at ${fitted.fontSize}px.`;
+        return fitted;
+      });
+      if (message) setStatus(message);
+      return next;
+    });
+  }, []);
+
   const handleCanvasPointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = event.currentTarget;
@@ -486,7 +532,9 @@ function App() {
           layers: [interaction.layer],
           start: point,
         };
-        setCanvasCursor(cursorForMode(interaction.mode));
+        setActiveInteractionMode(interaction.mode);
+        setHoverInteractionMode(interaction.mode);
+        setCanvasCursor(cursorForMode(interaction.mode, true));
         setStatus(`${labelForMode(interaction.mode)} ${interaction.layer.name}.`);
         return;
       }
@@ -503,10 +551,16 @@ function App() {
         const moveTargets = selectedIds.includes(picked.id) && selectedLayers.length > 1 ? selectedLayers : [picked];
         setSelectedIds(moveTargets.map((layer) => layer.id));
         activeCanvasInteraction.current = { mode: "move", layers: moveTargets, start: point };
+        setActiveInteractionMode("move");
+        setHoverInteractionMode("move");
         setCanvasCursor("grabbing");
         setStatus(moveTargets.length > 1 ? `Dragging ${moveTargets.length} layers.` : `Selected ${picked.name}. Dragging to move.`);
       } else {
+        event.preventDefault();
+        setSelectedIds([]);
+        setHoverInteractionMode(null);
         setCanvasCursor("default");
+        setStatus("Selection cleared.");
       }
     },
     [layers, selectLayer, selectedIds, selectedLayer, selectedLayers],
@@ -528,10 +582,16 @@ function App() {
 
       const interaction = pickLayerInteractionAt(layers, point, selectedLayer);
       if (interaction) {
-        setCanvasCursor(interaction.mode === "move" && interaction.layer.id !== selectedLayer?.id ? "pointer" : cursorForMode(interaction.mode));
+        setHoverInteractionMode(interaction.mode);
+        setCanvasCursor(
+          interaction.mode === "move" && interaction.layer.id !== selectedLayer?.id
+            ? "pointer"
+            : cursorForMode(interaction.mode),
+        );
         return;
       }
 
+      setHoverInteractionMode(null);
       setCanvasCursor("default");
     },
     [layers, selectedLayer],
@@ -544,6 +604,7 @@ function App() {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
     activeCanvasInteraction.current = null;
+    setActiveInteractionMode(null);
     setCanvasCursor("default");
     setStatus(`${labelForMode(active.mode)} complete.`);
   }, []);
@@ -623,10 +684,13 @@ function App() {
     <div className="app-shell">
       <TopToolbar
         settings={settings}
+        language={language}
         onSettingsChange={updateSettings}
         onPresetChange={handlePresetChange}
         onExport={handleExport}
+        onLanguageChange={setLanguage}
         isExporting={isExporting}
+        t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
         <LeftPanel
@@ -649,6 +713,7 @@ function App() {
           onDeleteTemplate={deleteTemplate}
           onOpenImageLab={() => setIsImageLabOpen(true)}
           assets={assets}
+          t={t}
         />
         <CanvasStage
           canvasRef={canvasRef}
@@ -662,6 +727,7 @@ function App() {
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
+          t={t}
         />
         <InspectorPanel
           assets={assets}
@@ -688,7 +754,10 @@ function App() {
           onToggleVisible={toggleLayerVisible}
           onToggleSelectable={toggleLayerSelectable}
           onAlignSelection={alignSelection}
+          onTransformSelection={transformSelection}
           onCustomFontFiles={handleCustomFontFiles}
+          onFitTextToBounds={fitTextToBounds}
+          t={t}
         />
       </main>
       {isImageLabOpen ? (
@@ -707,22 +776,27 @@ function App() {
           >
             <div className="modal-header">
               <div className="modal-title-block">
-                <h2 id="image-lab-title">Image Lab</h2>
+                <h2 id="image-lab-title">{t("imageLab.title")}</h2>
               </div>
               <button
                 type="button"
                 className="icon-button modal-close"
-                aria-label="Close Image Lab"
+                aria-label={t("imageLab.close")}
                 onClick={() => setIsImageLabOpen(false)}
               >
                 <X size={18} />
               </button>
             </div>
-            <ImageLabPanel assets={assets} onImageFiles={handleImageFiles} onCreateProcessedAsset={createProcessedAsset} />
+            <ImageLabPanel
+              assets={assets}
+              onImageFiles={handleImageFiles}
+              onCreateProcessedAsset={createProcessedAsset}
+              t={t}
+            />
           </section>
         </div>
       ) : null}
-      <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} />
+      <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} t={t} />
     </div>
   );
 }
@@ -734,9 +808,9 @@ function transformLayersFromPointer(active: ActiveCanvasInteraction, point: Canv
   return [resizeLayer(active.layer, active.mode, point)];
 }
 
-function cursorForMode(mode: CanvasInteractionMode): string {
+function cursorForMode(mode: CanvasInteractionMode, active = false): string {
   if (mode === "move") return "grab";
-  if (mode === "rotate") return "crosshair";
+  if (mode === "rotate") return active ? "grabbing" : "grab";
   if (mode === "resize-nw" || mode === "resize-se") return "nwse-resize";
   return "nesw-resize";
 }

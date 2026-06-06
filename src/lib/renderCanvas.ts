@@ -1,4 +1,4 @@
-import { rotateHandleOffset, selectionHandleRadius } from "./canvasInteraction";
+import { rotateHandleOffset, selectionHandleRadius, type CanvasInteractionMode } from "./canvasInteraction";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
@@ -8,6 +8,8 @@ export interface RenderOptions {
   selectedLayerIds?: string[];
   drawSelection?: boolean;
   previewPadding?: number;
+  hoverInteractionMode?: CanvasInteractionMode | null;
+  activeInteractionMode?: CanvasInteractionMode | null;
 }
 
 export async function renderThumbnailToCanvas(
@@ -27,8 +29,7 @@ export async function renderThumbnailToCanvas(
 
   context.clearRect(0, 0, canvas.width, canvas.height);
   if (previewPadding > 0) {
-    context.fillStyle = "#dfe7ee";
-    context.fillRect(0, 0, canvas.width, canvas.height);
+    drawPreviewBackdrop(context, canvas.width, canvas.height);
   }
   context.fillStyle = settings.background;
   context.fillRect(previewPadding, previewPadding, settings.width, settings.height);
@@ -53,11 +54,28 @@ export async function renderThumbnailToCanvas(
       .map((id) => layers.find((layer) => layer.id === id))
       .filter((layer): layer is ThumbnailLayer => Boolean(layer));
     for (const selected of selectedLayers) {
-      drawSelection(context, selected, selectedLayers.length === 1);
+      drawSelection(context, selected, selectedLayers.length === 1, {
+        hoverMode: options.hoverInteractionMode ?? null,
+        activeMode: options.activeInteractionMode ?? null,
+      });
     }
   }
 
   context.restore();
+}
+
+function drawPreviewBackdrop(context: CanvasRenderingContext2D, width: number, height: number): void {
+  context.fillStyle = "#dfe7ee";
+  context.fillRect(0, 0, width, height);
+  const size = 24;
+  for (let y = 0; y < height; y += size) {
+    for (let x = 0; x < width; x += size) {
+      if ((x / size + y / size) % 2 === 0) {
+        context.fillStyle = "rgba(255, 255, 255, 0.48)";
+        context.fillRect(x, y, size, size);
+      }
+    }
+  }
 }
 
 async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
@@ -187,7 +205,12 @@ function drawMissingImage(context: CanvasRenderingContext2D, width: number, heig
   context.fillText("missing image", 0, 0);
 }
 
-function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer, drawHandles: boolean) {
+function drawSelection(
+  context: CanvasRenderingContext2D,
+  layer: ThumbnailLayer,
+  drawHandles: boolean,
+  state: { hoverMode: CanvasInteractionMode | null; activeMode: CanvasInteractionMode | null },
+) {
   context.save();
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
@@ -197,23 +220,60 @@ function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer,
   context.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
   context.setLineDash([]);
   if (drawHandles) {
+    const rotateHot = state.activeMode === "rotate" || state.hoverMode === "rotate";
     context.beginPath();
     context.moveTo(0, -layer.height / 2);
     context.lineTo(0, -layer.height / 2 - rotateHandleOffset);
+    context.strokeStyle = rotateHot ? "#ff4f5f" : "#10b6d7";
+    context.lineWidth = rotateHot ? 5 : 4;
     context.stroke();
-    context.fillStyle = "#10b6d7";
     for (const [x, y] of [
       [-layer.width / 2, -layer.height / 2],
       [layer.width / 2, -layer.height / 2],
       [layer.width / 2, layer.height / 2],
       [-layer.width / 2, layer.height / 2],
-      [0, -layer.height / 2 - rotateHandleOffset],
     ]) {
-      context.beginPath();
-      context.arc(x, y, selectionHandleRadius, 0, Math.PI * 2);
-      context.fill();
+      drawResizeHandle(context, x, y);
     }
+    drawRotationHandle(context, 0, -layer.height / 2 - rotateHandleOffset, rotateHot, state.activeMode === "rotate");
   }
+  context.restore();
+}
+
+function drawResizeHandle(context: CanvasRenderingContext2D, x: number, y: number): void {
+  context.beginPath();
+  context.fillStyle = "#10b6d7";
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 3;
+  context.arc(x, y, selectionHandleRadius, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+}
+
+function drawRotationHandle(context: CanvasRenderingContext2D, x: number, y: number, hot: boolean, active: boolean): void {
+  const radius = hot ? selectionHandleRadius + 6 : selectionHandleRadius + 2;
+  context.save();
+  context.translate(x, y);
+  context.fillStyle = active ? "#ff4f5f" : hot ? "#ffffff" : "#ffffff";
+  context.strokeStyle = hot ? "#ff4f5f" : "#10b6d7";
+  context.lineWidth = hot ? 5 : 4;
+  context.beginPath();
+  context.arc(0, 0, radius, 0, Math.PI * 2);
+  context.fill();
+  context.stroke();
+
+  context.strokeStyle = active ? "#ffffff" : hot ? "#ff4f5f" : "#10b6d7";
+  context.fillStyle = context.strokeStyle;
+  context.lineWidth = 4;
+  context.beginPath();
+  context.arc(0, 0, radius - 9, -0.6 * Math.PI, 0.75 * Math.PI);
+  context.stroke();
+  context.beginPath();
+  context.moveTo(-radius + 9, 1);
+  context.lineTo(-radius + 18, -4);
+  context.lineTo(-radius + 16, 7);
+  context.closePath();
+  context.fill();
   context.restore();
 }
 
