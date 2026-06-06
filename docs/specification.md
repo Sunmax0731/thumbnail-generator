@@ -104,6 +104,8 @@ The selected layer can be edited directly on the canvas:
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
 - Inspector numeric fields remain the source of precise values.
+- When multiple visible editable layers overlap under the pointer, body clicks select the frontmost layer in the current render order.
+- Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 
 ## Alignment
 
@@ -139,6 +141,28 @@ The right inspector is grouped by task:
 ## Font Choices
 
 Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
+
+The predefined options are declared in `src/lib/fonts.ts`. Additional values can enter the layer model through CSV import, HTML import, saved templates, or browser-local custom font import.
+
+## Custom Fonts
+
+Custom fonts are stored in browser `localStorage` under `thumbnail-generator.customFonts.v1`. A custom font entry stores:
+
+- Font id.
+- Display name.
+- Generated FontFace family.
+- Source file name.
+- Data URL.
+- Format: `woff2`, `woff`, `truetype`, or `opentype`.
+- Created timestamp.
+
+Users can import `.woff2`, `.woff`, `.ttf`, or `.otf` files from the Adjust tab while a text layer is selected. The app loads the file through the browser FontFace API, adds it to the font dropdown, and applies it immediately to the selected text layer. Unsupported formats or load failures are reported in the status bar.
+
+Export waits for `document.fonts.ready` before drawing so custom fonts are reflected in PNG, JPEG, and WebP output.
+
+## Preview Fit
+
+The canvas preview keeps a user-controlled zoom value, but preset or output size changes recompute a fit zoom from the visible canvas stage and the document aspect ratio. Tall presets such as Shorts shrink the preview so the complete document and preview padding fit inside the desktop stage instead of forcing the editor shell to grow vertically.
 
 ## Browser Templates
 

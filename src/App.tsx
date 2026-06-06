@@ -8,7 +8,6 @@ import { StatusBar } from "./components/StatusBar";
 import { TopToolbar } from "./components/TopToolbar";
 import { alignLayers, type AlignmentMode } from "./lib/alignment";
 import {
-  getLayerInteractionAt,
   moveLayer as moveCanvasLayer,
   pointToCanvas,
   resizeLayer,
@@ -24,11 +23,22 @@ import {
   type PaletteTarget,
   writeColorPalette,
 } from "./lib/colorPalette";
+import {
+  customFontToOption,
+  findMatchingCustomFont,
+  loadCustomFonts,
+  mergeCustomFonts,
+  readCustomFontFile,
+  readCustomFonts,
+  type CustomFont,
+  writeCustomFonts,
+} from "./lib/customFonts";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
+import { fontOptions as defaultFontOptions } from "./lib/fonts";
 import { parseHtmlLayout } from "./lib/htmlLayout";
-import { pickLayerAt } from "./lib/hitTest";
+import { pickLayerInteractionAt } from "./lib/hitTest";
 import { selectLayerIdsAfterDelete, selectTopSelectableLayerIds } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
@@ -75,6 +85,10 @@ function App() {
   const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
   const [paletteNameDraft, setPaletteNameDraft] = useState("Accent fill");
   const [paletteTargetDraft, setPaletteTargetDraft] = useState<PaletteTarget>("fill");
+  const [customFonts, setCustomFonts] = useState<CustomFont[]>(() =>
+    typeof window === "undefined" ? [] : readCustomFonts(),
+  );
+  const [fontReadyRevision, setFontReadyRevision] = useState(0);
   const [isImageLabOpen, setIsImageLabOpen] = useState(false);
 
   const selectedLayers = useMemo(
@@ -82,6 +96,10 @@ function App() {
     [layers, selectedIds],
   );
   const selectedLayer = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
+  const fontOptions = useMemo(
+    () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
+    [customFonts],
+  );
   const selectionLabel =
     selectedLayers.length === 0
       ? "None"
@@ -121,7 +139,28 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [assets, layers, selectedIds, settings]);
+  }, [assets, fontReadyRevision, layers, selectedIds, settings]);
+
+  useEffect(() => {
+    if (customFonts.length === 0) return;
+    let cancelled = false;
+    loadCustomFonts(customFonts)
+      .then((errors) => {
+        if (cancelled) return;
+        setFontReadyRevision((current) => current + 1);
+        if (errors.length > 0) {
+          setStatus(`Font load warning: ${errors.join(" ")}`);
+        }
+      })
+      .catch((error: unknown) => {
+        if (!cancelled) {
+          setStatus(`Font load failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [customFonts]);
 
   useEffect(() => {
     if (!isImageLabOpen) return;
@@ -208,6 +247,46 @@ function App() {
       setStatus(`Imported ${loaded.length} image file${loaded.length === 1 ? "" : "s"}.`);
     },
     [settings.height, settings.width],
+  );
+
+  const handleCustomFontFiles = useCallback(
+    async (files: FileList | null) => {
+      const fontFiles = Array.from(files ?? []);
+      if (fontFiles.length === 0) return;
+
+      try {
+        const loaded = await Promise.all(fontFiles.map((file) => readCustomFontFile(file)));
+        const loadErrors = await loadCustomFonts(loaded);
+        if (loadErrors.length > 0) {
+          throw new Error(loadErrors.join(" "));
+        }
+
+        const next = mergeCustomFonts(customFonts, loaded);
+        writeCustomFonts(next);
+        setCustomFonts(next);
+        setFontReadyRevision((current) => current + 1);
+
+        const firstFont = loaded[0] ? findMatchingCustomFont(next, loaded[0]) : undefined;
+        if (selectedLayer?.type === "text" && firstFont) {
+          const option = customFontToOption(firstFont);
+          setLayers((current) =>
+            current.map((layer) => (layer.id === selectedLayer.id && layer.type === "text" ? { ...layer, fontFamily: option.value } : layer)),
+          );
+          setStatus(`Added custom font "${firstFont.name}" and applied it to ${selectedLayer.name}.`);
+          return;
+        }
+
+        const addedCount = next.length - customFonts.length;
+        setStatus(
+          addedCount > 0
+            ? `Added ${addedCount} custom font${addedCount === 1 ? "" : "s"}.`
+            : "Custom font already exists.",
+        );
+      } catch (error) {
+        setStatus(`Font import failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [customFonts, selectedLayer],
   );
 
   const addTextLayer = useCallback(() => {
@@ -396,18 +475,23 @@ function App() {
       const canvas = event.currentTarget;
       const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
       const additive = event.ctrlKey || event.metaKey || event.shiftKey;
-      const selectedMode = selectedLayer ? getLayerInteractionAt(selectedLayer, point) : null;
+      const interaction = pickLayerInteractionAt(layers, point, selectedLayer);
 
-      if (selectedLayer && selectedMode) {
+      if (interaction && interaction.mode !== "move") {
         event.preventDefault();
         safelySetPointerCapture(canvas, event.pointerId);
-        activeCanvasInteraction.current = { mode: selectedMode, layer: selectedLayer, layers: [selectedLayer], start: point };
-        setCanvasCursor(cursorForMode(selectedMode));
-        setStatus(`${labelForMode(selectedMode)} ${selectedLayer.name}.`);
+        activeCanvasInteraction.current = {
+          mode: interaction.mode,
+          layer: interaction.layer,
+          layers: [interaction.layer],
+          start: point,
+        };
+        setCanvasCursor(cursorForMode(interaction.mode));
+        setStatus(`${labelForMode(interaction.mode)} ${interaction.layer.name}.`);
         return;
       }
 
-      const picked = pickLayerAt(layers, point.x, point.y);
+      const picked = interaction?.layer;
       if (picked) {
         event.preventDefault();
         if (additive) {
@@ -442,14 +526,13 @@ function App() {
         return;
       }
 
-      const selectedMode = selectedLayer ? getLayerInteractionAt(selectedLayer, point) : null;
-      if (selectedMode) {
-        setCanvasCursor(cursorForMode(selectedMode));
+      const interaction = pickLayerInteractionAt(layers, point, selectedLayer);
+      if (interaction) {
+        setCanvasCursor(interaction.mode === "move" && interaction.layer.id !== selectedLayer?.id ? "pointer" : cursorForMode(interaction.mode));
         return;
       }
 
-      const picked = pickLayerAt(layers, point.x, point.y);
-      setCanvasCursor(picked ? "pointer" : "default");
+      setCanvasCursor("default");
     },
     [layers, selectedLayer],
   );
@@ -589,6 +672,7 @@ function App() {
           paletteDraft={paletteDraft}
           paletteNameDraft={paletteNameDraft}
           paletteTargetDraft={paletteTargetDraft}
+          fontOptions={fontOptions}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteTargetDraftChange={setPaletteTargetDraft}
@@ -604,6 +688,7 @@ function App() {
           onToggleVisible={toggleLayerVisible}
           onToggleSelectable={toggleLayerSelectable}
           onAlignSelection={alignSelection}
+          onCustomFontFiles={handleCustomFontFiles}
         />
       </main>
       {isImageLabOpen ? (

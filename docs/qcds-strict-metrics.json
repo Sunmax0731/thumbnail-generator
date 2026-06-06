@@ -2,20 +2,20 @@
   "schemaVersion": 1,
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
-    "rating": "A-",
-    "rationale": "MVP functionality is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Direct canvas editing, multi-selection alignment, canvas alignment, layer D&D, layer locking and deletion, named color palette entries with Fill/Stroke targets, task-tab information architecture, Image Lab modal Rect/Circle drag cutouts and chroma key, font dropdown, sliders, and named templates are included. Cross-browser coverage remains future work."
+    "rating": "A+",
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes CSV/HTML import, z-order-aware preview selection, Colors tab vertical expansion, custom WOFF2/WOFF/TTF/OTF font import through FontFace, portrait preset preview fitting, layer editing, and WebP export. Cross-browser, real-device, and very large font storage edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
-    "rationale": "Static browser-only GitHub Pages app with no backend or paid service dependency."
+    "rationale": "Static browser-only GitHub Pages app with no backend, no paid service dependency, and browser-local custom font storage."
   },
   "delivery": {
-    "rating": "A-",
-    "rationale": "Implementation, docs, tests, build, Pages workflow, release checklist, runtime evidence, and a passing remote Pages deployment are complete. Broader real-device checks remain future work."
+    "rating": "A+",
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, user guide is present, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
   },
   "satisfaction": {
-    "rating": "A-",
-    "rationale": "Primary requested workflow passed: CSV/HTML import, image import, left Assets/Layouts/Templates tabs, right Layers/Adjust/Colors tabs, inspector edits, direct canvas move/resize/rotate, multi-select alignment, canvas alignment, named Fill/Stroke palette registration/apply, lock toggles, layer ordering, Delete-key removal, delete confirmation modal cancel/confirm, Adjust controls without duplicated numeric readouts, font dropdown, multiple template saves, Image Lab modal workspace, Image Lab Rect/Circle drag selection, Image Lab drag/polygon cutouts with chroma key, effects controls, sliders, and PNG/JPEG/WebP export path. Broader template variety and cross-browser checks remain future work."
+    "rating": "A+",
+    "rationale": "Requested improvements passed: Colors tab vertical expansion, preview z-order selection, preset fit for Shorts/portrait, arbitrary font import/load/apply/export, and QCDS evidence update. Remaining satisfaction risk is broader real-user font files, template variety, and non-Chromium browser coverage."
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -26,48 +26,47 @@
     "browserPluginFallbackReason": "Browser is not available: iab",
     "url": "http://127.0.0.1:4173/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
-    "pagesWorkflow": "passed",
+    "pagesWorkflow": "previously passed",
+    "desktopViewport": "1440x900",
+    "mobileViewport": "390x844",
+    "screenshots": [
+      "docs/assets/runtime-work-items-font.png",
+      "docs/assets/runtime-work-items-colors.png",
+      "docs/assets/runtime-work-items-preset.png",
+      "docs/assets/runtime-work-items-mobile.png"
+    ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
+      "Colors tab vertical swatch area",
       "CSV import",
       "HTML import",
+      "z-order canvas selection",
       "inspector edit",
-      "canvas direct move",
-      "canvas direct resize",
-      "canvas direct rotate",
-      "multi-select alignment",
-      "single-layer canvas alignment",
-      "preview padding handles",
-      "layer drag-and-drop order",
-      "layer lock toggle",
-      "layer Delete key removal",
-      "layer delete confirmation modal",
-      "color palette named registration",
-      "color palette fill target apply",
-      "color palette stroke target apply",
-      "Adjust labels without duplicate numeric readouts",
-      "font dropdown",
-      "named template save",
-      "named template load",
-      "named template delete",
-      "multiple template saves",
-      "Image Lab modal workspace",
-      "Image Lab modal close controls",
-      "Image Lab Rect drag selection",
-      "Image Lab Circle drag selection",
-      "Image Lab drag cutout",
-      "Image Lab polygon cutout",
-      "Image Lab chroma key",
-      "numeric sliders",
-      "image import",
+      "custom font import",
+      "custom font localStorage",
+      "custom font FontFace load",
+      "custom font apply to text layer",
+      "portrait preset fit",
       "WebP export download",
-      "desktop viewport",
       "mobile viewport",
-      "mobile Image Lab modal",
-      "mobile canvas viewport"
+      "mobile no horizontal overflow"
     ]
-  }
+  },
+  "followUpCandidates": [
+    {
+      "priority": "P3",
+      "item": "Cross-browser checks for Safari, Firefox, and Edge"
+    },
+    {
+      "priority": "P3",
+      "item": "Real-device mobile checks for touch canvas editing and Image Lab drag gestures"
+    },
+    {
+      "priority": "P4",
+      "item": "Storage quota warning before saving very large custom font files"
+    }
+  ]
 }

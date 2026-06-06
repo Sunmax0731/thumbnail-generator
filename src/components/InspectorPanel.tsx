@@ -20,9 +20,11 @@ import {
   SlidersHorizontal,
   Trash2,
   Unlock,
+  Upload,
 } from "lucide-react";
 import type { AlignmentMode } from "../lib/alignment";
-import { fontLabelFor, fontOptions } from "../lib/fonts";
+import { acceptedFontFileTypes } from "../lib/customFonts";
+import { fontLabelFor, type FontOption } from "../lib/fonts";
 import type { PaletteColor, PaletteTarget } from "../lib/colorPalette";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
@@ -37,6 +39,7 @@ interface InspectorPanelProps {
   paletteDraft: string;
   paletteNameDraft: string;
   paletteTargetDraft: PaletteTarget;
+  fontOptions: FontOption[];
   onPaletteDraftChange: (value: string) => void;
   onPaletteNameDraftChange: (value: string) => void;
   onPaletteTargetDraftChange: (value: PaletteTarget) => void;
@@ -52,6 +55,7 @@ interface InspectorPanelProps {
   onToggleVisible: (id: string) => void;
   onToggleSelectable: (id: string) => void;
   onAlignSelection: (mode: AlignmentMode) => void;
+  onCustomFontFiles: (files: FileList | null) => void;
 }
 
 export function InspectorPanel({
@@ -63,6 +67,7 @@ export function InspectorPanel({
   paletteDraft,
   paletteNameDraft,
   paletteTargetDraft,
+  fontOptions,
   onPaletteDraftChange,
   onPaletteNameDraftChange,
   onPaletteTargetDraftChange,
@@ -78,6 +83,7 @@ export function InspectorPanel({
   onToggleVisible,
   onToggleSelectable,
   onAlignSelection,
+  onCustomFontFiles,
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
@@ -347,7 +353,14 @@ export function InspectorPanel({
             {selected.type === "image" && (
               <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} />
             )}
-            {selected.type === "text" && <TextControls selected={selected} onUpdateLayer={onUpdateLayer} />}
+            {selected.type === "text" && (
+              <TextControls
+                selected={selected}
+                fontOptions={fontOptions}
+                onUpdateLayer={onUpdateLayer}
+                onCustomFontFiles={onCustomFontFiles}
+              />
+            )}
             {selected.type === "shape" && <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} />}
           </div>
         </section>
@@ -554,10 +567,14 @@ function ImageControls({
 
 function TextControls({
   selected,
+  fontOptions,
   onUpdateLayer,
+  onCustomFontFiles,
 }: {
   selected: Extract<ThumbnailLayer, { type: "text" }>;
+  fontOptions: FontOption[];
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  onCustomFontFiles: InspectorPanelProps["onCustomFontFiles"];
 }) {
   return (
     <>
@@ -602,6 +619,18 @@ function TextControls({
             </option>
           ))}
         </select>
+      </label>
+      <label className="file-drop compact-drop custom-font-drop" title="WOFF2, WOFF, TTF, or OTF">
+        <Upload size={15} />
+        <span>Add font</span>
+        <input
+          type="file"
+          accept={acceptedFontFileTypes}
+          onChange={(event) => {
+            onCustomFontFiles(event.currentTarget.files);
+            event.currentTarget.value = "";
+          }}
+        />
       </label>
       <div className="field-grid two">
         <ColorInput

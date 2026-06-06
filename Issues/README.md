@@ -1,14 +1,15 @@
 # Issues
 
-このディレクトリは、GitHub Issue を使わない場面でも Issue 駆動で作業単位を管理するためのローカル backlog です。
+This directory is the local backlog for work that is tracked without GitHub Issues.
 
 ## File Rule
 
-- 1 Issue につき 1 Markdown ファイルを作成します。
-- ファイル名は `0001-short-title.md` のように連番と短い slug を使います。
-- `Status` は `open`、`in-progress`、`blocked`、`closed` のいずれかにします。
-- `Priority` は `P0` から `P4` を使います。
-- 具体作業も原則として Issue の Acceptance Criteria に集約します。既存互換が必要な場合だけ `Tasks/*.md` を `Tasks:` でリンクします。
+- Use one Markdown file per issue.
+- Name files with a numeric prefix and short slug, such as `0001-short-title.md`.
+- `Status` must be one of `open`, `in-progress`, `blocked`, or `closed`.
+- `Priority` must be one of `P0`, `P1`, `P2`, `P3`, or `P4`.
+- Put concrete work and completion criteria in each issue's Acceptance Criteria.
+- When task-level files are needed, link them from `Tasks:`.
 
 ## Template
 
@@ -23,17 +24,17 @@
 - Phase: 04-implementation
 - Created: YYYY-MM-DD
 - QCDS: Quality, Delivery
-- Tasks: 
+- Tasks:
 
 ## Context
 
-背景と目的。
+Background and goal.
 
 ## Acceptance Criteria
 
-- [ ] 完了条件。
+- [ ] Completion condition.
 
 ## Notes
 
-- 
+-
 ```

@@ -29,6 +29,7 @@
 html,
 body,
 #root {
+  height: 100%;
   min-height: 100%;
   margin: 0;
 }
@@ -56,7 +57,9 @@ button:disabled {
 
 .app-shell {
   display: flex;
-  min-height: 100vh;
+  height: 100vh;
+  min-height: 0;
+  overflow: hidden;
   background: var(--bg);
   color: var(--text);
   flex-direction: column;
@@ -137,6 +140,7 @@ button:disabled {
   flex: 1;
   grid-template-columns: minmax(280px, 324px) minmax(460px, 1fr) minmax(286px, 342px);
   gap: 12px;
+  overflow: hidden;
   padding: 12px;
 }
 
@@ -429,6 +433,19 @@ button:disabled {
   clip: rect(0 0 0 0);
 }
 
+.custom-font-drop {
+  display: flex;
+  min-height: 38px;
+  justify-content: center;
+  padding: 0 10px;
+}
+
+.custom-font-drop span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 850;
+}
+
 .asset-list {
   display: grid;
   gap: 6px;
@@ -568,6 +585,7 @@ button:disabled {
 
 .canvas-scroll {
   display: grid;
+  min-height: 0;
   overflow: auto;
   flex: 1;
   padding: 22px;
@@ -825,11 +843,22 @@ button:disabled {
   min-height: 34px;
 }
 
+.inspector-panel .palette-section {
+  flex: 1;
+  min-height: 0;
+}
+
 .swatch-grid {
   display: grid;
   gap: 6px;
   max-height: 184px;
   overflow: auto;
+}
+
+.inspector-panel .palette-section .swatch-grid {
+  flex: 1;
+  min-height: 260px;
+  max-height: clamp(260px, calc(100vh - 318px), 640px);
 }
 
 .swatch-row {
@@ -1031,7 +1060,9 @@ button:disabled {
   }
 
   .app-shell {
+    height: auto;
     min-height: 100vh;
+    overflow: visible;
   }
 
   .top-toolbar {
@@ -1044,6 +1075,7 @@ button:disabled {
 
   .workspace {
     grid-template-columns: 1fr;
+    overflow: visible;
   }
 
   .side-panel {
@@ -1158,7 +1190,6 @@ button:disabled {
 
   .canvas-frame {
     min-width: 300px !important;
-    width: 100% !important;
   }
 
   .status-message span {

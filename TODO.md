@@ -96,4 +96,10 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Validate desktop and mobile layout, Image Lab Rect/Circle drag selection, and existing primary workflows.
 
 ## Work Items
+
 - [x] [P2] [Phase:05-test] Layers削除とColors/Adjust改善 [Issue](Issues/0001-layers-colors-adjust.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Colorsタブ表示領域の縦拡張 [Issue](Issues/0002-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] プレビュー選択で重なり順を考慮する [Issue](Issues/0003-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Preset変更時のキャンバス表示範囲適応 [Issue](Issues/0004-preset.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 任意フォント追加機能の実装 [Issue](Issues/0005-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 改善要望対応とQCDS評価 [Issue](Issues/0006-qcds.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]

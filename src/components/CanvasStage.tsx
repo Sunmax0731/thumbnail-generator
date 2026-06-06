@@ -1,4 +1,6 @@
+import { useCallback, useEffect, useRef } from "react";
 import { Maximize2, MousePointer2, ZoomIn, ZoomOut } from "lucide-react";
+import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { OutputSettings } from "../lib/types";
 
 interface CanvasStageProps {
@@ -28,6 +30,33 @@ export function CanvasStage({
   onPointerMove,
   onPointerUp,
 }: CanvasStageProps) {
+  const scrollRef = useRef<HTMLDivElement | null>(null);
+  const fitCanvas = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+    const styles = window.getComputedStyle(container);
+    const horizontalPadding = cssPixels(styles.paddingLeft) + cssPixels(styles.paddingRight);
+    const verticalPadding = cssPixels(styles.paddingTop) + cssPixels(styles.paddingBottom);
+    onZoomChange(
+      calculateCanvasFitZoom({
+        containerWidth: container.clientWidth - horizontalPadding,
+        containerHeight: container.clientHeight - verticalPadding,
+        documentWidth: settings.width,
+        documentHeight: settings.height,
+        previewPadding,
+      }),
+    );
+  }, [onZoomChange, previewPadding, settings.height, settings.width]);
+
+  useEffect(() => {
+    fitCanvas();
+    const container = scrollRef.current;
+    if (!container || typeof ResizeObserver === "undefined") return;
+    const observer = new ResizeObserver(() => fitCanvas());
+    observer.observe(container);
+    return () => observer.disconnect();
+  }, [fitCanvas]);
+
   return (
     <section className="stage-panel" aria-label="Canvas preview">
       <div className="stage-toolbar">
@@ -59,12 +88,12 @@ export function CanvasStage({
           >
             <ZoomIn size={16} />
           </button>
-          <button type="button" className="icon-button" title="Fit canvas" onClick={() => onZoomChange(0.94)}>
+          <button type="button" className="icon-button" title="Fit canvas" onClick={fitCanvas}>
             <Maximize2 size={16} />
           </button>
         </div>
       </div>
-      <div className="canvas-scroll">
+      <div className="canvas-scroll" ref={scrollRef}>
         <div
           className="canvas-frame"
           style={{
@@ -87,4 +116,9 @@ export function CanvasStage({
       </div>
     </section>
   );
+}
+
+function cssPixels(value: string): number {
+  const parsed = Number.parseFloat(value);
+  return Number.isFinite(parsed) ? parsed : 0;
 }

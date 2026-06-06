@@ -7,6 +7,7 @@ export async function exportThumbnailDataUrl(
   assets: ImageAsset[],
   settings: OutputSettings,
 ): Promise<string> {
+  await waitForDocumentFonts();
   const canvas = document.createElement("canvas");
   await renderThumbnailToCanvas(canvas, layers, assets, settings, { drawSelection: false });
   return canvas.toDataURL(mimeForFormat(settings.format), settings.quality);
@@ -27,3 +28,7 @@ export async function downloadThumbnail(
   return filename;
 }
 
+async function waitForDocumentFonts(): Promise<void> {
+  if (typeof document === "undefined" || !document.fonts) return;
+  await document.fonts.ready;
+}

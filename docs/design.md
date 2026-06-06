@@ -23,6 +23,8 @@ The editor keeps the established three-column structure, but dense controls are 
 
 This keeps the first viewport focused on the current editing task while retaining one-click access to layout text, template storage, layer ordering, layer adjustment, and color registration.
 
+The Colors tab reserves a larger vertical swatch area inside the inspector so named Fill/Stroke entries can be scanned without compressing the rest of the editor. The Adjust tab keeps custom font import adjacent to the text font dropdown so font addition and selection remain one workflow.
+
 ## UI Principles
 
 - Build the actual editor, not a landing page.
@@ -54,6 +56,7 @@ This keeps the first viewport focused on the current editing task while retainin
 - Image Lab modal uses a two-column workspace on desktop and a single-column workspace on mobile.
 - Left and right task tabs remain visible at the top of their panels and collapse without horizontal overflow on mobile.
 - Canvas preserves aspect ratio and never overlaps controls.
+- Preset changes recompute preview fit so tall documents such as Shorts fit inside the desktop canvas stage without expanding the whole app shell.
 - Text and controls must not overflow their containers.
 
 ## Concept Fidelity Ledger
@@ -63,3 +66,4 @@ This keeps the first viewport focused on the current editing task while retainin
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
 - Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, canvas selection, Image Lab modal processing, and PNG/JPEG/WebP export.
+- Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, expands the Colors tab swatch area, fits tall presets in the visible stage, and lets users add browser-local custom fonts from the Adjust tab.

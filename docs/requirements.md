@@ -9,11 +9,13 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Import local image files and use them as editable thumbnail layers.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
+- Import browser-local custom font files for text layers.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Define or replace layouts from CSV.
 - Define or replace layouts from HTML-like markup.
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
 - Provide common presets and custom output dimensions.
+- Automatically fit the preview when preset aspect ratio changes would otherwise push the canvas outside the visible stage.
 
 ## Non-Functional Requirements
 
@@ -29,4 +31,3 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Authentication or team collaboration.
 - Paid font hosting.
 - Full Photoshop-style image editing.
-
