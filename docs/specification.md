@@ -106,6 +106,7 @@ The selected layer can be edited directly on the canvas:
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
 - The Adjust tab exposes live Relative edit controls for multi-selection. Move X and Move Y apply coordinate deltas to each selected editable layer as the control value changes. Rotation delta adds the same degree delta to each selected editable layer's current rotation as the control value changes. The UI tracks incremental deltas, so changing a live value from `12` to `5` applies `-7` rather than another absolute `5`.
+- The Adjust tab also exposes Match angle to first selected when multiple editable layers are selected. The first selected editable layer is the reference; every other selected editable layer receives that exact rotation value. Locked layers remain unchanged.
 - Inspector numeric fields remain the source of precise values.
 - When multiple visible editable layers overlap under the pointer, body clicks select the frontmost layer in the current render order.
 - Clicking preview space that is not a selectable layer or active handle clears the current selection.
@@ -210,6 +211,22 @@ Registered colors can be applied to:
 - Text outline color.
 - Shape fill color.
 - Shape stroke color.
+
+## Edit State Storage
+
+The current edit state is stored in browser `localStorage` under `thumbnail-generator.editState.v1`. The autosave preference is stored separately under `thumbnail-generator.editState.preferences.v1`.
+
+A saved edit state stores:
+
+- Schema version.
+- Saved timestamp.
+- Output settings.
+- Layer list.
+- Imported image assets, including data URLs when browser storage quota allows it.
+- Current CSV and HTML layout text.
+- Current template-name draft.
+
+The saved edit state is separate from named templates. Manual Save state overwrites this one work-in-progress slot. When Autosave current edit state is enabled, editor changes are saved after a short debounce. Reloading the app restores the saved edit state when one exists.
 
 ## Image Lab
 

@@ -14,6 +14,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
+- Match multiple selected editable layer angles to the first selected editable layer.
+- Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
 - Make the direct rotation handle visually recognizable through cursor and handle states.

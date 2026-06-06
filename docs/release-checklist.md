@@ -6,7 +6,9 @@
 - [x] `docs/specification.md` is current.
 - [x] `docs/design.md` is current and references the concept image.
 - [x] `docs/test-plan.md` includes actual verification results.
+- [x] `docs/features.md` lists the primary features and quick usage paths.
 - [x] `docs/user-guide.md` covers manual app usage.
+- [x] `docs/improvement-backlog.md` captures taskized follow-up improvement candidates.
 - [x] `docs/qcds-evaluation.md` and `docs/qcds-strict-metrics.json` are current.
 - [x] `npm test` passes.
 - [x] `npm run build` passes.

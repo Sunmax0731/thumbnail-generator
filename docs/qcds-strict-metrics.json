@@ -3,11 +3,11 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes CSV/HTML import, live multi-select relative X/Y movement and relative rotation without Apply buttons, text alignment three-button control, resizable Layers and Colors list areas, Japanese/English UI switching with browser-language detection and English fallback, image import, layer editing, and WebP export. Cross-browser, real-device, and very large font storage edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes current edit state save, autosave toggle, reload restore, multi-select angle matching, CSV/HTML import, inspector layer editing, WebP export, and mobile no-overflow. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
-    "rationale": "Static browser-only GitHub Pages app with no backend, no paid service dependency, and browser-local custom font storage."
+    "rationale": "Static browser-only GitHub Pages app with no backend, no paid service dependency, and browser-local edit state, template, color, and custom font storage."
   },
   "delivery": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: live relative multi-layer movement/rotation, three-button text alignment, resizable Layers and Colors list areas, Japanese/English UI switching, CSV/HTML/image import, WebP export, and QCDS evidence update. Remaining satisfaction risk is broader real-user font files, template variety, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: current edit state save, autosave toggle, reload restore, multi-select angle matching, feature/usage documentation, improvement taskization, CSV/HTML import, inspector editing, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, template variety, and non-Chromium browser coverage."
   },
   "runtimeGate": {
     "platform": "WebApp",
@@ -30,26 +30,22 @@
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-final-work-items-desktop.png",
-      "docs/assets/runtime-final-work-items-mobile.png"
+      "docs/assets/runtime-edit-state-rotation-desktop.png",
+      "docs/assets/runtime-edit-state-rotation-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
-      "Japanese language switch",
-      "English language switch",
-      "live multi-select relative move and rotation",
-      "generated CSV evidence for live relative edits",
-      "text alignment three-button control",
-      "resizable Layers list handle",
-      "resizable Colors list handle",
-      "layer-like color rows",
+      "manual edit-state save",
+      "autosave toggle",
+      "reload restore",
+      "multi-select angle matching",
+      "generated CSV evidence for matched rotations",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
       "CSV import",
       "HTML import",
       "inspector edit",
-      "image import",
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"
@@ -67,6 +63,10 @@
     {
       "priority": "P4",
       "item": "Storage quota warning before saving very large custom font files"
+    },
+    {
+      "priority": "P4",
+      "item": "Clear saved edit state action with confirmation"
     }
   ]
 }

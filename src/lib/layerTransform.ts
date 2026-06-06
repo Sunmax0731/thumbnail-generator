@@ -27,6 +27,19 @@ export function applyRelativeLayerTransform(
   });
 }
 
+export function matchSelectedLayerRotation(layers: ThumbnailLayer[], selectedIds: string[]): ThumbnailLayer[] {
+  const selected = new Set(selectedIds);
+  const reference = selectedIds
+    .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
+    .find((layer): layer is ThumbnailLayer => Boolean(layer));
+  if (!reference) return layers;
+
+  return layers.map((layer) => {
+    if (!selected.has(layer.id) || !layer.selectable || layer.id === reference.id) return layer;
+    return { ...layer, rotation: reference.rotation };
+  });
+}
+
 function finiteOrZero(value: number | undefined): number {
   return Number.isFinite(value) ? Number(value) : 0;
 }

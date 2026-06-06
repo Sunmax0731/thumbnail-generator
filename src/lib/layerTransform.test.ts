@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeShapeLayer } from "./layerFactory";
-import { applyRelativeLayerTransform } from "./layerTransform";
+import { applyRelativeLayerTransform, matchSelectedLayerRotation } from "./layerTransform";
 
 describe("layerTransform", () => {
   it("applies the same position and rotation deltas to selected editable layers", () => {
@@ -29,5 +29,19 @@ describe("layerTransform", () => {
 
     expect(result[0].rotation).toBe(-165);
     expect(result[1].rotation).toBe(175);
+  });
+
+  it("matches selected layer rotations to the first editable selection", () => {
+    const first = makeShapeLayer({ id: "first", rotation: 14 });
+    const second = makeShapeLayer({ id: "second", rotation: -42 });
+    const locked = makeShapeLayer({ id: "locked", selectable: false, rotation: 90 });
+    const outside = makeShapeLayer({ id: "outside", rotation: 8 });
+
+    const result = matchSelectedLayerRotation([first, second, locked, outside], ["first", "second", "locked"]);
+
+    expect(result[0].rotation).toBe(14);
+    expect(result[1].rotation).toBe(14);
+    expect(result[2].rotation).toBe(90);
+    expect(result[3].rotation).toBe(8);
   });
 });

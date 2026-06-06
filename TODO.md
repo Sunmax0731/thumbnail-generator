@@ -113,3 +113,8 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] 複数選択の移動・回転をリアルタイム反映 [Issue](Issues/0014-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] 文字揃えを3択ボタン化 [Issue](Issues/0015-3.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] LayersとColorsの表示領域を可変化する [Issue](Issues/0016-layers-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 現在の編集状態を保存する機能を追加してください。 [Issue](Issues/0017-issue.md) [QCDS:Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 編集状態の保存と自動保存切り替えを追加 [Issue](Issues/0018-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 複数選択時の角度合わせ機能 [Issue](Issues/0019-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 機能一覧と使い方ドキュメント作成 [Issue](Issues/0020-issue.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] サムネイル作成ツール改善タスク化 [Issue](Issues/0021-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]

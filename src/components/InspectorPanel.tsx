@@ -67,6 +67,7 @@ interface InspectorPanelProps {
   onToggleSelectable: (id: string) => void;
   onAlignSelection: (mode: AlignmentMode) => void;
   onTransformSelection: (transform: RelativeLayerTransform) => void;
+  onMatchSelectionRotation: () => void;
   onCustomFontFiles: (files: FileList | null) => void;
   onFitTextToBounds: (id: string) => void;
   t: Translator;
@@ -98,6 +99,7 @@ export function InspectorPanel({
   onToggleSelectable,
   onAlignSelection,
   onTransformSelection,
+  onMatchSelectionRotation,
   onCustomFontFiles,
   onFitTextToBounds,
   t,
@@ -418,6 +420,7 @@ export function InspectorPanel({
             onMoveXChange={(value) => updateLiveRelativeTransform("moveX", value)}
             onMoveYChange={(value) => updateLiveRelativeTransform("moveY", value)}
             onRotationChange={(value) => updateLiveRelativeTransform("rotation", value)}
+            onMatchRotation={onMatchSelectionRotation}
             t={t}
           />
         ) : (
@@ -605,6 +608,7 @@ function GroupTransformControls({
   onMoveXChange,
   onMoveYChange,
   onRotationChange,
+  onMatchRotation,
   t,
 }: {
   selectedCount: number;
@@ -614,6 +618,7 @@ function GroupTransformControls({
   onMoveXChange: (value: number) => void;
   onMoveYChange: (value: number) => void;
   onRotationChange: (value: number) => void;
+  onMatchRotation: () => void;
   t: Translator;
 }) {
   return (
@@ -653,6 +658,14 @@ function GroupTransformControls({
           icon={<RotateCw size={14} />}
           onChange={onRotationChange}
         />
+        <button
+          type="button"
+          className="secondary-button icon-text wide-button"
+          disabled={selectedCount < 2}
+          onClick={onMatchRotation}
+        >
+          <RotateCw size={16} /> {t("inspector.matchRotation")}
+        </button>
       </div>
     </section>
   );

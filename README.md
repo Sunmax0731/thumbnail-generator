@@ -9,7 +9,7 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 - Canvas-based thumbnail preview and export.
 - Direct canvas editing for the selected layer: drag move, corner resize, and rotation handle.
 - Preview blank-click deselection that clears the inspector and selection highlight.
-- Multi-layer selection, group movement, live relative X/Y movement, live relative rotation, and alignment controls. Single-layer alignment targets the canvas.
+- Multi-layer selection, group movement, live relative X/Y movement, live relative rotation, angle matching to the first selected layer, and alignment controls. Single-layer alignment targets the canvas.
 - Selection handles render in preview padding outside the thumbnail document area, and off-canvas layer overflow remains visible while editing.
 - Rotation handles show normal, hover, and drag states with a rotate glyph and grab cursor.
 - Left sidebar is organized by Assets, Layouts, and Templates task tabs.
@@ -20,6 +20,7 @@ The app lets creators compose thumbnail layouts from imported images, CSV rows, 
 - Text layers with font size, font dropdown, color, rotation, outline stroke, and three-button text alignment.
 - Text layers can be fit to their layer bounds with a one-click Fit text to box action.
 - Shape layers with fill/stroke, size, and rotation.
+- Current edit state can be saved in browser localStorage, restored after reload, and optionally autosaved while editing.
 - Browser-local color palette with quick apply for text, shape fill, and stroke/outline colors.
 - Named browser-local color palette entries with Fill/Stroke targets displayed in layer-like rows.
 - Custom WOFF2/WOFF/TTF/OTF font import for text layers, stored in browser localStorage.
@@ -55,7 +56,9 @@ Published Pages URL: `https://sunmax0731.github.io/thumbnail-generator/`
 - [docs/specification.md](docs/specification.md): CSV/HTML schema and feature specification.
 - [docs/design.md](docs/design.md): UI design basis and concept reference.
 - [docs/test-plan.md](docs/test-plan.md): automated and manual verification plan.
+- [docs/features.md](docs/features.md): feature list and usage quick reference.
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide for creators and reviewers.
+- [docs/improvement-backlog.md](docs/improvement-backlog.md): taskized follow-up improvement candidates.
 - [docs/qcds-evaluation.md](docs/qcds-evaluation.md): QCDS score and rationale.
 - [docs/release-checklist.md](docs/release-checklist.md): release readiness checklist.
 - `release/thumbnail-generator-docs.zip`: packaged docs artifact.
@@ -66,10 +69,10 @@ Latest local gate:
 
 - URL: `http://127.0.0.1:4173/thumbnail-generator/`
 - Browser: Playwright headless Chromium. Browser plugin fallback reason: in-app Browser returned `Browser is not available: iab`.
-- Passed: nonblank canvas, primary UI visible, Japanese/English language switch, live multi-select relative move/rotation without Apply buttons, generated CSV evidence for live relative edits, text alignment three-button control, resizable Layers and Colors list handles, layer-like color rows, CSV import, HTML import, image import, WebP export download, desktop viewport, mobile viewport, and mobile no-overflow check.
+- Passed: nonblank canvas, primary UI visible, saved edit state, autosave toggle, reload restore, multi-select angle matching, generated CSV evidence, CSV import, HTML import, inspector layer editing, WebP export download, desktop viewport, mobile viewport, and mobile no-overflow check.
 - Latest work-item screenshots:
-  - `docs/assets/runtime-final-work-items-desktop.png`
-  - `docs/assets/runtime-final-work-items-mobile.png`
+  - `docs/assets/runtime-edit-state-rotation-desktop.png`
+  - `docs/assets/runtime-edit-state-rotation-mobile.png`
 
 Latest remote deploy:
 

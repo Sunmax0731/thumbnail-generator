@@ -10,12 +10,14 @@
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers keep selection on valid selectable layers.
 - Relative layer transforms apply common movement and rotation deltas to selected editable layers.
+- Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
 - Live relative transform controls convert current UI values into incremental movement and rotation deltas.
 - Preview padding expands for visible off-canvas layer bounds.
 - Text fit chooses the largest font size that fits the text layer bounds.
 - Language detection selects Japanese or English from browser language tags and falls back to English.
 - Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
+- Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 
 ## Manual Browser Runtime Gate
 
@@ -38,6 +40,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
 - Multi-selection supports live relative X/Y movement and relative rotation from the Adjust tab without Apply buttons.
+- Multi-selection supports matching selected layer angles to the first selected editable layer from the Adjust tab.
 - Single selection can align to the canvas.
 - Selection handles remain visible in preview padding outside the thumbnail document area.
 - Off-canvas layer overflow remains visible and editable in the preview while export remains clipped to the output canvas.
@@ -52,6 +55,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust tab numeric controls edit through paired range/number inputs without duplicated value readouts in labels.
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
+- Current edit state can be manually saved, restored after reload, and autosaved when the autosave toggle is on.
 - Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
 - Image Lab Rect and Circle modes support direct drag selection on the preview.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
@@ -66,7 +70,7 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 18 test files, 47 tests.
+- `npm test`: pass. 19 test files, 51 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
@@ -78,28 +82,27 @@ Completed on 2026-06-07.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-final-work-items-desktop.png`
-  - `docs/assets/runtime-final-work-items-mobile.png`
+  - `docs/assets/runtime-edit-state-rotation-desktop.png`
+  - `docs/assets/runtime-edit-state-rotation-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, varied sampled pixels).
+- Nonblank canvas pixel check: pass (`1500x940`, 4 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
-- Language switch: pass. Toolbar switched to Japanese and back to English.
-- Live multi-select relative edit: pass. Without Apply buttons, `Main title` and `Subtitle` received Move `12,-8` and Rotation `+15`; generated CSV reflected `Main title,90,74,...,12` and `Subtitle,103,524,...,13`.
-- Text alignment buttons: pass. Adjust rendered three alignment buttons, no text-align select, and selecting Right set `aria-checked=true` plus generated CSV `right` alignment for `Main title`.
-- Resizable Layers list: pass. Handle cursor was `ns-resize`; list height changed from `360` to `432`.
-- Resizable Colors list: pass. A saved color rendered as a layer-like row; handle cursor was `ns-resize`; list height changed from `320` to `392`.
+- Edit state save: pass. Save state wrote `thumbnail-generator.editState.v1` in localStorage.
+- Autosave toggle: pass. Enabling Autosave current edit state and adding a text layer saved `New text` after the debounce.
+- Reload restore: pass. Reload restored the saved edit state and `New text` appeared in the layer list.
+- Multi-select angle match: pass. `Main title` and `Subtitle` were selected, Match angle to first selected was run, and generated CSV showed both rotations as `-3`.
 - CSV import: pass. Status reported `CSV applied`.
 - HTML import: pass. Status reported `HTML applied`.
-- Image import: pass. A local image file import created an image layer and status reported `Imported 1 image file`.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-06T15-30-00-680Z.webp`).
+- Inspector layer editing: pass. Changing the HTML-imported layer X value to `144` was reflected in generated CSV.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-06T15-57-31-979Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`; task tabs remained visible.
 
 Console health:
 
-- No app console warnings, app errors, or page errors.
+- No app errors or page errors. Chromium emitted one canvas readback performance warning caused by the runtime gate pixel sampling.
 
 ### GitHub Pages
 

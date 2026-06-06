@@ -1,0 +1,68 @@
+import { describe, expect, it } from "vitest";
+import {
+  createEditStateSnapshot,
+  editStatePreferenceStorageKey,
+  editStateStorageKey,
+  readEditStatePreferences,
+  readSavedEditState,
+  writeEditStatePreferences,
+  writeSavedEditState,
+} from "./editState";
+import { makeTextLayer } from "./layerFactory";
+import { defaultOutputSettings } from "./presets";
+
+describe("editState", () => {
+  it("creates a restorable browser edit state snapshot", () => {
+    const snapshot = createEditStateSnapshot(
+      [makeTextLayer({ text: "SAVED" })],
+      [],
+      defaultOutputSettings,
+      "",
+      "",
+      "  Work in progress  ",
+      new Date("2026-06-07T00:00:00Z"),
+    );
+
+    expect(snapshot.updatedAt).toBe("2026-06-07T00:00:00.000Z");
+    expect(snapshot.templateName).toBe("Work in progress");
+    expect(snapshot.csv).toContain("SAVED");
+    expect(snapshot.html).toContain("SAVED");
+  });
+
+  it("reads and writes edit state and autosave preferences", () => {
+    const storage = createMemoryStorage();
+    const snapshot = createEditStateSnapshot(
+      [makeTextLayer({ text: "RESTORE", selectable: false })],
+      [],
+      defaultOutputSettings,
+      "csv",
+      "html",
+      "Draft",
+    );
+
+    writeSavedEditState(snapshot, storage);
+    writeEditStatePreferences({ autoSaveEnabled: true }, storage);
+
+    expect(storage.getItem(editStateStorageKey)).toContain("RESTORE");
+    expect(storage.getItem(editStatePreferenceStorageKey)).toContain("true");
+    expect(readSavedEditState(storage)?.layers[0].selectable).toBe(false);
+    expect(readEditStatePreferences(storage).autoSaveEnabled).toBe(true);
+  });
+
+  it("falls back when stored records are invalid", () => {
+    const storage = createMemoryStorage();
+    storage.setItem(editStateStorageKey, "{bad");
+    storage.setItem(editStatePreferenceStorageKey, "{bad");
+
+    expect(readSavedEditState(storage)).toBeNull();
+    expect(readEditStatePreferences(storage).autoSaveEnabled).toBe(false);
+  });
+});
+
+function createMemoryStorage(): Pick<Storage, "getItem" | "setItem"> {
+  const records = new Map<string, string>();
+  return {
+    getItem: (key) => records.get(key) ?? null,
+    setItem: (key, value) => records.set(key, value),
+  };
+}

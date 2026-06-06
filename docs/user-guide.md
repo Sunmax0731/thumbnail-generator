@@ -20,7 +20,7 @@ npm run preview
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Assets: import image files, open Image Lab, add text/shape layers, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
-- Templates: save, load, and delete browser-local templates.
+- Templates: save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, text, font, text alignment, shape, and image effects.
 - Colors: register named Fill or Stroke colors, apply them to selected text or shape layers, and resize the color list area with the handle below the list.
@@ -39,7 +39,18 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Drag the top rotation handle to rotate it. The rotation handle shows a rotate mark and changes to a grab cursor on hover.
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
 - With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta. Changes apply live as you edit the values; there is no Apply button.
+- With multiple layers selected, use Match angle to first selected to set every selected editable layer to the first selected editable layer's rotation.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
+
+## Save Current Edit State
+
+Open Templates and use Edit state:
+
+- Save state stores the current output settings, layers, image assets, CSV/HTML text, and template-name draft in browser localStorage.
+- Restore state reloads the saved work-in-progress state.
+- Autosave current edit state saves editor changes after a short delay while the toggle is on.
+
+This edit state is a single recovery slot. Browser templates remain separate named snapshots.
 
 ## Text Alignment
 
@@ -72,4 +83,4 @@ Open Image Lab from Assets. The modal supports chroma key, rectangle/circle drag
 
 ## Browser Storage
 
-The app stores templates, color palette entries, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts can consume more browser storage than templates or colors.
+The app stores the current edit state, autosave preference, templates, color palette entries, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.

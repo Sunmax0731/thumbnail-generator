@@ -33,6 +33,13 @@ import {
   type CustomFont,
   writeCustomFonts,
 } from "./lib/customFonts";
+import {
+  createEditStateSnapshot,
+  readEditStatePreferences,
+  readSavedEditState,
+  writeEditStatePreferences,
+  writeSavedEditState,
+} from "./lib/editState";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
@@ -40,7 +47,7 @@ import { fontOptions as defaultFontOptions } from "./lib/fonts";
 import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
 import { createTranslator, detectInitialLanguage, type Language } from "./lib/i18n";
-import { applyRelativeLayerTransform, type RelativeLayerTransform } from "./lib/layerTransform";
+import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeLayerTransform } from "./lib/layerTransform";
 import { selectLayerIdsAfterDelete, selectTopSelectableLayerIds } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
@@ -68,20 +75,36 @@ function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
   const didInitializeSelection = useRef(false);
+  const didMountAutoSave = useRef(false);
   const initialLanguage = useMemo(() => detectInitialLanguage(), []);
+  const initialSavedEditState = useMemo(() => (typeof window === "undefined" ? null : readSavedEditState()), []);
+  const initialEditStatePreferences = useMemo(
+    () => (typeof window === "undefined" ? { autoSaveEnabled: false } : readEditStatePreferences()),
+    [],
+  );
   const [language, setLanguage] = useState<Language>(initialLanguage);
   const t = useMemo(() => createTranslator(language), [language]);
-  const [settings, setSettings] = useState<OutputSettings>(defaultOutputSettings);
-  const [assets, setAssets] = useState<ImageAsset[]>(() => initialAssets(import.meta.env.BASE_URL));
-  const [layers, setLayers] = useState<ThumbnailLayer[]>(() => createInitialLayers());
+  const [settings, setSettings] = useState<OutputSettings>(initialSavedEditState?.settings ?? defaultOutputSettings);
+  const [assets, setAssets] = useState<ImageAsset[]>(() =>
+    initialSavedEditState?.assets.length ? initialSavedEditState.assets : initialAssets(import.meta.env.BASE_URL),
+  );
+  const [layers, setLayers] = useState<ThumbnailLayer[]>(() => initialSavedEditState?.layers ?? createInitialLayers());
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
-  const [csvText, setCsvText] = useState(sampleCsv);
-  const [htmlText, setHtmlText] = useState(sampleHtml);
-  const [templateName, setTemplateName] = useState("My thumbnail template");
+  const [csvText, setCsvText] = useState(initialSavedEditState?.csv ?? sampleCsv);
+  const [htmlText, setHtmlText] = useState(initialSavedEditState?.html ?? sampleHtml);
+  const [templateName, setTemplateName] = useState(initialSavedEditState?.templateName ?? "My thumbnail template");
   const [templates, setTemplates] = useState<SavedTemplate[]>(() =>
     typeof window === "undefined" ? [] : readSavedTemplates(),
   );
-  const [status, setStatus] = useState(() => createTranslator(initialLanguage)("status.ready"));
+  const [autoSaveEnabled, setAutoSaveEnabled] = useState(initialEditStatePreferences.autoSaveEnabled);
+  const [savedEditStateUpdatedAt, setSavedEditStateUpdatedAt] = useState<string | null>(
+    initialSavedEditState?.updatedAt ?? null,
+  );
+  const [status, setStatus] = useState(() =>
+    initialSavedEditState
+      ? `Restored saved edit state from ${formatSavedAt(initialSavedEditState.updatedAt)}.`
+      : createTranslator(initialLanguage)("status.ready"),
+  );
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
   const [canvasCursor, setCanvasCursor] = useState("default");
@@ -179,6 +202,26 @@ function App() {
       cancelled = true;
     };
   }, [customFonts]);
+
+  useEffect(() => {
+    try {
+      writeEditStatePreferences({ autoSaveEnabled });
+    } catch (error) {
+      setStatus(`Autosave setting failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, [autoSaveEnabled]);
+
+  useEffect(() => {
+    if (!didMountAutoSave.current) {
+      didMountAutoSave.current = true;
+      return;
+    }
+    if (!autoSaveEnabled) return;
+    const timeout = window.setTimeout(() => {
+      saveEditState("auto");
+    }, 350);
+    return () => window.clearTimeout(timeout);
+  }, [assets, autoSaveEnabled, csvText, htmlText, layers, settings, templateName]);
 
   useEffect(() => {
     if (!isImageLabOpen) return;
@@ -345,6 +388,39 @@ function App() {
     setStatus("Sample creator template restored.");
   }, []);
 
+  const saveEditState = useCallback(
+    (mode: "manual" | "auto" = "manual") => {
+      try {
+        const snapshot = createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName);
+        writeSavedEditState(snapshot);
+        setSavedEditStateUpdatedAt(snapshot.updatedAt);
+        if (mode === "manual") {
+          setStatus(`Saved current edit state at ${formatSavedAt(snapshot.updatedAt)}.`);
+        }
+      } catch (error) {
+        setStatus(`Edit state save failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [assets, csvText, htmlText, layers, settings, templateName],
+  );
+
+  const restoreEditState = useCallback(() => {
+    const snapshot = readSavedEditState();
+    if (!snapshot) {
+      setStatus("No saved edit state found.");
+      return;
+    }
+    setSettings(snapshot.settings);
+    setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
+    setLayers(snapshot.layers);
+    setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
+    setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
+    setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
+    setTemplateName(snapshot.templateName);
+    setSavedEditStateUpdatedAt(snapshot.updatedAt);
+    setStatus(`Restored saved edit state from ${formatSavedAt(snapshot.updatedAt)}.`);
+  }, []);
+
   const duplicateLayer = useCallback(
     (id: string) => {
       const source = layers.find((layer) => layer.id === id);
@@ -431,6 +507,18 @@ function App() {
     },
     [selectedIds, selectedLayers.length],
   );
+
+  const matchSelectionRotation = useCallback(() => {
+    const reference = selectedIds
+      .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
+      .find((layer): layer is ThumbnailLayer => Boolean(layer));
+    if (!reference || selectedLayers.length < 2) {
+      setStatus("Select at least two editable layers to match angles.");
+      return;
+    }
+    setLayers((current) => matchSelectedLayerRotation(current, selectedIds));
+    setStatus(`Matched ${selectedLayers.length} selected layer angles to ${reference.name}.`);
+  }, [layers, selectedIds, selectedLayers.length]);
 
   const addPaletteColor = useCallback(() => {
     const next = appendPaletteColor(paletteColors, {
@@ -711,6 +799,11 @@ function App() {
           onSaveTemplate={saveCurrentTemplate}
           onLoadTemplate={loadTemplate}
           onDeleteTemplate={deleteTemplate}
+          autoSaveEnabled={autoSaveEnabled}
+          savedEditStateUpdatedAt={savedEditStateUpdatedAt}
+          onAutoSaveChange={setAutoSaveEnabled}
+          onSaveEditState={() => saveEditState("manual")}
+          onRestoreEditState={restoreEditState}
           onOpenImageLab={() => setIsImageLabOpen(true)}
           assets={assets}
           t={t}
@@ -755,6 +848,7 @@ function App() {
           onToggleSelectable={toggleLayerSelectable}
           onAlignSelection={alignSelection}
           onTransformSelection={transformSelection}
+          onMatchSelectionRotation={matchSelectionRotation}
           onCustomFontFiles={handleCustomFontFiles}
           onFitTextToBounds={fitTextToBounds}
           t={t}
@@ -859,6 +953,12 @@ function slug(value: string): string {
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)/g, "")
     .slice(0, 32);
+}
+
+function formatSavedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
 }
 
 export default App;

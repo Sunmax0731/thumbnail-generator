@@ -12,6 +12,8 @@ interface LeftPanelProps {
   assets: ImageAsset[];
   templateName: string;
   templates: SavedTemplate[];
+  autoSaveEnabled: boolean;
+  savedEditStateUpdatedAt: string | null;
   onCsvTextChange: (value: string) => void;
   onHtmlTextChange: (value: string) => void;
   onApplyCsv: () => void;
@@ -25,6 +27,9 @@ interface LeftPanelProps {
   onSaveTemplate: () => void;
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
+  onAutoSaveChange: (enabled: boolean) => void;
+  onSaveEditState: () => void;
+  onRestoreEditState: () => void;
   onOpenImageLab: () => void;
   t: Translator;
 }
@@ -35,6 +40,8 @@ export function LeftPanel({
   assets,
   templateName,
   templates,
+  autoSaveEnabled,
+  savedEditStateUpdatedAt,
   onCsvTextChange,
   onHtmlTextChange,
   onApplyCsv,
@@ -48,6 +55,9 @@ export function LeftPanel({
   onSaveTemplate,
   onLoadTemplate,
   onDeleteTemplate,
+  onAutoSaveChange,
+  onSaveEditState,
+  onRestoreEditState,
   onOpenImageLab,
   t,
 }: LeftPanelProps) {
@@ -185,47 +195,83 @@ export function LeftPanel({
       ) : null}
 
       {activeSection === "templates" ? (
-        <section className="panel-section template-section">
-          <div className="section-heading">
-            <Save size={16} />
-            <h2>{t("left.browserTemplates")}</h2>
-            <span className="section-count">{templates.length}</span>
-          </div>
-          <label className="field">
-            <span>{t("left.templateName")}</span>
-            <input
-              type="text"
-              value={templateName}
-              onChange={(event) => onTemplateNameChange(event.currentTarget.value)}
-            />
-          </label>
-          <button type="button" className="primary-button icon-text wide-button" onClick={onSaveTemplate}>
-            <Save size={16} /> {t("left.saveTemplate")}
-          </button>
-          <div className="template-list" aria-label={t("left.savedTemplates")}>
-            {templates.length === 0 ? (
-              <p className="empty-note">{t("left.noTemplates")}</p>
-            ) : (
-              templates.map((template) => (
-                <div className="template-row" key={template.id}>
-                  <button type="button" className="template-load" onClick={() => onLoadTemplate(template.id)}>
-                    <FolderOpen size={15} />
-                    <span>{template.name}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="icon-button danger"
-                    title={t("left.deleteTemplate", { name: template.name })}
-                    onClick={() => onDeleteTemplate(template.id)}
-                  >
-                    <Trash2 size={14} />
-                  </button>
-                </div>
-              ))
-            )}
-          </div>
-        </section>
+        <>
+          <section className="panel-section edit-state-section">
+            <div className="section-heading">
+              <Save size={16} />
+              <h2>{t("left.editState")}</h2>
+            </div>
+            <label className="checkbox-row autosave-row">
+              <input
+                type="checkbox"
+                checked={autoSaveEnabled}
+                onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
+              />
+              <span>{t("left.autoSaveEditState")}</span>
+            </label>
+            <div className="button-grid">
+              <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
+                <Save size={16} /> {t("left.saveEditState")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
+                <FolderOpen size={16} /> {t("left.restoreEditState")}
+              </button>
+            </div>
+            <p className="edit-state-meta">
+              {savedEditStateUpdatedAt
+                ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
+                : t("left.noSavedEditState")}
+            </p>
+          </section>
+
+          <section className="panel-section template-section">
+            <div className="section-heading">
+              <Save size={16} />
+              <h2>{t("left.browserTemplates")}</h2>
+              <span className="section-count">{templates.length}</span>
+            </div>
+            <label className="field">
+              <span>{t("left.templateName")}</span>
+              <input
+                type="text"
+                value={templateName}
+                onChange={(event) => onTemplateNameChange(event.currentTarget.value)}
+              />
+            </label>
+            <button type="button" className="primary-button icon-text wide-button" onClick={onSaveTemplate}>
+              <Save size={16} /> {t("left.saveTemplate")}
+            </button>
+            <div className="template-list" aria-label={t("left.savedTemplates")}>
+              {templates.length === 0 ? (
+                <p className="empty-note">{t("left.noTemplates")}</p>
+              ) : (
+                templates.map((template) => (
+                  <div className="template-row" key={template.id}>
+                    <button type="button" className="template-load" onClick={() => onLoadTemplate(template.id)}>
+                      <FolderOpen size={15} />
+                      <span>{template.name}</span>
+                    </button>
+                    <button
+                      type="button"
+                      className="icon-button danger"
+                      title={t("left.deleteTemplate", { name: template.name })}
+                      onClick={() => onDeleteTemplate(template.id)}
+                    >
+                      <Trash2 size={14} />
+                    </button>
+                  </div>
+                ))
+              )}
+            </div>
+          </section>
+        </>
       ) : null}
     </aside>
   );
+}
+
+function formatSavedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
 }
