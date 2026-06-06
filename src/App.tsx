@@ -4,6 +4,7 @@ import { InspectorPanel } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
 import { StatusBar } from "./components/StatusBar";
 import { TopToolbar } from "./components/TopToolbar";
+import { alignLayers, type AlignmentMode } from "./lib/alignment";
 import {
   getLayerInteractionAt,
   moveLayer as moveCanvasLayer,
@@ -13,6 +14,13 @@ import {
   type CanvasInteractionMode,
   type CanvasPoint,
 } from "./lib/canvasInteraction";
+import {
+  addPaletteColor as appendPaletteColor,
+  readColorPalette,
+  removePaletteColor,
+  type PaletteColor,
+  writeColorPalette,
+} from "./lib/colorPalette";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
@@ -33,9 +41,12 @@ import type { ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from ".
 
 interface ActiveCanvasInteraction {
   mode: CanvasInteractionMode;
-  layer: ThumbnailLayer;
+  layer?: ThumbnailLayer;
+  layers: ThumbnailLayer[];
   start: CanvasPoint;
 }
+
+const previewPadding = 88;
 
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -43,7 +54,7 @@ function App() {
   const [settings, setSettings] = useState<OutputSettings>(defaultOutputSettings);
   const [assets, setAssets] = useState<ImageAsset[]>(() => initialAssets(import.meta.env.BASE_URL));
   const [layers, setLayers] = useState<ThumbnailLayer[]>(() => createInitialLayers());
-  const [selectedId, setSelectedId] = useState<string>("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [csvText, setCsvText] = useState(sampleCsv);
   const [htmlText, setHtmlText] = useState(sampleHtml);
   const [templateName, setTemplateName] = useState("My thumbnail template");
@@ -54,17 +65,31 @@ function App() {
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
   const [canvasCursor, setCanvasCursor] = useState("default");
-
-  const selectedLayer = useMemo(
-    () => layers.find((layer) => layer.id === selectedId) ?? layers.at(-1),
-    [layers, selectedId],
+  const [paletteColors, setPaletteColors] = useState<PaletteColor[]>(() =>
+    typeof window === "undefined" ? [] : readColorPalette(),
   );
+  const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
+
+  const selectedLayers = useMemo(
+    () => layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable),
+    [layers, selectedIds],
+  );
+  const selectedLayer = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
+  const selectionLabel =
+    selectedLayers.length === 0
+      ? "None"
+      : selectedLayers.length === 1
+        ? selectedLayers[0].name
+        : `${selectedLayers.length} layers selected`;
 
   useEffect(() => {
-    if ((!selectedId || !layers.some((layer) => layer.id === selectedId)) && layers.length > 0) {
-      setSelectedId(layers.at(-1)?.id ?? "");
-    }
-  }, [layers, selectedId]);
+    setSelectedIds((current) => {
+      const valid = current.filter((id) => layers.some((layer) => layer.id === id && layer.selectable));
+      if (valid.length > 0) return valid.length === current.length ? current : valid;
+      const next = [...layers].reverse().find((layer) => layer.selectable);
+      return next ? [next.id] : [];
+    });
+  }, [layers]);
 
   useEffect(() => {
     let cancelled = false;
@@ -72,8 +97,9 @@ function App() {
     if (!canvas) return;
 
     renderThumbnailToCanvas(canvas, layers, assets, settings, {
-      selectedLayerId: selectedLayer?.id,
+      selectedLayerIds: selectedIds,
       drawSelection: true,
+      previewPadding,
     })
       .then(() => {
         if (!cancelled) {
@@ -89,7 +115,7 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [assets, layers, selectedLayer?.id, settings]);
+  }, [assets, layers, selectedIds, settings]);
 
   const updateSettings = useCallback((next: Partial<OutputSettings>) => {
     setSettings((current) => ({ ...current, ...next }));
@@ -99,6 +125,22 @@ function App() {
     setLayers((current) => current.map((layer) => (layer.id === id ? updater(layer) : layer)));
   }, []);
 
+  const selectLayer = useCallback(
+    (id: string, additive = false) => {
+      const layer = layers.find((candidate) => candidate.id === id);
+      if (!layer) return;
+      if (!layer.selectable) {
+        setStatus(`${layer.name} is locked for selection and editing.`);
+        return;
+      }
+      setSelectedIds((current) => {
+        if (!additive) return [id];
+        return current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id];
+      });
+    },
+    [layers],
+  );
+
   const applyCsv = useCallback(() => {
     const result = parseCsvLayout(csvText, {
       baseWidth: settings.width,
@@ -107,7 +149,7 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedId(result.layers.at(-1)?.id ?? "");
+      setSelectedIds(selectTopLayerIds(result.layers));
       setStatus(`CSV applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`CSV not applied. ${result.warnings.join(" ")}`);
@@ -122,7 +164,7 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedId(result.layers.at(-1)?.id ?? "");
+      setSelectedIds(selectTopLayerIds(result.layers));
       setStatus(`HTML applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`HTML not applied. ${result.warnings.join(" ")}`);
@@ -147,10 +189,10 @@ function App() {
         }),
       );
       setLayers((current) => [...current, ...newLayers]);
-      setSelectedId(newLayers.at(-1)?.id ?? selectedId);
+      setSelectedIds(selectTopLayerIds(newLayers));
       setStatus(`Imported ${loaded.length} image file${loaded.length === 1 ? "" : "s"}.`);
     },
-    [selectedId, settings.height, settings.width],
+    [settings.height, settings.width],
   );
 
   const addTextLayer = useCallback(() => {
@@ -164,7 +206,7 @@ function App() {
       fontSize: Math.round(settings.width / 15),
     });
     setLayers((current) => [...current, layer]);
-    setSelectedId(layer.id);
+    setSelectedIds([layer.id]);
     setStatus("Text layer added.");
   }, [settings.height, settings.width]);
 
@@ -178,14 +220,14 @@ function App() {
       fill: "#10b6d7",
     });
     setLayers((current) => [...current, layer]);
-    setSelectedId(layer.id);
+    setSelectedIds([layer.id]);
     setStatus("Shape layer added.");
   }, [settings.height, settings.width]);
 
   const resetTemplate = useCallback(() => {
     const next = createInitialLayers();
     setLayers(next);
-    setSelectedId(next.at(-1)?.id ?? "");
+    setSelectedIds(selectTopLayerIds(next));
     setCsvText(sampleCsv);
     setHtmlText(sampleHtml);
     setStatus("Sample creator template restored.");
@@ -197,7 +239,7 @@ function App() {
       if (!source) return;
       const copy = cloneLayer({ ...source, x: source.x + 24, y: source.y + 24 });
       setLayers((current) => [...current, copy]);
-      setSelectedId(copy.id);
+      setSelectedIds([copy.id]);
       setStatus(`Duplicated ${source.name}.`);
     },
     [layers],
@@ -210,7 +252,10 @@ function App() {
         return current;
       }
       const next = current.filter((layer) => layer.id !== id);
-      setSelectedId(next.at(-1)?.id ?? "");
+      setSelectedIds((selected) => {
+        const filtered = selected.filter((selectedId) => selectedId !== id);
+        return filtered.length > 0 ? filtered : selectTopLayerIds(next);
+      });
       setStatus("Layer removed.");
       return next;
     });
@@ -238,11 +283,87 @@ function App() {
       if (draggedIndex < 0 || targetIndex < 0) return current;
       const [dragged] = displayOrder.splice(draggedIndex, 1);
       displayOrder.splice(targetIndex, 0, dragged);
-      setSelectedId(draggedId);
+      setSelectedIds([draggedId]);
       setStatus("Layer order updated by drag and drop.");
       return displayOrder.reverse();
     });
   }, []);
+
+  const toggleLayerVisible = useCallback((id: string) => {
+    setLayers((current) => current.map((layer) => (layer.id === id ? { ...layer, visible: !layer.visible } : layer)));
+  }, []);
+
+  const toggleLayerSelectable = useCallback((id: string) => {
+    setLayers((current) =>
+      current.map((layer) => (layer.id === id ? { ...layer, selectable: !layer.selectable } : layer)),
+    );
+    setSelectedIds((current) => current.filter((selectedId) => selectedId !== id));
+  }, []);
+
+  const alignSelection = useCallback(
+    (mode: AlignmentMode) => {
+      setLayers((current) => alignLayers(current, selectedIds, settings, mode));
+      setStatus(selectedIds.length > 1 ? `Aligned ${selectedIds.length} layers.` : "Aligned layer to canvas.");
+    },
+    [selectedIds, settings],
+  );
+
+  const addPaletteColor = useCallback(() => {
+    const next = appendPaletteColor(paletteColors, paletteDraft);
+    writeColorPalette(next);
+    setPaletteColors(next);
+    setStatus(next.length === paletteColors.length ? "Palette color already exists or is invalid." : "Palette color registered.");
+  }, [paletteColors, paletteDraft]);
+
+  const deletePaletteColor = useCallback(
+    (id: string) => {
+      const next = removePaletteColor(paletteColors, id);
+      writeColorPalette(next);
+      setPaletteColors(next);
+      setStatus("Palette color removed.");
+    },
+    [paletteColors],
+  );
+
+  const applyPaletteColor = useCallback(
+    (color: string, target: "primary" | "stroke") => {
+      setLayers((current) =>
+        current.map((layer) => {
+          if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
+          if (layer.type === "text") {
+            return target === "primary" ? { ...layer, color } : { ...layer, strokeColor: color };
+          }
+          if (layer.type === "shape") {
+            return target === "primary" ? { ...layer, fill: color } : { ...layer, strokeColor: color };
+          }
+          return layer;
+        }),
+      );
+      setStatus(target === "primary" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
+    },
+    [selectedIds],
+  );
+
+  const createProcessedAsset = useCallback(
+    (asset: ImageAsset) => {
+      setAssets((current) => [...current, asset]);
+      const assetRatio = asset.width && asset.height ? asset.height / asset.width : 9 / 16;
+      const width = Math.min(settings.width * 0.46, asset.width ?? settings.width * 0.46);
+      const height = Math.min(settings.height * 0.72, width * assetRatio);
+      const layer = makeImageLayer({
+        name: asset.name,
+        imageKey: asset.key,
+        x: settings.width * 0.5 - width / 2,
+        y: settings.height * 0.5 - height / 2,
+        width,
+        height,
+      });
+      setLayers((current) => [...current, layer]);
+      setSelectedIds([layer.id]);
+      setStatus(`Created processed image layer "${asset.name}".`);
+    },
+    [settings.height, settings.width],
+  );
 
   const handlePresetChange = useCallback((presetId: string) => {
     setSettings((current) => applyPreset(current, presetId));
@@ -251,13 +372,14 @@ function App() {
   const handleCanvasPointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = event.currentTarget;
-      const point = pointToCanvas(canvas, event.clientX, event.clientY);
+      const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
+      const additive = event.ctrlKey || event.metaKey || event.shiftKey;
       const selectedMode = selectedLayer ? getLayerInteractionAt(selectedLayer, point) : null;
 
       if (selectedLayer && selectedMode) {
         event.preventDefault();
-        canvas.setPointerCapture(event.pointerId);
-        activeCanvasInteraction.current = { mode: selectedMode, layer: selectedLayer, start: point };
+        safelySetPointerCapture(canvas, event.pointerId);
+        activeCanvasInteraction.current = { mode: selectedMode, layer: selectedLayer, layers: [selectedLayer], start: point };
         setCanvasCursor(cursorForMode(selectedMode));
         setStatus(`${labelForMode(selectedMode)} ${selectedLayer.name}.`);
         return;
@@ -266,28 +388,35 @@ function App() {
       const picked = pickLayerAt(layers, point.x, point.y);
       if (picked) {
         event.preventDefault();
-        canvas.setPointerCapture(event.pointerId);
-        setSelectedId(picked.id);
-        activeCanvasInteraction.current = { mode: "move", layer: picked, start: point };
+        if (additive) {
+          selectLayer(picked.id, true);
+          setStatus(`Toggled ${picked.name} in the selection.`);
+          return;
+        }
+        safelySetPointerCapture(canvas, event.pointerId);
+        const moveTargets = selectedIds.includes(picked.id) && selectedLayers.length > 1 ? selectedLayers : [picked];
+        setSelectedIds(moveTargets.map((layer) => layer.id));
+        activeCanvasInteraction.current = { mode: "move", layers: moveTargets, start: point };
         setCanvasCursor("grabbing");
-        setStatus(`Selected ${picked.name}. Dragging to move.`);
+        setStatus(moveTargets.length > 1 ? `Dragging ${moveTargets.length} layers.` : `Selected ${picked.name}. Dragging to move.`);
       } else {
         setCanvasCursor("default");
       }
     },
-    [layers, selectedLayer],
+    [layers, selectLayer, selectedIds, selectedLayer, selectedLayers],
   );
 
   const handleCanvasPointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
       const canvas = event.currentTarget;
-      const point = pointToCanvas(canvas, event.clientX, event.clientY);
+      const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
       const active = activeCanvasInteraction.current;
 
       if (active) {
         event.preventDefault();
-        const nextLayer = transformLayerFromPointer(active, point);
-        setLayers((current) => current.map((layer) => (layer.id === active.layer.id ? nextLayer : layer)));
+        const nextLayers = transformLayersFromPointer(active, point);
+        const nextById = new Map(nextLayers.map((layer) => [layer.id, layer]));
+        setLayers((current) => current.map((layer) => nextById.get(layer.id) ?? layer));
         return;
       }
 
@@ -341,8 +470,9 @@ function App() {
       if (!template) return;
       setSettings(template.settings);
       setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
-      setLayers(template.layers);
-      setSelectedId(template.layers.at(-1)?.id ?? "");
+      const nextLayers = template.layers.map((layer) => ({ ...layer, selectable: layer.selectable !== false }));
+      setLayers(nextLayers);
+      setSelectedIds(selectTopLayerIds(nextLayers));
       setCsvText(template.csv || layersToCsv(template.layers));
       setHtmlText(template.html || layersToHtml(template.layers));
       setTemplateName(template.name);
@@ -412,15 +542,17 @@ function App() {
           onSaveTemplate={saveCurrentTemplate}
           onLoadTemplate={loadTemplate}
           onDeleteTemplate={deleteTemplate}
+          onCreateProcessedAsset={createProcessedAsset}
           assets={assets}
         />
         <CanvasStage
           canvasRef={canvasRef}
           settings={settings}
           layerCount={layers.length}
-          selectedLayerName={selectedLayer?.name ?? "None"}
+          selectedLayerName={selectionLabel}
           zoom={zoom}
           cursor={canvasCursor}
+          previewPadding={previewPadding}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
@@ -429,13 +561,23 @@ function App() {
         <InspectorPanel
           assets={assets}
           layers={layers}
-          selectedId={selectedLayer?.id ?? ""}
-          onSelect={setSelectedId}
+          selectedIds={selectedIds}
+          settings={settings}
+          paletteColors={paletteColors}
+          paletteDraft={paletteDraft}
+          onPaletteDraftChange={setPaletteDraft}
+          onAddPaletteColor={addPaletteColor}
+          onDeletePaletteColor={deletePaletteColor}
+          onApplyPaletteColor={applyPaletteColor}
+          onSelect={selectLayer}
           onUpdateLayer={updateLayer}
           onDelete={deleteLayer}
           onDuplicate={duplicateLayer}
           onMove={moveLayer}
           onReorderLayer={reorderLayer}
+          onToggleVisible={toggleLayerVisible}
+          onToggleSelectable={toggleLayerSelectable}
+          onAlignSelection={alignSelection}
         />
       </main>
       <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} />
@@ -443,10 +585,11 @@ function App() {
   );
 }
 
-function transformLayerFromPointer(active: ActiveCanvasInteraction, point: CanvasPoint): ThumbnailLayer {
-  if (active.mode === "move") return moveCanvasLayer(active.layer, active.start, point);
-  if (active.mode === "rotate") return rotateLayer(active.layer, active.start, point);
-  return resizeLayer(active.layer, active.mode, point);
+function transformLayersFromPointer(active: ActiveCanvasInteraction, point: CanvasPoint): ThumbnailLayer[] {
+  if (active.mode === "move") return active.layers.map((layer) => moveCanvasLayer(layer, active.start, point));
+  if (!active.layer) return active.layers;
+  if (active.mode === "rotate") return [rotateLayer(active.layer, active.start, point)];
+  return [resizeLayer(active.layer, active.mode, point)];
 }
 
 function cursorForMode(mode: CanvasInteractionMode): string {
@@ -462,17 +605,37 @@ function labelForMode(mode: CanvasInteractionMode): string {
   return "Resize";
 }
 
+function selectTopLayerIds(layers: ThumbnailLayer[]): string[] {
+  const top = [...layers].reverse().find((layer) => layer.selectable);
+  return top ? [top.id] : [];
+}
+
+function safelySetPointerCapture(element: HTMLElement, pointerId: number): void {
+  try {
+    element.setPointerCapture(pointerId);
+  } catch {
+    // Synthetic tests may dispatch pointer events without an active browser pointer.
+  }
+}
+
 function readImageFile(file: File): Promise<ImageAsset> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
       const baseName = file.name.replace(/\.[^.]+$/, "");
       const key = `${slug(baseName)}-${Date.now().toString(36)}`;
-      resolve({
-        key,
-        name: baseName,
-        src: String(reader.result),
-      });
+      const src = String(reader.result);
+      const image = new Image();
+      image.onload = () =>
+        resolve({
+          key,
+          name: baseName,
+          src,
+          width: image.naturalWidth || image.width,
+          height: image.naturalHeight || image.height,
+        });
+      image.onerror = () => resolve({ key, name: baseName, src });
+      image.src = src;
     };
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);

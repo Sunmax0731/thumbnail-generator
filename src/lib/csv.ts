@@ -29,6 +29,7 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
       rotation: numberOr(record.rotation, 0),
       opacity: clamp(numberOr(record.opacity, 1), 0, 1),
       visible: boolOr(record.visible, true),
+      selectable: boolOr(record.selectable, true),
     };
 
     if (type === "image") {

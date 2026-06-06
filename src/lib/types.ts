@@ -22,6 +22,7 @@ export interface BaseLayer {
   rotation: number;
   opacity: number;
   visible: boolean;
+  selectable: boolean;
 }
 
 export interface ImageLayer extends BaseLayer {
@@ -87,4 +88,3 @@ export interface LayoutParseResult {
   layers: ThumbnailLayer[];
   warnings: string[];
 }
-

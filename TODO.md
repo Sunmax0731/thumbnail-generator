@@ -61,3 +61,19 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] Save generated layouts as named browser-local templates.
 - [x] Support multiple saved templates with load and delete controls.
 - [x] Validate new interactions with automated tests and browser runtime gate.
+
+## 8. Multi-Select, Palette, Locking, and Image Lab
+
+- [x] Add multi-layer selection from canvas and Layers panel.
+- [x] Add alignment controls for multi-selection and canvas alignment for single selection.
+- [x] Add browser-local color palette registration and quick color application to text and shape layers.
+- [x] Render selection resize and rotation handles outside the canvas document bounds without clipping.
+- [x] Add layer selectable/editable lock toggle and exclude locked layers from canvas selection and inspector edits.
+- [x] Confirm named templates continue to support multiple saved entries after model changes.
+- [x] Add an Image Lab tab for imported-image processing.
+- [x] Implement chroma-key transparency.
+- [x] Implement rectangular and circular image cutouts.
+- [x] Implement polygon/free cutout by placing points.
+- [x] Implement mouse-drag range cutout.
+- [x] Add sliders for numeric controls with practical min/max bounds.
+- [x] Validate new interactions with automated tests and browser runtime gate.

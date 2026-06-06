@@ -35,6 +35,7 @@ export function makeImageLayer(partial: Partial<ImageLayer> = {}): ImageLayer {
     rotation: partial.rotation ?? 0,
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
+    selectable: partial.selectable ?? true,
     imageKey: partial.imageKey ?? "sample-bg",
     effects: { ...defaultEffects, ...partial.effects },
   };
@@ -52,6 +53,7 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
     rotation: partial.rotation ?? 0,
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
+    selectable: partial.selectable ?? true,
     text: partial.text ?? "NEW THUMBNAIL",
     fontSize: partial.fontSize ?? 88,
     fontFamily: partial.fontFamily ?? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
@@ -76,6 +78,7 @@ export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
     rotation: partial.rotation ?? 0,
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
+    selectable: partial.selectable ?? true,
     shape: (partial.shape as ShapeKind) ?? "rect",
     fill: partial.fill ?? "#10b6d7",
     strokeColor: partial.strokeColor ?? "#ffffff",
@@ -92,4 +95,3 @@ export function cloneLayer(layer: ThumbnailLayer): ThumbnailLayer {
   }
   return makeShapeLayer({ ...layer, id: makeLayerId("shape"), name: `${layer.name} copy` });
 }
-

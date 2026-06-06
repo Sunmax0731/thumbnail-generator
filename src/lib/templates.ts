@@ -47,7 +47,7 @@ export function readSavedTemplates(storage: Pick<Storage, "getItem"> = window.lo
   try {
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter(isSavedTemplate);
+    return parsed.filter(isSavedTemplate).map(normalizeTemplate);
   } catch {
     return [];
   }
@@ -61,16 +61,17 @@ export function writeSavedTemplates(
 }
 
 export function upsertTemplate(templates: SavedTemplate[], template: SavedTemplate): SavedTemplate[] {
-  const sameNameIndex = templates.findIndex((candidate) => candidate.name === template.name);
-  if (sameNameIndex === -1) return [template, ...templates];
-  const next = [...templates];
-  next[sameNameIndex] = {
+  return [template, ...templates];
+}
+
+function normalizeTemplate(template: SavedTemplate): SavedTemplate {
+  return {
     ...template,
-    id: next[sameNameIndex].id,
-    createdAt: next[sameNameIndex].createdAt,
-    updatedAt: template.updatedAt,
+    layers: template.layers.map((layer) => ({
+      ...layer,
+      selectable: layer.selectable !== false,
+    })),
   };
-  return next;
 }
 
 function isSavedTemplate(value: unknown): value is SavedTemplate {
@@ -88,4 +89,3 @@ function isSavedTemplate(value: unknown): value is SavedTemplate {
     Boolean(candidate.settings)
   );
 }
-

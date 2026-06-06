@@ -22,6 +22,7 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
       rotation: numberOr(attr(node, "rotation"), 0),
       opacity: clamp(numberOr(attr(node, "opacity"), 1), 0, 1),
       visible: attr(node, "visible") !== "false",
+      selectable: attr(node, "selectable") !== "false",
     };
 
     if (type === "image") {

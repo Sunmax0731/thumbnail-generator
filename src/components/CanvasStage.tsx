@@ -8,6 +8,7 @@ interface CanvasStageProps {
   selectedLayerName: string;
   zoom: number;
   cursor: string;
+  previewPadding: number;
   onZoomChange: (zoom: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
@@ -21,6 +22,7 @@ export function CanvasStage({
   selectedLayerName,
   zoom,
   cursor,
+  previewPadding,
   onZoomChange,
   onPointerDown,
   onPointerMove,
@@ -66,7 +68,7 @@ export function CanvasStage({
         <div
           className="canvas-frame"
           style={{
-            aspectRatio: `${settings.width} / ${settings.height}`,
+            aspectRatio: `${settings.width + previewPadding * 2} / ${settings.height + previewPadding * 2}`,
             width: `${Math.round(100 * zoom)}%`,
             minWidth: settings.height > settings.width ? "290px" : "520px",
           }}

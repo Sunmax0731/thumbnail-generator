@@ -1,4 +1,6 @@
-import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Shapes, Trash2, Type } from "lucide-react";
+import { useState } from "react";
+import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Scissors, Shapes, Trash2, Type } from "lucide-react";
+import { ImageLabPanel } from "./ImageLabPanel";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
@@ -21,6 +23,7 @@ interface LeftPanelProps {
   onSaveTemplate: () => void;
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
+  onCreateProcessedAsset: (asset: ImageAsset) => void;
 }
 
 export function LeftPanel({
@@ -42,9 +45,35 @@ export function LeftPanel({
   onSaveTemplate,
   onLoadTemplate,
   onDeleteTemplate,
+  onCreateProcessedAsset,
 }: LeftPanelProps) {
+  const [activeTab, setActiveTab] = useState<"layout" | "image">("layout");
+
   return (
     <aside className="side-panel left-panel" aria-label="Imports and layout sources">
+      <div className="panel-tabs" role="tablist" aria-label="Editor source tabs">
+        <button
+          type="button"
+          role="tab"
+          className={activeTab === "layout" ? "selected" : ""}
+          onClick={() => setActiveTab("layout")}
+        >
+          <LayoutTemplate size={15} /> Layout
+        </button>
+        <button
+          type="button"
+          role="tab"
+          className={activeTab === "image" ? "selected" : ""}
+          onClick={() => setActiveTab("image")}
+        >
+          <Scissors size={15} /> Image Lab
+        </button>
+      </div>
+
+      {activeTab === "image" ? (
+        <ImageLabPanel assets={assets} onImageFiles={onImageFiles} onCreateProcessedAsset={onCreateProcessedAsset} />
+      ) : (
+        <>
       <section className="panel-section">
         <div className="section-heading">
           <ImagePlus size={16} />
@@ -166,6 +195,8 @@ export function LeftPanel({
           <Code2 size={16} /> Apply HTML
         </button>
       </section>
+        </>
+      )}
     </aside>
   );
 }

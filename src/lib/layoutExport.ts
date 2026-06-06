@@ -9,6 +9,8 @@ const csvColumns = [
   "height",
   "rotation",
   "opacity",
+  "visible",
+  "selectable",
   "text",
   "fontSize",
   "fontFamily",
@@ -24,7 +26,8 @@ const csvColumns = [
   "image",
 ] as const;
 
-type HtmlAttribute = [string, string | number];
+type LayoutValue = string | number | boolean;
+type HtmlAttribute = [string, LayoutValue];
 
 export function layersToCsv(layers: ThumbnailLayer[]): string {
   const rows = layers.map((layer) => csvColumns.map((column) => valueForCsvColumn(layer, column)));
@@ -36,8 +39,8 @@ export function layersToHtml(layers: ThumbnailLayer[]): string {
   return `<section data-thumbnail-layout="thumbnail-generator">\n${body}\n</section>`;
 }
 
-function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[number]): string | number {
-  const common: Record<string, string | number> = {
+function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[number]): LayoutValue {
+  const common: Record<string, LayoutValue> = {
     type: layer.type,
     name: layer.name,
     x: round(layer.x),
@@ -46,6 +49,8 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     height: round(layer.height),
     rotation: round(layer.rotation),
     opacity: round(layer.opacity),
+    visible: layer.visible,
+    selectable: layer.selectable,
   };
   if (column in common) return common[column];
 
@@ -95,6 +100,8 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-height", round(layer.height)],
     ["data-rotation", round(layer.rotation)],
     ["data-opacity", round(layer.opacity)],
+    ["data-visible", String(layer.visible)],
+    ["data-selectable", String(layer.selectable)],
   ];
 
   if (layer.type === "image") {
@@ -124,7 +131,7 @@ function layerToHtml(layer: ThumbnailLayer): string {
   ])}>${escapeHtml(layer.text)}</div>`;
 }
 
-function attrs(items: Array<[string, string | number]>): string {
+function attrs(items: Array<[string, LayoutValue]>): string {
   return items
     .filter(([, value]) => value !== "")
     .map(([key, value]) => `${key}="${escapeHtml(String(value))}"`)
@@ -145,7 +152,7 @@ function effectsToString(layer: ImageLayer): string {
     .join(";");
 }
 
-function escapeCsv(value: string | number): string {
+function escapeCsv(value: LayoutValue): string {
   const text = String(value);
   if (!/[",\r\n]/.test(text)) return text;
   return `"${text.replace(/"/g, '""')}"`;

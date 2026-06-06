@@ -2,7 +2,7 @@ import type { ThumbnailLayer } from "./types";
 
 export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): ThumbnailLayer | undefined {
   for (const layer of [...layers].reverse()) {
-    if (!layer.visible) continue;
+    if (!layer.visible || !layer.selectable) continue;
     const centerX = layer.x + layer.width / 2;
     const centerY = layer.y + layer.height / 2;
     const radians = (-layer.rotation * Math.PI) / 180;
@@ -21,4 +21,3 @@ export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): Thu
   }
   return undefined;
 }
-

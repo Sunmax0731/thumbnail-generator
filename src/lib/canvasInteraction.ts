@@ -17,11 +17,11 @@ export const selectionHandleRadius = 16;
 export const rotateHandleOffset = 54;
 const minLayerSize = 24;
 
-export function pointToCanvas(canvas: HTMLCanvasElement, clientX: number, clientY: number): CanvasPoint {
+export function pointToCanvas(canvas: HTMLCanvasElement, clientX: number, clientY: number, previewPadding = 0): CanvasPoint {
   const rect = canvas.getBoundingClientRect();
   return {
-    x: ((clientX - rect.left) / rect.width) * canvas.width,
-    y: ((clientY - rect.top) / rect.height) * canvas.height,
+    x: ((clientX - rect.left) / rect.width) * canvas.width - previewPadding,
+    y: ((clientY - rect.top) / rect.height) * canvas.height - previewPadding,
   };
 }
 
@@ -153,4 +153,3 @@ function normalizeDegrees(value: number): number {
 function distance(a: CanvasPoint, b: CanvasPoint): number {
   return Math.hypot(a.x - b.x, a.y - b.y);
 }
-

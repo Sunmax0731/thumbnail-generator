@@ -54,11 +54,31 @@ export function TopToolbar({
               onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
             }
           />
+          <input
+            type="range"
+            min={320}
+            max={4096}
+            step={16}
+            value={settings.width}
+            onChange={(event) =>
+              onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
+            }
+          />
         </label>
         <label className="field size-field">
           <span>H</span>
           <input
             type="number"
+            min={320}
+            max={4096}
+            step={16}
+            value={settings.height}
+            onChange={(event) =>
+              onSettingsChange({ presetId: "custom", height: Number.parseInt(event.target.value, 10) || 720 })
+            }
+          />
+          <input
+            type="range"
             min={320}
             max={4096}
             step={16}

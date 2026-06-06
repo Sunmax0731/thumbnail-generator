@@ -23,14 +23,13 @@ describe("templates", () => {
     expect(template.html).toContain("TITLE");
   });
 
-  it("replaces an existing template with the same name", () => {
+  it("keeps multiple templates even when names match", () => {
     const older = createTemplateSnapshot("A", [makeTextLayer({ text: "OLD" })], [], defaultOutputSettings);
     const newer = createTemplateSnapshot("A", [makeTextLayer({ text: "NEW" })], [], defaultOutputSettings);
     const templates = upsertTemplate([older], newer);
 
-    expect(templates).toHaveLength(1);
-    expect(templates[0].id).toBe(older.id);
+    expect(templates).toHaveLength(2);
+    expect(templates[0].id).toBe(newer.id);
     expect(templates[0].csv).toContain("NEW");
   });
 });
-

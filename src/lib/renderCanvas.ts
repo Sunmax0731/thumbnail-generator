@@ -5,7 +5,9 @@ const imageCache = new Map<string, Promise<HTMLImageElement>>();
 
 export interface RenderOptions {
   selectedLayerId?: string | null;
+  selectedLayerIds?: string[];
   drawSelection?: boolean;
+  previewPadding?: number;
 }
 
 export async function renderThumbnailToCanvas(
@@ -15,28 +17,47 @@ export async function renderThumbnailToCanvas(
   settings: OutputSettings,
   options: RenderOptions = {},
 ): Promise<void> {
-  canvas.width = settings.width;
-  canvas.height = settings.height;
+  const previewPadding = options.previewPadding ?? 0;
+  canvas.width = settings.width + previewPadding * 2;
+  canvas.height = settings.height + previewPadding * 2;
   const context = canvas.getContext("2d");
   if (!context) {
     throw new Error("Canvas 2D context is not available.");
   }
 
-  context.clearRect(0, 0, settings.width, settings.height);
+  context.clearRect(0, 0, canvas.width, canvas.height);
+  if (previewPadding > 0) {
+    context.fillStyle = "#dfe7ee";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+  }
   context.fillStyle = settings.background;
-  context.fillRect(0, 0, settings.width, settings.height);
+  context.fillRect(previewPadding, previewPadding, settings.width, settings.height);
+
+  if (previewPadding > 0) {
+    context.strokeStyle = "rgba(17, 24, 39, 0.28)";
+    context.lineWidth = 2;
+    context.strokeRect(previewPadding, previewPadding, settings.width, settings.height);
+  }
+
+  context.save();
+  context.translate(previewPadding, previewPadding);
 
   const sortedLayers = layers.filter((layer) => layer.visible);
   for (const layer of sortedLayers) {
     await drawLayer(context, layer, assets);
   }
 
-  if (options.drawSelection && options.selectedLayerId) {
-    const selected = layers.find((layer) => layer.id === options.selectedLayerId);
-    if (selected) {
-      drawSelection(context, selected);
+  if (options.drawSelection) {
+    const selectedIds = options.selectedLayerIds ?? (options.selectedLayerId ? [options.selectedLayerId] : []);
+    const selectedLayers = selectedIds
+      .map((id) => layers.find((layer) => layer.id === id))
+      .filter((layer): layer is ThumbnailLayer => Boolean(layer));
+    for (const selected of selectedLayers) {
+      drawSelection(context, selected, selectedLayers.length === 1);
     }
   }
+
+  context.restore();
 }
 
 async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
@@ -166,7 +187,7 @@ function drawMissingImage(context: CanvasRenderingContext2D, width: number, heig
   context.fillText("missing image", 0, 0);
 }
 
-function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer) {
+function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer, drawHandles: boolean) {
   context.save();
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
@@ -175,21 +196,23 @@ function drawSelection(context: CanvasRenderingContext2D, layer: ThumbnailLayer)
   context.setLineDash([16, 10]);
   context.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
   context.setLineDash([]);
-  context.beginPath();
-  context.moveTo(0, -layer.height / 2);
-  context.lineTo(0, -layer.height / 2 - rotateHandleOffset);
-  context.stroke();
-  context.fillStyle = "#10b6d7";
-  for (const [x, y] of [
-    [-layer.width / 2, -layer.height / 2],
-    [layer.width / 2, -layer.height / 2],
-    [layer.width / 2, layer.height / 2],
-    [-layer.width / 2, layer.height / 2],
-    [0, -layer.height / 2 - rotateHandleOffset],
-  ]) {
+  if (drawHandles) {
     context.beginPath();
-    context.arc(x, y, selectionHandleRadius, 0, Math.PI * 2);
-    context.fill();
+    context.moveTo(0, -layer.height / 2);
+    context.lineTo(0, -layer.height / 2 - rotateHandleOffset);
+    context.stroke();
+    context.fillStyle = "#10b6d7";
+    for (const [x, y] of [
+      [-layer.width / 2, -layer.height / 2],
+      [layer.width / 2, -layer.height / 2],
+      [layer.width / 2, layer.height / 2],
+      [-layer.width / 2, layer.height / 2],
+      [0, -layer.height / 2 - rotateHandleOffset],
+    ]) {
+      context.beginPath();
+      context.arc(x, y, selectionHandleRadius, 0, Math.PI * 2);
+      context.fill();
+    }
   }
   context.restore();
 }

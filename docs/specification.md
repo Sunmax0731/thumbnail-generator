@@ -11,6 +11,8 @@ All layers share:
 - `width`, `height`: layer bounds in output pixels.
 - `rotation`: degrees clockwise around the layer center.
 - `opacity`: `0` to `1`.
+- `visible`: whether the layer renders.
+- `selectable`: whether the layer can be selected or edited.
 
 ## Image Layers
 
@@ -98,11 +100,26 @@ The selected layer can be edited directly on the canvas:
 - Drag inside the selected layer to move it.
 - Drag corner handles to resize it.
 - Drag the rotation handle above the layer to rotate it.
+- Handles are rendered in preview padding, so controls remain visible even when they extend outside the thumbnail document bounds.
+- Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
+- Dragging a selected layer in a multi-selection moves the selected group.
 - Inspector numeric fields remain the source of precise values.
+
+## Alignment
+
+Alignment controls support left, center, right, top, middle, and bottom:
+
+- With one selected layer, alignment targets the full canvas/output area.
+- With multiple selected layers, alignment targets the selected group bounds.
 
 ## Layer Ordering
 
 The Layers panel displays the topmost layer first. Dragging a row in the list changes the canvas stacking order.
+
+Layer rows also include:
+
+- Visibility toggle.
+- Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
 
 ## Font Choices
 
@@ -120,3 +137,30 @@ Templates are saved in browser `localStorage` under a repository-specific key. A
 - Generated CSV and HTML layout text.
 
 Multiple templates can be saved, loaded, and deleted.
+
+Saving a template always creates a new saved entry, so repeated saves with the same display name are preserved.
+
+## Color Palette
+
+The color palette is stored in browser `localStorage` under `thumbnail-generator.colorPalette.v1`. Registered colors can be applied to:
+
+- Text fill color.
+- Text outline color.
+- Shape fill color.
+- Shape stroke color.
+
+## Image Lab
+
+The Image Lab tab processes imported or bundled images in the browser and creates a processed image asset plus a new image layer. Supported operations:
+
+- Chroma-key transparency with key color and tolerance.
+- Rectangular cutout.
+- Circular/elliptical cutout.
+- Polygon/free cutout by placing three or more points.
+- Drag-range rectangular cutout.
+
+Processing outputs PNG data URLs and remains browser-only.
+
+## Slider Controls
+
+Numeric controls use sliders with paired number inputs where precision is useful. This includes layer position, size, rotation, opacity, text size, line height, strokes, image effects, output size, and Image Lab crop/chroma parameters.

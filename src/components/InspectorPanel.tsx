@@ -1,5 +1,12 @@
 import { useState } from "react";
+import type { ReactNode } from "react";
 import {
+  AlignHorizontalJustifyCenter,
+  AlignHorizontalJustifyEnd,
+  AlignHorizontalJustifyStart,
+  AlignVerticalJustifyCenter,
+  AlignVerticalJustifyEnd,
+  AlignVerticalJustifyStart,
   ArrowDown,
   ArrowUp,
   Copy,
@@ -7,37 +14,64 @@ import {
   EyeOff,
   GripVertical,
   Layers,
+  Lock,
   RotateCw,
   SlidersHorizontal,
   Trash2,
+  Unlock,
 } from "lucide-react";
+import type { AlignmentMode } from "../lib/alignment";
 import { fontLabelFor, fontOptions } from "../lib/fonts";
-import type { ImageAsset, ImageEffects, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
+import type { PaletteColor } from "../lib/colorPalette";
+import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
+
+type PaletteApplyTarget = "primary" | "stroke";
 
 interface InspectorPanelProps {
   assets: ImageAsset[];
   layers: ThumbnailLayer[];
-  selectedId: string;
-  onSelect: (id: string) => void;
+  selectedIds: string[];
+  settings: OutputSettings;
+  paletteColors: PaletteColor[];
+  paletteDraft: string;
+  onPaletteDraftChange: (value: string) => void;
+  onAddPaletteColor: () => void;
+  onDeletePaletteColor: (id: string) => void;
+  onApplyPaletteColor: (color: string, target: PaletteApplyTarget) => void;
+  onSelect: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, direction: -1 | 1) => void;
   onReorderLayer: (draggedId: string, targetId: string) => void;
+  onToggleVisible: (id: string) => void;
+  onToggleSelectable: (id: string) => void;
+  onAlignSelection: (mode: AlignmentMode) => void;
 }
 
 export function InspectorPanel({
   assets,
   layers,
-  selectedId,
+  selectedIds,
+  settings,
+  paletteColors,
+  paletteDraft,
+  onPaletteDraftChange,
+  onAddPaletteColor,
+  onDeletePaletteColor,
+  onApplyPaletteColor,
   onSelect,
   onUpdateLayer,
   onDelete,
   onDuplicate,
   onMove,
   onReorderLayer,
+  onToggleVisible,
+  onToggleSelectable,
+  onAlignSelection,
 }: InspectorPanelProps) {
-  const selected = layers.find((layer) => layer.id === selectedId) ?? layers.at(-1);
+  const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
+  const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const [draggingId, setDraggingId] = useState<string | null>(null);
 
   return (
@@ -49,19 +83,24 @@ export function InspectorPanel({
         </div>
         <div className="layer-list" aria-label="Layer list">
           {[...layers].reverse().map((layer) => (
-            <button
+            <div
               key={layer.id}
-              type="button"
               draggable
-              className={`layer-row ${layer.id === selected?.id ? "selected" : ""} ${
+              role="button"
+              tabIndex={0}
+              aria-disabled={!layer.selectable}
+              className={`layer-row ${selectedIds.includes(layer.id) ? "selected" : ""} ${
                 draggingId === layer.id ? "dragging" : ""
-              }`}
-              onClick={() => onSelect(layer.id)}
+              } ${!layer.selectable ? "locked" : ""}`}
+              onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+              onKeyDown={(event) => {
+                if (event.key === "Enter" || event.key === " ") onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+              }}
               onDragStart={(event) => {
                 event.dataTransfer.effectAllowed = "move";
                 event.dataTransfer.setData("text/plain", layer.id);
                 setDraggingId(layer.id);
-                onSelect(layer.id);
+                if (layer.selectable) onSelect(layer.id);
               }}
               onDragOver={(event) => {
                 event.preventDefault();
@@ -78,11 +117,76 @@ export function InspectorPanel({
               <GripVertical size={14} className="drag-grip" />
               <span className={`layer-type ${layer.type}`}>{layer.type}</span>
               <span className="layer-name">{layer.name}</span>
-              {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
-            </button>
+              <button
+                type="button"
+                className="mini-icon-button"
+                title={layer.visible ? "Hide layer" : "Show layer"}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onToggleVisible(layer.id);
+                }}
+              >
+                {layer.visible ? <Eye size={14} /> : <EyeOff size={14} />}
+              </button>
+              <button
+                type="button"
+                className="mini-icon-button"
+                title={layer.selectable ? "Lock selection and editing" : "Unlock selection and editing"}
+                onClick={(event) => {
+                  event.stopPropagation();
+                  onToggleSelectable(layer.id);
+                }}
+              >
+                {layer.selectable ? <Unlock size={14} /> : <Lock size={14} />}
+              </button>
+            </div>
           ))}
         </div>
       </section>
+
+      <section className="panel-section">
+        <div className="section-heading">
+          <AlignHorizontalJustifyCenter size={16} />
+          <h2>Align</h2>
+        </div>
+        <p className="selection-note">
+          {selectedLayers.length === 0
+            ? "No editable layer selected."
+            : selectedLayers.length === 1
+              ? "Single layer aligns to the canvas."
+              : `${selectedLayers.length} layers align to the selection bounds.`}
+        </p>
+        <div className="align-grid" aria-label="Alignment controls">
+          <AlignButton label="Left" mode="left" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignHorizontalJustifyStart size={16} />
+          </AlignButton>
+          <AlignButton label="Center" mode="center" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignHorizontalJustifyCenter size={16} />
+          </AlignButton>
+          <AlignButton label="Right" mode="right" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignHorizontalJustifyEnd size={16} />
+          </AlignButton>
+          <AlignButton label="Top" mode="top" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignVerticalJustifyStart size={16} />
+          </AlignButton>
+          <AlignButton label="Middle" mode="middle" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignVerticalJustifyCenter size={16} />
+          </AlignButton>
+          <AlignButton label="Bottom" mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
+            <AlignVerticalJustifyEnd size={16} />
+          </AlignButton>
+        </div>
+      </section>
+
+      <PaletteControls
+        colors={paletteColors}
+        draft={paletteDraft}
+        selectedCount={selectedLayers.length}
+        onDraftChange={onPaletteDraftChange}
+        onAdd={onAddPaletteColor}
+        onDelete={onDeletePaletteColor}
+        onApply={onApplyPaletteColor}
+      />
 
       {selected ? (
         <section className="panel-section inspector-section">
@@ -111,57 +215,59 @@ export function InspectorPanel({
               value={selected.name}
               onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, name: value }))}
             />
-            <label className="checkbox-row">
-              <input
-                type="checkbox"
-                checked={selected.visible}
-                onChange={(event) =>
-                  onUpdateLayer(selected.id, (layer) => ({ ...layer, visible: event.currentTarget.checked }))
-                }
-              />
-              Visible
-            </label>
             <div className="field-grid two">
-              <NumberInput label="X" value={selected.x} onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)} />
-              <NumberInput label="Y" value={selected.y} onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)} />
-              <NumberInput
+              <SliderNumberInput
+                label="X"
+                value={selected.x}
+                min={-settings.width}
+                max={settings.width * 2}
+                step={1}
+                onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)}
+              />
+              <SliderNumberInput
+                label="Y"
+                value={selected.y}
+                min={-settings.height}
+                max={settings.height * 2}
+                step={1}
+                onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)}
+              />
+              <SliderNumberInput
                 label="Width"
                 value={selected.width}
+                min={16}
+                max={settings.width * 2}
+                step={1}
                 onChange={(value) => updateNumber(selected, "width", value, onUpdateLayer)}
               />
-              <NumberInput
+              <SliderNumberInput
                 label="Height"
                 value={selected.height}
+                min={16}
+                max={settings.height * 2}
+                step={1}
                 onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
               />
             </div>
-            <label className="range-field">
-              <span>
-                <RotateCw size={14} /> Rotation {Math.round(selected.rotation)} deg
-              </span>
-              <input
-                type="range"
-                min={-180}
-                max={180}
-                value={selected.rotation}
-                onChange={(event) =>
-                  updateNumber(selected, "rotation", Number.parseFloat(event.currentTarget.value), onUpdateLayer)
-                }
-              />
-            </label>
-            <label className="range-field">
-              <span>Opacity {selected.opacity.toFixed(2)}</span>
-              <input
-                type="range"
-                min={0}
-                max={1}
-                step={0.01}
-                value={selected.opacity}
-                onChange={(event) =>
-                  updateNumber(selected, "opacity", Number.parseFloat(event.currentTarget.value), onUpdateLayer)
-                }
-              />
-            </label>
+            <SliderNumberInput
+              label="Rotation"
+              value={selected.rotation}
+              min={-180}
+              max={180}
+              step={1}
+              icon={<RotateCw size={14} />}
+              suffix="deg"
+              onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
+            />
+            <SliderNumberInput
+              label="Opacity"
+              value={selected.opacity}
+              min={0}
+              max={1}
+              step={0.01}
+              decimals={2}
+              onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
+            />
 
             {selected.type === "image" && (
               <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} />
@@ -172,6 +278,84 @@ export function InspectorPanel({
         </section>
       ) : null}
     </aside>
+  );
+}
+
+function AlignButton({
+  label,
+  mode,
+  disabled,
+  children,
+  onAlignSelection,
+}: {
+  label: string;
+  mode: AlignmentMode;
+  disabled: boolean;
+  children: ReactNode;
+  onAlignSelection: (mode: AlignmentMode) => void;
+}) {
+  return (
+    <button type="button" className="secondary-button icon-text" disabled={disabled} onClick={() => onAlignSelection(mode)}>
+      {children}
+      {label}
+    </button>
+  );
+}
+
+function PaletteControls({
+  colors,
+  draft,
+  selectedCount,
+  onDraftChange,
+  onAdd,
+  onDelete,
+  onApply,
+}: {
+  colors: PaletteColor[];
+  draft: string;
+  selectedCount: number;
+  onDraftChange: (value: string) => void;
+  onAdd: () => void;
+  onDelete: (id: string) => void;
+  onApply: (color: string, target: PaletteApplyTarget) => void;
+}) {
+  return (
+    <section className="panel-section palette-section">
+      <div className="section-heading">
+        <SlidersHorizontal size={16} />
+        <h2>Color palette</h2>
+      </div>
+      <div className="palette-register">
+        <label className="field color-field">
+          <span>Register</span>
+          <input type="color" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+          <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+        </label>
+        <button type="button" className="secondary-button" onClick={onAdd}>
+          Add
+        </button>
+      </div>
+      <div className="swatch-grid" aria-label="Registered colors">
+        {colors.map((color) => (
+          <div className="swatch-row" key={color.id}>
+            <button
+              type="button"
+              className="swatch"
+              title={`Apply ${color.value}`}
+              style={{ background: color.value }}
+              disabled={selectedCount === 0}
+              onClick={() => onApply(color.value, "primary")}
+            />
+            <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color.value, "stroke")}>
+              Stroke
+            </button>
+            <button type="button" className="mini-icon-button danger" title={`Delete ${color.value}`} onClick={() => onDelete(color.id)}>
+              <Trash2 size={13} />
+            </button>
+          </div>
+        ))}
+      </div>
+    </section>
   );
 }
 
@@ -200,11 +384,11 @@ function ImageControls({
         </select>
       </label>
       <div className="field-grid two">
-        <EffectInput selected={selected} effect="grayscale" label="Gray" max={1} step={0.05} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="blur" label="Blur" max={24} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="brightness" label="Bright" max={180} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="contrast" label="Contrast" max={180} step={1} onUpdateLayer={onUpdateLayer} />
-        <EffectInput selected={selected} effect="mosaic" label="Mosaic" max={48} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="grayscale" label="Gray" min={0} max={1} step={0.05} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="blur" label="Blur" min={0} max={24} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="brightness" label="Bright" min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="contrast" label="Contrast" min={0} max={180} step={1} onUpdateLayer={onUpdateLayer} />
+        <EffectInput selected={selected} effect="mosaic" label="Mosaic" min={0} max={48} step={1} onUpdateLayer={onUpdateLayer} />
       </div>
     </>
   );
@@ -228,14 +412,20 @@ function TextControls({
         />
       </label>
       <div className="field-grid two">
-        <NumberInput
+        <SliderNumberInput
           label="Font size"
           value={selected.fontSize}
+          min={8}
+          max={240}
+          step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontSize: value }))}
         />
-        <NumberInput
+        <SliderNumberInput
           label="Stroke"
           value={selected.strokeWidth}
+          min={0}
+          max={48}
+          step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
       </div>
@@ -267,8 +457,17 @@ function TextControls({
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
       </div>
+      <SliderNumberInput
+        label="Line height"
+        value={selected.lineHeight}
+        min={0.5}
+        max={2}
+        step={0.01}
+        decimals={2}
+        onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, lineHeight: value }))}
+      />
       <label className="field">
-        <span>Align</span>
+        <span>Text align</span>
         <select
           value={selected.align}
           onChange={(event) =>
@@ -317,9 +516,12 @@ function ShapeControls({
           value={selected.strokeColor}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
-        <NumberInput
+        <SliderNumberInput
           label="Stroke width"
           value={selected.strokeWidth}
+          min={0}
+          max={48}
+          step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
       </div>
@@ -331,6 +533,7 @@ function EffectInput({
   selected,
   effect,
   label,
+  min,
   max,
   step,
   onUpdateLayer,
@@ -338,47 +541,71 @@ function EffectInput({
   selected: Extract<ThumbnailLayer, { type: "image" }>;
   effect: keyof ImageEffects;
   label: string;
+  min: number;
   max: number;
   step: number;
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
 }) {
   return (
-    <label className="field">
-      <span>{label}</span>
-      <input
-        type="number"
-        min={0}
-        max={max}
-        step={step}
-        value={selected.effects[effect]}
-        onChange={(event) =>
-          onUpdateLayer(selected.id, (layer) =>
-            layer.type === "image"
-              ? {
-                  ...layer,
-                  effects: { ...layer.effects, [effect]: Number.parseFloat(event.currentTarget.value) || 0 },
-                }
-              : layer,
-          )
-        }
-      />
-    </label>
+    <SliderNumberInput
+      label={label}
+      value={selected.effects[effect]}
+      min={min}
+      max={max}
+      step={step}
+      decimals={step < 1 ? 2 : 0}
+      onChange={(value) =>
+        onUpdateLayer(selected.id, (layer) =>
+          layer.type === "image"
+            ? {
+                ...layer,
+                effects: { ...layer.effects, [effect]: value },
+              }
+            : layer,
+        )
+      }
+    />
   );
 }
 
-function NumberInput({
+function SliderNumberInput({
   label,
   value,
+  min,
+  max,
+  step,
+  decimals = 0,
+  suffix = "",
+  icon,
   onChange,
 }: {
   label: string;
   value: number;
+  min: number;
+  max: number;
+  step: number;
+  decimals?: number;
+  suffix?: string;
+  icon?: ReactNode;
   onChange: (value: number) => void;
 }) {
+  const rounded = round(value, decimals);
   return (
-    <label className="field">
-      <span>{label}</span>
-      <input type="number" value={round(value)} onChange={(event) => onChange(Number.parseFloat(event.target.value) || 0)} />
+    <label className="range-field slider-number">
+      <span>
+        {icon}
+        {label} {rounded}
+        {suffix}
+      </span>
+      <input type="range" min={min} max={max} step={step} value={rounded} onChange={(event) => onChange(Number(event.currentTarget.value))} />
+      <input
+        type="number"
+        min={min}
+        max={max}
+        step={step}
+        value={rounded}
+        onChange={(event) => onChange(Number.parseFloat(event.currentTarget.value) || 0)}
+      />
     </label>
   );
 }
@@ -411,6 +638,7 @@ function updateNumber(
   onUpdateLayer(selected.id, (layer) => ({ ...layer, [key]: value }));
 }
 
-function round(value: number): number {
-  return Math.round(value * 100) / 100;
+function round(value: number, decimals = 0): number {
+  const multiplier = 10 ** decimals;
+  return Math.round(value * multiplier) / multiplier;
 }
