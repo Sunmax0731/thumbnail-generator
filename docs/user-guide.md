@@ -63,7 +63,7 @@ Use Assets to add common starter layers quickly:
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover creator live, product review, tutorial steps, and portrait-short quote thumbnails. Browser templates remain separate named snapshots saved in localStorage.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 10 practical starts: Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch. Browser templates remain separate named snapshots saved in localStorage.
 
 ## Save Current Edit State
 

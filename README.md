@@ -22,7 +22,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
-- Load bundled default templates for livestream, review, tutorial, and portrait-short use cases.
+- Load 10 bundled default templates for livestream, review, tutorial, portrait-short, news, comparison, gaming, podcast, event, and launch use cases.
 - Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, HEX/RGB synchronized input with sliders, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Select bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical selection bounds following the visible text area.

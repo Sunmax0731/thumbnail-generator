@@ -32,7 +32,7 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Load bundled default templates for creator live, product review, tutorial, and portrait-short starting layouts.
+- Load 10 bundled default templates for creator live, product review, tutorial steps, portrait-short quote, breaking news, versus comparison, gaming highlight, podcast guest, event countdown, and minimal launch starting layouts.
 - Use Templates to save named browser-local templates.
 - Use Edit state to save the current work-in-progress state without creating a named template.
 - Enable Autosave current edit state to save the active editor state after changes.

@@ -4,7 +4,8 @@ import { layersToCsv, layersToHtml } from "./layoutExport";
 
 describe("defaultTemplates", () => {
   it("provides multiple use-case templates with renderable layers", () => {
-    expect(defaultTemplates.length).toBeGreaterThanOrEqual(4);
+    expect(defaultTemplates).toHaveLength(10);
+    expect(new Set(defaultTemplates.map((template) => template.id)).size).toBe(defaultTemplates.length);
 
     for (const template of defaultTemplates) {
       const layers = template.createLayers();
@@ -14,6 +15,10 @@ describe("defaultTemplates", () => {
       expect(template.settings.height).toBeGreaterThan(0);
       expect(layers.length).toBeGreaterThan(0);
       expect(layers.every((layer) => layer.visible)).toBe(true);
+      expect(layers.every((layer) => ["image", "text", "shape"].includes(layer.type))).toBe(true);
+      expect(
+        layers.every((layer) => layer.type !== "shape" || ["rect", "ellipse", "triangle", "line"].includes(layer.shape)),
+      ).toBe(true);
       expect(layersToCsv(layers)).toContain("type,name,x,y");
       expect(layersToHtml(layers)).toContain('data-thumbnail-layout="thumbnail-generator"');
     }
@@ -25,7 +30,12 @@ describe("defaultTemplates", () => {
       "product-review",
       "tutorial-steps",
       "shorts-quote",
+      "breaking-news",
+      "versus-comparison",
+      "gaming-highlight",
+      "podcast-guest",
+      "event-countdown",
+      "minimal-launch",
     ]);
   });
 });
-

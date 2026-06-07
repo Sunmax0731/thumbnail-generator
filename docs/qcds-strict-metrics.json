@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes selectable color-wheel points that do not switch the base color, linked wheel dragging that regenerates the other scheme colors, explicit base-color controls, synchronized HEX/RGB slider input with practical slider width, registered single-color rows with direct Fill/Stroke apply buttons, removal of Colors target/group registration UI, saved multi-color palette rows, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 10 bundled default templates, per-template nonblank rendering, supported image/text/shape/line parameters only, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,16 +15,13 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: wheel handle selection no longer changes the base color, dragging one companion point derives a new base color and updates the other scheme colors, RGB sliders update the palette HEX and have practical track width in the compact inspector, registered single colors apply directly through Fill and Stroke row buttons, Colors target/group registration UI and color group rows are removed, saved multi-color palettes remain distinct, CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested 10 practical bundled templates passed validation. Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch are all available, visually distinct, and loaded by the runtime gate without blank output or missing layer rows. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
     "source": "docs/codex-work-dashboard-qcds.md",
     "openItemsBeforeReview": [
-      "Colors palette handle behavior",
-      "Colors single-color Fill/Stroke apply UI",
-      "Colors group feature removal",
-      "Colors linked handle restoration"
+      "Default templates 10 practical layouts"
     ],
     "closedByReview": true,
     "ratingsAfterReview": {
@@ -39,35 +36,27 @@
     "requirement": "Chrome or headless browser confirms nonblank render, primary elements, and primary operations.",
     "status": "passed",
     "tool": "Playwright headless Chromium",
-    "browserPluginStatus": "attempted",
-    "browserPluginFallbackReason": "Browser backend returned Browser is not available: iab",
-    "url": "http://127.0.0.1:4185/thumbnail-generator/",
+    "browserPluginStatus": "not used",
+    "browserPluginFallbackReason": "Playwright headless Chromium was used for the scripted runtime gate.",
+    "url": "http://127.0.0.1:4186/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-rgb-slider-width-20260607-colors.png",
-      "docs/assets/runtime-rgb-slider-width-20260607-mobile.png"
+      "docs/assets/runtime-default-templates-20260607-desktop.png",
+      "docs/assets/runtime-default-templates-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
+      "10 bundled default templates",
+      "nonblank render per default template",
       "CSV import",
       "HTML import",
       "Adjust numeric edit changed canvas hash",
-      "wheel point selection preserved base HEX",
-      "linked wheel point drag updated companion colors",
-      "large palette bars",
-      "synchronized HEX/RGB slider input with practical slider width",
-      "desktop RGB range width 192px",
-      "mobile RGB range width 220px",
-      "recent color swatches",
-      "registered single-color Fill Stroke buttons",
-      "Colors target and group UI removed",
-      "saved multi-color palette row",
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"

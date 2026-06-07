@@ -28,7 +28,7 @@
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
-- Default template definitions provide multiple use-case layouts with exportable CSV/HTML.
+- Default template definitions provide exactly 10 distinct use-case layouts with exportable CSV/HTML and supported layer types.
 
 ## Manual Browser Runtime Gate
 
@@ -78,7 +78,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
 - Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
-- Bundled default templates can be loaded from Templates.
+- All 10 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
@@ -103,33 +103,31 @@ Completed on 2026-06-07.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4185/thumbnail-generator/`
-- Browser path attempted first: Browser plugin through node_repl.
-- Browser fallback reason: Browser backend returned `Browser is not available: iab`.
-- Fallback used: Playwright headless Chromium.
+- URL: `http://127.0.0.1:4186/thumbnail-generator/`
+- Tool: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-rgb-slider-width-20260607-colors.png`
-  - `docs/assets/runtime-rgb-slider-width-20260607-mobile.png`
+  - `docs/assets/runtime-default-templates-20260607-desktop.png`
+  - `docs/assets/runtime-default-templates-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 39 distinct sampled colors on initial desktop render).
-- Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
+- Nonblank canvas pixel check: pass on initial render and after every bundled default template load.
+- Default template count: pass. Templates panel exposed exactly 10 bundled templates.
+- Default template load: pass for Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch.
+- Layer list after template load: pass. Each loaded template exposed editable layer rows.
 - CSV import: pass. Status reported `CSV applied: 2 layers.`
 - HTML import: pass. Status reported `HTML applied: 2 layers.`
-- Layer editing: pass. Adjust numeric edit accepted in the inspector without page errors.
-- RGB slider layout: pass. Desktop RGB range widths measured `192px` with `64px` number inputs and no overlap.
-- RGB slider editing: pass. Moving the red channel slider updated the draft HEX to `#20b6d7`.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T10-28-21-770Z.webp`).
-- Mobile: pass. `390x844` viewport had horizontal overflow `0` and RGB range widths measured `220px`.
+- Layer editing: pass. Adjust numeric X edit accepted in the inspector and canvas remained nonblank.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T11-36-17-278Z.webp` during export selector verification; full gate also produced a `.webp` download).
+- Mobile: pass. `390x844` viewport exposed all 10 templates, rendered a nonblank canvas, and had horizontal overflow `0`.
 
 Console health:
 
-- No page errors or HTTP 4xx/5xx responses were reported.
-- One Chromium warning came from the gate's repeated `getImageData` readbacks for canvas hashing; it is not an app runtime error.
+- No page errors or app HTTP 4xx/5xx responses were reported.
+- The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### GitHub Pages
 

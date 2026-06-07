@@ -205,7 +205,18 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set covers creator livestream, product review, tutorial steps, and portrait-short quote layouts.
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 10 practical layouts built only from supported image, text, shape, and line layers:
+
+- Creator Live
+- Product Review
+- Tutorial Steps
+- Shorts Quote
+- Breaking News
+- Versus Comparison
+- Gaming Highlight
+- Podcast Guest
+- Event Countdown
+- Minimal Launch
 
 ## Font Choices
 

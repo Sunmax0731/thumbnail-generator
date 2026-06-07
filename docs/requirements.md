@@ -30,7 +30,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
-- Load bundled default templates for common thumbnail use cases without depending on localStorage.
+- Load 10 bundled default templates for common thumbnail use cases without depending on localStorage.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
 - Make the direct rotation handle visually recognizable through cursor and handle states.
