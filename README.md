@@ -10,12 +10,14 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 
 - Compose thumbnails with image, text, and shape layers.
 - Import local images and edit their position, size, rotation, opacity, and simple effects.
+- Select imported assets to add them as image layers or open them directly in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle.
 - Select multiple layers, move or rotate them together, align them, or match angles to the first selected layer.
 - Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
+- Load bundled default templates for livestream, review, tutorial, and portrait-short use cases.
 - Register named Fill or Stroke colors in the browser-local palette.
 - Import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Export to common video presets or custom output sizes.

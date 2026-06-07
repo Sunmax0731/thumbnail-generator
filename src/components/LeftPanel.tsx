@@ -1,17 +1,21 @@
 import { useState } from "react";
 import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Scissors, Shapes, Trash2, Type } from "lucide-react";
+import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
 import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
 type LeftPanelSection = "assets" | "layouts" | "templates";
+export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
   csvText: string;
   htmlText: string;
   assets: ImageAsset[];
+  selectedAssetKey: string;
   templateName: string;
   templates: SavedTemplate[];
+  defaultTemplates: DefaultTemplateDefinition[];
   autoSaveEnabled: boolean;
   savedEditStateUpdatedAt: string | null;
   onCsvTextChange: (value: string) => void;
@@ -19,9 +23,13 @@ interface LeftPanelProps {
   onApplyCsv: () => void;
   onApplyHtml: () => void;
   onImageFiles: (files: FileList | null) => void;
+  onSelectAsset: (key: string) => void;
+  onAddImageAssetLayer: (key: string) => void;
   onAddText: () => void;
   onAddShape: () => void;
+  onAddQuickLayer: (kind: QuickLayerKind) => void;
   onResetTemplate: () => void;
+  onLoadDefaultTemplate: (id: string) => void;
   onTemplateNameChange: (value: string) => void;
   onSyncLayoutText: () => void;
   onSaveTemplate: () => void;
@@ -30,7 +38,7 @@ interface LeftPanelProps {
   onAutoSaveChange: (enabled: boolean) => void;
   onSaveEditState: () => void;
   onRestoreEditState: () => void;
-  onOpenImageLab: () => void;
+  onOpenImageLab: (assetKey?: string) => void;
   t: Translator;
 }
 
@@ -38,8 +46,10 @@ export function LeftPanel({
   csvText,
   htmlText,
   assets,
+  selectedAssetKey,
   templateName,
   templates,
+  defaultTemplates,
   autoSaveEnabled,
   savedEditStateUpdatedAt,
   onCsvTextChange,
@@ -47,9 +57,13 @@ export function LeftPanel({
   onApplyCsv,
   onApplyHtml,
   onImageFiles,
+  onSelectAsset,
+  onAddImageAssetLayer,
   onAddText,
   onAddShape,
+  onAddQuickLayer,
   onResetTemplate,
+  onLoadDefaultTemplate,
   onTemplateNameChange,
   onSyncLayoutText,
   onSaveTemplate,
@@ -113,14 +127,35 @@ export function LeftPanel({
                 onChange={(event) => onImageFiles(event.currentTarget.files)}
               />
             </label>
-            <button type="button" className="secondary-button icon-text wide-button" onClick={onOpenImageLab}>
+            <button type="button" className="secondary-button icon-text wide-button" onClick={() => onOpenImageLab(selectedAssetKey)}>
               <Scissors size={16} /> {t("left.openImageLab")}
             </button>
             <div className="asset-list" aria-label={t("left.assetsList")}>
               {assets.map((asset) => (
-                <div className="asset-row" key={asset.key}>
-                  <img src={asset.src} alt="" />
-                  <span>{asset.name}</span>
+                <div className={`asset-row ${asset.key === selectedAssetKey ? "selected" : ""}`} key={asset.key}>
+                  <button type="button" className="asset-select" onClick={() => onSelectAsset(asset.key)}>
+                    <img src={asset.src} alt="" />
+                    <span>{asset.name}</span>
+                  </button>
+                  <button
+                    type="button"
+                    className="mini-icon-button"
+                    title={t("left.addAssetLayer")}
+                    onClick={() => onAddImageAssetLayer(asset.key)}
+                  >
+                    <ImagePlus size={14} />
+                  </button>
+                  <button
+                    type="button"
+                    className="mini-icon-button"
+                    title={t("left.openAssetInImageLab")}
+                    onClick={() => {
+                      onSelectAsset(asset.key);
+                      onOpenImageLab(asset.key);
+                    }}
+                  >
+                    <Scissors size={14} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -137,6 +172,18 @@ export function LeftPanel({
               </button>
               <button type="button" className="secondary-button icon-text" onClick={onAddShape}>
                 <Shapes size={16} /> {t("left.shape")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("headline")}>
+                <Type size={16} /> {t("left.headline")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("subtitle")}>
+                <Type size={16} /> {t("left.subtitle")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("badge")}>
+                <Shapes size={16} /> {t("left.badge")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("divider")}>
+                <Shapes size={16} /> {t("left.divider")}
               </button>
             </div>
             <button type="button" className="ghost-button wide-button" onClick={onResetTemplate}>
@@ -222,6 +269,27 @@ export function LeftPanel({
                 ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
                 : t("left.noSavedEditState")}
             </p>
+          </section>
+
+          <section className="panel-section default-template-section">
+            <div className="section-heading">
+              <LayoutTemplate size={16} />
+              <h2>{t("left.defaultTemplates")}</h2>
+              <span className="section-count">{defaultTemplates.length}</span>
+            </div>
+            <div className="default-template-list" aria-label={t("left.defaultTemplates")}>
+              {defaultTemplates.map((template) => (
+                <button
+                  type="button"
+                  className="template-preset-row"
+                  key={template.id}
+                  onClick={() => onLoadDefaultTemplate(template.id)}
+                >
+                  <span>{template.name}</span>
+                  <small>{template.description}</small>
+                </button>
+              ))}
+            </div>
           </section>
 
           <section className="panel-section template-section">

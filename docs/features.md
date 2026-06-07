@@ -27,6 +27,7 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
+- Load bundled default templates for creator live, product review, tutorial, and portrait-short starting layouts.
 - Use Templates to save named browser-local templates.
 - Use Edit state to save the current work-in-progress state without creating a named template.
 - Enable Autosave current edit state to save the active editor state after changes.
@@ -36,11 +37,14 @@ This page is the quick feature index for users and reviewers.
 ## Image And Text Tools
 
 - Import local image files from Assets.
+- Select an imported asset, add it directly as an image layer, or open it in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
-- Add text and shape layers from Assets.
+- Add text, headline, subtitle, shape, badge, divider, and selected image layers from Assets.
 - Select a text layer to change font, size, fill, outline, line height, and alignment.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
+- Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.
+- Controls that do not affect the current layer state are disabled, such as single-line text line height.
 
 ## Color Palette
 

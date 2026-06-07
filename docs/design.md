@@ -28,7 +28,11 @@ The Layers and Colors tabs use visible vertical resize handles so users can allo
 
 The Adjust tab changes by selection scope: a single selected layer shows absolute layer properties, while multiple selected layers show live relative movement, live relative rotation, and angle matching to the first selected layer. Text alignment is a direct three-button control for Left, Center, and Right. This avoids implying that group editing overwrites each layer with one absolute value except for the explicit Match angle action.
 
-The Templates tab separates two browser-local concepts: Edit state is one work-in-progress save slot with an autosave toggle, while Browser templates are named reusable snapshots. This keeps fast recovery close to templates without making every autosave into a template entry.
+The Assets tab keeps quick creation work close to media import. Imported assets are selectable rows with direct actions for adding an image layer or opening the asset in Image Lab. Quick Add includes common text and shape starters so frequent layer creation does not require detailed inspector setup first.
+
+The Templates tab separates three concepts: bundled default templates for immediate use-case starts, Edit state as one work-in-progress save slot with an autosave toggle, and Browser templates as named reusable snapshots. This keeps fast recovery close to templates without making every autosave into a template entry.
+
+Inspector controls use disabled states when an input cannot affect the current layer state, keeping inert settings visually distinct without hiding the surrounding workflow.
 
 ## UI Principles
 
@@ -71,5 +75,5 @@ The Templates tab separates two browser-local concepts: Edit state is one work-i
 - Layout: implemented the same left input rail, center canvas, right layer/inspector, top export toolbar, and bottom status structure, with task tabs added to reduce always-visible control density.
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
-- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, layer edits, blank-click deselection, live multi-layer relative movement/rotation, multi-layer angle matching, saved edit state with autosave, canvas selection, Image Lab modal processing, text fit-to-box, text alignment buttons, resizable inspector lists, and PNG/JPEG/WebP export.
+- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, selected asset insertion, expanded quick add, default templates, layer edits, blank-click deselection, live multi-layer relative movement/rotation, multi-layer angle matching, saved edit state with autosave, canvas selection, Image Lab modal processing with selected asset handoff, text fit-to-box, text alignment buttons, disabled inert inspector controls, Adjust reset buttons, resizable inspector lists, and PNG/JPEG/WebP export.
 - Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, lets users resize Layers and Colors list areas, fits tall presets in the visible stage, lets users add browser-local custom fonts from the Adjust tab, shows off-canvas layers during editing, and supports Japanese/English UI switching.

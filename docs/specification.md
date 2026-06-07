@@ -135,9 +135,9 @@ Layer rows also include:
 
 The left sidebar is grouped by task:
 
-- Assets: local image import, Image Lab launch, imported asset list, text/shape creation, and sample restoration.
+- Assets: local image import, Image Lab launch for the selected asset, imported asset list, selected asset image-layer insertion, expanded quick text/shape creation, and sample restoration.
 - Layouts: generated CSV/HTML text, CSV import, and HTML import.
-- Templates: browser-local template naming, saving, loading, and deletion.
+- Templates: edit-state controls, bundled default templates, and browser-local template naming, saving, loading, and deletion.
 
 The right inspector is grouped by task:
 
@@ -146,6 +146,28 @@ The right inspector is grouped by task:
 - Colors: browser-local color palette registration and quick application with saved names and Fill/Stroke targets. Saved colors are displayed in list rows similar to layer rows.
 
 The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
+
+Controls that cannot affect the current edit target are disabled instead of accepting inert input. Examples include single-line text line height, outline or stroke colors when stroke width is `0`, image asset switching when there is only one asset, and palette application when no selected text or shape layer can receive the color.
+
+The Adjust tab exposes reset buttons for selected-layer rotation and opacity. Reset rotation sets `rotation` to `0`; reset opacity sets `opacity` to `1`.
+
+## Quick Add
+
+Assets includes quick-add controls for:
+
+- Basic text layer.
+- Basic shape layer.
+- Headline text layer.
+- Subtitle text layer.
+- Badge shape.
+- Divider bar shape.
+- Selected image asset as an image layer.
+
+Each quick add inserts an editable layer, selects it, and keeps the canvas state immediately exportable.
+
+## Default Templates
+
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set covers creator livestream, product review, tutorial steps, and portrait-short quote layouts.
 
 ## Font Choices
 
@@ -240,7 +262,7 @@ The Image Lab modal workspace opens from the Images section in the sidebar. It p
 
 Processing outputs PNG data URLs and remains browser-only.
 
-The modal workspace provides a larger preview canvas than the sidebar, plus close button, backdrop dismissal, and Escape-key dismissal. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
+The modal workspace provides a larger preview canvas than the sidebar, plus close button, backdrop dismissal, and Escape-key dismissal. The left asset list can open Image Lab with the selected asset already active. Images imported inside Image Lab become the active processing target without requiring a second dropdown selection. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 
 ## Slider Controls
 

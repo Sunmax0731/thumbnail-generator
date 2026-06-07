@@ -297,6 +297,17 @@ button:disabled {
   box-shadow: 0 0 0 3px rgba(16, 182, 215, 0.16);
 }
 
+.field-disabled {
+  opacity: 0.54;
+}
+
+.field-disabled input,
+.field-disabled select,
+.field-disabled textarea {
+  cursor: not-allowed;
+  background: #f4f7f9;
+}
+
 .compact-field {
   min-width: 220px;
 }
@@ -458,6 +469,8 @@ button:disabled {
 }
 
 .asset-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 26px 26px;
   min-height: 38px;
   gap: 8px;
   padding: 5px;
@@ -468,7 +481,25 @@ button:disabled {
   font-weight: 700;
 }
 
+.asset-row.selected {
+  border-color: var(--accent);
+  background: rgba(16, 182, 215, 0.08);
+}
+
+.asset-select {
+  display: flex;
+  align-items: center;
+  min-width: 0;
+  gap: 8px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
+}
+
 .asset-row img {
+  flex: 0 0 auto;
   width: 42px;
   height: 26px;
   border-radius: 4px;
@@ -496,6 +527,49 @@ button:disabled {
   gap: 6px;
   max-height: 164px;
   overflow: auto;
+}
+
+.default-template-list {
+  display: grid;
+  gap: 6px;
+  max-height: 220px;
+  overflow: auto;
+}
+
+.template-preset-row {
+  display: grid;
+  gap: 3px;
+  min-height: 54px;
+  padding: 8px 9px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text);
+  text-align: left;
+}
+
+.template-preset-row:hover {
+  border-color: var(--accent);
+  background: rgba(16, 182, 215, 0.08);
+}
+
+.template-preset-row span {
+  overflow: hidden;
+  font-size: 12px;
+  font-weight: 900;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.template-preset-row small {
+  display: -webkit-box;
+  overflow: hidden;
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.25;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
 }
 
 .edit-state-meta {
@@ -743,6 +817,18 @@ button:disabled {
 .field-stack {
   display: grid;
   gap: 10px;
+}
+
+.field-with-action {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 8px;
+}
+
+.reset-button {
+  min-height: 30px;
+  padding: 0 9px;
 }
 
 .field-grid {

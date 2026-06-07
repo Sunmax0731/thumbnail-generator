@@ -18,9 +18,9 @@ npm run preview
 ## Editor Layout
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, open Image Lab, add text/shape layers, and restore the sample template.
+- Assets: import image files, select imported assets, add image/text/shape starter layers, open Image Lab for the selected asset, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
-- Templates: save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
+- Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, text, font, text alignment, shape, and image effects.
 - Colors: register named Fill or Stroke colors, apply them to selected text or shape layers, and resize the color list area with the handle below the list.
@@ -41,6 +41,21 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta. Changes apply live as you edit the values; there is no Apply button.
 - With multiple layers selected, use Match angle to first selected to set every selected editable layer to the first selected editable layer's rotation.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
+- In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
+- Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
+
+## Quick Add And Assets
+
+Use Assets to add common starter layers quickly:
+
+- Text and Shape add basic editable layers.
+- Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
+- Select an imported asset row, then use its add button to place that image as a layer.
+- Use the scissors button on an asset row to open that image directly in Image Lab.
+
+## Default Templates
+
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover creator live, product review, tutorial steps, and portrait-short quote thumbnails. Browser templates remain separate named snapshots saved in localStorage.
 
 ## Save Current Edit State
 
@@ -79,7 +94,7 @@ Select an output preset from the top toolbar. Tall presets such as Shorts automa
 
 ## Image Lab
 
-Open Image Lab from Assets. The modal supports chroma key, rectangle/circle drag cutouts, polygon cutout points, and drag-range rectangular cutouts. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, polygon cutout points, and drag-range rectangular cutouts. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
 
 ## Browser Storage
 

@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes current edit state save, autosave toggle, reload restore, multi-select angle matching, CSV/HTML import, inspector layer editing, WebP export, mobile no-overflow, user-facing README guidance, and Codex Work Dashboard QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes multiline text edit regression fix, default template expansion, disabled inert controls, Image Lab selected-asset and import-target improvements, expanded Quick Add, Adjust rotation/opacity reset, CSV/HTML import, WebP export, mobile no-overflow, user-facing README guidance, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -11,11 +11,11 @@
   },
   "delivery": {
     "rating": "A+",
-    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README and user guide are present, Codex Work Dashboard QCDS re-evaluation is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README and user guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: current edit state save, autosave toggle, reload restore, multi-select angle matching, feature/usage documentation, README user-facing release guidance, Codex Work Dashboard QCDS re-evaluation, improvement taskization, CSV/HTML import, inspector editing, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, template variety, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: multiline text edit regression fix, default template expansion, disabled inert controls, Image Lab selected-asset and import-target improvements, expanded Quick Add, Adjust rotation/opacity reset, CSV/HTML import, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -38,8 +38,8 @@
     "status": "passed",
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
-    "browserPluginFallbackReason": "Browser is not available: iab",
-    "url": "http://127.0.0.1:4173/thumbnail-generator/",
+    "browserPluginFallbackReason": "Browser tools were not exposed in this session after tool discovery",
+    "url": "http://127.0.0.1:4174/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
@@ -48,16 +48,21 @@
       "docs/assets/runtime-edit-state-rotation-desktop.png",
       "docs/assets/runtime-edit-state-rotation-mobile.png",
       "docs/assets/runtime-dashboard-qcds-desktop.png",
-      "docs/assets/runtime-dashboard-qcds-mobile.png"
+      "docs/assets/runtime-dashboard-qcds-mobile.png",
+      "docs/assets/runtime-backlog-20260607-desktop.png",
+      "docs/assets/runtime-backlog-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
-      "manual edit-state save",
-      "autosave toggle",
-      "reload restore",
-      "multi-select angle matching",
-      "generated CSV evidence for matched rotations",
+      "multiline text edit without null-value page error",
+      "disabled inert controls",
+      "Adjust rotation reset",
+      "Adjust opacity reset",
+      "expanded Quick Add",
+      "selected asset image-layer insertion",
+      "Image Lab selected-asset processing",
+      "default template loading",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
       "CSV import",

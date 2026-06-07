@@ -7,15 +7,18 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 ## Functional Requirements
 
 - Import local image files and use them as editable thumbnail layers.
+- Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
+- Add common text and shape layers through expanded quick-add controls.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
+- Load bundled default templates for common thumbnail use cases without depending on localStorage.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
 - Make the direct rotation handle visually recognizable through cursor and handle states.
@@ -26,6 +29,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Provide common presets and custom output dimensions.
 - Automatically fit the preview when preset aspect ratio changes would otherwise push the canvas outside the visible stage.
 - Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
+- Disable controls that do not affect the current selected layer or selected state.
+- Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
 
 ## Non-Functional Requirements
 

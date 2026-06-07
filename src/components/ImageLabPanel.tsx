@@ -13,7 +13,8 @@ type LabMode = CropMode | "drag";
 
 interface ImageLabPanelProps {
   assets: ImageAsset[];
-  onImageFiles: (files: FileList | null) => void;
+  initialAssetKey?: string;
+  onImportAssetFiles: (files: FileList | null) => Promise<ImageAsset[]>;
   onCreateProcessedAsset: (asset: ImageAsset) => void;
   t: Translator;
 }
@@ -29,7 +30,7 @@ interface PreviewRect {
 const previewWidth = 900;
 const previewHeight = 560;
 
-export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset, t }: ImageLabPanelProps) {
+export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onCreateProcessedAsset, t }: ImageLabPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previewRect = useRef<PreviewRect>({ x: 0, y: 0, width: 0, height: 0, scale: 1 });
   const dragStart = useRef<ImagePoint | null>(null);
@@ -44,6 +45,12 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset, t 
   const [isProcessing, setIsProcessing] = useState(false);
 
   const selectedAsset = useMemo(() => assets.find((asset) => asset.key === assetKey) ?? assets[0], [assetKey, assets]);
+
+  useEffect(() => {
+    if (initialAssetKey && assets.some((asset) => asset.key === initialAssetKey)) {
+      setAssetKey(initialAssetKey);
+    }
+  }, [assets, initialAssetKey]);
 
   useEffect(() => {
     if (!selectedAsset) return;
@@ -177,7 +184,17 @@ export function ImageLabPanel({ assets, onImageFiles, onCreateProcessedAsset, t 
         <label className="file-drop compact-drop">
           <ImagePlus size={18} />
           <span>{t("left.importImages")}</span>
-          <input type="file" accept="image/*" multiple onChange={(event) => onImageFiles(event.currentTarget.files)} />
+          <input
+            type="file"
+            accept="image/*"
+            multiple
+            onChange={async (event) => {
+              const input = event.currentTarget;
+              const loaded = await onImportAssetFiles(input.files);
+              if (loaded[0]) setAssetKey(loaded[0].key);
+              input.value = "";
+            }}
+          />
         </label>
         <label className="field">
           <span>{t("imageLab.asset")}</span>

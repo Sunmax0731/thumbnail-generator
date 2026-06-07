@@ -33,6 +33,7 @@ import {
   type CustomFont,
   writeCustomFonts,
 } from "./lib/customFonts";
+import { defaultTemplates } from "./lib/defaultTemplates";
 import {
   createEditStateSnapshot,
   readEditStatePreferences,
@@ -121,6 +122,7 @@ function App() {
   );
   const [fontReadyRevision, setFontReadyRevision] = useState(0);
   const [isImageLabOpen, setIsImageLabOpen] = useState(false);
+  const [selectedAssetKey, setSelectedAssetKey] = useState(() => assets[0]?.key ?? "");
 
   const selectedLayers = useMemo(
     () => layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable),
@@ -286,11 +288,19 @@ function App() {
     }
   }, [assets, htmlText, settings.height, settings.width]);
 
+  const importImageAssets = useCallback(async (files: FileList | null): Promise<ImageAsset[]> => {
+    if (!files || files.length === 0) return [];
+    const loaded = await Promise.all(Array.from(files).map(readImageFile));
+    setAssets((current) => [...current, ...loaded]);
+    setSelectedAssetKey(loaded[0]?.key ?? "");
+    setStatus(`Imported ${loaded.length} image asset${loaded.length === 1 ? "" : "s"}.`);
+    return loaded;
+  }, []);
+
   const handleImageFiles = useCallback(
     async (files: FileList | null) => {
-      if (!files || files.length === 0) return;
-      const loaded = await Promise.all(Array.from(files).map(readImageFile));
-      setAssets((current) => [...current, ...loaded]);
+      const loaded = await importImageAssets(files);
+      if (loaded.length === 0) return;
       const newLayers = loaded.map((asset, index) =>
         makeImageLayer({
           name: asset.name,
@@ -307,7 +317,32 @@ function App() {
       setSelectedIds(selectTopSelectableLayerIds(newLayers));
       setStatus(`Imported ${loaded.length} image file${loaded.length === 1 ? "" : "s"}.`);
     },
-    [settings.height, settings.width],
+    [importImageAssets, settings.height, settings.width],
+  );
+
+  const addImageLayerFromAsset = useCallback(
+    (assetKey: string) => {
+      const asset = assets.find((candidate) => candidate.key === assetKey);
+      if (!asset) {
+        setStatus("Select an image asset before adding an image layer.");
+        return;
+      }
+      const assetRatio = asset.width && asset.height ? asset.height / asset.width : 9 / 16;
+      const width = Math.min(settings.width * 0.42, asset.width ?? settings.width * 0.42);
+      const layer = makeImageLayer({
+        name: asset.name,
+        imageKey: asset.key,
+        x: settings.width * 0.5 - width / 2,
+        y: settings.height * 0.5 - Math.min(settings.height * 0.64, width * assetRatio) / 2,
+        width,
+        height: Math.min(settings.height * 0.64, width * assetRatio),
+      });
+      setLayers((current) => [...current, layer]);
+      setSelectedIds([layer.id]);
+      setSelectedAssetKey(asset.key);
+      setStatus(`Added ${asset.name} as an image layer.`);
+    },
+    [assets, settings.height, settings.width],
   );
 
   const handleCustomFontFiles = useCallback(
@@ -379,6 +414,65 @@ function App() {
     setStatus("Shape layer added.");
   }, [settings.height, settings.width]);
 
+  const addQuickLayer = useCallback(
+    (kind: "headline" | "subtitle" | "badge" | "divider") => {
+      const layer =
+        kind === "headline"
+          ? makeTextLayer({
+              name: "Headline",
+              x: settings.width * 0.08,
+              y: settings.height * 0.12,
+              width: settings.width * 0.68,
+              height: settings.height * 0.22,
+              text: "BIG NEWS",
+              fontSize: Math.round(settings.width / 12),
+              fontWeight: "900",
+              strokeWidth: 10,
+            })
+          : kind === "subtitle"
+            ? makeTextLayer({
+                name: "Subtitle",
+                x: settings.width * 0.1,
+                y: settings.height * 0.62,
+                width: settings.width * 0.58,
+                height: settings.height * 0.11,
+                text: "Add context here",
+                fontSize: Math.round(settings.width / 28),
+                fontFamily: "Arial Black, Arial, sans-serif",
+                fontWeight: "800",
+                color: "#fff4c7",
+                strokeWidth: 5,
+              })
+            : kind === "badge"
+              ? makeShapeLayer({
+                  name: "Badge",
+                  shape: "ellipse",
+                  x: settings.width * 0.72,
+                  y: settings.height * 0.1,
+                  width: settings.width * 0.18,
+                  height: settings.height * 0.18,
+                  fill: "#ffd166",
+                  strokeColor: "#111827",
+                  strokeWidth: 6,
+                  rotation: -8,
+                })
+              : makeShapeLayer({
+                  name: "Divider bar",
+                  x: settings.width * 0.08,
+                  y: settings.height * 0.76,
+                  width: settings.width * 0.62,
+                  height: settings.height * 0.045,
+                  fill: "#ff4f5f",
+                  strokeWidth: 0,
+                  rotation: -2,
+                });
+      setLayers((current) => [...current, layer]);
+      setSelectedIds([layer.id]);
+      setStatus(`Added ${layer.name}.`);
+    },
+    [settings.height, settings.width],
+  );
+
   const resetTemplate = useCallback(() => {
     const next = createInitialLayers();
     setLayers(next);
@@ -387,6 +481,24 @@ function App() {
     setHtmlText(sampleHtml);
     setStatus("Sample creator template restored.");
   }, []);
+
+  const loadDefaultTemplate = useCallback(
+    (templateId: string) => {
+      const template = defaultTemplates.find((candidate) => candidate.id === templateId);
+      if (!template) return;
+      const nextLayers = template.createLayers();
+      setSettings(template.settings);
+      setAssets(initialAssets(import.meta.env.BASE_URL));
+      setSelectedAssetKey("sample-bg");
+      setLayers(nextLayers);
+      setSelectedIds(selectTopSelectableLayerIds(nextLayers));
+      setCsvText(layersToCsv(nextLayers));
+      setHtmlText(layersToHtml(nextLayers));
+      setTemplateName(template.name);
+      setStatus(`Loaded default template "${template.name}".`);
+    },
+    [],
+  );
 
   const saveEditState = useCallback(
     (mode: "manual" | "auto" = "manual") => {
@@ -789,9 +901,15 @@ function App() {
           onApplyCsv={applyCsv}
           onApplyHtml={applyHtml}
           onImageFiles={handleImageFiles}
+          selectedAssetKey={selectedAssetKey}
+          onSelectAsset={setSelectedAssetKey}
+          onAddImageAssetLayer={addImageLayerFromAsset}
           onAddText={addTextLayer}
           onAddShape={addShapeLayer}
+          onAddQuickLayer={addQuickLayer}
           onResetTemplate={resetTemplate}
+          defaultTemplates={defaultTemplates}
+          onLoadDefaultTemplate={loadDefaultTemplate}
           templateName={templateName}
           templates={templates}
           onTemplateNameChange={setTemplateName}
@@ -804,7 +922,10 @@ function App() {
           onAutoSaveChange={setAutoSaveEnabled}
           onSaveEditState={() => saveEditState("manual")}
           onRestoreEditState={restoreEditState}
-          onOpenImageLab={() => setIsImageLabOpen(true)}
+          onOpenImageLab={(assetKey) => {
+            if (assetKey) setSelectedAssetKey(assetKey);
+            setIsImageLabOpen(true);
+          }}
           assets={assets}
           t={t}
         />
@@ -883,7 +1004,8 @@ function App() {
             </div>
             <ImageLabPanel
               assets={assets}
-              onImageFiles={handleImageFiles}
+              initialAssetKey={selectedAssetKey}
+              onImportAssetFiles={importImageAssets}
               onCreateProcessedAsset={createProcessedAsset}
               t={t}
             />

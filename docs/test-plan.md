@@ -18,6 +18,7 @@
 - Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
+- Default template definitions provide multiple use-case layouts with exportable CSV/HTML.
 
 ## Manual Browser Runtime Gate
 
@@ -61,6 +62,12 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
+- Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
+- Image Lab imports make the new image the active processing target.
+- Expanded quick add inserts headline, subtitle, badge, and divider starters.
+- Bundled default templates can be loaded from Templates.
+- Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
+- Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
 
@@ -70,35 +77,41 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 19 test files, 51 tests.
+- `npm test`: pass. 20 test files, 53 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4173/thumbnail-generator/`
+- URL: `http://127.0.0.1:4174/thumbnail-generator/`
 - Browser path attempted first: Browser plugin.
-- Browser fallback reason: in-app Browser returned `Browser is not available: iab`.
+- Browser fallback reason: Browser tools were not exposed in this session after tool discovery.
 - Fallback used: Playwright 1.60.0 headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-dashboard-qcds-desktop.png`
-  - `docs/assets/runtime-dashboard-qcds-mobile.png`
+  - `docs/assets/runtime-backlog-20260607-desktop.png`
+  - `docs/assets/runtime-backlog-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
 - Nonblank canvas pixel check: pass (`1500x940`, 3 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
+- Text newline edit regression: pass. Editing a text layer to `LINE ONE`, `LINE TWO`, and `LINE THREE` produced no page errors and no `Cannot read properties of null (reading 'value')`.
+- Disabled inert controls: pass. Single-line text line height was disabled, then became enabled after multiline text input.
+- Adjust reset: pass. Reset rotation and Reset opacity controls were clickable from Adjust.
+- Quick Add: pass. Headline and Badge starters inserted editable layers.
+- Asset row action: pass. Selected asset was added as an image layer.
+- Image Lab selected asset path: pass. Asset-row scissors opened the modal with an editable preview; Rect drag selection and Create processed layer produced a processed image layer.
+- Default templates: pass. Product Review loaded from Templates and replaced the canvas state.
 - CSV import: pass. Status reported `CSV applied`.
 - HTML import: pass. Status reported `HTML applied`.
-- Inspector layer editing: pass. Changing the HTML-imported `HTML Bar` layer X value to `144` was reflected in generated CSV as `HTML Bar,144,310`.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-06T16-19-02-226Z.webp`).
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T02-08-33-351Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`; task tabs remained visible.
 
 Console health:
 
-- No app errors or page errors. Chromium emitted one canvas readback performance warning caused by the runtime gate pixel sampling.
+- No app errors, page errors, or console errors were reported.
 
 Documentation release evidence:
 

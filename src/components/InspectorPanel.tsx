@@ -18,6 +18,7 @@ import {
   Lock,
   Move,
   Palette,
+  RotateCcw,
   RotateCw,
   SlidersHorizontal,
   Trash2,
@@ -106,6 +107,7 @@ export function InspectorPanel({
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
+  const paletteCompatibleCount = selectedLayers.filter((layer) => layer.type === "text" || layer.type === "shape").length;
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
@@ -295,7 +297,7 @@ export function InspectorPanel({
           draft={paletteDraft}
           nameDraft={paletteNameDraft}
           targetDraft={paletteTargetDraft}
-          selectedCount={selectedLayers.length}
+          selectedCount={paletteCompatibleCount}
           onDraftChange={onPaletteDraftChange}
           onNameDraftChange={onPaletteNameDraftChange}
           onTargetDraftChange={onPaletteTargetDraftChange}
@@ -375,25 +377,43 @@ export function InspectorPanel({
                   onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
                 />
               </div>
-              <SliderNumberInput
-                label={t("inspector.rotation")}
-                value={selected.rotation}
-                min={-180}
-                max={180}
-                step={1}
-                icon={<RotateCw size={14} />}
-                suffix="deg"
-                onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
-              />
-              <SliderNumberInput
-                label={t("inspector.opacity")}
-                value={selected.opacity}
-                min={0}
-                max={1}
-                step={0.01}
-                decimals={2}
-                onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
-              />
+              <div className="field-with-action">
+                <SliderNumberInput
+                  label={t("inspector.rotation")}
+                  value={selected.rotation}
+                  min={-180}
+                  max={180}
+                  step={1}
+                  icon={<RotateCw size={14} />}
+                  suffix="deg"
+                  onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
+                />
+                <button
+                  type="button"
+                  className="secondary-button icon-text reset-button"
+                  onClick={() => updateNumber(selected, "rotation", 0, onUpdateLayer)}
+                >
+                  <RotateCcw size={15} /> {t("inspector.resetRotation")}
+                </button>
+              </div>
+              <div className="field-with-action">
+                <SliderNumberInput
+                  label={t("inspector.opacity")}
+                  value={selected.opacity}
+                  min={0}
+                  max={1}
+                  step={0.01}
+                  decimals={2}
+                  onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
+                />
+                <button
+                  type="button"
+                  className="secondary-button icon-text reset-button"
+                  onClick={() => updateNumber(selected, "opacity", 1, onUpdateLayer)}
+                >
+                  <RotateCcw size={15} /> {t("inspector.resetOpacity")}
+                </button>
+              </div>
 
               {selected.type === "image" && (
                 <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
@@ -725,7 +745,11 @@ function ImageControls({
         <span>{t("inspector.imageKey")}</span>
         <select
           value={selected.imageKey}
-          onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, imageKey: event.target.value }))}
+          disabled={assets.length < 2}
+          onChange={(event) => {
+            const imageKey = event.currentTarget.value;
+            onUpdateLayer(selected.id, (layer) => ({ ...layer, imageKey }));
+          }}
         >
           {assets.map((asset) => (
             <option key={asset.key} value={asset.key}>
@@ -767,7 +791,10 @@ function TextControls({
         <textarea
           className="mini-textarea"
           value={selected.text}
-          onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, text: event.currentTarget.value }))}
+          onChange={(event) => {
+            const text = event.currentTarget.value;
+            onUpdateLayer(selected.id, (layer) => ({ ...layer, text }));
+          }}
         />
       </label>
       <div className="field-grid two">
@@ -795,7 +822,10 @@ function TextControls({
         <span>{t("inspector.font")}</span>
         <select
           value={selected.fontFamily}
-          onChange={(event) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fontFamily: event.target.value }))}
+          onChange={(event) => {
+            const fontFamily = event.currentTarget.value;
+            onUpdateLayer(selected.id, (layer) => ({ ...layer, fontFamily }));
+          }}
         >
           {!fontOptions.some((option) => option.value === selected.fontFamily) ? (
             <option value={selected.fontFamily}>{fontLabelFor(selected.fontFamily)}</option>
@@ -828,6 +858,7 @@ function TextControls({
         <ColorInput
           label={t("inspector.outline")}
           value={selected.strokeColor}
+          disabled={selected.strokeWidth <= 0}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
       </div>
@@ -838,6 +869,7 @@ function TextControls({
         max={2}
         step={0.01}
         decimals={2}
+        disabled={!hasMultipleLines(selected.text)}
         onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, lineHeight: value }))}
       />
       <div className="field">
@@ -917,9 +949,10 @@ function ShapeControls({
         <span>{t("inspector.shape")}</span>
         <select
           value={selected.shape}
-          onChange={(event) =>
-            onUpdateLayer(selected.id, (layer) => ({ ...layer, shape: event.target.value as ShapeKind }))
-          }
+          onChange={(event) => {
+            const shape = event.currentTarget.value as ShapeKind;
+            onUpdateLayer(selected.id, (layer) => ({ ...layer, shape }));
+          }}
         >
           <option value="rect">{t("inspector.rect")}</option>
           <option value="ellipse">{t("inspector.ellipse")}</option>
@@ -935,6 +968,7 @@ function ShapeControls({
         <ColorInput
           label={t("inspector.stroke")}
           value={selected.strokeColor}
+          disabled={selected.strokeWidth <= 0}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
         <SliderNumberInput
@@ -998,6 +1032,7 @@ function SliderNumberInput({
   decimals = 0,
   suffix = "",
   icon,
+  disabled = false,
   onChange,
 }: {
   label: string;
@@ -1008,23 +1043,33 @@ function SliderNumberInput({
   decimals?: number;
   suffix?: string;
   icon?: ReactNode;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }) {
   const rounded = round(value, decimals);
   return (
-    <label className="range-field slider-number">
+    <label className={`range-field slider-number ${disabled ? "field-disabled" : ""}`}>
       <span>
         {icon}
         {label}
         {suffix ? <span className="field-unit"> {suffix}</span> : null}
       </span>
-      <input type="range" min={min} max={max} step={step} value={rounded} onChange={(event) => onChange(Number(event.currentTarget.value))} />
+      <input
+        type="range"
+        min={min}
+        max={max}
+        step={step}
+        value={rounded}
+        disabled={disabled}
+        onChange={(event) => onChange(Number(event.currentTarget.value))}
+      />
       <input
         type="number"
         min={min}
         max={max}
         step={step}
         value={rounded}
+        disabled={disabled}
         onChange={(event) => onChange(Number.parseFloat(event.currentTarget.value) || 0)}
       />
     </label>
@@ -1040,12 +1085,22 @@ function TextInput({ label, value, onChange }: { label: string; value: string; o
   );
 }
 
-function ColorInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function ColorInput({
+  label,
+  value,
+  disabled = false,
+  onChange,
+}: {
+  label: string;
+  value: string;
+  disabled?: boolean;
+  onChange: (value: string) => void;
+}) {
   return (
-    <label className="field color-field">
+    <label className={`field color-field ${disabled ? "field-disabled" : ""}`}>
       <span>{label}</span>
-      <input type="color" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
-      <input type="text" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
+      <input type="color" value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)} />
+      <input type="text" value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)} />
     </label>
   );
 }
@@ -1062,6 +1117,10 @@ function updateNumber(
 function round(value: number, decimals = 0): number {
   const multiplier = 10 ** decimals;
   return Math.round(value * multiplier) / multiplier;
+}
+
+function hasMultipleLines(value: string): boolean {
+  return /\r|\n/.test(value);
 }
 
 function clampPanelHeight(value: number): number {
