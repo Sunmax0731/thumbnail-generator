@@ -1161,15 +1161,15 @@ button:disabled {
 .palette-rgb-fields {
   display: grid;
   grid-column: 1 / -1;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
 }
 
 .palette-rgb-fields label {
   display: grid;
-  grid-template-columns: 18px minmax(0, 1fr) 56px;
+  grid-template-columns: 18px minmax(120px, 1fr) 64px;
   align-items: center;
-  gap: 4px;
+  gap: 8px;
 }
 
 .palette-rgb-fields span {
