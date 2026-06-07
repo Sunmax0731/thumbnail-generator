@@ -16,15 +16,12 @@ import {
   type CanvasPoint,
 } from "./lib/canvasInteraction";
 import {
-  addHarmonyColors,
   addPaletteColor as appendPaletteColor,
   addSavedColorPalette,
   generatePaletteSchemeColors,
   normalizeColor,
-  paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
-  removePaletteGroupColors,
   removePaletteColor,
   removeSavedColorPalette,
   updatePaletteColor,
@@ -141,10 +138,8 @@ function App() {
     typeof window === "undefined" ? [] : readColorPalette(),
   );
   const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
-  const [paletteNameDraft, setPaletteNameDraft] = useState("Accent fill");
-  const [paletteTargetDraft, setPaletteTargetDraft] = useState<PaletteTarget>("fill");
+  const [paletteNameDraft, setPaletteNameDraft] = useState("Accent");
   const [paletteAlphaDraft, setPaletteAlphaDraft] = useState(1);
-  const [paletteGroupDraft, setPaletteGroupDraft] = useState("Action");
   const [paletteModeDraft, setPaletteModeDraft] = useState<HarmonyMode>("triad");
   const [selectedPaletteColorId, setSelectedPaletteColorId] = useState<string | null>(null);
   const [savedColorPalettes, setSavedColorPalettes] = useState<SavedColorPalette[]>(() =>
@@ -879,19 +874,17 @@ function App() {
     const next = appendPaletteColor(paletteColors, {
       value: paletteDraft,
       name: paletteNameDraft,
-      target: paletteTargetDraft,
       alpha: paletteAlphaDraft,
-      groupName: paletteGroupDraft,
     });
     writeColorPalette(next);
     setPaletteColors(next);
     setSelectedPaletteColorId(next[0]?.id ?? null);
     setStatus(
       next.length === paletteColors.length
-        ? "Palette color already exists for that target or is invalid."
-        : `Palette color registered for ${paletteTargetDraft === "fill" ? "Fill" : "Stroke"}.`,
+        ? "Palette color already exists or is invalid."
+        : "Palette color registered.",
     );
-  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft]);
+  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteNameDraft]);
 
   const selectPaletteColor = useCallback(
     (id: string) => {
@@ -900,9 +893,7 @@ function App() {
       setSelectedPaletteColorId(id);
       setPaletteDraft(color.value);
       setPaletteNameDraft(color.name);
-      setPaletteTargetDraft(color.target);
       setPaletteAlphaDraft(color.alpha);
-      setPaletteGroupDraft(color.groupName ?? "");
       setStatus(`Selected palette color "${color.name}" for editing.`);
     },
     [paletteColors],
@@ -916,48 +907,17 @@ function App() {
     const next = updatePaletteColor(paletteColors, selectedPaletteColorId, {
       value: paletteDraft,
       name: paletteNameDraft,
-      target: paletteTargetDraft,
       alpha: paletteAlphaDraft,
-      groupName: paletteGroupDraft,
     });
     writeColorPalette(next);
     setPaletteColors(next);
     setStatus("Palette color updated.");
-  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft, selectedPaletteColorId]);
+  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteNameDraft, selectedPaletteColorId]);
 
-  const generatePaletteHarmony = useCallback(
-    (mode: HarmonyMode) => {
-      const groupName = paletteGroupDraft.trim() || `${labelForHarmonyMode(mode)} palette`;
-      const withBase = appendPaletteColor(paletteColors, {
-        value: paletteDraft,
-        name: paletteNameDraft,
-        target: paletteTargetDraft,
-        alpha: paletteAlphaDraft,
-        groupName,
-      });
-      const next = addHarmonyColors(
-        withBase,
-        {
-          value: paletteDraft,
-          target: paletteTargetDraft,
-          alpha: paletteAlphaDraft,
-          groupName,
-        },
-        mode,
-      );
-      writeColorPalette(next);
-      setPaletteColors(next);
-      setPaletteGroupDraft(groupName);
-      setSelectedPaletteColorId(next[0]?.id ?? null);
-      setStatus(`Generated ${mode} palette suggestions.`);
-    },
-    [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft],
-  );
-
-  const saveCurrentColorPalette = useCallback(() => {
-    const colors = generatePaletteSchemeColors(paletteDraft, paletteModeDraft);
+  const saveCurrentColorPalette = useCallback((previewColors?: string[]) => {
+    const colors = previewColors?.length ? previewColors : generatePaletteSchemeColors(paletteDraft, paletteModeDraft);
     const next = addSavedColorPalette(savedColorPalettes, {
-      name: paletteGroupDraft || paletteNameDraft,
+      name: paletteNameDraft,
       baseColor: paletteDraft,
       mode: paletteModeDraft,
       colors,
@@ -969,7 +929,7 @@ function App() {
         ? "Palette was not saved because the base color is invalid."
         : `Saved ${colors.length} color palette "${next[0].name}".`,
     );
-  }, [paletteDraft, paletteGroupDraft, paletteModeDraft, paletteNameDraft, savedColorPalettes]);
+  }, [paletteDraft, paletteModeDraft, paletteNameDraft, savedColorPalettes]);
 
   const deleteSavedColorPalette = useCallback(
     (id: string) => {
@@ -990,21 +950,6 @@ function App() {
       setStatus("Palette color removed.");
     },
     [paletteColors],
-  );
-
-  const deletePaletteGroup = useCallback(
-    (groupName: string) => {
-      const next = removePaletteGroupColors(paletteColors, groupName);
-      const nextIds = new Set(next.map((color) => color.id));
-      writeColorPalette(next);
-      setPaletteColors(next);
-      setSelectedPaletteColorId((current) => (current && !nextIds.has(current) ? null : current));
-      if (paletteGroupDraft.trim() === groupName) {
-        setPaletteGroupDraft("");
-      }
-      setStatus(`Palette group "${groupName}" removed.`);
-    },
-    [paletteColors, paletteGroupDraft],
   );
 
   const applyPaletteColor = useCallback(
@@ -1029,36 +974,6 @@ function App() {
       setStatus(target === "fill" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
     },
     [paletteAlphaDraft, paletteColors, paletteDraft, selectedIds],
-  );
-
-  const applyPaletteGroup = useCallback(
-    (groupName: string) => {
-      const group = paletteGroups(paletteColors).find((candidate) => candidate.name === groupName);
-      if (!group) return;
-      setLayers((current) =>
-        current.map((layer) => {
-          if (!selectedIds.includes(layer.id) || !layer.selectable || (layer.type !== "text" && layer.type !== "shape")) return layer;
-          if (layer.type === "text") {
-            return {
-              ...layer,
-              color: group.fill?.value ?? layer.color,
-              fillOpacity: group.fill?.alpha ?? layer.fillOpacity,
-              strokeColor: group.stroke?.value ?? layer.strokeColor,
-              strokeOpacity: group.stroke?.alpha ?? layer.strokeOpacity,
-            };
-          }
-          return {
-            ...layer,
-            fill: group.fill?.value ?? layer.fill,
-            fillOpacity: group.fill?.alpha ?? layer.fillOpacity,
-            strokeColor: group.stroke?.value ?? layer.strokeColor,
-            strokeOpacity: group.stroke?.alpha ?? layer.strokeOpacity,
-          };
-        }),
-      );
-      setStatus(`Applied palette group "${groupName}".`);
-    },
-    [paletteColors, selectedIds],
   );
 
   const createProcessedAsset = useCallback(
@@ -1402,29 +1317,22 @@ function App() {
           paletteColors={paletteColors}
           paletteDraft={paletteDraft}
           paletteNameDraft={paletteNameDraft}
-          paletteTargetDraft={paletteTargetDraft}
           paletteAlphaDraft={paletteAlphaDraft}
-          paletteGroupDraft={paletteGroupDraft}
           paletteModeDraft={paletteModeDraft}
           selectedPaletteColorId={selectedPaletteColorId}
           savedColorPalettes={savedColorPalettes}
           fontOptions={fontOptions}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
-          onPaletteTargetDraftChange={setPaletteTargetDraft}
           onPaletteAlphaDraftChange={setPaletteAlphaDraft}
-          onPaletteGroupDraftChange={setPaletteGroupDraft}
           onPaletteModeDraftChange={setPaletteModeDraft}
           onSelectPaletteColor={selectPaletteColor}
           onAddPaletteColor={addPaletteColor}
           onUpdatePaletteColor={saveSelectedPaletteColor}
           onDeletePaletteColor={deletePaletteColor}
-          onDeletePaletteGroup={deletePaletteGroup}
           onSaveCurrentColorPalette={saveCurrentColorPalette}
           onDeleteSavedColorPalette={deleteSavedColorPalette}
           onApplyPaletteColor={applyPaletteColor}
-          onApplyPaletteGroup={applyPaletteGroup}
-          onGeneratePaletteHarmony={generatePaletteHarmony}
           onSelect={selectLayer}
           onSelectIndividual={selectIndividualLayer}
           onUpdateLayer={updateLayer}
@@ -1510,17 +1418,6 @@ function labelForMode(mode: CanvasInteractionMode): string {
   if (mode === "move") return "Move";
   if (mode === "rotate") return "Rotate";
   return "Resize";
-}
-
-function labelForHarmonyMode(mode: HarmonyMode): string {
-  if (mode === "complementary") return "Complement";
-  if (mode === "analogous") return "Analogous";
-  if (mode === "split") return "Split";
-  if (mode === "square") return "Square";
-  if (mode === "compound") return "Compound";
-  if (mode === "shades") return "Shades";
-  if (mode === "monochromatic") return "Monochrome";
-  return "Triad";
 }
 
 function safelySetPointerCapture(element: HTMLElement, pointerId: number): void {

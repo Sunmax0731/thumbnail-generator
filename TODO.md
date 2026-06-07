@@ -153,3 +153,6 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] Colorsタブのグループ機能とパレット機能ですが、それぞれグループ（２色の線と塗りをセットする）とパレット（複数の色を参照できるようにする）を明示的に区別するようにしてください。 [Issue](Issues/0054-colors.md) [QCDS:Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colorsタブでグループとパレットを明確に区別 [Issue](Issues/0055-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] Colorsタブのカラーパレット改善 [Issue](Issues/0056-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] カラーパレット操作性のブラッシュアップ [Issue](Issues/0057-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] Colorsタブの単色適用UI改善 [Issue](Issues/0058-colors-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] Colorsタブのグループ機能削除 [Issue](Issues/0059-colors.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]

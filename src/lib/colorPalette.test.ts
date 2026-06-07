@@ -9,10 +9,8 @@ import {
   normalizeColor,
   normalizePaletteName,
   parseRgbColorInput,
-  paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
-  removePaletteGroupColors,
   removePaletteColor,
   removeSavedColorPalette,
   rgbChannelsToHex,
@@ -37,13 +35,13 @@ describe("colorPalette", () => {
 
   it("adds unique colors and removes by id", () => {
     const colors = addPaletteColor([], { value: "#ff4f5f", name: "Action coral", target: "fill" }, 1);
-    expect(colors).toEqual([{ id: "palette-fill-1", name: "Action coral", value: "#ff4f5f", target: "fill", alpha: 1 }]);
+    expect(colors).toEqual([{ id: "palette-1", name: "Action coral", value: "#ff4f5f", target: "fill", alpha: 1 }]);
     expect(addPaletteColor(colors, "#ff4f5f", 2)).toHaveLength(1);
-    expect(addPaletteColor(colors, { value: "#ff4f5f", target: "stroke" }, 2)).toEqual([
-      { id: "palette-stroke-2", name: "Stroke #ff4f5f", value: "#ff4f5f", target: "stroke", alpha: 1 },
-      { id: "palette-fill-1", name: "Action coral", value: "#ff4f5f", target: "fill", alpha: 1 },
+    expect(addPaletteColor(colors, { value: "#00ff00", target: "stroke" }, 2)).toEqual([
+      { id: "palette-2", name: "Color #00ff00", value: "#00ff00", target: "stroke", alpha: 1 },
+      { id: "palette-1", name: "Action coral", value: "#ff4f5f", target: "fill", alpha: 1 },
     ]);
-    expect(removePaletteColor(colors, "palette-fill-1")).toHaveLength(0);
+    expect(removePaletteColor(colors, "palette-1")).toHaveLength(0);
   });
 
   it("normalizes palette names and migrates legacy storage entries", () => {
@@ -56,21 +54,27 @@ describe("colorPalette", () => {
     expect(colors).toEqual([{ id: "legacy-blue", name: "Fill #123abc", value: "#123abc", target: "fill", alpha: 1 }]);
   });
 
-  it("updates colors, groups fill and stroke entries, and generates harmony colors", () => {
+  it("updates colors, ignores legacy group metadata, and generates harmony colors", () => {
     const colors = [
       { id: "fill", name: "Fill", value: "#ff0000", target: "fill" as const, alpha: 0.8, groupName: "Brand" },
       { id: "stroke", name: "Stroke", value: "#111111", target: "stroke" as const, alpha: 1, groupName: "Brand" },
-    ];
+    ] as unknown as Parameters<typeof updatePaletteColor>[0];
 
     expect(updatePaletteColor(colors, "fill", { value: "#00ff00", name: "Green", alpha: 0.5 })[0]).toMatchObject({
       name: "Green",
       value: "#00ff00",
       alpha: 0.5,
     });
-    expect(paletteGroups(colors)).toEqual([{ name: "Brand", fill: colors[0], stroke: colors[1] }]);
-    expect(removePaletteGroupColors(colors, " Brand ")).toEqual([]);
     expect(generateHarmonyColors("#ff0000", "triad")).toEqual(["#00ff00", "#0000ff"]);
     expect(addHarmonyColors([], { value: "#ff0000", target: "fill" }, "complementary", 10)).toHaveLength(1);
+
+    const read = readColorPalette({
+      getItem: () => JSON.stringify(colors),
+    });
+    expect(read).toEqual([
+      { id: "fill", name: "Fill", value: "#ff0000", target: "fill", alpha: 0.8 },
+      { id: "stroke", name: "Stroke", value: "#111111", target: "stroke", alpha: 1 },
+    ]);
   });
 
   it("creates and reads saved palette units with multiple harmony modes", () => {

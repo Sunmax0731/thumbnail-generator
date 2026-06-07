@@ -16,8 +16,8 @@
 - Preview padding expands for visible off-canvas layer bounds.
 - Text fit chooses the largest font size that fits the text layer bounds.
 - Language detection selects Japanese or English from browser language tags and falls back to English.
-- Color palette registration preserves names, Fill/Stroke targets, uniqueness, legacy storage migration, and whole-group deletion.
-- Color palette editing preserves selected swatch updates, opacity, grouping, and harmony generation.
+- Color palette registration preserves names, color-value uniqueness, opacity, legacy storage migration, and per-row Fill/Stroke application.
+- Color palette editing preserves selected swatch updates, opacity, saved multi-color palette generation, and legacy group metadata tolerance.
 - CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, and line styles.
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
@@ -63,7 +63,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers panel supports visibility and selectable/editable lock toggles.
 - Layers panel supports Delete-key removal for a focused editable row.
 - Layers panel delete buttons open a confirmation dialog; cancel preserves the layer and confirm removes it.
-- Registered palette colors save names and Fill/Stroke targets, display in layer-like list rows, then apply to text/shape fill and stroke colors.
+- Registered palette colors save names, display in layer-like list rows, then apply to text/shape fill and stroke colors through per-row Fill and Stroke buttons.
 - Text alignment uses three direct buttons, and the selected alignment state is visible.
 - Adjust tab numeric controls edit through paired range/number inputs without duplicated value readouts in labels.
 - Named templates can be saved to browser storage, loaded, and deleted.
@@ -84,8 +84,8 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
-- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, generated palette group blocks, Fill/Stroke color groups, group apply/delete, and harmony suggestions.
-- Colors supports Adobe-style color wheel points, wheel drag, large palette bars, synchronized HEX/RGB input, recent-color reuse, and immediate preview application to selected text/shape layers.
+- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
+- Colors supports Adobe-style color wheel point selection without base-color changes, single-point drag editing without moving other points, explicit base-color controls, large palette bars, synchronized HEX/RGB slider input, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
@@ -103,29 +103,32 @@ Completed on 2026-06-07.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4182/thumbnail-generator/`
+- URL: `http://127.0.0.1:4183/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-colors-edge-gate-20260607-desktop.png`
-  - `docs/assets/runtime-colors-edge-gate-20260607-colors.png`
-  - `docs/assets/runtime-colors-edge-gate-20260607-mobile.png`
+  - `docs/assets/runtime-final-colors-20260607-desktop.png`
+  - `docs/assets/runtime-final-colors-20260607-colors.png`
+  - `docs/assets/runtime-final-colors-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 560 distinct sampled colors on initial desktop render).
+- Nonblank canvas pixel check: pass (`1500x940`, 400 distinct sampled colors on initial desktop render).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
 - CSV import: pass. Status reported `CSV applied: 2 layers.`
 - HTML import: pass. Status reported `HTML applied: 3 layers.`
-- Edge blur editing: pass. Setting Edge blur to `28` and enabling Blur stroke changed the canvas hash from `3202979441` to `1322676249`.
-- Adjust reset layout and behavior: pass. Reset rotation returned the selected layer to `0`; Reset opacity returned it to `1`.
-- Colors wheel drag and preview: pass. Dragging the color wheel changed the draft to `#4841c9` and changed the canvas hash from `1322676249` to `3115334162`.
-- Colors group/palette distinction: pass. A `Gate` Fill/Stroke color group was created, then deleted (`1` row before delete, `0` after); one multi-color palette row was saved; registered single-color rows remained.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T07-59-23-396Z.webp`).
+- Layer editing: pass. Adjust numeric edit changed the canvas hash from `1442555670` to `3150399104`.
+- Colors wheel point selection: pass. Selecting a generated wheel point did not change the base HEX value.
+- Colors wheel point drag: pass. Dragging one companion wheel point changed that point's style while another point and the base HEX stayed unchanged.
+- RGB slider editing: pass. Moving the red channel slider updated the draft HEX to `#20b6d7`.
+- Colors single-color apply: pass. Registered swatch Fill/Stroke buttons are available; applying Fill changed the canvas hash from `3150399104` to `2962876288`.
+- Colors group removal: pass. Target/Group registration controls and Color groups rows were absent from the Colors panel.
+- Saved multi-color palette: pass. One multi-color palette row was saved from the displayed palette colors.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T09-30-10-702Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:

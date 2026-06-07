@@ -71,29 +71,22 @@ interface InspectorPanelProps {
   paletteColors: PaletteColor[];
   paletteDraft: string;
   paletteNameDraft: string;
-  paletteTargetDraft: PaletteTarget;
   paletteAlphaDraft: number;
-  paletteGroupDraft: string;
   paletteModeDraft: HarmonyMode;
   selectedPaletteColorId: string | null;
   savedColorPalettes: SavedColorPalette[];
   fontOptions: FontOption[];
   onPaletteDraftChange: (value: string) => void;
   onPaletteNameDraftChange: (value: string) => void;
-  onPaletteTargetDraftChange: (value: PaletteTarget) => void;
   onPaletteAlphaDraftChange: (value: number) => void;
-  onPaletteGroupDraftChange: (value: string) => void;
   onPaletteModeDraftChange: (value: HarmonyMode) => void;
   onSelectPaletteColor: (id: string) => void;
   onAddPaletteColor: () => void;
   onUpdatePaletteColor: () => void;
   onDeletePaletteColor: (id: string) => void;
-  onDeletePaletteGroup: (groupName: string) => void;
-  onSaveCurrentColorPalette: () => void;
+  onSaveCurrentColorPalette: (colors?: string[]) => void;
   onDeleteSavedColorPalette: (id: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget, alpha?: number) => void;
-  onApplyPaletteGroup: (groupName: string) => void;
-  onGeneratePaletteHarmony: (mode: HarmonyMode) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onSelectIndividual: (id: string) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
@@ -123,29 +116,22 @@ export function InspectorPanel({
   paletteColors,
   paletteDraft,
   paletteNameDraft,
-  paletteTargetDraft,
   paletteAlphaDraft,
-  paletteGroupDraft,
   paletteModeDraft,
   selectedPaletteColorId,
   savedColorPalettes,
   fontOptions,
   onPaletteDraftChange,
   onPaletteNameDraftChange,
-  onPaletteTargetDraftChange,
   onPaletteAlphaDraftChange,
-  onPaletteGroupDraftChange,
   onPaletteModeDraftChange,
   onSelectPaletteColor,
   onAddPaletteColor,
   onUpdatePaletteColor,
   onDeletePaletteColor,
-  onDeletePaletteGroup,
   onSaveCurrentColorPalette,
   onDeleteSavedColorPalette,
   onApplyPaletteColor,
-  onApplyPaletteGroup,
-  onGeneratePaletteHarmony,
   onSelect,
   onSelectIndividual,
   onUpdateLayer,
@@ -425,29 +411,22 @@ export function InspectorPanel({
           colors={paletteColors}
           draft={paletteDraft}
           nameDraft={paletteNameDraft}
-          targetDraft={paletteTargetDraft}
           alphaDraft={paletteAlphaDraft}
-          groupDraft={paletteGroupDraft}
           modeDraft={paletteModeDraft}
           selectedColorId={selectedPaletteColorId}
           savedPalettes={savedColorPalettes}
           selectedCount={paletteCompatibleCount}
           onDraftChange={onPaletteDraftChange}
           onNameDraftChange={onPaletteNameDraftChange}
-          onTargetDraftChange={onPaletteTargetDraftChange}
           onAlphaDraftChange={onPaletteAlphaDraftChange}
-          onGroupDraftChange={onPaletteGroupDraftChange}
           onModeDraftChange={onPaletteModeDraftChange}
           onSelectColor={onSelectPaletteColor}
           onAdd={onAddPaletteColor}
           onUpdate={onUpdatePaletteColor}
           onDelete={onDeletePaletteColor}
-          onDeleteGroup={onDeletePaletteGroup}
           onSavePalette={onSaveCurrentColorPalette}
           onDeleteSavedPalette={onDeleteSavedColorPalette}
           onApply={onApplyPaletteColor}
-          onApplyGroup={onApplyPaletteGroup}
-          onGenerateHarmony={onGeneratePaletteHarmony}
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
@@ -773,9 +752,7 @@ function PaletteControls({
   colors,
   draft,
   nameDraft,
-  targetDraft,
   alphaDraft,
-  groupDraft,
   modeDraft,
   selectedColorId,
   savedPalettes,
@@ -783,29 +760,22 @@ function PaletteControls({
   listHeight,
   onDraftChange,
   onNameDraftChange,
-  onTargetDraftChange,
   onAlphaDraftChange,
-  onGroupDraftChange,
   onModeDraftChange,
   onSelectColor,
   onAdd,
   onUpdate,
   onDelete,
-  onDeleteGroup,
   onSavePalette,
   onDeleteSavedPalette,
   onApply,
-  onApplyGroup,
-  onGenerateHarmony,
   onResizeList,
   t,
 }: {
   colors: PaletteColor[];
   draft: string;
   nameDraft: string;
-  targetDraft: PaletteTarget;
   alphaDraft: number;
-  groupDraft: string;
   modeDraft: HarmonyMode;
   selectedColorId: string | null;
   savedPalettes: SavedColorPalette[];
@@ -813,40 +783,55 @@ function PaletteControls({
   listHeight: number;
   onDraftChange: (value: string) => void;
   onNameDraftChange: (value: string) => void;
-  onTargetDraftChange: (value: PaletteTarget) => void;
   onAlphaDraftChange: (value: number) => void;
-  onGroupDraftChange: (value: string) => void;
   onModeDraftChange: (value: HarmonyMode) => void;
   onSelectColor: (id: string) => void;
   onAdd: () => void;
   onUpdate: () => void;
   onDelete: (id: string) => void;
-  onDeleteGroup: (groupName: string) => void;
-  onSavePalette: () => void;
+  onSavePalette: (colors?: string[]) => void;
   onDeleteSavedPalette: (id: string) => void;
   onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
-  onApplyGroup: (groupName: string) => void;
-  onGenerateHarmony: (mode: HarmonyMode) => void;
   onResizeList: (deltaY: number) => void;
   t: Translator;
 }) {
-  const groups = groupPaletteRows(colors);
+  const [activePointIndex, setActivePointIndex] = useState(0);
+  const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
+  const [manualPreviewColors, setManualPreviewColors] = useState<Record<number, string>>({});
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
   const previewRgb = hexToRgbChannels(previewBaseColor) ?? { r: 0, g: 0, b: 0 };
-  const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
+  const generatedColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
+  const previewColors = generatedColors.map((color, index) => manualPreviewColors[index] ?? color);
+  const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
   const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
-  const setDraftAndPreview = (value: string, alpha = alphaDraft) => {
+
+  useEffect(() => {
+    if (activePointIndex >= previewColors.length) setActivePointIndex(0);
+  }, [activePointIndex, previewColors.length]);
+
+  const setBaseDraft = (value: string, options: { preservePreviewPoints?: boolean } = {}) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     onDraftChange(normalized ?? value);
-    if (normalized && selectedCount > 0) onApply(normalized, targetDraft, alpha);
+    if (!options.preservePreviewPoints) {
+      setManualPreviewColors({});
+      setActivePointIndex(0);
+    }
   };
-  const updateDraftFromWheelPointer = (event: ReactPointerEvent<HTMLElement>) => {
-    setDraftAndPreview(colorFromWheelPointer(event, event.currentTarget));
+
+  const updatePreviewPoint = (index: number, color: string) => {
+    setManualPreviewColors((current) => {
+      const seeded =
+        Object.keys(current).length > 0
+          ? current
+          : Object.fromEntries(previewColors.map((previewColor, previewIndex) => [previewIndex, previewColor]));
+      return { ...seeded, [index]: color };
+    });
+    setActivePointIndex(index);
+    if (index === 0) setBaseDraft(color, { preservePreviewPoints: true });
   };
+
   const handleAlphaDraftChange = (value: number) => {
     onAlphaDraftChange(value);
-    const normalized = normalizeColor(draft);
-    if (normalized && selectedCount > 0) onApply(normalized, targetDraft, value);
   };
   const setRgbChannel = (channel: "r" | "g" | "b", value: number) => {
     const next = rgbChannelsToHex(
@@ -854,7 +839,7 @@ function PaletteControls({
       channel === "g" ? value : previewRgb.g,
       channel === "b" ? value : previewRgb.b,
     );
-    setDraftAndPreview(next);
+    setBaseDraft(next);
   };
   return (
     <section className="panel-section palette-section">
@@ -872,27 +857,55 @@ function PaletteControls({
             className="palette-wheel"
             aria-label={t("inspector.paletteScheme")}
             onPointerDown={(event) => {
+              if (event.target !== event.currentTarget) return;
               event.currentTarget.setPointerCapture(event.pointerId);
-              updateDraftFromWheelPointer(event);
+              setDraggingPointIndex(-1);
+              setBaseDraft(colorFromWheelPointer(event, event.currentTarget));
             }}
             onPointerMove={(event) => {
               if ((event.buttons & 1) !== 1 || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
-              updateDraftFromWheelPointer(event);
+              const color = colorFromWheelPointer(event, event.currentTarget);
+              if (draggingPointIndex === null) return;
+              if (draggingPointIndex === -1) {
+                setBaseDraft(color);
+              } else {
+                updatePreviewPoint(draggingPointIndex, color);
+              }
             }}
             onPointerUp={(event) => {
               if (event.currentTarget.hasPointerCapture(event.pointerId)) {
                 event.currentTarget.releasePointerCapture(event.pointerId);
               }
+              setDraggingPointIndex(null);
+            }}
+            onPointerCancel={(event) => {
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+              }
+              setDraggingPointIndex(null);
             }}
           >
             {previewColors.map((color, index) => (
               <button
                 key={`${color}-${index}`}
                 type="button"
-                className={`palette-wheel-point ${index === 0 ? "base" : ""}`}
+                className={`palette-wheel-point ${index === 0 ? "base" : ""} ${activePointIndex === index ? "selected" : ""}`}
                 style={{ ...wheelPointStyle(color), background: color }}
                 title={color}
-                onClick={() => setDraftAndPreview(color)}
+                onPointerDown={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  const wheel = event.currentTarget.parentElement;
+                  if (!wheel) return;
+                  wheel.setPointerCapture(event.pointerId);
+                  setDraggingPointIndex(index);
+                  setActivePointIndex(index);
+                }}
+                onClick={(event) => {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setActivePointIndex(index);
+                }}
               />
             ))}
           </div>
@@ -903,7 +916,7 @@ function PaletteControls({
                 type="button"
                 title={color}
                 style={{ background: color, opacity: alphaDraft }}
-                onClick={() => setDraftAndPreview(color)}
+                onClick={() => setActivePointIndex(index)}
               />
             ))}
           </div>
@@ -914,7 +927,7 @@ function PaletteControls({
               key={`bar-${color}-${index}`}
               type="button"
               style={{ background: color, color: readableTextColor(color) }}
-              onClick={() => setDraftAndPreview(color)}
+              onClick={() => setBaseDraft(color)}
             >
               <span>{index === 0 ? t("inspector.paletteBase") : t("inspector.paletteColor")}</span>
               <strong>{color}</strong>
@@ -928,30 +941,26 @@ function PaletteControls({
           </label>
           <label className="field color-field">
             <span>{t("inspector.paletteHex")}</span>
-            <input type="color" value={previewBaseColor} onChange={(event) => setDraftAndPreview(event.currentTarget.value)} />
-            <input type="text" value={draft} onChange={(event) => setDraftAndPreview(event.currentTarget.value)} />
+            <input type="color" value={previewBaseColor} onChange={(event) => setBaseDraft(event.currentTarget.value)} />
+            <input type="text" value={draft} onChange={(event) => setBaseDraft(event.currentTarget.value)} />
           </label>
           <div className="palette-rgb-fields" aria-label={t("inspector.paletteRgb")}>
-            <label>
+            <label className="palette-rgb-channel">
               <span>R</span>
+              <input type="range" min={0} max={255} value={previewRgb.r} onChange={(event) => setRgbChannel("r", Number(event.currentTarget.value))} />
               <input type="number" min={0} max={255} value={previewRgb.r} onChange={(event) => setRgbChannel("r", Number(event.currentTarget.value))} />
             </label>
-            <label>
+            <label className="palette-rgb-channel">
               <span>G</span>
+              <input type="range" min={0} max={255} value={previewRgb.g} onChange={(event) => setRgbChannel("g", Number(event.currentTarget.value))} />
               <input type="number" min={0} max={255} value={previewRgb.g} onChange={(event) => setRgbChannel("g", Number(event.currentTarget.value))} />
             </label>
-            <label>
+            <label className="palette-rgb-channel">
               <span>B</span>
+              <input type="range" min={0} max={255} value={previewRgb.b} onChange={(event) => setRgbChannel("b", Number(event.currentTarget.value))} />
               <input type="number" min={0} max={255} value={previewRgb.b} onChange={(event) => setRgbChannel("b", Number(event.currentTarget.value))} />
             </label>
           </div>
-          <label className="field palette-target-field">
-            <span>{t("inspector.paletteTarget")}</span>
-            <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
-              <option value="fill">{t("inspector.fill")}</option>
-              <option value="stroke">{t("inspector.stroke")}</option>
-            </select>
-          </label>
           <SliderNumberInput
             label={t("inspector.paletteAlpha")}
             value={alphaDraft}
@@ -961,13 +970,16 @@ function PaletteControls({
             decimals={2}
             onChange={handleAlphaDraftChange}
           />
-          <label className="field palette-name-field">
-            <span>{t("inspector.paletteGroup")}</span>
-            <input type="text" value={groupDraft} onChange={(event) => onGroupDraftChange(event.currentTarget.value)} />
-          </label>
           <label className="field palette-target-field">
             <span>{t("inspector.palettePattern")}</span>
-            <select value={modeDraft} onChange={(event) => onModeDraftChange(event.currentTarget.value as HarmonyMode)}>
+            <select
+              value={modeDraft}
+              onChange={(event) => {
+                setManualPreviewColors({});
+                setActivePointIndex(0);
+                onModeDraftChange(event.currentTarget.value as HarmonyMode);
+              }}
+            >
               {palettePatternModes.map((mode) => (
                 <option key={mode} value={mode}>
                   {t(harmonyLabelKey(mode))}
@@ -976,13 +988,16 @@ function PaletteControls({
             </select>
           </label>
           <div className="palette-actions">
+            <button type="button" className="secondary-button" onClick={() => setBaseDraft(activePointColor)}>
+              {t("inspector.paletteUseSelectedBase")}
+            </button>
             <button type="button" className="secondary-button" onClick={onAdd}>
               {t("inspector.addColor")}
             </button>
             <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
               {t("inspector.updateColor")}
             </button>
-            <button type="button" className="secondary-button" onClick={onSavePalette}>
+            <button type="button" className="secondary-button" onClick={() => onSavePalette(previewColors)}>
               {t("inspector.savePalette")}
             </button>
           </div>
@@ -993,58 +1008,9 @@ function PaletteControls({
           <span>{t("inspector.paletteRecent")}</span>
           <div>
             {recentColors.map((color) => (
-              <button key={`recent-${color}`} type="button" title={color} style={{ background: color }} onClick={() => setDraftAndPreview(color)} />
+              <button key={`recent-${color}`} type="button" title={color} style={{ background: color }} onClick={() => setBaseDraft(color)} />
             ))}
           </div>
-        </div>
-      ) : null}
-      <div className="button-grid harmony-grid">
-        {(["analogous", "complementary", "split", "triad"] as HarmonyMode[]).map((mode) => (
-          <button key={mode} type="button" className="ghost-button" onClick={() => onGenerateHarmony(mode)}>
-            {t(harmonyLabelKey(mode))}
-          </button>
-        ))}
-      </div>
-      {groups.length > 0 ? (
-        <div className="palette-group-list" aria-label={t("inspector.paletteGroups")}>
-          <div className="palette-subheading">
-            <span>{t("inspector.paletteGroups")}</span>
-          </div>
-          {groups.map((group) => (
-            <div className="palette-group-row" key={group.name}>
-              <button
-                type="button"
-                className="secondary-button palette-group-button"
-                disabled={selectedCount === 0}
-                onClick={() => onApplyGroup(group.name)}
-              >
-                <span>{group.name}</span>
-                <span className="palette-group-swatches">
-                  <i
-                    className={!group.fill ? "missing" : ""}
-                    title={t("inspector.fill")}
-                    style={{ background: group.fill?.value ?? "transparent", opacity: group.fill?.alpha ?? 1 }}
-                  />
-                  <i
-                    className={!group.stroke ? "missing" : ""}
-                    title={t("inspector.stroke")}
-                    style={{ background: group.stroke?.value ?? "transparent", opacity: group.stroke?.alpha ?? 1 }}
-                  />
-                </span>
-                <small className="palette-group-count">
-                  {group.fill && group.stroke ? "2" : "1/2"}
-                </small>
-              </button>
-              <button
-                type="button"
-                className="mini-icon-button danger"
-                title={t("inspector.deletePaletteGroup", { name: group.name })}
-                onClick={() => onDeleteGroup(group.name)}
-              >
-                <Trash2 size={13} />
-              </button>
-            </div>
-          ))}
         </div>
       ) : null}
       {savedPalettes.length > 0 ? (
@@ -1094,26 +1060,32 @@ function PaletteControls({
             <button
               type="button"
               className="swatch"
-              aria-label={t("inspector.applyColor", { name: color.name, target: paletteTargetLabel(color.target, t) })}
-              title={t("inspector.applyColor", { name: color.name, target: paletteTargetLabel(color.target, t) })}
+              aria-label={color.name}
+              title={color.name}
               style={{ background: color.value }}
-              disabled={selectedCount === 0}
-              onClick={() => onApply(color.value, color.target)}
+              onClick={() => onSelectColor(color.id)}
             />
             <button
               type="button"
               className="ghost-button swatch-apply-button"
               disabled={selectedCount === 0}
-              onClick={() => onApply(color.value, color.target)}
+              onClick={() => onApply(color.value, "fill", color.alpha)}
             >
-              {paletteTargetLabel(color.target, t)}
+              {t("inspector.fill")}
+            </button>
+            <button
+              type="button"
+              className="ghost-button swatch-apply-button"
+              disabled={selectedCount === 0}
+              onClick={() => onApply(color.value, "stroke", color.alpha)}
+            >
+              {t("inspector.stroke")}
             </button>
             <div className="swatch-meta">
               <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
                 <span className="swatch-name">{color.name}</span>
                 <span className="swatch-value">
                   {color.value} / {Math.round(color.alpha * 100)}%
-                  {color.groupName ? ` / ${color.groupName}` : ""}
                 </span>
               </button>
             </div>
@@ -1232,10 +1204,6 @@ function DeleteLayerDialog({
   );
 }
 
-function paletteTargetLabel(target: PaletteTarget, t: Translator): string {
-  return target === "fill" ? t("inspector.fill") : t("inspector.stroke");
-}
-
 function uniqueColors(colors: string[]): string[] {
   const seen = new Set<string>();
   const unique: string[] = [];
@@ -1347,19 +1315,6 @@ const palettePatternModes: HarmonyMode[] = [
   "shades",
   "monochromatic",
 ];
-
-function groupPaletteRows(colors: PaletteColor[]): Array<{ name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }> {
-  const groups = new Map<string, { name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }>();
-  for (const color of colors) {
-    if (!color.groupName) continue;
-    const group = groups.get(color.groupName) ?? { name: color.groupName, colors: [] };
-    group.colors.push(color);
-    if (color.target === "fill" && !group.fill) group.fill = color;
-    if (color.target === "stroke" && !group.stroke) group.stroke = color;
-    groups.set(color.groupName, group);
-  }
-  return Array.from(groups.values());
-}
 
 function isKeyboardInputTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;

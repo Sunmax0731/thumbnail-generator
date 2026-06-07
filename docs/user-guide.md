@@ -23,7 +23,7 @@ npm run preview
 - Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named Fill or Stroke single colors, explore colors with a drag-capable color wheel and generated palette bars, use synchronized HEX/RGB inputs, reuse recent colors, preview and save multi-color palette patterns, set opacity and group names, generate harmony suggestions as grouped single-color entries, apply single colors, saved-palette colors, or Fill/Stroke color groups to selected text or shape layers, delete color groups, and resize the color list area with the handle below the list.
+- Colors: register and edit named single colors, explore colors with a drag-capable color wheel and generated palette bars, use synchronized HEX/RGB sliders and number inputs, reuse recent colors, preview and save multi-color palette patterns, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -112,11 +112,11 @@ Select an output preset from the top toolbar. Tall presets such as Shorts automa
 
 Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
 
-## Color Groups And Harmony
+## Color Palette
 
-Open Colors to select an existing single-color swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied with that Fill or Stroke color, and Group to connect Fill and Stroke entries into one named Fill + Stroke set. Group rows apply matching Fill and Stroke colors together to selected text or shape layers, and the trash button on a group row removes that group without deleting saved multi-color palettes.
+Open Colors to select an existing single-color swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied when that color is used. Each registered swatch row has Fill and Stroke buttons, so the same saved single color can be applied directly to either style of the selected text or shape layer.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. The color wheel supports click and drag, the large palette bars select generated colors, HEX and RGB inputs stay synchronized, and recent colors provide a quick reuse row. Selecting or dragging to a generated, recent, HEX, RGB, or wheel color previews it immediately on the selected text or shape layer for the active Fill/Stroke target. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and the older Analogous/Complement/Split/Triad buttons still generate editable grouped swatch entries from the current draft color.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point moves and recolors only that point. Change the base color explicitly with the wheel background, HEX/RGB sliders, recent colors, palette bars, or Set selected as base. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons.
 
 ## Browser Storage
 

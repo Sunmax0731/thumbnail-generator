@@ -4,7 +4,6 @@ export interface PaletteColor {
   value: string;
   target: PaletteTarget;
   alpha: number;
-  groupName?: string;
 }
 
 export type PaletteTarget = "fill" | "stroke";
@@ -31,12 +30,12 @@ export interface SavedColorPalette {
 }
 
 export const defaultPaletteColors: PaletteColor[] = [
-  { id: "palette-white", name: "White fill", value: "#ffffff", target: "fill", alpha: 1, groupName: "Starter" },
-  { id: "palette-ink", name: "Ink stroke", value: "#111827", target: "stroke", alpha: 1, groupName: "Starter" },
-  { id: "palette-coral", name: "Coral fill", value: "#ff4f5f", target: "fill", alpha: 1, groupName: "Action" },
-  { id: "palette-cyan", name: "Cyan fill", value: "#10b6d7", target: "fill", alpha: 1, groupName: "Action" },
-  { id: "palette-yellow", name: "Yellow fill", value: "#ffd166", target: "fill", alpha: 1, groupName: "Accent" },
-  { id: "palette-purple", name: "Purple fill", value: "#7c3aed", target: "fill", alpha: 1, groupName: "Accent" },
+  { id: "palette-white", name: "White", value: "#ffffff", target: "fill", alpha: 1 },
+  { id: "palette-ink", name: "Ink", value: "#111827", target: "stroke", alpha: 1 },
+  { id: "palette-coral", name: "Coral", value: "#ff4f5f", target: "fill", alpha: 1 },
+  { id: "palette-cyan", name: "Cyan", value: "#10b6d7", target: "fill", alpha: 1 },
+  { id: "palette-yellow", name: "Yellow", value: "#ffd166", target: "fill", alpha: 1 },
+  { id: "palette-purple", name: "Purple", value: "#7c3aed", target: "fill", alpha: 1 },
 ];
 
 export interface AddPaletteColorInput {
@@ -44,7 +43,6 @@ export interface AddPaletteColorInput {
   name?: string;
   target?: PaletteTarget;
   alpha?: number;
-  groupName?: string;
 }
 
 export function normalizeColor(input: string): string | null {
@@ -98,16 +96,15 @@ export function addPaletteColor(
   const normalized = normalizeColor(draft.value);
   if (!normalized) return colors;
   const target = draft.target ?? "fill";
-  if (colors.some((color) => color.value === normalized && color.target === target)) return colors;
-  const fallbackName = `${target === "fill" ? "Fill" : "Stroke"} ${normalized}`;
+  if (colors.some((color) => color.value === normalized)) return colors;
+  const fallbackName = `Color ${normalized}`;
   return [
     {
-      id: `palette-${target}-${now.toString(36)}`,
+      id: `palette-${now.toString(36)}`,
       name: normalizePaletteName(draft.name, fallbackName),
       value: normalized,
       target,
       alpha: clampAlpha(draft.alpha),
-      groupName: normalizeOptionalGroupName(draft.groupName),
     },
     ...colors,
   ];
@@ -124,7 +121,6 @@ export function updatePaletteColor(colors: PaletteColor[], id: string, input: Ad
           value: normalized,
           target: input.target ?? color.target,
           alpha: clampAlpha(input.alpha),
-          groupName: normalizeOptionalGroupName(input.groupName),
         }
       : color,
   );
@@ -132,25 +128,6 @@ export function updatePaletteColor(colors: PaletteColor[], id: string, input: Ad
 
 export function removePaletteColor(colors: PaletteColor[], id: string): PaletteColor[] {
   return colors.filter((color) => color.id !== id);
-}
-
-export function removePaletteGroupColors(colors: PaletteColor[], groupName: string): PaletteColor[] {
-  const normalized = normalizeOptionalGroupName(groupName);
-  if (!normalized) return colors;
-  return colors.filter((color) => normalizeOptionalGroupName(color.groupName) !== normalized);
-}
-
-export function paletteGroups(colors: PaletteColor[]): Array<{ name: string; fill?: PaletteColor; stroke?: PaletteColor }> {
-  const grouped = new Map<string, { name: string; fill?: PaletteColor; stroke?: PaletteColor }>();
-  for (const color of colors) {
-    const name = normalizeOptionalGroupName(color.groupName);
-    if (!name) continue;
-    const group = grouped.get(name) ?? { name };
-    if (color.target === "fill" && !group.fill) group.fill = color;
-    if (color.target === "stroke" && !group.stroke) group.stroke = color;
-    grouped.set(name, group);
-  }
-  return Array.from(grouped.values()).filter((group) => group.fill || group.stroke);
 }
 
 export function generateHarmonyColors(baseColor: string, mode: HarmonyMode): string[] {
@@ -291,7 +268,6 @@ function coercePaletteColor(value: unknown): PaletteColor | null {
     value: normalized,
     target,
     alpha: clampAlpha(candidate.alpha),
-    groupName: normalizeOptionalGroupName(candidate.groupName),
   };
 }
 
@@ -319,12 +295,6 @@ function clampAlpha(value: unknown): number {
   const parsed = typeof value === "number" ? value : Number.parseFloat(String(value ?? 1));
   if (!Number.isFinite(parsed)) return 1;
   return Math.min(1, Math.max(0, parsed));
-}
-
-function normalizeOptionalGroupName(input: unknown): string | undefined {
-  if (typeof input !== "string") return undefined;
-  const trimmed = input.trim().replace(/\s+/g, " ").slice(0, 48);
-  return trimmed || undefined;
 }
 
 function hexToHsl(hex: string): { h: number; s: number; l: number } {
