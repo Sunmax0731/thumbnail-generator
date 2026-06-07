@@ -15,7 +15,8 @@ All layers share:
 - `selectable`: whether the layer can be selected or edited.
 - `groupId` and `groupName`: optional group metadata.
 - `layerBlur`: whole-layer blur in CSS filter pixels.
-- `edgeBlur`: soft edge/shadow blur amount.
+- `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw an outer blur, and negative values draw an inner blur clipped to the layer bounds or shape.
+- `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
 - `cornerRadius`: rounded corner radius for image layers and rectangular shape layers.
 
 ## Image Layers
@@ -42,6 +43,7 @@ Text layers include:
 - `strokeWidth`
 - `strokeOpacity`
 - `align`: `left`, `center`, or `right`
+- `writingMode`: `horizontal` or `vertical`
 - `lineHeight`
 - `letterSpacing`: additional spacing between rendered characters.
 - `fillOpacity`
@@ -65,7 +67,7 @@ Shape layers include:
 CSV rows support the following columns:
 
 ```text
-type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,cornerRadius,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
+type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
 ```
 
 Rules:
@@ -74,7 +76,7 @@ Rules:
 - Missing numbers fall back to safe defaults.
 - `effect` accepts semicolon-separated values such as `grayscale=1;blur=4;mosaic=12`.
 - `image` references an imported image name/key or a bundled sample key.
-- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `cornerRadius`, `groupId`, `groupName`, and `lineStyle` are optional and fall back to safe defaults.
+- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, `groupId`, `groupName`, `writingMode`, and `lineStyle` are optional and fall back to safe defaults.
 - Quoted CSV fields are supported.
 
 ## HTML Layout Schema
@@ -88,6 +90,7 @@ Examples:
 <img data-layer="image" data-name="Hero" data-image="sample-bg" data-x="0" data-y="0" data-width="1280" data-height="720" data-effect="contrast=112;brightness=96" />
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
+<div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
 ```
 
 ## Export
@@ -155,6 +158,7 @@ Layer rows also include:
 - Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
 - Delete button. Button deletion and keyboard Delete/Backspace on a focused editable layer row open the same confirmation dialog before removing the layer.
 - Group metadata. Grouped rows show a folder-like group marker plus the group name, and selecting one grouped layer selects all editable members of that group.
+- Grouped rows also expose an individual-edit button. This selects only that row's layer, marks it as an individual grouped selection, and lets Adjust edit that one layer without removing the group metadata.
 
 The Layers tab also includes:
 
@@ -204,7 +208,9 @@ Bundled default templates are static browser assets, not localStorage records. L
 
 Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
 
-The predefined options are declared in `src/lib/fonts.ts`. Additional values can enter the layer model through CSV import, HTML import, saved templates, or browser-local custom font import.
+The predefined options are declared in `src/lib/fonts.ts`. The dropdown includes local/system fallback stacks plus hosted Google Fonts options loaded from `index.html`: Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, and Roboto Condensed. Additional values can enter the layer model through CSV import, HTML import, saved templates, or browser-local custom font import.
+
+Text `writingMode` defaults to `horizontal`. `vertical` draws each line as a vertical column and is reflected in preview, layout export, saved templates, edit state, and thumbnail export.
 
 ## Custom Fonts
 
@@ -221,6 +227,18 @@ Custom fonts are stored in browser `localStorage` under `thumbnail-generator.cus
 Users can import `.woff2`, `.woff`, `.ttf`, or `.otf` files from the Adjust tab while a text layer is selected. The app loads the file through the browser FontFace API, adds it to the font dropdown, and applies it immediately to the selected text layer. Unsupported formats or load failures are reported in the status bar.
 
 Export waits for `document.fonts.ready` before drawing so custom fonts are reflected in PNG, JPEG, and WebP output.
+
+## YouTube Thumbnail Import
+
+Assets accepts a YouTube URL or 11-character video id. The browser extracts ids from `youtube.com/watch?v=...`, `youtu.be/...`, `/shorts/...`, `/embed/...`, and `/live/...` forms. It tries thumbnail candidates from highest to lowest quality:
+
+- `maxresdefault.jpg`
+- `sddefault.jpg`
+- `hqdefault.jpg`
+- `mqdefault.jpg`
+- `default.jpg`
+
+The first successful image response is converted to a data URL image asset and inserted as an editable image layer. This keeps export compatible with the browser-only canvas path and does not require a backend proxy.
 
 ## Preview Fit
 
@@ -268,6 +286,17 @@ Registered colors can be applied to:
 Palette entries can be selected back into the Colors editor and updated in place. A palette entry stores optional `groupName` and `alpha` values. Applying a Fill or Stroke palette entry also applies that entry's opacity to supported text and shape layers.
 
 Palette groups are derived from entries with the same group name. Applying a group sets the selected text/shape fill and stroke colors together when the group has matching Fill and Stroke entries. Group blocks display all saved swatches in that group so generated palettes are visually separate from the registered-color list. The palette maker previews the current base color with generated companion colors, and harmony generation stores the base plus analogous, complementary, split-complementary, or triad suggestions in one group.
+
+Saved palette sets are stored separately under `thumbnail-generator.savedColorPalettes.v1`. A saved palette set stores:
+
+- Palette id.
+- Display name.
+- Pattern mode: analogous, complementary, split, triad, square, compound, shades, or monochromatic.
+- Base color.
+- Generated color list.
+- Created timestamp.
+
+The palette maker can save the currently displayed pattern as one palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
 
 ## Edit State Storage
 

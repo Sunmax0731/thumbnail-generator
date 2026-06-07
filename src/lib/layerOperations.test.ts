@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeShapeLayer } from "./layerFactory";
-import { selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./layerOperations";
+import { selectIndividualLayerId, selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./layerOperations";
 
 describe("layerOperations", () => {
   it("selects the top selectable layer when the deleted layer was the only selection", () => {
@@ -46,5 +46,16 @@ describe("layerOperations", () => {
 
     expect(selectLayerIdsForLayer(layers, ["outside"], "group-a", true)).toEqual(["outside", "group-a", "group-b"]);
     expect(selectLayerIdsForLayer(layers, ["outside", "group-a", "group-b"], "group-b", true)).toEqual(["outside"]);
+  });
+
+  it("can select one editable grouped layer without expanding to the whole group", () => {
+    const layers = [
+      makeShapeLayer({ id: "group-a", groupId: "g1", groupName: "Folder" }),
+      makeShapeLayer({ id: "group-b", groupId: "g1", groupName: "Folder" }),
+      makeShapeLayer({ id: "locked", groupId: "g1", groupName: "Folder", selectable: false }),
+    ];
+
+    expect(selectIndividualLayerId(layers, "group-b")).toEqual(["group-b"]);
+    expect(selectIndividualLayerId(layers, "locked")).toEqual([]);
   });
 });

@@ -8,9 +8,27 @@ export interface PaletteColor {
 }
 
 export type PaletteTarget = "fill" | "stroke";
-export type HarmonyMode = "analogous" | "complementary" | "split" | "triad";
+export type HarmonyMode =
+  | "analogous"
+  | "complementary"
+  | "split"
+  | "triad"
+  | "square"
+  | "compound"
+  | "shades"
+  | "monochromatic";
 
 export const colorPaletteStorageKey = "thumbnail-generator.colorPalette.v1";
+export const savedColorPaletteStorageKey = "thumbnail-generator.savedColorPalettes.v1";
+
+export interface SavedColorPalette {
+  id: string;
+  name: string;
+  mode: HarmonyMode;
+  baseColor: string;
+  colors: string[];
+  createdAt: string;
+}
 
 export const defaultPaletteColors: PaletteColor[] = [
   { id: "palette-white", name: "White fill", value: "#ffffff", target: "fill", alpha: 1, groupName: "Starter" },
@@ -103,16 +121,39 @@ export function paletteGroups(colors: PaletteColor[]): Array<{ name: string; fil
 }
 
 export function generateHarmonyColors(baseColor: string, mode: HarmonyMode): string[] {
+  const [, ...companions] = generatePaletteSchemeColors(baseColor, mode);
+  return companions;
+}
+
+export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode): string[] {
   const normalized = normalizeColor(baseColor);
   if (!normalized) return [];
   const hsl = hexToHsl(normalized);
-  const offsets: Record<HarmonyMode, number[]> = {
+  const offsets: Partial<Record<HarmonyMode, number[]>> = {
     analogous: [-30, 30],
     complementary: [180],
     split: [150, 210],
     triad: [120, 240],
+    square: [90, 180, 270],
+    compound: [30, 180],
   };
-  return offsets[mode].map((offset) => hslToHex({ ...hsl, h: normalizeHue(hsl.h + offset) }));
+  if (mode === "shades") {
+    return [
+      hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.42) }),
+      hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.68) }),
+      normalized,
+      hslToHex({ ...hsl, l: clampUnit(hsl.l + (1 - hsl.l) * 0.34) }),
+      hslToHex({ ...hsl, l: clampUnit(hsl.l + (1 - hsl.l) * 0.58) }),
+    ];
+  }
+  if (mode === "monochromatic") {
+    return [
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.55), l: clampUnit(hsl.l * 0.82) }),
+      normalized,
+      hslToHex({ ...hsl, s: clampUnit(Math.min(1, hsl.s * 1.2)), l: clampUnit(hsl.l + (1 - hsl.l) * 0.28) }),
+    ];
+  }
+  return [normalized, ...(offsets[mode] ?? []).map((offset) => hslToHex({ ...hsl, h: normalizeHue(hsl.h + offset) }))];
 }
 
 export function addHarmonyColors(
@@ -154,6 +195,56 @@ export function writeColorPalette(colors: PaletteColor[], storage: Pick<Storage,
   storage.setItem(colorPaletteStorageKey, JSON.stringify(colors));
 }
 
+export function addSavedColorPalette(
+  palettes: SavedColorPalette[],
+  input: { name?: string; baseColor: string; mode: HarmonyMode; colors?: string[] },
+  now = new Date(),
+): SavedColorPalette[] {
+  const baseColor = normalizeColor(input.baseColor);
+  if (!baseColor) return palettes;
+  const colors = (input.colors ?? generatePaletteSchemeColors(baseColor, input.mode))
+    .map((color) => normalizeColor(color))
+    .filter((color): color is string => Boolean(color));
+  if (colors.length === 0) return palettes;
+  return [
+    {
+      id: `saved-palette-${now.getTime().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
+      name: normalizePaletteName(input.name, `${capitalize(input.mode)} palette`),
+      mode: input.mode,
+      baseColor,
+      colors,
+      createdAt: now.toISOString(),
+    },
+    ...palettes,
+  ];
+}
+
+export function removeSavedColorPalette(palettes: SavedColorPalette[], id: string): SavedColorPalette[] {
+  return palettes.filter((palette) => palette.id !== id);
+}
+
+export function readSavedColorPalettes(storage: Pick<Storage, "getItem"> = window.localStorage): SavedColorPalette[] {
+  const raw = storage.getItem(savedColorPaletteStorageKey);
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    if (!Array.isArray(parsed)) return [];
+    return parsed.flatMap((value) => {
+      const palette = coerceSavedColorPalette(value);
+      return palette ? [palette] : [];
+    });
+  } catch {
+    return [];
+  }
+}
+
+export function writeSavedColorPalettes(
+  palettes: SavedColorPalette[],
+  storage: Pick<Storage, "setItem"> = window.localStorage,
+): void {
+  storage.setItem(savedColorPaletteStorageKey, JSON.stringify(palettes));
+}
+
 function coercePaletteColor(value: unknown): PaletteColor | null {
   if (!value || typeof value !== "object") return null;
   const candidate = value as Partial<PaletteColor>;
@@ -168,6 +259,26 @@ function coercePaletteColor(value: unknown): PaletteColor | null {
     target,
     alpha: clampAlpha(candidate.alpha),
     groupName: normalizeOptionalGroupName(candidate.groupName),
+  };
+}
+
+function coerceSavedColorPalette(value: unknown): SavedColorPalette | null {
+  if (!value || typeof value !== "object") return null;
+  const candidate = value as Partial<SavedColorPalette>;
+  if (typeof candidate.id !== "string" || typeof candidate.baseColor !== "string") return null;
+  const baseColor = normalizeColor(candidate.baseColor);
+  if (!baseColor || !isHarmonyMode(candidate.mode)) return null;
+  const colors = Array.isArray(candidate.colors)
+    ? candidate.colors.map((color) => normalizeColor(String(color))).filter((color): color is string => Boolean(color))
+    : generatePaletteSchemeColors(baseColor, candidate.mode);
+  if (colors.length === 0) return null;
+  return {
+    id: candidate.id,
+    name: normalizePaletteName(candidate.name, `${capitalize(candidate.mode)} palette`),
+    mode: candidate.mode,
+    baseColor,
+    colors,
+    createdAt: typeof candidate.createdAt === "string" ? candidate.createdAt : new Date(0).toISOString(),
   };
 }
 
@@ -227,6 +338,23 @@ function normalizeHue(value: number): number {
   return ((value % 360) + 360) % 360;
 }
 
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(0, value));
+}
+
 function capitalize(value: string): string {
   return `${value.slice(0, 1).toUpperCase()}${value.slice(1)}`;
+}
+
+function isHarmonyMode(value: unknown): value is HarmonyMode {
+  return (
+    value === "analogous" ||
+    value === "complementary" ||
+    value === "split" ||
+    value === "triad" ||
+    value === "square" ||
+    value === "compound" ||
+    value === "shades" ||
+    value === "monochromatic"
+  );
 }

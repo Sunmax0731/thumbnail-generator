@@ -1,5 +1,13 @@
 import { defaultEffects, makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
-import type { ImageEffects, LayoutParseOptions, LayoutParseResult, LineStyle, TextAlign, ThumbnailLayer } from "./types";
+import type {
+  ImageEffects,
+  LayoutParseOptions,
+  LayoutParseResult,
+  LineStyle,
+  TextAlign,
+  TextWritingMode,
+  ThumbnailLayer,
+} from "./types";
 
 const requiredColumns = ["type"];
 
@@ -34,6 +42,7 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
       groupName: record.groupName?.trim() || undefined,
       layerBlur: numberOr(record.layerBlur, 0),
       edgeBlur: numberOr(record.edgeBlur, 0),
+      edgeBlurStroke: boolOr(record.edgeBlurStroke, false),
       cornerRadius: numberOr(record.cornerRadius, 0),
     };
 
@@ -64,6 +73,7 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
           strokeWidth: numberOr(record.strokeWidth, 6),
           strokeOpacity: clamp(numberOr(record.strokeOpacity, 1), 0, 1),
           align: parseAlign(record.align),
+          writingMode: parseWritingMode(record.writingMode),
           lineHeight: numberOr(record.lineHeight, 1),
           letterSpacing: numberOr(record.letterSpacing, 0),
           fillOpacity: clamp(numberOr(record.fillOpacity, 1), 0, 1),
@@ -176,6 +186,11 @@ function clamp(value: number, min: number, max: number): number {
 function parseAlign(input = ""): TextAlign {
   if (input === "center" || input === "right") return input;
   return "left";
+}
+
+function parseWritingMode(input = ""): TextWritingMode {
+  if (input === "vertical") return "vertical";
+  return "horizontal";
 }
 
 function parseShape(input = "") {

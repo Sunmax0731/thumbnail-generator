@@ -2,6 +2,7 @@ import { rotateHandleOffset, selectionHandleRadius, type CanvasInteractionMode }
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
+const edgeShadowOffset = 10000;
 
 export interface RenderOptions {
   selectedLayerId?: string | null;
@@ -81,33 +82,68 @@ function drawPreviewBackdrop(context: CanvasRenderingContext2D, width: number, h
 async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
   context.save();
   context.globalAlpha = layer.opacity;
-  context.filter = layer.layerBlur > 0 ? `blur(${layer.layerBlur}px)` : "none";
-  if (layer.edgeBlur > 0) {
-    context.shadowBlur = layer.edgeBlur;
-    context.shadowColor = "rgba(15, 23, 42, 0.34)";
-  }
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
 
+  if (layer.edgeBlur !== 0) {
+    await drawLayerEdgeBlur(context, layer, assets);
+  }
+  await drawLayerContent(context, layer, assets, {
+    includeFill: true,
+    includeStroke: true,
+    layerBlur: layer.layerBlur,
+  });
+  context.restore();
+}
+
+async function drawLayerEdgeBlur(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
+  const amount = Math.abs(layer.edgeBlur);
+  if (amount <= 0) return;
+  context.save();
+  if (layer.edgeBlur < 0) {
+    clipLayerBounds(context, layer);
+  }
+  context.shadowBlur = amount;
+  context.shadowColor = "rgba(15, 23, 42, 0.36)";
+  context.shadowOffsetX = edgeShadowOffset;
+  context.translate(-edgeShadowOffset, 0);
+  await drawLayerContent(context, layer, assets, {
+    includeFill: true,
+    includeStroke: shouldIncludeStrokeForEdgeBlur(layer),
+    layerBlur: 0,
+  });
+  context.restore();
+}
+
+async function drawLayerContent(
+  context: CanvasRenderingContext2D,
+  layer: ThumbnailLayer,
+  assets: ImageAsset[],
+  options: { includeFill: boolean; includeStroke: boolean; layerBlur: number },
+) {
   if (layer.type === "image") {
     const asset = assets.find((candidate) => candidate.key === layer.imageKey || candidate.name === layer.imageKey);
     if (asset) {
       const image = await loadImage(asset.src);
-      drawImageLayer(context, image, layer.width, layer.height, layer.effects, layer.cornerRadius, layer.layerBlur);
+      drawImageLayer(context, image, layer.width, layer.height, layer.effects, layer.cornerRadius, options.layerBlur);
     } else {
       drawMissingImage(context, layer.width, layer.height);
     }
   }
 
   if (layer.type === "shape") {
-    drawShapeLayer(context, layer);
+    context.save();
+    context.filter = options.layerBlur > 0 ? `blur(${options.layerBlur}px)` : "none";
+    drawShapeLayer(context, layer, options);
+    context.restore();
   }
 
   if (layer.type === "text") {
-    drawTextLayer(context, layer);
+    context.save();
+    context.filter = options.layerBlur > 0 ? `blur(${options.layerBlur}px)` : "none";
+    drawTextLayer(context, layer, options);
+    context.restore();
   }
-
-  context.restore();
 }
 
 function drawImageLayer(
@@ -155,9 +191,13 @@ function buildFilter(effects: ImageEffects, layerBlur = 0): string {
   return filters.join(" ");
 }
 
-function drawShapeLayer(context: CanvasRenderingContext2D, layer: ShapeLayer) {
+function drawShapeLayer(
+  context: CanvasRenderingContext2D,
+  layer: ShapeLayer,
+  options: { includeFill: boolean; includeStroke: boolean },
+) {
   if (layer.shape === "line") {
-    drawLineShape(context, layer);
+    drawLineShape(context, layer, options);
     return;
   }
 
@@ -174,10 +214,12 @@ function drawShapeLayer(context: CanvasRenderingContext2D, layer: ShapeLayer) {
   }
 
   const baseAlpha = context.globalAlpha;
-  context.fillStyle = layer.fill;
-  context.globalAlpha = baseAlpha * layer.fillOpacity;
-  context.fill();
-  if (layer.strokeWidth > 0) {
+  if (options.includeFill) {
+    context.fillStyle = layer.fill;
+    context.globalAlpha = baseAlpha * layer.fillOpacity;
+    context.fill();
+  }
+  if (options.includeStroke && layer.strokeWidth > 0) {
     context.globalAlpha = baseAlpha * layer.strokeOpacity;
     context.lineWidth = layer.strokeWidth;
     context.strokeStyle = layer.strokeColor;
@@ -186,7 +228,16 @@ function drawShapeLayer(context: CanvasRenderingContext2D, layer: ShapeLayer) {
   context.globalAlpha = baseAlpha;
 }
 
-function drawTextLayer(context: CanvasRenderingContext2D, layer: TextLayer) {
+function drawTextLayer(
+  context: CanvasRenderingContext2D,
+  layer: TextLayer,
+  options: { includeFill: boolean; includeStroke: boolean },
+) {
+  if (layer.writingMode === "vertical") {
+    drawVerticalTextLayer(context, layer, options);
+    return;
+  }
+
   const lines = layer.text.split(/\r?\n/);
   const lineHeightPx = layer.fontSize * layer.lineHeight;
   const totalHeight = lineHeightPx * lines.length;
@@ -199,21 +250,73 @@ function drawTextLayer(context: CanvasRenderingContext2D, layer: TextLayer) {
   let y = -totalHeight / 2 + lineHeightPx / 2;
   const baseAlpha = context.globalAlpha;
   for (const line of lines) {
-    if (layer.strokeWidth > 0) {
+    if (options.includeStroke && layer.strokeWidth > 0) {
       context.globalAlpha = baseAlpha * layer.strokeOpacity;
       context.lineWidth = layer.strokeWidth;
       context.strokeStyle = layer.strokeColor;
       drawSpacedText(context, line, x, y, layer.width, layer.letterSpacing, "stroke");
     }
-    context.globalAlpha = baseAlpha * layer.fillOpacity;
-    context.fillStyle = layer.color;
-    drawSpacedText(context, line, x, y, layer.width, layer.letterSpacing, "fill");
+    if (options.includeFill) {
+      context.globalAlpha = baseAlpha * layer.fillOpacity;
+      context.fillStyle = layer.color;
+      drawSpacedText(context, line, x, y, layer.width, layer.letterSpacing, "fill");
+    }
     y += lineHeightPx;
   }
   context.globalAlpha = baseAlpha;
 }
 
-function drawLineShape(context: CanvasRenderingContext2D, layer: ShapeLayer): void {
+function drawVerticalTextLayer(
+  context: CanvasRenderingContext2D,
+  layer: TextLayer,
+  options: { includeFill: boolean; includeStroke: boolean },
+): void {
+  const columns = layer.text.split(/\r?\n/);
+  const charAdvance = layer.fontSize * layer.lineHeight;
+  const columnWidth = layer.fontSize + Math.max(0, layer.letterSpacing);
+  const totalWidth = columns.length * columnWidth;
+  const startX =
+    layer.align === "right"
+      ? layer.width / 2 - totalWidth + columnWidth / 2
+      : layer.align === "center"
+        ? -totalWidth / 2 + columnWidth / 2
+        : -layer.width / 2 + columnWidth / 2;
+
+  context.font = `${layer.fontWeight} ${layer.fontSize}px ${layer.fontFamily}`;
+  context.textAlign = "center";
+  context.textBaseline = "middle";
+  context.lineJoin = "round";
+
+  const baseAlpha = context.globalAlpha;
+  columns.forEach((column, columnIndex) => {
+    const chars = Array.from(column.length > 0 ? column : " ");
+    const totalHeight = chars.length * charAdvance;
+    const x = startX + columnIndex * columnWidth;
+    let y = -totalHeight / 2 + charAdvance / 2;
+    for (const char of chars) {
+      if (options.includeStroke && layer.strokeWidth > 0) {
+        context.globalAlpha = baseAlpha * layer.strokeOpacity;
+        context.lineWidth = layer.strokeWidth;
+        context.strokeStyle = layer.strokeColor;
+        context.strokeText(char, x, y, layer.width);
+      }
+      if (options.includeFill) {
+        context.globalAlpha = baseAlpha * layer.fillOpacity;
+        context.fillStyle = layer.color;
+        context.fillText(char, x, y, layer.width);
+      }
+      y += charAdvance;
+    }
+  });
+  context.globalAlpha = baseAlpha;
+}
+
+function drawLineShape(
+  context: CanvasRenderingContext2D,
+  layer: ShapeLayer,
+  options: { includeStroke: boolean },
+): void {
+  if (!options.includeStroke) return;
   const baseAlpha = context.globalAlpha;
   context.globalAlpha = baseAlpha * layer.strokeOpacity;
   context.strokeStyle = layer.strokeColor;
@@ -240,6 +343,30 @@ function drawLineShape(context: CanvasRenderingContext2D, layer: ShapeLayer): vo
   }
   context.setLineDash([]);
   context.globalAlpha = baseAlpha;
+}
+
+function shouldIncludeStrokeForEdgeBlur(layer: ThumbnailLayer): boolean {
+  if (layer.type === "image") return true;
+  if (layer.type === "shape" && layer.shape === "line") return true;
+  return layer.edgeBlurStroke;
+}
+
+function clipLayerBounds(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
+  context.beginPath();
+  if (layer.type === "shape" && layer.shape === "ellipse") {
+    context.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
+  } else if (layer.type === "shape" && layer.shape === "triangle") {
+    context.moveTo(0, -layer.height / 2);
+    context.lineTo(layer.width / 2, layer.height / 2);
+    context.lineTo(-layer.width / 2, layer.height / 2);
+    context.closePath();
+  } else if (layer.type === "shape" && layer.shape === "line") {
+    const halfHeight = Math.max(layer.height / 2, layer.strokeWidth / 2, 1);
+    context.rect(-layer.width / 2, -halfHeight, layer.width, halfHeight * 2);
+  } else {
+    context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, layer.cornerRadius);
+  }
+  context.clip();
 }
 
 function clipRoundedRect(

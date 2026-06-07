@@ -62,4 +62,23 @@ describe("textFit", () => {
 
     expect(size).toBe(42);
   });
+
+  it("fits vertical text against column width and character height", () => {
+    const layer = makeTextLayer({
+      width: 96,
+      height: 180,
+      text: "VERT",
+      strokeWidth: 0,
+      lineHeight: 1,
+      writingMode: "vertical",
+    });
+
+    const size = calculateFittedFontSize(layer, {
+      minFontSize: 8,
+      maxFontSize: 80,
+      measureTextWidth: measure,
+    });
+
+    expect(size).toBe(45);
+  });
 });

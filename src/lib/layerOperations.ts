@@ -36,6 +36,10 @@ export function selectLayerIdsForLayer(
   return [...validSelectedIds, ...targetIds.filter((id) => !selected.has(id))];
 }
 
+export function selectIndividualLayerId(layers: ThumbnailLayer[], layerId: string): string[] {
+  return layers.some((layer) => layer.id === layerId && layer.selectable) ? [layerId] : [];
+}
+
 export function selectLayerIdsAfterDelete(
   layers: ThumbnailLayer[],
   selectedIds: string[],

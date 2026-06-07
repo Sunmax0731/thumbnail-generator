@@ -18,12 +18,12 @@ npm run preview
 ## Editor Layout
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, select imported assets, add image/text/shape/line starter layers, open Image Lab for the selected asset, and restore the sample template.
+- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add image/text/shape/line starter layers, open Image Lab for the selected asset, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
-- Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, edge blur, corner radius, text, font, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named Fill or Stroke colors, preview palette patterns, set opacity and group names, generate harmony suggestions as grouped palette blocks, apply single colors or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
+- Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
+- Colors: register and edit named Fill or Stroke colors, preview and save palette patterns, set opacity and group names, generate harmony suggestions as grouped palette blocks, apply single colors, saved-palette colors, or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -44,6 +44,7 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Use Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y for copy, paste, cut, duplicate, undo, and redo when focus is outside text fields and modals.
 - Press Delete or Backspace while a layer is selected to open the layer delete confirmation dialog.
 - Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row or one grouped preview object selects the editable members of that group.
+- For a grouped row, use the small pointer button to select only that layer. Adjust then edits that one grouped object while the group metadata remains intact.
 - Use Fit to canvas in Layers to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
@@ -57,6 +58,7 @@ Use Assets to add common starter layers quickly:
 - Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
 - Select an imported asset row, then use its add button to place that image as a layer.
+- Paste a YouTube URL or 11-character video id into YouTube URL and select Import thumbnail to add that video thumbnail as an editable image layer.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
 
 ## Default Templates
@@ -94,6 +96,14 @@ The app picks the largest font size that fits the layer width and height while r
 
 When a text layer is selected during import, the new font is applied to that layer immediately. If a font file is unsupported or cannot be loaded, the status bar shows the import or load failure.
 
+## Google Fonts And Vertical Text
+
+Select a text layer, open Adjust, and use Font to choose hosted Google Fonts options such as Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, or Roboto Condensed. Use Writing mode to switch the selected text layer between Horizontal and Vertical. Vertical text is rendered in the preview and export path and is saved through CSV/HTML, templates, and edit state.
+
+## Edge Blur
+
+Select a layer and open Adjust. Edge blur accepts signed values: `0` disables it, positive values create an outer blur, and negative values create an inner blur. For text and shape layers, Blur stroke controls whether outlines/strokes participate in the blur source or remain sharp.
+
 ## Presets And Export
 
 Select an output preset from the top toolbar. Tall presets such as Shorts automatically reduce the preview zoom so the whole canvas fits the visible stage. Use PNG, JPG, WebP, or Export to download the rendered thumbnail.
@@ -106,8 +116,8 @@ Open Image Lab from Assets or from an asset row. The modal supports chroma key, 
 
 Open Colors to select an existing swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied with that Fill or Stroke color, and Group to connect Fill and Stroke entries into one named set. Group buttons apply matching Fill and Stroke colors together to selected text or shape layers.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Use Analogous, Complement, Split, or Triad to generate color-wheel suggestions from the current draft color. These suggestions are saved with the base color as one grouped palette block while still appearing as ordinary palette entries that can be edited, deleted, or applied one at a time.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one palette set. Each saved-palette color has Fill and Stroke buttons, and the older Analogous/Complement/Split/Triad buttons still generate editable grouped swatch entries from the current draft color.
 
 ## Browser Storage
 
-The app stores the current edit state, autosave preference, templates, color palette entries, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.
+The app stores the current edit state, autosave preference, templates, color palette entries, saved palette sets, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.

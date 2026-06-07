@@ -17,6 +17,7 @@ import {
   GripVertical,
   Layers,
   Lock,
+  MousePointer2,
   Move,
   Palette,
   RotateCcw,
@@ -30,7 +31,14 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
-import { generateHarmonyColors, normalizeColor, type HarmonyMode, type PaletteColor, type PaletteTarget } from "../lib/colorPalette";
+import {
+  generatePaletteSchemeColors,
+  normalizeColor,
+  type HarmonyMode,
+  type PaletteColor,
+  type PaletteTarget,
+  type SavedColorPalette,
+} from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
 import {
   emptyLiveRelativeTransformState,
@@ -39,7 +47,16 @@ import {
   type LiveRelativeTransformAxis,
 } from "../lib/liveRelativeTransform";
 import type { RelativeLayerTransform } from "../lib/layerTransform";
-import type { ImageAsset, ImageEffects, LineStyle, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
+import type {
+  ImageAsset,
+  ImageEffects,
+  LineStyle,
+  OutputSettings,
+  ShapeKind,
+  TextAlign,
+  TextWritingMode,
+  ThumbnailLayer,
+} from "../lib/types";
 
 type InspectorSection = "layers" | "edit" | "colors";
 
@@ -54,21 +71,27 @@ interface InspectorPanelProps {
   paletteTargetDraft: PaletteTarget;
   paletteAlphaDraft: number;
   paletteGroupDraft: string;
+  paletteModeDraft: HarmonyMode;
   selectedPaletteColorId: string | null;
+  savedColorPalettes: SavedColorPalette[];
   fontOptions: FontOption[];
   onPaletteDraftChange: (value: string) => void;
   onPaletteNameDraftChange: (value: string) => void;
   onPaletteTargetDraftChange: (value: PaletteTarget) => void;
   onPaletteAlphaDraftChange: (value: number) => void;
   onPaletteGroupDraftChange: (value: string) => void;
+  onPaletteModeDraftChange: (value: HarmonyMode) => void;
   onSelectPaletteColor: (id: string) => void;
   onAddPaletteColor: () => void;
   onUpdatePaletteColor: () => void;
   onDeletePaletteColor: (id: string) => void;
+  onSaveCurrentColorPalette: () => void;
+  onDeleteSavedColorPalette: (id: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget) => void;
   onApplyPaletteGroup: (groupName: string) => void;
   onGeneratePaletteHarmony: (mode: HarmonyMode) => void;
   onSelect: (id: string, additive?: boolean) => void;
+  onSelectIndividual: (id: string) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
@@ -99,21 +122,27 @@ export function InspectorPanel({
   paletteTargetDraft,
   paletteAlphaDraft,
   paletteGroupDraft,
+  paletteModeDraft,
   selectedPaletteColorId,
+  savedColorPalettes,
   fontOptions,
   onPaletteDraftChange,
   onPaletteNameDraftChange,
   onPaletteTargetDraftChange,
   onPaletteAlphaDraftChange,
   onPaletteGroupDraftChange,
+  onPaletteModeDraftChange,
   onSelectPaletteColor,
   onAddPaletteColor,
   onUpdatePaletteColor,
   onDeletePaletteColor,
+  onSaveCurrentColorPalette,
+  onDeleteSavedColorPalette,
   onApplyPaletteColor,
   onApplyPaletteGroup,
   onGeneratePaletteHarmony,
   onSelect,
+  onSelectIndividual,
   onUpdateLayer,
   onDelete,
   onDuplicate,
@@ -225,7 +254,9 @@ export function InspectorPanel({
                   aria-disabled={!layer.selectable}
                   className={`layer-row ${selectedIds.includes(layer.id) ? "selected" : ""} ${
                     draggingId === layer.id ? "dragging" : ""
-                  } ${!layer.selectable ? "locked" : ""} ${layer.groupId ? "grouped" : ""}`}
+                  } ${!layer.selectable ? "locked" : ""} ${layer.groupId ? "grouped" : ""} ${
+                    layer.groupId && selectedIds.length === 1 && selectedIds[0] === layer.id ? "individual-selected" : ""
+                  }`}
                   onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -262,7 +293,27 @@ export function InspectorPanel({
                   <span className="layer-name">
                     {layer.name}
                     {layer.groupName ? <small className="layer-group-pill">{layer.groupName}</small> : null}
+                    {layer.groupId && selectedIds.length === 1 && selectedIds[0] === layer.id ? (
+                      <small className="layer-solo-pill">{t("inspector.individualBadge")}</small>
+                    ) : null}
                   </span>
+                  {layer.groupId ? (
+                    <button
+                      type="button"
+                      className="mini-icon-button"
+                      disabled={!layer.selectable}
+                      aria-label={t("inspector.selectIndividual", { name: layer.name })}
+                      title={t("inspector.selectIndividualTitle")}
+                      onClick={(event) => {
+                        event.stopPropagation();
+                        onSelectIndividual(layer.id);
+                      }}
+                    >
+                      <MousePointer2 size={14} />
+                    </button>
+                  ) : (
+                    <span aria-hidden="true" className="layer-row-spacer" />
+                  )}
                   <button
                     type="button"
                     className="mini-icon-button"
@@ -372,17 +423,22 @@ export function InspectorPanel({
           targetDraft={paletteTargetDraft}
           alphaDraft={paletteAlphaDraft}
           groupDraft={paletteGroupDraft}
+          modeDraft={paletteModeDraft}
           selectedColorId={selectedPaletteColorId}
+          savedPalettes={savedColorPalettes}
           selectedCount={paletteCompatibleCount}
           onDraftChange={onPaletteDraftChange}
           onNameDraftChange={onPaletteNameDraftChange}
           onTargetDraftChange={onPaletteTargetDraftChange}
           onAlphaDraftChange={onPaletteAlphaDraftChange}
           onGroupDraftChange={onPaletteGroupDraftChange}
+          onModeDraftChange={onPaletteModeDraftChange}
           onSelectColor={onSelectPaletteColor}
           onAdd={onAddPaletteColor}
           onUpdate={onUpdatePaletteColor}
           onDelete={onDeletePaletteColor}
+          onSavePalette={onSaveCurrentColorPalette}
+          onDeleteSavedPalette={onDeleteSavedColorPalette}
           onApply={onApplyPaletteColor}
           onApplyGroup={onApplyPaletteGroup}
           onGenerateHarmony={onGeneratePaletteHarmony}
@@ -508,11 +564,25 @@ export function InspectorPanel({
                 <SliderNumberInput
                   label={t("inspector.edgeBlur")}
                   value={selected.edgeBlur}
-                  min={0}
+                  min={-48}
                   max={48}
                   step={1}
                   onChange={(value) => updateNumber(selected, "edgeBlur", value, onUpdateLayer)}
                 />
+                <label
+                  className={`checkbox-row inline-checkbox ${selected.type === "image" ? "field-disabled" : ""}`}
+                  title={t("inspector.edgeBlurStrokeHelp")}
+                >
+                  <input
+                    type="checkbox"
+                    checked={selected.edgeBlurStroke}
+                    disabled={selected.type === "image"}
+                    onChange={(event) =>
+                      onUpdateLayer(selected.id, (layer) => ({ ...layer, edgeBlurStroke: event.currentTarget.checked }))
+                    }
+                  />
+                  <span>{t("inspector.edgeBlurStroke")}</span>
+                </label>
                 <SliderNumberInput
                   label={t("inspector.cornerRadius")}
                   value={selected.cornerRadius}
@@ -699,7 +769,9 @@ function PaletteControls({
   targetDraft,
   alphaDraft,
   groupDraft,
+  modeDraft,
   selectedColorId,
+  savedPalettes,
   selectedCount,
   listHeight,
   onDraftChange,
@@ -707,10 +779,13 @@ function PaletteControls({
   onTargetDraftChange,
   onAlphaDraftChange,
   onGroupDraftChange,
+  onModeDraftChange,
   onSelectColor,
   onAdd,
   onUpdate,
   onDelete,
+  onSavePalette,
+  onDeleteSavedPalette,
   onApply,
   onApplyGroup,
   onGenerateHarmony,
@@ -723,7 +798,9 @@ function PaletteControls({
   targetDraft: PaletteTarget;
   alphaDraft: number;
   groupDraft: string;
+  modeDraft: HarmonyMode;
   selectedColorId: string | null;
+  savedPalettes: SavedColorPalette[];
   selectedCount: number;
   listHeight: number;
   onDraftChange: (value: string) => void;
@@ -731,10 +808,13 @@ function PaletteControls({
   onTargetDraftChange: (value: PaletteTarget) => void;
   onAlphaDraftChange: (value: number) => void;
   onGroupDraftChange: (value: string) => void;
+  onModeDraftChange: (value: HarmonyMode) => void;
   onSelectColor: (id: string) => void;
   onAdd: () => void;
   onUpdate: () => void;
   onDelete: (id: string) => void;
+  onSavePalette: () => void;
+  onDeleteSavedPalette: (id: string) => void;
   onApply: (color: string, target: PaletteTarget) => void;
   onApplyGroup: (groupName: string) => void;
   onGenerateHarmony: (mode: HarmonyMode) => void;
@@ -743,7 +823,7 @@ function PaletteControls({
 }) {
   const groups = groupPaletteRows(colors);
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
-  const previewColors = [previewBaseColor, ...generateHarmonyColors(previewBaseColor, "triad")];
+  const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
@@ -797,11 +877,24 @@ function PaletteControls({
             <span>{t("inspector.paletteGroup")}</span>
             <input type="text" value={groupDraft} onChange={(event) => onGroupDraftChange(event.currentTarget.value)} />
           </label>
+          <label className="field palette-target-field">
+            <span>{t("inspector.palettePattern")}</span>
+            <select value={modeDraft} onChange={(event) => onModeDraftChange(event.currentTarget.value as HarmonyMode)}>
+              {palettePatternModes.map((mode) => (
+                <option key={mode} value={mode}>
+                  {t(harmonyLabelKey(mode))}
+                </option>
+              ))}
+            </select>
+          </label>
           <button type="button" className="secondary-button" onClick={onAdd}>
             {t("inspector.addColor")}
           </button>
           <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
             {t("inspector.updateColor")}
+          </button>
+          <button type="button" className="secondary-button wide-button palette-save-button" onClick={onSavePalette}>
+            {t("inspector.savePalette")}
           </button>
         </div>
       </div>
@@ -812,6 +905,41 @@ function PaletteControls({
           </button>
         ))}
       </div>
+      {savedPalettes.length > 0 ? (
+        <div className="saved-palette-list" aria-label={t("inspector.savedPalettes")}>
+          {savedPalettes.map((palette) => (
+            <div className="saved-palette-row" key={palette.id}>
+              <div className="saved-palette-header">
+                <span>{palette.name}</span>
+                <small>
+                  {t(harmonyLabelKey(palette.mode))} / {palette.colors.length}
+                </small>
+                <button
+                  type="button"
+                  className="mini-icon-button danger"
+                  title={t("inspector.deletePalette", { name: palette.name })}
+                  onClick={() => onDeleteSavedPalette(palette.id)}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
+              <div className="saved-palette-colors">
+                {palette.colors.map((color, index) => (
+                  <div className="saved-palette-color" key={`${palette.id}-${color}-${index}`}>
+                    <span className="saved-palette-swatch" style={{ background: color }} />
+                    <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "fill")}>
+                      {t("inspector.fill")}
+                    </button>
+                    <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "stroke")}>
+                      {t("inspector.stroke")}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      ) : null}
       {groups.length > 0 ? (
         <div className="palette-group-list" aria-label={t("inspector.paletteGroups")}>
           {groups.map((group) => (
@@ -987,9 +1115,24 @@ function harmonyLabelKey(mode: HarmonyMode) {
     complementary: "inspector.harmony.complementary",
     split: "inspector.harmony.split",
     triad: "inspector.harmony.triad",
+    square: "inspector.harmony.square",
+    compound: "inspector.harmony.compound",
+    shades: "inspector.harmony.shades",
+    monochromatic: "inspector.harmony.monochromatic",
   } as const;
   return keys[mode];
 }
+
+const palettePatternModes: HarmonyMode[] = [
+  "analogous",
+  "complementary",
+  "split",
+  "triad",
+  "square",
+  "compound",
+  "shades",
+  "monochromatic",
+];
 
 function groupPaletteRows(colors: PaletteColor[]): Array<{ name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }> {
   const groups = new Map<string, { name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }>();
@@ -1124,6 +1267,19 @@ function TextControls({
               {option.label}
             </option>
           ))}
+        </select>
+      </label>
+      <label className="field">
+        <span>{t("inspector.writingMode")}</span>
+        <select
+          value={selected.writingMode}
+          onChange={(event) => {
+            const writingMode = event.currentTarget.value as TextWritingMode;
+            onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, writingMode } : layer));
+          }}
+        >
+          <option value="horizontal">{t("inspector.writingHorizontal")}</option>
+          <option value="vertical">{t("inspector.writingVertical")}</option>
         </select>
       </label>
       <label className="file-drop compact-drop custom-font-drop" title="WOFF2, WOFF, TTF, or OTF">

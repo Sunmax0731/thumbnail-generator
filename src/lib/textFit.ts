@@ -57,6 +57,17 @@ function doesTextFit(
   availableHeight: number,
   measureTextWidth: TextFitOptions["measureTextWidth"],
 ): boolean {
+  if (layer.writingMode === "vertical") {
+    const columnWidth = fontSize + Math.max(0, layer.letterSpacing);
+    const requiredWidth = lines.length * columnWidth;
+    if (requiredWidth > availableWidth) return false;
+    return lines.every((line) => {
+      const chars = Array.from(line);
+      const totalHeight = chars.length * fontSize * layer.lineHeight;
+      return totalHeight <= availableHeight;
+    });
+  }
+
   const totalHeight = lines.length * fontSize * layer.lineHeight;
   if (totalHeight > availableHeight) return false;
 

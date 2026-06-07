@@ -22,7 +22,7 @@ describe("parseHtmlLayout", () => {
   it("reads advanced layer and text attributes", () => {
     const result = parseHtmlLayout(
       `<section>
-        <div data-layer="text" data-group-id="g1" data-group-name="Brand" data-layer-blur="2" data-edge-blur="3" data-letter-spacing="5" data-fill-opacity="0.7" data-stroke-opacity="0.4">TIGHT</div>
+        <div data-layer="text" data-group-id="g1" data-group-name="Brand" data-layer-blur="2" data-edge-blur="-3" data-edge-blur-stroke="true" data-writing-mode="vertical" data-letter-spacing="5" data-fill-opacity="0.7" data-stroke-opacity="0.4">TIGHT</div>
         <div data-layer="shape" data-shape="line" data-line-style="dotted" data-corner-radius="18" data-stroke-width="9"></div>
       </section>`,
       { baseWidth: 1280, baseHeight: 720 },
@@ -33,7 +33,9 @@ describe("parseHtmlLayout", () => {
       groupId: "g1",
       groupName: "Brand",
       layerBlur: 2,
-      edgeBlur: 3,
+      edgeBlur: -3,
+      edgeBlurStroke: true,
+      writingMode: "vertical",
       letterSpacing: 5,
       fillOpacity: 0.7,
       strokeOpacity: 0.4,

@@ -36,6 +36,7 @@ interface LeftPanelProps {
   onApplyCsv: () => void;
   onApplyHtml: () => void;
   onImageFiles: (files: FileList | null) => void;
+  onImportYouTubeThumbnail: (url: string) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
   onAddText: () => void;
@@ -71,6 +72,7 @@ export function LeftPanel({
   onApplyCsv,
   onApplyHtml,
   onImageFiles,
+  onImportYouTubeThumbnail,
   onSelectAsset,
   onAddImageAssetLayer,
   onAddText,
@@ -91,6 +93,7 @@ export function LeftPanel({
   t,
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("assets");
+  const [youtubeUrl, setYoutubeUrl] = useState("");
 
   return (
     <aside className="side-panel left-panel" aria-label={t("left.aria")}>
@@ -142,6 +145,24 @@ export function LeftPanel({
                 onChange={(event) => onImageFiles(event.currentTarget.files)}
               />
             </label>
+            <div className="youtube-import">
+              <label className="field">
+                <span>{t("left.youtubeUrl")}</span>
+                <input
+                  type="url"
+                  value={youtubeUrl}
+                  placeholder={t("left.youtubePlaceholder")}
+                  onChange={(event) => setYoutubeUrl(event.currentTarget.value)}
+                />
+              </label>
+              <button
+                type="button"
+                className="secondary-button icon-text"
+                onClick={() => onImportYouTubeThumbnail(youtubeUrl)}
+              >
+                <ImagePlus size={16} /> {t("left.importYoutube")}
+              </button>
+            </div>
             <button type="button" className="secondary-button icon-text wide-button" onClick={() => onOpenImageLab(selectedAssetKey)}>
               <Scissors size={16} /> {t("left.openImageLab")}
             </button>

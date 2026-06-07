@@ -2,12 +2,16 @@ import { describe, expect, it } from "vitest";
 import {
   addHarmonyColors,
   addPaletteColor,
+  addSavedColorPalette,
   generateHarmonyColors,
+  generatePaletteSchemeColors,
   normalizeColor,
   normalizePaletteName,
   paletteGroups,
   readColorPalette,
+  readSavedColorPalettes,
   removePaletteColor,
+  removeSavedColorPalette,
   updatePaletteColor,
 } from "./colorPalette";
 
@@ -53,5 +57,27 @@ describe("colorPalette", () => {
     expect(paletteGroups(colors)).toEqual([{ name: "Brand", fill: colors[0], stroke: colors[1] }]);
     expect(generateHarmonyColors("#ff0000", "triad")).toEqual(["#00ff00", "#0000ff"]);
     expect(addHarmonyColors([], { value: "#ff0000", target: "fill" }, "complementary", 10)).toHaveLength(1);
+  });
+
+  it("creates and reads saved palette units with multiple harmony modes", () => {
+    expect(generatePaletteSchemeColors("#ff0000", "complementary")).toHaveLength(2);
+    expect(generatePaletteSchemeColors("#ff0000", "square")).toHaveLength(4);
+    expect(generatePaletteSchemeColors("#ff0000", "shades")).toHaveLength(5);
+    expect(generatePaletteSchemeColors("#ff0000", "monochromatic")).toHaveLength(3);
+
+    const now = new Date("2026-06-07T00:00:00.000Z");
+    const palettes = addSavedColorPalette([], { name: "Stream set", baseColor: "#ff0000", mode: "triad" }, now);
+    expect(palettes[0]).toMatchObject({
+      name: "Stream set",
+      mode: "triad",
+      baseColor: "#ff0000",
+      colors: ["#ff0000", "#00ff00", "#0000ff"],
+    });
+
+    const read = readSavedColorPalettes({
+      getItem: () => JSON.stringify(palettes),
+    });
+    expect(read).toEqual(palettes);
+    expect(removeSavedColorPalette(palettes, palettes[0].id)).toEqual([]);
   });
 });

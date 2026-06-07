@@ -7,9 +7,12 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 ## Functional Requirements
 
 - Import local image files and use them as editable thumbnail layers.
+- Import YouTube video thumbnails by URL or video id and use them as editable image layers.
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
+- Select hosted Google Fonts options from the font dropdown for text layers.
+- Switch text layers between horizontal and vertical writing mode.
 - Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
@@ -21,6 +24,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
+- Select one grouped layer individually from the Layers panel for single-layer adjustment without ungrouping.
 - Select a group from either Layers or the preview by choosing one editable grouped member.
 - Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
@@ -40,12 +44,15 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
 - Edit registered palette colors, assign palette groups, apply fill/stroke groups, set palette opacity, preview palette patterns, and generate grouped color harmony suggestions.
+- Save the currently previewed palette pattern as one browser-local palette set and apply individual saved-palette colors as Fill or Stroke.
+- Use signed edge blur values to choose inner or outer edge blur, and optionally include text/shape strokes in the blur source.
 - Treat canvas drag movement as one undo/redo history step from drag start to drag completion, not as intermediate pointer positions.
 
 ## Non-Functional Requirements
 
 - Static GitHub Pages compatible app.
 - Browser-only operation with no backend.
+- YouTube thumbnail import must remain browser-only and must not require a server proxy.
 - The app must render nonblank in Chrome or a headless browser.
 - Japanese and English UI labels must not overflow or overlap in the main editor viewport.
 - Primary operations must be verifiable through local automated and manual tests.

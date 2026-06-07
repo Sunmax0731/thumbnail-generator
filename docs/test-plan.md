@@ -19,8 +19,12 @@
 - Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
 - Color palette editing preserves selected swatch updates, opacity, grouping, and harmony generation.
 - CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, and line styles.
+- CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
+- Text fit accounts for vertical text column width and character height.
+- YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
+- Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide multiple use-case layouts with exportable CSV/HTML.
 
@@ -77,7 +81,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
-- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, generated palette group blocks, palette groups, group apply, and harmony suggestions.
+- Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
+- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved palette sets, generated palette group blocks, palette groups, group apply, and harmony suggestions.
+- Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
+- Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
@@ -88,35 +95,33 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 20 test files, 59 tests.
+- `npm test`: pass. 21 test files, 64 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4175/thumbnail-generator/`
+- URL: `http://127.0.0.1:4180/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-final-p2-20260607-desktop.png`
-  - `docs/assets/runtime-final-p2-20260607-mobile.png`
+  - `docs/assets/runtime-final-open-p2-20260607-desktop.png`
+  - `docs/assets/runtime-final-open-p2-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 18 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 65 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
-- CSV import: pass. Status reported `CSV applied`.
-- HTML import: pass. Status reported `HTML applied`.
-- Quick Add Line: pass. `Line` from Assets created a line layer, and Layers no longer exposed an `Add line` button.
-- Group creation: pass. Created `QA group` and `QA group 2` after the first group already existed.
-- Group selection display: pass. Grouped rows rendered folder-like group markers and group pills.
-- Preview group selection: pass. Clicking a grouped preview object selected the group and the stage reported `2 layers selected`.
-- Colors palette maker: pass. `Palette maker` rendered, Triad generated `QA palette`, and the generated group block displayed at least 3 swatches together.
-- Drag undo/redo: pass. Badge drag moved X from `922` to `1012`; Ctrl+Z returned to `922`; Ctrl+Y restored `1012`.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T04-57-34-323Z.webp`).
+- CSV import: pass. Status reported `CSV applied: 3 layers.`
+- HTML import: pass. Status reported `HTML applied: 3 layers.`
+- Text editing: pass. Added a text layer, selected Anton from Google Fonts, switched Writing mode to Vertical, set signed inner edge blur, and enabled Blur stroke.
+- Group individual editing: pass. Created `QA group`, used the grouped row individual-edit pointer, and the grouped row displayed the individual selection badge.
+- Saved palette set: pass. Square pattern saved as one 4-color palette set and a saved-palette Fill button applied to the selected text layer.
+- YouTube thumbnail import: pass. `https://youtu.be/dQw4w9WgXcQ` imported as `YouTube dQw4w9WgXcQ` and became editable as an image layer.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T06-01-35-160Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:

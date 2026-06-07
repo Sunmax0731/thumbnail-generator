@@ -139,3 +139,8 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:05-test] グループ追加と選択表示の修正 [Issue](Issues/0040-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] Colorsのカラーパレット作成UI改善 [Issue](Issues/0041-colors-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] 移動操作のUNDO/REDO履歴を確定位置のみ記録する [Issue](Issues/0042-undo-redo.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 縁ぼかしの方向制御と文字対応 [Issue](Issues/0043-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] パレット単位の色管理と適用GUI [Issue](Issues/0044-gui.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] グループ内オブジェクトの個別選択と編集 [Issue](Issues/0045-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] YouTubeサムネイル取得と編集機能拡張 [Issue](Issues/0046-youtube.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] Google Fonts対応フォントの追加 [Issue](Issues/0047-google-fonts.md) [QCDS:Quality,Satisfaction] [Status:closed]

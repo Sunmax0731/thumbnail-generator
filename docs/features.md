@@ -19,6 +19,7 @@ This page is the quick feature index for users and reviewers.
 - Use Adjust relative edit controls to apply live Move X, Move Y, and Rotation delta changes.
 - Use Match angle to first selected to copy the first selected editable layer's rotation to the other selected editable layers.
 - Group selected layers from Layers, rename the group, ungroup it, and select grouped rows or grouped preview objects as a multi-selection.
+- Edit one grouped layer individually from the Layers row without ungrouping.
 - Fit selected image or shape layers to the canvas from Layers.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y when focus is outside text fields and modals.
 
@@ -41,12 +42,14 @@ This page is the quick feature index for users and reviewers.
 ## Image And Text Tools
 
 - Import local image files from Assets.
+- Import a YouTube video thumbnail from Assets with a YouTube URL or video id.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from Assets.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
+- Select hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
 - Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.
@@ -57,6 +60,7 @@ This page is the quick feature index for users and reviewers.
 - Register and edit named Fill or Stroke colors in Colors.
 - Set palette opacity and group names.
 - Apply saved Fill or Stroke colors, or one-click Fill/Stroke groups, to selected text and shape layers.
-- Preview a graphical palette pattern from the draft color and opacity.
-- Generate analogous, complementary, split-complementary, and triad palette suggestions as grouped palette blocks from the draft color.
+- Preview graphical palette patterns from the draft color and opacity.
+- Save the currently displayed pattern as one palette set and apply each saved-palette color as Fill or Stroke.
+- Generate analogous, complementary, split-complementary, triad, square, compound, shades, and monochromatic palette suggestions from the draft color.
 - Resize the Colors list area when reviewing many saved swatches.

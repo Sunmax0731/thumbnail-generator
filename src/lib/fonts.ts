@@ -5,6 +5,30 @@ export interface FontOption {
 
 export const fontOptions: FontOption[] = [
   {
+    label: "Anton (Google Fonts)",
+    value: "'Anton', Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
+  },
+  {
+    label: "Bangers (Google Fonts)",
+    value: "'Bangers', Impact, Haettenschweiler, 'Arial Narrow Bold', cursive",
+  },
+  {
+    label: "Bebas Neue (Google Fonts)",
+    value: "'Bebas Neue', 'Arial Narrow', 'Roboto Condensed', Arial, sans-serif",
+  },
+  {
+    label: "Noto Sans JP 900 (Google Fonts)",
+    value: "'Noto Sans JP', 'Yu Gothic', 'Meiryo', Arial, sans-serif",
+  },
+  {
+    label: "Oswald (Google Fonts)",
+    value: "'Oswald', 'Roboto Condensed', Arial, sans-serif",
+  },
+  {
+    label: "Roboto Condensed (Google Fonts)",
+    value: "'Roboto Condensed', 'Arial Narrow', Arial, sans-serif",
+  },
+  {
     label: "Impact",
     value: "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
   },
@@ -37,4 +61,3 @@ export const fontOptions: FontOption[] = [
 export function fontLabelFor(value: string): string {
   return fontOptions.find((option) => option.value === value)?.label ?? "Imported font";
 }
-

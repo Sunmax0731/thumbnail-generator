@@ -18,14 +18,20 @@ import {
 import {
   addHarmonyColors,
   addPaletteColor as appendPaletteColor,
+  addSavedColorPalette,
+  generatePaletteSchemeColors,
   paletteGroups,
   readColorPalette,
+  readSavedColorPalettes,
   removePaletteColor,
+  removeSavedColorPalette,
   updatePaletteColor,
   type PaletteColor,
   type PaletteTarget,
   type HarmonyMode,
   writeColorPalette,
+  type SavedColorPalette,
+  writeSavedColorPalettes,
 } from "./lib/colorPalette";
 import {
   customFontToOption,
@@ -53,7 +59,12 @@ import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
 import { createTranslator, detectInitialLanguage, type Language } from "./lib/i18n";
 import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeLayerTransform } from "./lib/layerTransform";
-import { selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./lib/layerOperations";
+import {
+  selectIndividualLayerId,
+  selectLayerIdsAfterDelete,
+  selectLayerIdsForLayer,
+  selectTopSelectableLayerIds,
+} from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { calculatePreviewPadding } from "./lib/previewPadding";
@@ -68,6 +79,7 @@ import {
 } from "./lib/templates";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
 import type { ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
 interface ActiveCanvasInteraction {
   mode: CanvasInteractionMode;
@@ -131,7 +143,11 @@ function App() {
   const [paletteTargetDraft, setPaletteTargetDraft] = useState<PaletteTarget>("fill");
   const [paletteAlphaDraft, setPaletteAlphaDraft] = useState(1);
   const [paletteGroupDraft, setPaletteGroupDraft] = useState("Action");
+  const [paletteModeDraft, setPaletteModeDraft] = useState<HarmonyMode>("triad");
   const [selectedPaletteColorId, setSelectedPaletteColorId] = useState<string | null>(null);
+  const [savedColorPalettes, setSavedColorPalettes] = useState<SavedColorPalette[]>(() =>
+    typeof window === "undefined" ? [] : readSavedColorPalettes(),
+  );
   const [customFonts, setCustomFonts] = useState<CustomFont[]>(() =>
     typeof window === "undefined" ? [] : readCustomFonts(),
   );
@@ -285,6 +301,20 @@ function App() {
     [layers],
   );
 
+  const selectIndividualLayer = useCallback(
+    (id: string) => {
+      const layer = layers.find((candidate) => candidate.id === id);
+      if (!layer) return;
+      if (!layer.selectable) {
+        setStatus(`${layer.name} is locked for selection and editing.`);
+        return;
+      }
+      setSelectedIds(selectIndividualLayerId(layers, layer.id));
+      setStatus(layer.groupId ? `Selected ${layer.name} for individual group editing.` : `Selected ${layer.name}.`);
+    },
+    [layers],
+  );
+
   const applyCsv = useCallback(() => {
     const result = parseCsvLayout(csvText, {
       baseWidth: settings.width,
@@ -370,6 +400,35 @@ function App() {
       setStatus(`Added ${asset.name} as an image layer.`);
     },
     [assets, settings.height, settings.width],
+  );
+
+  const importYouTubeThumbnail = useCallback(
+    async (url: string) => {
+      setStatus("Fetching YouTube thumbnail...");
+      try {
+        const asset = await createYouTubeThumbnailAsset(url);
+        setAssets((current) => [...current, asset]);
+        setSelectedAssetKey(asset.key);
+        const assetRatio = asset.width && asset.height ? asset.height / asset.width : 9 / 16;
+        const width = Math.min(settings.width * 0.58, asset.width ?? settings.width * 0.58);
+        const height = Math.min(settings.height * 0.78, width * assetRatio);
+        const layer = makeImageLayer({
+          name: asset.name,
+          imageKey: asset.key,
+          x: settings.width * 0.5 - width / 2,
+          y: settings.height * 0.5 - height / 2,
+          width,
+          height,
+          effects: { grayscale: 0, blur: 0, brightness: 100, contrast: 100, mosaic: 0 },
+        });
+        setLayers((current) => [...current, layer]);
+        setSelectedIds([layer.id]);
+        setStatus(`Imported YouTube thumbnail for editing as "${asset.name}".`);
+      } catch (error) {
+        setStatus(`YouTube thumbnail import failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [settings.height, settings.width],
   );
 
   const handleCustomFontFiles = useCallback(
@@ -893,6 +952,33 @@ function App() {
     [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft],
   );
 
+  const saveCurrentColorPalette = useCallback(() => {
+    const colors = generatePaletteSchemeColors(paletteDraft, paletteModeDraft);
+    const next = addSavedColorPalette(savedColorPalettes, {
+      name: paletteGroupDraft || paletteNameDraft,
+      baseColor: paletteDraft,
+      mode: paletteModeDraft,
+      colors,
+    });
+    writeSavedColorPalettes(next);
+    setSavedColorPalettes(next);
+    setStatus(
+      next.length === savedColorPalettes.length
+        ? "Palette was not saved because the base color is invalid."
+        : `Saved ${colors.length} color palette "${next[0].name}".`,
+    );
+  }, [paletteDraft, paletteGroupDraft, paletteModeDraft, paletteNameDraft, savedColorPalettes]);
+
+  const deleteSavedColorPalette = useCallback(
+    (id: string) => {
+      const next = removeSavedColorPalette(savedColorPalettes, id);
+      writeSavedColorPalettes(next);
+      setSavedColorPalettes(next);
+      setStatus("Saved palette removed.");
+    },
+    [savedColorPalettes],
+  );
+
   const deletePaletteColor = useCallback(
     (id: string) => {
       const next = removePaletteColor(paletteColors, id);
@@ -1246,6 +1332,7 @@ function App() {
           onApplyCsv={applyCsv}
           onApplyHtml={applyHtml}
           onImageFiles={handleImageFiles}
+          onImportYouTubeThumbnail={importYouTubeThumbnail}
           selectedAssetKey={selectedAssetKey}
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
@@ -1300,21 +1387,27 @@ function App() {
           paletteTargetDraft={paletteTargetDraft}
           paletteAlphaDraft={paletteAlphaDraft}
           paletteGroupDraft={paletteGroupDraft}
+          paletteModeDraft={paletteModeDraft}
           selectedPaletteColorId={selectedPaletteColorId}
+          savedColorPalettes={savedColorPalettes}
           fontOptions={fontOptions}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteTargetDraftChange={setPaletteTargetDraft}
           onPaletteAlphaDraftChange={setPaletteAlphaDraft}
           onPaletteGroupDraftChange={setPaletteGroupDraft}
+          onPaletteModeDraftChange={setPaletteModeDraft}
           onSelectPaletteColor={selectPaletteColor}
           onAddPaletteColor={addPaletteColor}
           onUpdatePaletteColor={saveSelectedPaletteColor}
           onDeletePaletteColor={deletePaletteColor}
+          onSaveCurrentColorPalette={saveCurrentColorPalette}
+          onDeleteSavedColorPalette={deleteSavedColorPalette}
           onApplyPaletteColor={applyPaletteColor}
           onApplyPaletteGroup={applyPaletteGroup}
           onGeneratePaletteHarmony={generatePaletteHarmony}
           onSelect={selectLayer}
+          onSelectIndividual={selectIndividualLayer}
           onUpdateLayer={updateLayer}
           onDelete={deleteLayer}
           onDuplicate={duplicateLayer}
@@ -1404,6 +1497,10 @@ function labelForHarmonyMode(mode: HarmonyMode): string {
   if (mode === "complementary") return "Complement";
   if (mode === "analogous") return "Analogous";
   if (mode === "split") return "Split";
+  if (mode === "square") return "Square";
+  if (mode === "compound") return "Compound";
+  if (mode === "shades") return "Shades";
+  if (mode === "monochromatic") return "Monochrome";
   return "Triad";
 }
 

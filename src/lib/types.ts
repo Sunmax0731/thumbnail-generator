@@ -2,6 +2,7 @@ export type LayerType = "image" | "text" | "shape";
 export type ShapeKind = "rect" | "ellipse" | "triangle" | "line";
 export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
+export type TextWritingMode = "horizontal" | "vertical";
 export type ExportFormat = "png" | "jpeg" | "webp";
 
 export interface ImageEffects {
@@ -28,6 +29,7 @@ export interface BaseLayer {
   groupName?: string;
   layerBlur: number;
   edgeBlur: number;
+  edgeBlurStroke: boolean;
   cornerRadius: number;
 }
 
@@ -48,6 +50,7 @@ export interface TextLayer extends BaseLayer {
   strokeWidth: number;
   strokeOpacity: number;
   align: TextAlign;
+  writingMode: TextWritingMode;
   lineHeight: number;
   letterSpacing: number;
   fillOpacity: number;

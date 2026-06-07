@@ -15,6 +15,7 @@ const csvColumns = [
   "groupName",
   "layerBlur",
   "edgeBlur",
+  "edgeBlurStroke",
   "cornerRadius",
   "text",
   "fontSize",
@@ -26,6 +27,7 @@ const csvColumns = [
   "strokeWidth",
   "strokeOpacity",
   "align",
+  "writingMode",
   "lineHeight",
   "letterSpacing",
   "shape",
@@ -64,6 +66,7 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     groupName: layer.groupName ?? "",
     layerBlur: round(layer.layerBlur ?? 0),
     edgeBlur: round(layer.edgeBlur ?? 0),
+    edgeBlurStroke: layer.edgeBlurStroke ?? false,
     cornerRadius: round(layer.cornerRadius ?? 0),
   };
   if (column in common) return common[column];
@@ -91,6 +94,7 @@ function textCsvValue(layer: TextLayer, column: string): string | number {
     strokeWidth: round(layer.strokeWidth),
     strokeOpacity: round(layer.strokeOpacity),
     align: layer.align,
+    writingMode: layer.writingMode,
     lineHeight: round(layer.lineHeight),
     letterSpacing: round(layer.letterSpacing),
   };
@@ -126,6 +130,7 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-group-name", layer.groupName ?? ""],
     ["data-layer-blur", round(layer.layerBlur ?? 0)],
     ["data-edge-blur", round(layer.edgeBlur ?? 0)],
+    ["data-edge-blur-stroke", String(layer.edgeBlurStroke ?? false)],
     ["data-corner-radius", round(layer.cornerRadius ?? 0)],
   ];
 
@@ -157,6 +162,7 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-stroke-width", round(layer.strokeWidth)],
     ["data-stroke-opacity", round(layer.strokeOpacity)],
     ["data-align", layer.align],
+    ["data-writing-mode", layer.writingMode],
     ["data-line-height", round(layer.lineHeight)],
     ["data-letter-spacing", round(layer.letterSpacing)],
   ])}>${escapeHtml(layer.text)}</div>`;

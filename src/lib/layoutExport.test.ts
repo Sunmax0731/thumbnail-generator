@@ -23,8 +23,11 @@ describe("layoutExport", () => {
         groupId: "g1",
         groupName: "Brand",
         layerBlur: 2,
+        edgeBlur: -6,
+        edgeBlurStroke: true,
         letterSpacing: 5,
         fillOpacity: 0.8,
+        writingMode: "vertical",
       }),
       makeShapeLayer({ name: "Rule", shape: "line", lineStyle: "wave", strokeWidth: 12, cornerRadius: 4 }),
     ]);
@@ -32,6 +35,9 @@ describe("layoutExport", () => {
     expect(html).toContain('data-layer="text"');
     expect(html).toContain("LIVE &lt;NOW&gt;");
     expect(html).toContain('data-group-id="g1"');
+    expect(html).toContain('data-edge-blur="-6"');
+    expect(html).toContain('data-edge-blur-stroke="true"');
+    expect(html).toContain('data-writing-mode="vertical"');
     expect(html).toContain('data-letter-spacing="5"');
     expect(html).toContain('data-line-style="wave"');
   });

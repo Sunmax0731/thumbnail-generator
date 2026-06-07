@@ -1,6 +1,13 @@
 import { parseEffects, numberOr } from "./csv";
 import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
-import type { LayoutParseOptions, LayoutParseResult, LineStyle, TextAlign, ThumbnailLayer } from "./types";
+import type {
+  LayoutParseOptions,
+  LayoutParseResult,
+  LineStyle,
+  TextAlign,
+  TextWritingMode,
+  ThumbnailLayer,
+} from "./types";
 
 export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): LayoutParseResult {
   const warnings: string[] = [];
@@ -27,6 +34,7 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
       groupName: attr(node, "group-name") || undefined,
       layerBlur: numberOr(attr(node, "layer-blur"), 0),
       edgeBlur: numberOr(attr(node, "edge-blur"), 0),
+      edgeBlurStroke: parseBoolean(attr(node, "edge-blur-stroke"), false),
       cornerRadius: numberOr(attr(node, "corner-radius"), 0),
     };
 
@@ -57,6 +65,7 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
           strokeWidth: numberOr(attr(node, "stroke-width"), 6),
           strokeOpacity: clamp(numberOr(attr(node, "stroke-opacity"), 1), 0, 1),
           align: parseAlign(attr(node, "align")),
+          writingMode: parseWritingMode(attr(node, "writing-mode")),
           lineHeight: numberOr(attr(node, "line-height"), 1),
           letterSpacing: numberOr(attr(node, "letter-spacing"), 0),
           fillOpacity: clamp(numberOr(attr(node, "fill-opacity"), 1), 0, 1),
@@ -97,6 +106,16 @@ function toDatasetKey(name: string): string {
 function parseAlign(input = ""): TextAlign {
   if (input === "center" || input === "right") return input;
   return "left";
+}
+
+function parseWritingMode(input = ""): TextWritingMode {
+  if (input === "vertical") return "vertical";
+  return "horizontal";
+}
+
+function parseBoolean(input: string, fallback: boolean): boolean {
+  if (!input) return fallback;
+  return !["false", "0", "no", "off"].includes(input.trim().toLowerCase());
 }
 
 function parseShape(input = "") {
