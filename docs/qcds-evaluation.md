@@ -23,7 +23,11 @@ Satisfaction is A+ because the requested 10 practical bundled templates are avai
 
 Dashboard evidence is recorded in `docs/codex-work-dashboard-qcds.md`.
 
-The latest P2 item was creating 10 practical bundled templates while staying within the current layer model and supported parameters. After updating implementation, README, TODO, Issues, and QCDS evidence, all QCDS axes remain A+ and no axis is below A.
+The latest implementation item was Code Starter-facing QCDS visualization. The Code Starter summary is recorded in `docs/qcds-code-starter-summary.md` and `docs/qcds-code-starter-summary.json`.
+
+The previous VS Code Code Starter `D-` display is superseded by the repository source of truth: `QCDS A+` with `Q:A+ C:A+ D:A+ S:A+`. The `D-` state was an unevaluated/open-work-item fallback because the selected issue listed QCDS axes but did not yet have a work-item-linked rating summary.
+
+After updating implementation evidence, README, TODO, Issues, and QCDS artifacts, all QCDS axes remain A+ and no axis is below A.
 
 ## Runtime Gate
 

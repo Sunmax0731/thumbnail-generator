@@ -159,3 +159,4 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] カラーパレットハンドル変更時の配色連動復元 [Issue](Issues/0060-colors-linked-handles.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colors RGB slider width improvement [Issue](Issues/0061-colors-rgb-slider-width.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] 実現可能テンプレート10件作成 [Issue](Issues/0062-10.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] QCDS評価のCode Starter可視化 [Issue](Issues/0063-qcds-code-starter.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]

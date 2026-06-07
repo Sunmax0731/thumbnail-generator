@@ -76,6 +76,7 @@ Useful reports include the browser name/version, viewport or device, what you im
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide.
 - [docs/test-plan.md](docs/test-plan.md): automated and browser runtime validation plan and results.
 - [docs/qcds-evaluation.md](docs/qcds-evaluation.md): Quality, Cost, Delivery, and Satisfaction evaluation.
+- [docs/qcds-code-starter-summary.md](docs/qcds-code-starter-summary.md): VS Code Code Starter-facing QCDS display summary.
 - [docs/codex-work-dashboard-qcds.md](docs/codex-work-dashboard-qcds.md): final Codex Work Dashboard re-evaluation evidence.
 - [docs/release-checklist.md](docs/release-checklist.md): release readiness checklist.
 - [TODO.md](TODO.md): local waterfall task contract.

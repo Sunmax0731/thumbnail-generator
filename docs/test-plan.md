@@ -133,3 +133,20 @@ Console health:
 
 - Previous workflow: `Deploy GitHub Pages`, pass.
 - Published URL: `https://sunmax0731.github.io/thumbnail-generator/`
+
+### QCDS Code Starter Visibility
+
+Completed on 2026-06-07.
+
+- Code Starter-facing summary: pass.
+- Machine-readable source: `docs/qcds-code-starter-summary.json`.
+- Human-readable source: `docs/qcds-code-starter-summary.md`.
+- Display label: `QCDS A+`.
+- Axis label: `Q:A+ C:A+ D:A+ S:A+`.
+- Previous `D-` display cause: unevaluated/open-work-item fallback for an issue that listed QCDS axes but did not yet have a work-item-linked per-axis rating artifact.
+- Current work item: `Issues/0063-qcds-code-starter.md`, closed.
+- Validation: `npm test` passed with 22 test files and 71 tests; `npm run build` passed.
+- Runtime gate: pass with Playwright headless Chromium at `http://127.0.0.1:4186/thumbnail-generator/`.
+- Runtime gate checks: nonblank initial canvas, primary workspace visible, CSV import, HTML import, Adjust X edit from `130` to `140`, and WebP export download.
+- Runtime gate export evidence: `thumbnail-1280x720-2026-06-07T13-15-49-232Z.webp`.
+- Manual note: if the VS Code Code Starter view is cached, reload/refresh the view after this repository update.

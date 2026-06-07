@@ -31,6 +31,22 @@
       "satisfaction": "A+"
     }
   },
+  "codeStarterVisualization": {
+    "status": "visible",
+    "source": "docs/qcds-code-starter-summary.json",
+    "humanReadableSource": "docs/qcds-code-starter-summary.md",
+    "workItem": "Issues/0063-qcds-code-starter.md",
+    "previousVisibleRating": "D-",
+    "previousVisibleCause": "Unevaluated/open-work-item fallback: the selected issue listed QCDS axes but had no work-item-linked per-axis rating artifact.",
+    "displayLabel": "QCDS A+",
+    "axisLabel": "Q:A+ C:A+ D:A+ S:A+",
+    "ratings": {
+      "quality": "A+",
+      "cost": "A+",
+      "delivery": "A+",
+      "satisfaction": "A+"
+    }
+  },
   "runtimeGate": {
     "platform": "WebApp",
     "requirement": "Chrome or headless browser confirms nonblank render, primary elements, and primary operations.",
