@@ -1,4 +1,5 @@
 import { layersToCsv, layersToHtml } from "./layoutExport";
+import { normalizeLayer } from "./layerFactory";
 import type { ImageAsset, OutputSettings, ThumbnailLayer } from "./types";
 
 export const editStateStorageKey = "thumbnail-generator.editState.v1";
@@ -81,10 +82,7 @@ export function writeEditStatePreferences(
 function normalizeSavedEditState(state: SavedEditState): SavedEditState {
   return {
     ...state,
-    layers: state.layers.map((layer) => ({
-      ...layer,
-      selectable: layer.selectable !== false,
-    })),
+    layers: state.layers.map((layer) => normalizeLayer({ ...layer, selectable: layer.selectable !== false })),
   };
 }
 

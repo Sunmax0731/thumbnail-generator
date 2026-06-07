@@ -1,5 +1,6 @@
 export type LayerType = "image" | "text" | "shape";
-export type ShapeKind = "rect" | "ellipse" | "triangle";
+export type ShapeKind = "rect" | "ellipse" | "triangle" | "line";
+export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
 export type ExportFormat = "png" | "jpeg" | "webp";
 
@@ -23,6 +24,11 @@ export interface BaseLayer {
   opacity: number;
   visible: boolean;
   selectable: boolean;
+  groupId?: string;
+  groupName?: string;
+  layerBlur: number;
+  edgeBlur: number;
+  cornerRadius: number;
 }
 
 export interface ImageLayer extends BaseLayer {
@@ -40,16 +46,22 @@ export interface TextLayer extends BaseLayer {
   color: string;
   strokeColor: string;
   strokeWidth: number;
+  strokeOpacity: number;
   align: TextAlign;
   lineHeight: number;
+  letterSpacing: number;
+  fillOpacity: number;
 }
 
 export interface ShapeLayer extends BaseLayer {
   type: "shape";
   shape: ShapeKind;
   fill: string;
+  fillOpacity: number;
   strokeColor: string;
   strokeWidth: number;
+  strokeOpacity: number;
+  lineStyle: LineStyle;
 }
 
 export type ThumbnailLayer = ImageLayer | TextLayer | ShapeLayer;

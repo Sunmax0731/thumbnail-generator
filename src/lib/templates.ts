@@ -1,4 +1,5 @@
 import { layersToCsv, layersToHtml } from "./layoutExport";
+import { normalizeLayer } from "./layerFactory";
 import type { ImageAsset, OutputSettings, ThumbnailLayer } from "./types";
 
 export const templateStorageKey = "thumbnail-generator.savedTemplates.v1";
@@ -67,10 +68,7 @@ export function upsertTemplate(templates: SavedTemplate[], template: SavedTempla
 function normalizeTemplate(template: SavedTemplate): SavedTemplate {
   return {
     ...template,
-    layers: template.layers.map((layer) => ({
-      ...layer,
-      selectable: layer.selectable !== false,
-    })),
+    layers: template.layers.map((layer) => normalizeLayer({ ...layer, selectable: layer.selectable !== false })),
   };
 }
 

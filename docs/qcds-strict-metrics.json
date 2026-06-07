@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes multiline text edit regression fix, default template expansion, disabled inert controls, Image Lab selected-asset and import-target improvements, expanded Quick Add, Adjust rotation/opacity reset, CSV/HTML import, WebP export, mobile no-overflow, user-facing README guidance, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes line layers, layer blur, edge blur, corner radius, edit shortcuts, Image Lab range re-editing with Drag mode removal, text kerning, layer grouping, fit-to-canvas, editable palette colors, palette groups, palette opacity, harmony suggestions, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing README guidance, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: multiline text edit regression fix, default template expansion, disabled inert controls, Image Lab selected-asset and import-target improvements, expanded Quick Add, Adjust rotation/opacity reset, CSV/HTML import, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: line layers with style controls, layer blur, edge blur, corner radius, edit shortcuts, Image Lab range re-editing with Drag mode removal, text kerning, layer grouping, fit-to-canvas, editable palette colors, palette groups, palette opacity, harmony suggestions, CSV/HTML import/export persistence, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -38,7 +38,7 @@
     "status": "passed",
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
-    "browserPluginFallbackReason": "Browser tools were not exposed in this session after tool discovery",
+    "browserPluginFallbackReason": "Browser backend returned Browser is not available: iab",
     "url": "http://127.0.0.1:4174/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
@@ -50,7 +50,9 @@
       "docs/assets/runtime-dashboard-qcds-desktop.png",
       "docs/assets/runtime-dashboard-qcds-mobile.png",
       "docs/assets/runtime-backlog-20260607-desktop.png",
-      "docs/assets/runtime-backlog-20260607-mobile.png"
+      "docs/assets/runtime-backlog-20260607-mobile.png",
+      "docs/assets/runtime-open-work-items-20260607-desktop.png",
+      "docs/assets/runtime-open-work-items-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -73,6 +75,13 @@
       "mobile no horizontal overflow",
       "README user-facing guidance",
       "Codex Work Dashboard QCDS evidence"
+      ,
+      "line layer and line style editing",
+      "layer blur, edge blur, and corner radius",
+      "keyboard copy paste undo redo and delete modal",
+      "layer grouping and fit-to-canvas",
+      "palette edit, group, opacity, and harmony generation",
+      "Image Lab Rect handle editing and Drag mode removal"
     ]
   },
   "followUpCandidates": [

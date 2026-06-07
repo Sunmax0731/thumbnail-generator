@@ -710,8 +710,8 @@ button:disabled {
 }
 
 .layer-section {
-  flex: 1;
-  min-height: 280px;
+  flex: 0 0 auto;
+  min-height: 0;
 }
 
 .layer-list {
@@ -783,6 +783,19 @@ button:disabled {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+.layer-group-pill {
+  display: inline-block;
+  max-width: 100%;
+  margin-left: 6px;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: rgba(16, 182, 215, 0.12);
+  color: var(--accent-strong);
+  font-size: 9px;
+  font-weight: 900;
+  vertical-align: middle;
 }
 
 .mini-icon-button {
@@ -947,6 +960,39 @@ button:disabled {
   min-height: 34px;
 }
 
+.harmony-grid {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+}
+
+.harmony-grid .ghost-button {
+  min-height: 30px;
+  padding: 0 5px;
+  font-size: 10px;
+}
+
+.palette-group-list {
+  display: grid;
+  gap: 6px;
+}
+
+.palette-group-button {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.palette-group-swatches {
+  display: inline-flex;
+  gap: 4px;
+}
+
+.palette-group-swatches i {
+  width: 16px;
+  height: 16px;
+  border: 1px solid rgba(17, 24, 39, 0.18);
+  border-radius: 999px;
+}
+
 .inspector-panel .palette-section {
   flex: 1;
   min-height: 0;
@@ -977,6 +1023,11 @@ button:disabled {
   background: #ffffff;
 }
 
+.swatch-row.selected {
+  border-color: var(--accent);
+  background: rgba(16, 182, 215, 0.08);
+}
+
 .swatch {
   width: 34px;
   height: 30px;
@@ -995,6 +1046,16 @@ button:disabled {
   display: grid;
   min-width: 0;
   gap: 1px;
+}
+
+.swatch-edit-button {
+  display: grid;
+  min-width: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: inherit;
+  text-align: left;
 }
 
 .swatch-name,

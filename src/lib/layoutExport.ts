@@ -11,17 +11,26 @@ const csvColumns = [
   "opacity",
   "visible",
   "selectable",
+  "groupId",
+  "groupName",
+  "layerBlur",
+  "edgeBlur",
+  "cornerRadius",
   "text",
   "fontSize",
   "fontFamily",
   "fontWeight",
   "color",
+  "fillOpacity",
   "strokeColor",
   "strokeWidth",
+  "strokeOpacity",
   "align",
   "lineHeight",
+  "letterSpacing",
   "shape",
   "fill",
+  "lineStyle",
   "effect",
   "image",
 ] as const;
@@ -51,6 +60,11 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     opacity: round(layer.opacity),
     visible: layer.visible,
     selectable: layer.selectable,
+    groupId: layer.groupId ?? "",
+    groupName: layer.groupName ?? "",
+    layerBlur: round(layer.layerBlur ?? 0),
+    edgeBlur: round(layer.edgeBlur ?? 0),
+    cornerRadius: round(layer.cornerRadius ?? 0),
   };
   if (column in common) return common[column];
 
@@ -72,10 +86,13 @@ function textCsvValue(layer: TextLayer, column: string): string | number {
     fontFamily: layer.fontFamily,
     fontWeight: layer.fontWeight,
     color: layer.color,
+    fillOpacity: round(layer.fillOpacity),
     strokeColor: layer.strokeColor,
     strokeWidth: round(layer.strokeWidth),
+    strokeOpacity: round(layer.strokeOpacity),
     align: layer.align,
     lineHeight: round(layer.lineHeight),
+    letterSpacing: round(layer.letterSpacing),
   };
   return map[column] ?? "";
 }
@@ -84,8 +101,11 @@ function shapeCsvValue(layer: ShapeLayer, column: string): string | number {
   const map: Record<string, string | number> = {
     shape: layer.shape,
     fill: layer.fill,
+    fillOpacity: round(layer.fillOpacity),
     strokeColor: layer.strokeColor,
     strokeWidth: round(layer.strokeWidth),
+    strokeOpacity: round(layer.strokeOpacity),
+    lineStyle: layer.lineStyle,
   };
   return map[column] ?? "";
 }
@@ -102,6 +122,11 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-opacity", round(layer.opacity)],
     ["data-visible", String(layer.visible)],
     ["data-selectable", String(layer.selectable)],
+    ["data-group-id", layer.groupId ?? ""],
+    ["data-group-name", layer.groupName ?? ""],
+    ["data-layer-blur", round(layer.layerBlur ?? 0)],
+    ["data-edge-blur", round(layer.edgeBlur ?? 0)],
+    ["data-corner-radius", round(layer.cornerRadius ?? 0)],
   ];
 
   if (layer.type === "image") {
@@ -113,8 +138,11 @@ function layerToHtml(layer: ThumbnailLayer): string {
       ...common,
       ["data-shape", layer.shape],
       ["data-fill", layer.fill],
+      ["data-fill-opacity", round(layer.fillOpacity)],
       ["data-stroke-color", layer.strokeColor],
       ["data-stroke-width", round(layer.strokeWidth)],
+      ["data-stroke-opacity", round(layer.strokeOpacity)],
+      ["data-line-style", layer.lineStyle],
     ])}></div>`;
   }
 
@@ -124,10 +152,13 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-font-family", layer.fontFamily],
     ["data-font-weight", layer.fontWeight],
     ["data-color", layer.color],
+    ["data-fill-opacity", round(layer.fillOpacity)],
     ["data-stroke-color", layer.strokeColor],
     ["data-stroke-width", round(layer.strokeWidth)],
+    ["data-stroke-opacity", round(layer.strokeOpacity)],
     ["data-align", layer.align],
     ["data-line-height", round(layer.lineHeight)],
+    ["data-letter-spacing", round(layer.letterSpacing)],
   ])}>${escapeHtml(layer.text)}</div>`;
 }
 

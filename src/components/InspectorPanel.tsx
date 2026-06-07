@@ -29,7 +29,7 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
-import type { PaletteColor, PaletteTarget } from "../lib/colorPalette";
+import type { HarmonyMode, PaletteColor, PaletteTarget } from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
 import {
   emptyLiveRelativeTransformState,
@@ -38,7 +38,7 @@ import {
   type LiveRelativeTransformAxis,
 } from "../lib/liveRelativeTransform";
 import type { RelativeLayerTransform } from "../lib/layerTransform";
-import type { ImageAsset, ImageEffects, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
+import type { ImageAsset, ImageEffects, LineStyle, OutputSettings, ShapeKind, TextAlign, ThumbnailLayer } from "../lib/types";
 
 type InspectorSection = "layers" | "edit" | "colors";
 
@@ -51,15 +51,25 @@ interface InspectorPanelProps {
   paletteDraft: string;
   paletteNameDraft: string;
   paletteTargetDraft: PaletteTarget;
+  paletteAlphaDraft: number;
+  paletteGroupDraft: string;
+  selectedPaletteColorId: string | null;
   fontOptions: FontOption[];
   onPaletteDraftChange: (value: string) => void;
   onPaletteNameDraftChange: (value: string) => void;
   onPaletteTargetDraftChange: (value: PaletteTarget) => void;
+  onPaletteAlphaDraftChange: (value: number) => void;
+  onPaletteGroupDraftChange: (value: string) => void;
+  onSelectPaletteColor: (id: string) => void;
   onAddPaletteColor: () => void;
+  onUpdatePaletteColor: () => void;
   onDeletePaletteColor: (id: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget) => void;
+  onApplyPaletteGroup: (groupName: string) => void;
+  onGeneratePaletteHarmony: (mode: HarmonyMode) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
+  onAddLineLayer: () => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, direction: -1 | 1) => void;
@@ -69,6 +79,10 @@ interface InspectorPanelProps {
   onAlignSelection: (mode: AlignmentMode) => void;
   onTransformSelection: (transform: RelativeLayerTransform) => void;
   onMatchSelectionRotation: () => void;
+  onCreateGroup: (name: string) => void;
+  onRenameGroup: (groupId: string, name: string) => void;
+  onUngroup: (groupId: string) => void;
+  onFitSelectedToCanvas: () => void;
   onCustomFontFiles: (files: FileList | null) => void;
   onFitTextToBounds: (id: string) => void;
   t: Translator;
@@ -83,15 +97,25 @@ export function InspectorPanel({
   paletteDraft,
   paletteNameDraft,
   paletteTargetDraft,
+  paletteAlphaDraft,
+  paletteGroupDraft,
+  selectedPaletteColorId,
   fontOptions,
   onPaletteDraftChange,
   onPaletteNameDraftChange,
   onPaletteTargetDraftChange,
+  onPaletteAlphaDraftChange,
+  onPaletteGroupDraftChange,
+  onSelectPaletteColor,
   onAddPaletteColor,
+  onUpdatePaletteColor,
   onDeletePaletteColor,
   onApplyPaletteColor,
+  onApplyPaletteGroup,
+  onGeneratePaletteHarmony,
   onSelect,
   onUpdateLayer,
+  onAddLineLayer,
   onDelete,
   onDuplicate,
   onMove,
@@ -101,6 +125,10 @@ export function InspectorPanel({
   onAlignSelection,
   onTransformSelection,
   onMatchSelectionRotation,
+  onCreateGroup,
+  onRenameGroup,
+  onUngroup,
+  onFitSelectedToCanvas,
   onCustomFontFiles,
   onFitTextToBounds,
   t,
@@ -116,10 +144,31 @@ export function InspectorPanel({
   const [colorListHeight, setColorListHeight] = useState(320);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
   const selectedIdsKey = selectedIds.join("|");
+  const selectedGroupIds = Array.from(new Set(selectedLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
+  const activeGroupId = selectedGroupIds.length === 1 ? selectedGroupIds[0] : undefined;
+  const activeGroupName = activeGroupId
+    ? selectedLayers.find((layer) => layer.groupId === activeGroupId)?.groupName ?? "Layer group"
+    : "";
+  const canvasFitEligibleCount = selectedLayers.filter((layer) => layer.type === "image" || layer.type === "shape").length;
 
   useEffect(() => {
     setRelativeTransform(emptyLiveRelativeTransformState);
   }, [selectedIdsKey]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key !== "Delete" && event.key !== "Backspace") return;
+      if (event.ctrlKey || event.metaKey || event.altKey) return;
+      if (isKeyboardInputTarget(event.target)) return;
+      if (document.querySelector(".confirm-backdrop, .image-lab-backdrop")) return;
+      const candidate = selectedLayers[0];
+      if (!candidate) return;
+      event.preventDefault();
+      setDeleteCandidateId(candidate.id);
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [selectedLayers]);
 
   const updateLiveRelativeTransform = (axis: LiveRelativeTransformAxis, value: number) => {
     const { nextState, transform } = updateLiveRelativeTransformState(relativeTransform, axis, value);
@@ -186,7 +235,7 @@ export function InspectorPanel({
                     }
                     if ((event.key === "Delete" || event.key === "Backspace") && layer.selectable) {
                       event.preventDefault();
-                      onDelete(layer.id);
+                      setDeleteCandidateId(layer.id);
                     }
                   }}
                   onDragStart={(event) => {
@@ -209,7 +258,10 @@ export function InspectorPanel({
                 >
                   <GripVertical size={14} className="drag-grip" />
                   <span className={`layer-type ${layer.type}`}>{layer.type}</span>
-                  <span className="layer-name">{layer.name}</span>
+                  <span className="layer-name">
+                    {layer.name}
+                    {layer.groupName ? <small className="layer-group-pill">{layer.groupName}</small> : null}
+                  </span>
                   <button
                     type="button"
                     className="mini-icon-button"
@@ -253,7 +305,30 @@ export function InspectorPanel({
               label={t("inspector.resizeLayerList")}
               onResize={(delta) => setLayerListHeight((height) => clampPanelHeight(height + delta))}
             />
+            <div className="button-grid">
+              <button type="button" className="secondary-button icon-text" onClick={onAddLineLayer}>
+                <GripHorizontal size={16} /> {t("inspector.addLine")}
+              </button>
+              <button
+                type="button"
+                className="secondary-button icon-text"
+                disabled={canvasFitEligibleCount === 0}
+                onClick={onFitSelectedToCanvas}
+              >
+                <Move size={16} /> {t("inspector.fitToCanvas")}
+              </button>
+            </div>
           </section>
+
+          <LayerGroupControls
+            selectedCount={selectedLayers.length}
+            activeGroupId={activeGroupId}
+            activeGroupName={activeGroupName}
+            onCreateGroup={onCreateGroup}
+            onRenameGroup={onRenameGroup}
+            onUngroup={onUngroup}
+            t={t}
+          />
 
           <section className="panel-section">
             <div className="section-heading">
@@ -297,13 +372,22 @@ export function InspectorPanel({
           draft={paletteDraft}
           nameDraft={paletteNameDraft}
           targetDraft={paletteTargetDraft}
+          alphaDraft={paletteAlphaDraft}
+          groupDraft={paletteGroupDraft}
+          selectedColorId={selectedPaletteColorId}
           selectedCount={paletteCompatibleCount}
           onDraftChange={onPaletteDraftChange}
           onNameDraftChange={onPaletteNameDraftChange}
           onTargetDraftChange={onPaletteTargetDraftChange}
+          onAlphaDraftChange={onPaletteAlphaDraftChange}
+          onGroupDraftChange={onPaletteGroupDraftChange}
+          onSelectColor={onSelectPaletteColor}
           onAdd={onAddPaletteColor}
+          onUpdate={onUpdatePaletteColor}
           onDelete={onDeletePaletteColor}
           onApply={onApplyPaletteColor}
+          onApplyGroup={onApplyPaletteGroup}
+          onGenerateHarmony={onGeneratePaletteHarmony}
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
@@ -413,6 +497,33 @@ export function InspectorPanel({
                 >
                   <RotateCcw size={15} /> {t("inspector.resetOpacity")}
                 </button>
+              </div>
+              <div className="field-grid two">
+                <SliderNumberInput
+                  label={t("inspector.layerBlur")}
+                  value={selected.layerBlur}
+                  min={0}
+                  max={36}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "layerBlur", value, onUpdateLayer)}
+                />
+                <SliderNumberInput
+                  label={t("inspector.edgeBlur")}
+                  value={selected.edgeBlur}
+                  min={0}
+                  max={48}
+                  step={1}
+                  onChange={(value) => updateNumber(selected, "edgeBlur", value, onUpdateLayer)}
+                />
+                <SliderNumberInput
+                  label={t("inspector.cornerRadius")}
+                  value={selected.cornerRadius}
+                  min={0}
+                  max={Math.max(180, Math.min(selected.width, selected.height) / 2)}
+                  step={1}
+                  disabled={selected.type === "text"}
+                  onChange={(value) => updateNumber(selected, "cornerRadius", value, onUpdateLayer)}
+                />
               </div>
 
               {selected.type === "image" && (
@@ -527,19 +638,84 @@ function ResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: n
   );
 }
 
+function LayerGroupControls({
+  selectedCount,
+  activeGroupId,
+  activeGroupName,
+  onCreateGroup,
+  onRenameGroup,
+  onUngroup,
+  t,
+}: {
+  selectedCount: number;
+  activeGroupId?: string;
+  activeGroupName: string;
+  onCreateGroup: (name: string) => void;
+  onRenameGroup: (groupId: string, name: string) => void;
+  onUngroup: (groupId: string) => void;
+  t: Translator;
+}) {
+  const [draft, setDraft] = useState(activeGroupName || "Layer group");
+
+  useEffect(() => {
+    setDraft(activeGroupName || "Layer group");
+  }, [activeGroupName]);
+
+  return (
+    <section className="panel-section group-section">
+      <div className="section-heading">
+        <Layers size={16} />
+        <h2>{t("inspector.groups")}</h2>
+        <span className="section-count">{selectedCount}</span>
+      </div>
+      <TextInput label={t("inspector.groupName")} value={draft} onChange={setDraft} />
+      <div className="button-grid">
+        <button type="button" className="secondary-button" disabled={selectedCount < 2} onClick={() => onCreateGroup(draft)}>
+          {t("inspector.createGroup")}
+        </button>
+        <button
+          type="button"
+          className="secondary-button"
+          disabled={!activeGroupId}
+          onClick={() => activeGroupId && onRenameGroup(activeGroupId, draft)}
+        >
+          {t("inspector.renameGroup")}
+        </button>
+      </div>
+      <button
+        type="button"
+        className="ghost-button wide-button"
+        disabled={!activeGroupId}
+        onClick={() => activeGroupId && onUngroup(activeGroupId)}
+      >
+        {t("inspector.ungroup")}
+      </button>
+    </section>
+  );
+}
+
 function PaletteControls({
   colors,
   draft,
   nameDraft,
   targetDraft,
+  alphaDraft,
+  groupDraft,
+  selectedColorId,
   selectedCount,
   listHeight,
   onDraftChange,
   onNameDraftChange,
   onTargetDraftChange,
+  onAlphaDraftChange,
+  onGroupDraftChange,
+  onSelectColor,
   onAdd,
+  onUpdate,
   onDelete,
   onApply,
+  onApplyGroup,
+  onGenerateHarmony,
   onResizeList,
   t,
 }: {
@@ -547,17 +723,27 @@ function PaletteControls({
   draft: string;
   nameDraft: string;
   targetDraft: PaletteTarget;
+  alphaDraft: number;
+  groupDraft: string;
+  selectedColorId: string | null;
   selectedCount: number;
   listHeight: number;
   onDraftChange: (value: string) => void;
   onNameDraftChange: (value: string) => void;
   onTargetDraftChange: (value: PaletteTarget) => void;
+  onAlphaDraftChange: (value: number) => void;
+  onGroupDraftChange: (value: string) => void;
+  onSelectColor: (id: string) => void;
   onAdd: () => void;
+  onUpdate: () => void;
   onDelete: (id: string) => void;
   onApply: (color: string, target: PaletteTarget) => void;
+  onApplyGroup: (groupName: string) => void;
+  onGenerateHarmony: (mode: HarmonyMode) => void;
   onResizeList: (deltaY: number) => void;
   t: Translator;
 }) {
+  const groups = groupPaletteRows(colors);
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
@@ -581,13 +767,55 @@ function PaletteControls({
             <option value="stroke">{t("inspector.stroke")}</option>
           </select>
         </label>
+        <SliderNumberInput
+          label={t("inspector.paletteAlpha")}
+          value={alphaDraft}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          onChange={onAlphaDraftChange}
+        />
+        <label className="field palette-name-field">
+          <span>{t("inspector.paletteGroup")}</span>
+          <input type="text" value={groupDraft} onChange={(event) => onGroupDraftChange(event.currentTarget.value)} />
+        </label>
         <button type="button" className="secondary-button" onClick={onAdd}>
           {t("inspector.addColor")}
         </button>
+        <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
+          {t("inspector.updateColor")}
+        </button>
       </div>
+      <div className="button-grid harmony-grid">
+        {(["analogous", "complementary", "split", "triad"] as HarmonyMode[]).map((mode) => (
+          <button key={mode} type="button" className="ghost-button" onClick={() => onGenerateHarmony(mode)}>
+            {t(harmonyLabelKey(mode))}
+          </button>
+        ))}
+      </div>
+      {groups.length > 0 ? (
+        <div className="palette-group-list" aria-label={t("inspector.paletteGroups")}>
+          {groups.map((group) => (
+            <button
+              key={group.name}
+              type="button"
+              className="secondary-button palette-group-button"
+              disabled={selectedCount === 0}
+              onClick={() => onApplyGroup(group.name)}
+            >
+              <span>{group.name}</span>
+              <span className="palette-group-swatches">
+                {group.fill ? <i style={{ background: group.fill.value, opacity: group.fill.alpha }} /> : null}
+                {group.stroke ? <i style={{ background: group.stroke.value, opacity: group.stroke.alpha }} /> : null}
+              </span>
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
         {colors.map((color) => (
-          <div className="swatch-row" key={color.id}>
+          <div className={`swatch-row ${selectedColorId === color.id ? "selected" : ""}`} key={color.id}>
             <button
               type="button"
               className="swatch"
@@ -606,8 +834,13 @@ function PaletteControls({
               {paletteTargetLabel(color.target, t)}
             </button>
             <div className="swatch-meta">
-              <span className="swatch-name">{color.name}</span>
-              <span className="swatch-value">{color.value}</span>
+              <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
+                <span className="swatch-name">{color.name}</span>
+                <span className="swatch-value">
+                  {color.value} / {Math.round(color.alpha * 100)}%
+                  {color.groupName ? ` / ${color.groupName}` : ""}
+                </span>
+              </button>
             </div>
             <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
               <Trash2 size={13} />
@@ -728,6 +961,33 @@ function paletteTargetLabel(target: PaletteTarget, t: Translator): string {
   return target === "fill" ? t("inspector.fill") : t("inspector.stroke");
 }
 
+function harmonyLabelKey(mode: HarmonyMode) {
+  const keys = {
+    analogous: "inspector.harmony.analogous",
+    complementary: "inspector.harmony.complementary",
+    split: "inspector.harmony.split",
+    triad: "inspector.harmony.triad",
+  } as const;
+  return keys[mode];
+}
+
+function groupPaletteRows(colors: PaletteColor[]): Array<{ name: string; fill?: PaletteColor; stroke?: PaletteColor }> {
+  const groups = new Map<string, { name: string; fill?: PaletteColor; stroke?: PaletteColor }>();
+  for (const color of colors) {
+    if (!color.groupName) continue;
+    const group = groups.get(color.groupName) ?? { name: color.groupName };
+    if (color.target === "fill" && !group.fill) group.fill = color;
+    if (color.target === "stroke" && !group.stroke) group.stroke = color;
+    groups.set(color.groupName, group);
+  }
+  return Array.from(groups.values());
+}
+
+function isKeyboardInputTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  return Boolean(target.closest("input, textarea, select")) || target.isContentEditable;
+}
+
 function ImageControls({
   selected,
   assets,
@@ -814,6 +1074,14 @@ function TextControls({
           step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
+        <SliderNumberInput
+          label={t("inspector.kerning")}
+          value={selected.letterSpacing}
+          min={-8}
+          max={48}
+          step={1}
+          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, letterSpacing: value } : layer))}
+        />
       </div>
       <button type="button" className="secondary-button icon-text wide-button" onClick={() => onFitTextToBounds(selected.id)}>
         <Type size={16} /> {t("inspector.fitText")}
@@ -860,6 +1128,25 @@ function TextControls({
           value={selected.strokeColor}
           disabled={selected.strokeWidth <= 0}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
+        />
+        <SliderNumberInput
+          label={t("inspector.fillOpacity")}
+          value={selected.fillOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, fillOpacity: value } : layer))}
+        />
+        <SliderNumberInput
+          label={t("inspector.strokeOpacity")}
+          value={selected.strokeOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          disabled={selected.strokeWidth <= 0}
+          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, strokeOpacity: value } : layer))}
         />
       </div>
       <SliderNumberInput
@@ -957,12 +1244,31 @@ function ShapeControls({
           <option value="rect">{t("inspector.rect")}</option>
           <option value="ellipse">{t("inspector.ellipse")}</option>
           <option value="triangle">{t("inspector.triangle")}</option>
+          <option value="line">{t("inspector.line")}</option>
         </select>
       </label>
+      {selected.shape === "line" ? (
+        <label className="field">
+          <span>{t("inspector.lineStyle")}</span>
+          <select
+            value={selected.lineStyle}
+            onChange={(event) => {
+              const lineStyle = event.currentTarget.value as LineStyle;
+              onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, lineStyle } : layer));
+            }}
+          >
+            <option value="solid">{t("inspector.lineSolid")}</option>
+            <option value="dotted">{t("inspector.lineDotted")}</option>
+            <option value="dashed">{t("inspector.lineDashed")}</option>
+            <option value="wave">{t("inspector.lineWave")}</option>
+          </select>
+        </label>
+      ) : null}
       <div className="field-grid two">
         <ColorInput
           label={t("inspector.fill")}
           value={selected.fill}
+          disabled={selected.shape === "line"}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fill: value }))}
         />
         <ColorInput
@@ -972,12 +1278,32 @@ function ShapeControls({
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
         />
         <SliderNumberInput
+          label={t("inspector.fillOpacity")}
+          value={selected.fillOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          disabled={selected.shape === "line"}
+          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, fillOpacity: value } : layer))}
+        />
+        <SliderNumberInput
           label={t("inspector.strokeWidth")}
           value={selected.strokeWidth}
           min={0}
           max={48}
           step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
+        />
+        <SliderNumberInput
+          label={t("inspector.strokeOpacity")}
+          value={selected.strokeOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          disabled={selected.strokeWidth <= 0}
+          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, strokeOpacity: value } : layer))}
         />
       </div>
     </>
@@ -1107,7 +1433,7 @@ function ColorInput({
 
 function updateNumber(
   selected: ThumbnailLayer,
-  key: "x" | "y" | "width" | "height" | "rotation" | "opacity",
+  key: "x" | "y" | "width" | "height" | "rotation" | "opacity" | "layerBlur" | "edgeBlur" | "cornerRadius",
   value: number,
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"],
 ) {

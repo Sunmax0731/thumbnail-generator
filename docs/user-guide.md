@@ -21,9 +21,9 @@ npm run preview
 - Assets: import image files, select imported assets, add image/text/shape starter layers, open Image Lab for the selected asset, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
-- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, and resize the list area with the handle below the list.
-- Adjust: edit the selected layer's position, size, rotation, opacity, text, font, text alignment, shape, and image effects.
-- Colors: register named Fill or Stroke colors, apply them to selected text or shape layers, and resize the color list area with the handle below the list.
+- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, add line layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
+- Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, edge blur, corner radius, text, font, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
+- Colors: register and edit named Fill or Stroke colors, set opacity and group names, generate harmony suggestions, apply single colors or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -40,6 +40,10 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
 - With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta. Changes apply live as you edit the values; there is no Apply button.
 - With multiple layers selected, use Match angle to first selected to set every selected editable layer to the first selected editable layer's rotation.
+- Use Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y for copy, paste, cut, duplicate, undo, and redo when focus is outside text fields and modals.
+- Press Delete or Backspace while a layer is selected to open the layer delete confirmation dialog.
+- Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row selects the editable members of that group.
+- Use Fit to canvas in Layers to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
 - Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
@@ -49,6 +53,7 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 Use Assets to add common starter layers quickly:
 
 - Text and Shape add basic editable layers.
+- Layers includes Line for adding an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
 - Select an imported asset row, then use its add button to place that image as a layer.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
@@ -94,7 +99,13 @@ Select an output preset from the top toolbar. Tall presets such as Shorts automa
 
 ## Image Lab
 
-Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, polygon cutout points, and drag-range rectangular cutouts. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
+
+## Color Groups And Harmony
+
+Open Colors to select an existing swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied with that Fill or Stroke color, and Group to connect Fill and Stroke entries into one named set. Group buttons apply matching Fill and Stroke colors together to selected text or shape layers.
+
+Use Analogous, Complement, Split, or Triad to generate color-wheel suggestions from the current draft color. These suggestions are added as ordinary palette entries, so they can still be edited, deleted, or applied one at a time.
 
 ## Browser Storage
 

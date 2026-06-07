@@ -30,9 +30,13 @@ The Adjust tab changes by selection scope: a single selected layer shows absolut
 
 The Assets tab keeps quick creation work close to media import. Imported assets are selectable rows with direct actions for adding an image layer or opening the asset in Image Lab. Quick Add includes common text and shape starters so frequent layer creation does not require detailed inspector setup first.
 
+The Layers tab keeps layer-list actions below the list: Add line, Fit to canvas, and group controls. Group controls reuse the existing multi-selection mental model: grouped rows show a compact group pill, selecting a grouped row selects all editable group members, and rename/ungroup actions stay near the layer list rather than adding a separate hierarchy tree.
+
 The Templates tab separates three concepts: bundled default templates for immediate use-case starts, Edit state as one work-in-progress save slot with an autosave toggle, and Browser templates as named reusable snapshots. This keeps fast recovery close to templates without making every autosave into a template entry.
 
-Inspector controls use disabled states when an input cannot affect the current layer state, keeping inert settings visually distinct without hiding the surrounding workflow.
+Inspector controls use disabled states when an input cannot affect the current layer state, keeping inert settings visually distinct without hiding the surrounding workflow. The Adjust tab exposes advanced but compact layer appearance controls for layer blur, edge blur, corner radius, text kerning, line style, and fill/stroke opacity.
+
+The Colors tab treats saved swatches as editable rows. Selecting a row loads it into the editor, Update writes it back, group buttons apply matching Fill and Stroke entries together, and harmony buttons add quick color-wheel suggestions without replacing the single-swatch workflow.
 
 ## UI Principles
 
@@ -75,5 +79,5 @@ Inspector controls use disabled states when an input cannot affect the current l
 - Layout: implemented the same left input rail, center canvas, right layer/inspector, top export toolbar, and bottom status structure, with task tabs added to reduce always-visible control density.
 - Palette: implemented white panels, light gray workbench, cyan selected states, and coral export/action accents.
 - Container model: implemented compact tool panels with 8px or smaller radii and no marketing hero page.
-- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, selected asset insertion, expanded quick add, default templates, layer edits, blank-click deselection, live multi-layer relative movement/rotation, multi-layer angle matching, saved edit state with autosave, canvas selection, Image Lab modal processing with selected asset handoff, text fit-to-box, text alignment buttons, disabled inert inspector controls, Adjust reset buttons, resizable inspector lists, and PNG/JPEG/WebP export.
+- Interaction: concept showed editor controls; implementation adds working CSV/HTML import, file import, selected asset insertion, expanded quick add, line layers, default templates, layer edits, layer blur/edge blur/corner radius, blank-click deselection, live multi-layer relative movement/rotation, layer grouping, fit selected layers to canvas, keyboard edit shortcuts, multi-layer angle matching, saved edit state with autosave, canvas selection, Image Lab modal processing with selected asset handoff and editable Rect/Circle/Polygon selections, text fit-to-box, text kerning, text alignment buttons, disabled inert inspector controls, Adjust reset buttons, editable/grouped/harmony color palette controls, resizable inspector lists, and PNG/JPEG/WebP export.
 - Follow-up improvements: implementation now selects the frontmost overlapping layer on preview body clicks, lets users resize Layers and Colors list areas, fits tall presets in the visible stage, lets users add browser-local custom fonts from the Adjust tab, shows off-canvas layers during editing, and supports Japanese/English UI switching.

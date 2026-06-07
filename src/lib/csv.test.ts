@@ -38,5 +38,31 @@ shape,Plate,10,500,600,80,,0,rect,#ff0000,,`,
     expect(result.layers[1]).toMatchObject({ type: "text", text: "A, B", fontSize: 80 });
     expect(result.layers[2]).toMatchObject({ type: "shape", fill: "#ff0000" });
   });
-});
 
+  it("reads layer effects, grouping, kerning, opacity, radius, and line styles", () => {
+    const result = parseCsvLayout(
+      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,cornerRadius,text,letterSpacing,fillOpacity,strokeOpacity,shape,lineStyle,strokeWidth
+text,Title,0,0,400,120,g1,Brand,3,4,0,HELLO,6,0.8,0.5,,,
+shape,Wave,10,20,500,20,g1,Brand,2,6,14,,,,,line,wave,12`,
+      { baseWidth: 1280, baseHeight: 720 },
+    );
+
+    expect(result.layers[0]).toMatchObject({
+      type: "text",
+      groupId: "g1",
+      groupName: "Brand",
+      layerBlur: 3,
+      edgeBlur: 4,
+      letterSpacing: 6,
+      fillOpacity: 0.8,
+      strokeOpacity: 0.5,
+    });
+    expect(result.layers[1]).toMatchObject({
+      type: "shape",
+      shape: "line",
+      lineStyle: "wave",
+      cornerRadius: 14,
+      strokeWidth: 12,
+    });
+  });
+});

@@ -43,4 +43,23 @@ describe("textFit", () => {
     expect(fitted.color).toBe(layer.color);
     expect(fitted.text).toBe(layer.text);
   });
+
+  it("accounts for letter spacing when fitting text", () => {
+    const layer = makeTextLayer({
+      width: 102,
+      height: 80,
+      text: "ABCD",
+      strokeWidth: 0,
+      lineHeight: 1,
+      letterSpacing: 6,
+    });
+
+    const size = calculateFittedFontSize(layer, {
+      minFontSize: 8,
+      maxFontSize: 60,
+      measureTextWidth: measure,
+    });
+
+    expect(size).toBe(42);
+  });
 });

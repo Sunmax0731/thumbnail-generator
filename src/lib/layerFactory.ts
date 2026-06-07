@@ -36,6 +36,11 @@ export function makeImageLayer(partial: Partial<ImageLayer> = {}): ImageLayer {
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
     selectable: partial.selectable ?? true,
+    groupId: partial.groupId,
+    groupName: partial.groupName,
+    layerBlur: partial.layerBlur ?? 0,
+    edgeBlur: partial.edgeBlur ?? 0,
+    cornerRadius: partial.cornerRadius ?? 0,
     imageKey: partial.imageKey ?? "sample-bg",
     effects: { ...defaultEffects, ...partial.effects },
   };
@@ -54,6 +59,11 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
     selectable: partial.selectable ?? true,
+    groupId: partial.groupId,
+    groupName: partial.groupName,
+    layerBlur: partial.layerBlur ?? 0,
+    edgeBlur: partial.edgeBlur ?? 0,
+    cornerRadius: partial.cornerRadius ?? 0,
     text: partial.text ?? "NEW THUMBNAIL",
     fontSize: partial.fontSize ?? 88,
     fontFamily: partial.fontFamily ?? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
@@ -61,8 +71,11 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
     color: partial.color ?? "#ffffff",
     strokeColor: partial.strokeColor ?? "#111827",
     strokeWidth: partial.strokeWidth ?? 8,
+    strokeOpacity: partial.strokeOpacity ?? 1,
     align: (partial.align as TextAlign) ?? "left",
     lineHeight: partial.lineHeight ?? 1,
+    letterSpacing: partial.letterSpacing ?? 0,
+    fillOpacity: partial.fillOpacity ?? 1,
   };
 }
 
@@ -79,19 +92,33 @@ export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
     opacity: partial.opacity ?? 1,
     visible: partial.visible ?? true,
     selectable: partial.selectable ?? true,
+    groupId: partial.groupId,
+    groupName: partial.groupName,
+    layerBlur: partial.layerBlur ?? 0,
+    edgeBlur: partial.edgeBlur ?? 0,
+    cornerRadius: partial.cornerRadius ?? 12,
     shape: (partial.shape as ShapeKind) ?? "rect",
     fill: partial.fill ?? "#10b6d7",
+    fillOpacity: partial.fillOpacity ?? 1,
     strokeColor: partial.strokeColor ?? "#ffffff",
     strokeWidth: partial.strokeWidth ?? 0,
+    strokeOpacity: partial.strokeOpacity ?? 1,
+    lineStyle: partial.lineStyle ?? "solid",
   };
 }
 
 export function cloneLayer(layer: ThumbnailLayer): ThumbnailLayer {
   if (layer.type === "image") {
-    return makeImageLayer({ ...layer, id: makeLayerId("image"), name: `${layer.name} copy` });
+    return makeImageLayer({ ...layer, id: makeLayerId("image"), name: `${layer.name} copy`, groupId: undefined, groupName: undefined });
   }
   if (layer.type === "text") {
-    return makeTextLayer({ ...layer, id: makeLayerId("text"), name: `${layer.name} copy` });
+    return makeTextLayer({ ...layer, id: makeLayerId("text"), name: `${layer.name} copy`, groupId: undefined, groupName: undefined });
   }
-  return makeShapeLayer({ ...layer, id: makeLayerId("shape"), name: `${layer.name} copy` });
+  return makeShapeLayer({ ...layer, id: makeLayerId("shape"), name: `${layer.name} copy`, groupId: undefined, groupName: undefined });
+}
+
+export function normalizeLayer(layer: ThumbnailLayer): ThumbnailLayer {
+  if (layer.type === "image") return makeImageLayer(layer);
+  if (layer.type === "text") return makeTextLayer(layer);
+  return makeShapeLayer(layer);
 }

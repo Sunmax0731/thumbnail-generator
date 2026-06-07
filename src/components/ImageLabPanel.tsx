@@ -9,7 +9,8 @@ import {
 import type { Translator } from "../lib/i18n";
 import type { ImageAsset } from "../lib/types";
 
-type LabMode = CropMode | "drag";
+type LabMode = Exclude<CropMode, "none">;
+type RectDragMode = "new" | "move" | "nw" | "ne" | "sw" | "se";
 
 interface ImageLabPanelProps {
   assets: ImageAsset[];
@@ -34,6 +35,9 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previewRect = useRef<PreviewRect>({ x: 0, y: 0, width: 0, height: 0, scale: 1 });
   const dragStart = useRef<ImagePoint | null>(null);
+  const dragStartRect = useRef<RectSelection | null>(null);
+  const rectDragMode = useRef<RectDragMode>("new");
+  const polygonDragIndex = useRef<number | null>(null);
   const [assetKey, setAssetKey] = useState(assets[0]?.key ?? "");
   const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
   const [mode, setMode] = useState<LabMode>("rect");
@@ -105,36 +109,58 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
     (event: React.PointerEvent<HTMLCanvasElement>) => {
       const point = pointerToImage(event);
       if (mode === "polygon") {
+        const hitIndex = hitPolygonPoint(point, polygonPoints, previewRect.current.scale);
+        if (hitIndex >= 0) {
+          if (event.altKey) {
+            setPolygonPoints((current) => current.filter((_, index) => index !== hitIndex));
+            return;
+          }
+          safelySetPointerCapture(event.currentTarget, event.pointerId);
+          polygonDragIndex.current = hitIndex;
+          return;
+        }
         setPolygonPoints((current) => [...current, point]);
         return;
       }
-      if (isDragSelectionMode(mode)) {
-        safelySetPointerCapture(event.currentTarget, event.pointerId);
-        dragStart.current = point;
-        setCropRect({ x: point.x, y: point.y, width: 1, height: 1 });
-      }
+      safelySetPointerCapture(event.currentTarget, event.pointerId);
+      dragStart.current = point;
+      dragStartRect.current = fitRect(cropRect, imageSize.width, imageSize.height);
+      rectDragMode.current = hitRectDragMode(point, dragStartRect.current, previewRect.current.scale);
+      if (rectDragMode.current === "new") setCropRect({ x: point.x, y: point.y, width: 1, height: 1 });
     },
-    [mode, pointerToImage],
+    [cropRect, imageSize.height, imageSize.width, mode, pointerToImage, polygonPoints],
   );
 
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      if (!isDragSelectionMode(mode) || !dragStart.current) return;
       const point = pointerToImage(event);
-      setCropRect({
-        x: dragStart.current.x,
-        y: dragStart.current.y,
-        width: point.x - dragStart.current.x,
-        height: point.y - dragStart.current.y,
-      });
+      if (mode === "polygon" && polygonDragIndex.current !== null) {
+        const index = polygonDragIndex.current;
+        setPolygonPoints((current) => current.map((candidate, pointIndex) => (pointIndex === index ? point : candidate)));
+        return;
+      }
+      if (mode === "polygon" || !dragStart.current) return;
+      const startRect = dragStartRect.current;
+      if (!startRect || rectDragMode.current === "new") {
+        setCropRect({
+          x: dragStart.current.x,
+          y: dragStart.current.y,
+          width: point.x - dragStart.current.x,
+          height: point.y - dragStart.current.y,
+        });
+        return;
+      }
+      setCropRect(updateRectFromDrag(startRect, dragStart.current, point, rectDragMode.current));
     },
     [mode, pointerToImage],
   );
 
   const handlePointerUp = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      const hadDragSelection = Boolean(dragStart.current) && isDragSelectionMode(mode);
+      const hadDragSelection = Boolean(dragStart.current) && mode !== "polygon";
       dragStart.current = null;
+      dragStartRect.current = null;
+      polygonDragIndex.current = null;
       if (event.currentTarget.hasPointerCapture(event.pointerId)) {
         event.currentTarget.releasePointerCapture(event.pointerId);
       }
@@ -153,7 +179,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
         chromaKeyEnabled: chromaEnabled,
         chromaKeyColor: chromaColor,
         chromaKeyTolerance: chromaTolerance,
-        cropMode: mode === "drag" ? "rect" : mode,
+        cropMode: mode,
         cropRect: fitRect(cropRect, imageSize.width, imageSize.height),
         polygonPoints,
       });
@@ -218,7 +244,6 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
             ["rect", t("imageLab.rect")],
             ["ellipse", t("imageLab.circle")],
             ["polygon", t("imageLab.free")],
-            ["drag", t("imageLab.drag")],
           ].map(([value, label]) => (
             <button
               key={value}
@@ -365,6 +390,24 @@ function drawPreview(
     context.strokeRect(rx, ry, rw, rh);
   }
   context.setLineDash([]);
+  drawRectHandles(context, [
+    [rx, ry],
+    [rx + rw, ry],
+    [rx, ry + rh],
+    [rx + rw, ry + rh],
+  ]);
+}
+
+function drawRectHandles(context: CanvasRenderingContext2D, points: Array<[number, number]>): void {
+  context.fillStyle = "#ffffff";
+  context.strokeStyle = "#10b6d7";
+  context.lineWidth = 3;
+  points.forEach(([x, y]) => {
+    context.beginPath();
+    context.rect(x - 5, y - 5, 10, 10);
+    context.fill();
+    context.stroke();
+  });
 }
 
 function LabSlider({
@@ -408,8 +451,45 @@ function normalizeRect(rect: RectSelection): RectSelection {
   return { x, y, width: Math.abs(rect.width), height: Math.abs(rect.height) };
 }
 
-function isDragSelectionMode(mode: LabMode): mode is "rect" | "ellipse" | "drag" {
-  return mode === "rect" || mode === "ellipse" || mode === "drag";
+function hitRectDragMode(point: ImagePoint, rect: RectSelection, scale: number): RectDragMode {
+  const normalized = normalizeRect(rect);
+  const threshold = Math.max(8, 12 / scale);
+  const handles: Array<[RectDragMode, ImagePoint]> = [
+    ["nw", { x: normalized.x, y: normalized.y }],
+    ["ne", { x: normalized.x + normalized.width, y: normalized.y }],
+    ["sw", { x: normalized.x, y: normalized.y + normalized.height }],
+    ["se", { x: normalized.x + normalized.width, y: normalized.y + normalized.height }],
+  ];
+  for (const [mode, handle] of handles) {
+    if (Math.hypot(point.x - handle.x, point.y - handle.y) <= threshold) return mode;
+  }
+  if (
+    point.x >= normalized.x &&
+    point.x <= normalized.x + normalized.width &&
+    point.y >= normalized.y &&
+    point.y <= normalized.y + normalized.height
+  ) {
+    return "move";
+  }
+  return "new";
+}
+
+function updateRectFromDrag(rect: RectSelection, start: ImagePoint, point: ImagePoint, mode: RectDragMode): RectSelection {
+  const right = rect.x + rect.width;
+  const bottom = rect.y + rect.height;
+  if (mode === "move") {
+    return { ...rect, x: rect.x + point.x - start.x, y: rect.y + point.y - start.y };
+  }
+  if (mode === "nw") return { x: point.x, y: point.y, width: right - point.x, height: bottom - point.y };
+  if (mode === "ne") return { x: rect.x, y: point.y, width: point.x - rect.x, height: bottom - point.y };
+  if (mode === "sw") return { x: point.x, y: rect.y, width: right - point.x, height: point.y - rect.y };
+  if (mode === "se") return { x: rect.x, y: rect.y, width: point.x - rect.x, height: point.y - rect.y };
+  return { x: start.x, y: start.y, width: point.x - start.x, height: point.y - start.y };
+}
+
+function hitPolygonPoint(point: ImagePoint, points: ImagePoint[], scale: number): number {
+  const threshold = Math.max(8, 12 / scale);
+  return points.findIndex((candidate) => Math.hypot(point.x - candidate.x, point.y - candidate.y) <= threshold);
 }
 
 function clamp(value: number, min: number, max: number): number {

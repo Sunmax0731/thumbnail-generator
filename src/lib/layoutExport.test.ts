@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { layersToCsv, layersToHtml } from "./layoutExport";
-import { makeImageLayer, makeTextLayer } from "./layerFactory";
+import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
 
 describe("layoutExport", () => {
   it("exports current layers to CSV", () => {
@@ -15,10 +15,24 @@ describe("layoutExport", () => {
   });
 
   it("exports current layers to HTML data-layer markup", () => {
-    const html = layersToHtml([makeTextLayer({ name: "Title", text: "LIVE <NOW>", fontSize: 80 })]);
+    const html = layersToHtml([
+      makeTextLayer({
+        name: "Title",
+        text: "LIVE <NOW>",
+        fontSize: 80,
+        groupId: "g1",
+        groupName: "Brand",
+        layerBlur: 2,
+        letterSpacing: 5,
+        fillOpacity: 0.8,
+      }),
+      makeShapeLayer({ name: "Rule", shape: "line", lineStyle: "wave", strokeWidth: 12, cornerRadius: 4 }),
+    ]);
 
     expect(html).toContain('data-layer="text"');
     expect(html).toContain("LIVE &lt;NOW&gt;");
+    expect(html).toContain('data-group-id="g1"');
+    expect(html).toContain('data-letter-spacing="5"');
+    expect(html).toContain('data-line-style="wave"');
   });
 });
-

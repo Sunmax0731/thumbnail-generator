@@ -62,7 +62,8 @@ function doesTextFit(
 
   return lines.every((line) => {
     const measured = measureTextWidth ? measureTextWidth(line, fontSize, layer) : estimateTextWidth(line, fontSize);
-    return measured <= availableWidth;
+    const spacing = Math.max(0, line.length - 1) * layer.letterSpacing;
+    return measured + spacing <= availableWidth;
   });
 }
 

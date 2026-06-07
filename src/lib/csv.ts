@@ -1,5 +1,5 @@
 import { defaultEffects, makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
-import type { ImageEffects, LayoutParseOptions, LayoutParseResult, TextAlign, ThumbnailLayer } from "./types";
+import type { ImageEffects, LayoutParseOptions, LayoutParseResult, LineStyle, TextAlign, ThumbnailLayer } from "./types";
 
 const requiredColumns = ["type"];
 
@@ -30,6 +30,11 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
       opacity: clamp(numberOr(record.opacity, 1), 0, 1),
       visible: boolOr(record.visible, true),
       selectable: boolOr(record.selectable, true),
+      groupId: record.groupId?.trim() || undefined,
+      groupName: record.groupName?.trim() || undefined,
+      layerBlur: numberOr(record.layerBlur, 0),
+      edgeBlur: numberOr(record.edgeBlur, 0),
+      cornerRadius: numberOr(record.cornerRadius, 0),
     };
 
     if (type === "image") {
@@ -57,8 +62,11 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
           color: record.color?.trim() || "#ffffff",
           strokeColor: record.strokeColor?.trim() || "#111827",
           strokeWidth: numberOr(record.strokeWidth, 6),
+          strokeOpacity: clamp(numberOr(record.strokeOpacity, 1), 0, 1),
           align: parseAlign(record.align),
           lineHeight: numberOr(record.lineHeight, 1),
+          letterSpacing: numberOr(record.letterSpacing, 0),
+          fillOpacity: clamp(numberOr(record.fillOpacity, 1), 0, 1),
         }),
       ];
     }
@@ -69,8 +77,11 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
           ...base,
           shape: parseShape(record.shape),
           fill: record.fill?.trim() || record.color?.trim() || "#10b6d7",
+          fillOpacity: clamp(numberOr(record.fillOpacity, 1), 0, 1),
           strokeColor: record.strokeColor?.trim() || "#ffffff",
           strokeWidth: numberOr(record.strokeWidth, 0),
+          strokeOpacity: clamp(numberOr(record.strokeOpacity, 1), 0, 1),
+          lineStyle: parseLineStyle(record.lineStyle),
         }),
       ];
     }
@@ -168,6 +179,11 @@ function parseAlign(input = ""): TextAlign {
 }
 
 function parseShape(input = "") {
-  if (input === "ellipse" || input === "triangle") return input;
+  if (input === "ellipse" || input === "triangle" || input === "line") return input;
   return "rect";
+}
+
+function parseLineStyle(input = ""): LineStyle {
+  if (input === "dotted" || input === "dashed" || input === "wave") return input;
+  return "solid";
 }

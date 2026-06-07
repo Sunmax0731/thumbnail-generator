@@ -81,6 +81,11 @@ function drawPreviewBackdrop(context: CanvasRenderingContext2D, width: number, h
 async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
   context.save();
   context.globalAlpha = layer.opacity;
+  context.filter = layer.layerBlur > 0 ? `blur(${layer.layerBlur}px)` : "none";
+  if (layer.edgeBlur > 0) {
+    context.shadowBlur = layer.edgeBlur;
+    context.shadowColor = "rgba(15, 23, 42, 0.34)";
+  }
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
 
@@ -88,7 +93,7 @@ async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLaye
     const asset = assets.find((candidate) => candidate.key === layer.imageKey || candidate.name === layer.imageKey);
     if (asset) {
       const image = await loadImage(asset.src);
-      drawImageLayer(context, image, layer.width, layer.height, layer.effects);
+      drawImageLayer(context, image, layer.width, layer.height, layer.effects, layer.cornerRadius, layer.layerBlur);
     } else {
       drawMissingImage(context, layer.width, layer.height);
     }
@@ -111,9 +116,12 @@ function drawImageLayer(
   width: number,
   height: number,
   effects: ImageEffects,
+  cornerRadius: number,
+  layerBlur: number,
 ) {
   context.save();
-  context.filter = buildFilter(effects);
+  context.filter = buildFilter(effects, layerBlur);
+  clipRoundedRect(context, -width / 2, -height / 2, width, height, cornerRadius);
 
   if (effects.mosaic > 0) {
     const block = Math.max(2, Math.round(effects.mosaic));
@@ -137,10 +145,10 @@ function drawImageLayer(
   context.restore();
 }
 
-function buildFilter(effects: ImageEffects): string {
+function buildFilter(effects: ImageEffects, layerBlur = 0): string {
   const filters = [
     `grayscale(${effects.grayscale})`,
-    `blur(${effects.blur}px)`,
+    `blur(${effects.blur + layerBlur}px)`,
     `brightness(${effects.brightness}%)`,
     `contrast(${effects.contrast}%)`,
   ];
@@ -148,6 +156,11 @@ function buildFilter(effects: ImageEffects): string {
 }
 
 function drawShapeLayer(context: CanvasRenderingContext2D, layer: ShapeLayer) {
+  if (layer.shape === "line") {
+    drawLineShape(context, layer);
+    return;
+  }
+
   context.beginPath();
   if (layer.shape === "ellipse") {
     context.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
@@ -157,16 +170,20 @@ function drawShapeLayer(context: CanvasRenderingContext2D, layer: ShapeLayer) {
     context.lineTo(-layer.width / 2, layer.height / 2);
     context.closePath();
   } else {
-    context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, 12);
+    context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, layer.cornerRadius);
   }
 
+  const baseAlpha = context.globalAlpha;
   context.fillStyle = layer.fill;
+  context.globalAlpha = baseAlpha * layer.fillOpacity;
   context.fill();
   if (layer.strokeWidth > 0) {
+    context.globalAlpha = baseAlpha * layer.strokeOpacity;
     context.lineWidth = layer.strokeWidth;
     context.strokeStyle = layer.strokeColor;
     context.stroke();
   }
+  context.globalAlpha = baseAlpha;
 }
 
 function drawTextLayer(context: CanvasRenderingContext2D, layer: TextLayer) {
@@ -180,15 +197,91 @@ function drawTextLayer(context: CanvasRenderingContext2D, layer: TextLayer) {
 
   const x = layer.align === "center" ? 0 : layer.align === "right" ? layer.width / 2 : -layer.width / 2;
   let y = -totalHeight / 2 + lineHeightPx / 2;
+  const baseAlpha = context.globalAlpha;
   for (const line of lines) {
     if (layer.strokeWidth > 0) {
+      context.globalAlpha = baseAlpha * layer.strokeOpacity;
       context.lineWidth = layer.strokeWidth;
       context.strokeStyle = layer.strokeColor;
-      context.strokeText(line, x, y, layer.width);
+      drawSpacedText(context, line, x, y, layer.width, layer.letterSpacing, "stroke");
     }
+    context.globalAlpha = baseAlpha * layer.fillOpacity;
     context.fillStyle = layer.color;
-    context.fillText(line, x, y, layer.width);
+    drawSpacedText(context, line, x, y, layer.width, layer.letterSpacing, "fill");
     y += lineHeightPx;
+  }
+  context.globalAlpha = baseAlpha;
+}
+
+function drawLineShape(context: CanvasRenderingContext2D, layer: ShapeLayer): void {
+  const baseAlpha = context.globalAlpha;
+  context.globalAlpha = baseAlpha * layer.strokeOpacity;
+  context.strokeStyle = layer.strokeColor;
+  context.lineWidth = Math.max(1, layer.strokeWidth || layer.height || 8);
+  context.lineCap = "round";
+  context.lineJoin = "round";
+  if (layer.lineStyle === "dotted") context.setLineDash([1, context.lineWidth * 1.55]);
+  if (layer.lineStyle === "dashed") context.setLineDash([context.lineWidth * 2.6, context.lineWidth * 1.25]);
+  if (layer.lineStyle === "wave") {
+    context.beginPath();
+    const amplitude = Math.max(4, context.lineWidth * 0.8);
+    const step = Math.max(12, context.lineWidth * 2);
+    for (let x = -layer.width / 2; x <= layer.width / 2; x += step) {
+      const y = Math.sin(((x + layer.width / 2) / step) * Math.PI * 2) * amplitude;
+      if (x === -layer.width / 2) context.moveTo(x, y);
+      else context.lineTo(x, y);
+    }
+    context.stroke();
+  } else {
+    context.beginPath();
+    context.moveTo(-layer.width / 2, 0);
+    context.lineTo(layer.width / 2, 0);
+    context.stroke();
+  }
+  context.setLineDash([]);
+  context.globalAlpha = baseAlpha;
+}
+
+function clipRoundedRect(
+  context: CanvasRenderingContext2D,
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  cornerRadius: number,
+): void {
+  if (cornerRadius <= 0) return;
+  context.beginPath();
+  context.roundRect(x, y, width, height, Math.min(cornerRadius, width / 2, height / 2));
+  context.clip();
+}
+
+function drawSpacedText(
+  context: CanvasRenderingContext2D,
+  text: string,
+  x: number,
+  y: number,
+  maxWidth: number,
+  letterSpacing: number,
+  mode: "fill" | "stroke",
+): void {
+  if (letterSpacing === 0 || text.length <= 1) {
+    if (mode === "fill") context.fillText(text, x, y, maxWidth);
+    else context.strokeText(text, x, y, maxWidth);
+    return;
+  }
+
+  const chars = Array.from(text);
+  const totalWidth =
+    chars.reduce((sum, char) => sum + context.measureText(char).width, 0) + letterSpacing * Math.max(0, chars.length - 1);
+  let currentX = x;
+  if (context.textAlign === "center") currentX = x - totalWidth / 2;
+  if (context.textAlign === "right" || context.textAlign === "end") currentX = x - totalWidth;
+
+  for (const char of chars) {
+    if (mode === "fill") context.fillText(char, currentX, y, maxWidth);
+    else context.strokeText(char, currentX, y, maxWidth);
+    currentX += context.measureText(char).width + letterSpacing;
   }
 }
 

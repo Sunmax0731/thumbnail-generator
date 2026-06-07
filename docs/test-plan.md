@@ -16,6 +16,9 @@
 - Text fit chooses the largest font size that fits the text layer bounds.
 - Language detection selects Japanese or English from browser language tags and falls back to English.
 - Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
+- Color palette editing preserves selected swatch updates, opacity, grouping, and harmony generation.
+- CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, and line styles.
+- Text fit accounts for kerning/letter spacing.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide multiple use-case layouts with exportable CSV/HTML.
@@ -57,8 +60,9 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
 - Current edit state can be manually saved, restored after reload, and autosaved when the autosave toggle is on.
-- Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, polygon/free cutout, and drag-range cutout.
-- Image Lab Rect and Circle modes support direct drag selection on the preview.
+- Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, and polygon/free cutout.
+- Image Lab Rect and Circle modes support direct drag selection on the preview, then preview-handle move/resize.
+- Image Lab Polygon mode supports point dragging and point deletion.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
@@ -68,6 +72,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Bundled default templates can be loaded from Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
+- Layers supports adding line layers, choosing line styles, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
+- Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
+- Colors supports selecting and updating saved swatches, palette opacity, palette groups, group apply, and harmony suggestions.
+- Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
 
@@ -77,25 +85,27 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 20 test files, 53 tests.
+- `npm test`: pass. 20 test files, 57 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
 - URL: `http://127.0.0.1:4174/thumbnail-generator/`
-- Browser path attempted first: Browser plugin.
-- Browser fallback reason: Browser tools were not exposed in this session after tool discovery.
+- Browser path attempted first: Browser plugin through node_repl.
+- Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright 1.60.0 headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
   - `docs/assets/runtime-backlog-20260607-desktop.png`
   - `docs/assets/runtime-backlog-20260607-mobile.png`
+  - `docs/assets/runtime-open-work-items-20260607-desktop.png`
+  - `docs/assets/runtime-open-work-items-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 3 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 14 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
 - Text newline edit regression: pass. Editing a text layer to `LINE ONE`, `LINE TWO`, and `LINE THREE` produced no page errors and no `Cannot read properties of null (reading 'value')`.
 - Disabled inert controls: pass. Single-line text line height was disabled, then became enabled after multiline text input.
@@ -106,7 +116,12 @@ Passed checks:
 - Default templates: pass. Product Review loaded from Templates and replaced the canvas state.
 - CSV import: pass. Status reported `CSV applied`.
 - HTML import: pass. Status reported `HTML applied`.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T02-08-33-351Z.webp`).
+- Line layer: pass. Added a line layer, edited line style to Wave, and edited layer blur, edge blur, and corner radius.
+- Shortcuts: pass. Ctrl+C/Ctrl+V added a copied layer, Ctrl+Z removed it, Ctrl+Y restored it, and Delete opened the confirmation modal.
+- Layers group and canvas fit: pass. Fit to canvas executed for a selected shape/image-compatible layer, selected layers were grouped as `QA group`, and the group pill appeared in Layers.
+- Colors editing and harmony: pass. Existing swatch was selected, renamed, recolored, given opacity/group metadata, updated, and Triad generated additional swatches.
+- Image Lab range editing: pass. Drag mode was absent, Rect selection was drag-created then handle-edited, and Create processed layer completed.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T04-11-11-165Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`; task tabs remained visible.
 
 Console health:

@@ -10,12 +10,18 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
+- Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
 - Add common text and shape layers through expanded quick-add controls.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
+- Add line layers and edit line style as solid, dotted, dashed, or wave.
+- Adjust layer blur, edge blur, and corner radius where applicable.
+- Adjust text/shape fill and stroke opacity independently.
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
+- Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
+- Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Load bundled default templates for common thumbnail use cases without depending on localStorage.
@@ -31,6 +37,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
+- Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
+- Edit registered palette colors, assign palette groups, apply fill/stroke groups, set palette opacity, and generate basic color harmony suggestions.
 
 ## Non-Functional Requirements
 

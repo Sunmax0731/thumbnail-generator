@@ -1,6 +1,6 @@
 import { parseEffects, numberOr } from "./csv";
 import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
-import type { LayoutParseOptions, LayoutParseResult, TextAlign, ThumbnailLayer } from "./types";
+import type { LayoutParseOptions, LayoutParseResult, LineStyle, TextAlign, ThumbnailLayer } from "./types";
 
 export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): LayoutParseResult {
   const warnings: string[] = [];
@@ -23,6 +23,11 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
       opacity: clamp(numberOr(attr(node, "opacity"), 1), 0, 1),
       visible: attr(node, "visible") !== "false",
       selectable: attr(node, "selectable") !== "false",
+      groupId: attr(node, "group-id") || undefined,
+      groupName: attr(node, "group-name") || undefined,
+      layerBlur: numberOr(attr(node, "layer-blur"), 0),
+      edgeBlur: numberOr(attr(node, "edge-blur"), 0),
+      cornerRadius: numberOr(attr(node, "corner-radius"), 0),
     };
 
     if (type === "image") {
@@ -50,8 +55,11 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
           color: attr(node, "color") || "#ffffff",
           strokeColor: attr(node, "stroke-color") || "#111827",
           strokeWidth: numberOr(attr(node, "stroke-width"), 6),
+          strokeOpacity: clamp(numberOr(attr(node, "stroke-opacity"), 1), 0, 1),
           align: parseAlign(attr(node, "align")),
           lineHeight: numberOr(attr(node, "line-height"), 1),
+          letterSpacing: numberOr(attr(node, "letter-spacing"), 0),
+          fillOpacity: clamp(numberOr(attr(node, "fill-opacity"), 1), 0, 1),
         }),
       ];
     }
@@ -62,8 +70,11 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
           ...base,
           shape: parseShape(attr(node, "shape")),
           fill: attr(node, "fill") || attr(node, "color") || "#10b6d7",
+          fillOpacity: clamp(numberOr(attr(node, "fill-opacity"), 1), 0, 1),
           strokeColor: attr(node, "stroke-color") || "#ffffff",
           strokeWidth: numberOr(attr(node, "stroke-width"), 0),
+          strokeOpacity: clamp(numberOr(attr(node, "stroke-opacity"), 1), 0, 1),
+          lineStyle: parseLineStyle(attr(node, "line-style")),
         }),
       ];
     }
@@ -89,8 +100,13 @@ function parseAlign(input = ""): TextAlign {
 }
 
 function parseShape(input = "") {
-  if (input === "ellipse" || input === "triangle") return input;
+  if (input === "ellipse" || input === "triangle" || input === "line") return input;
   return "rect";
+}
+
+function parseLineStyle(input = ""): LineStyle {
+  if (input === "dotted" || input === "dashed" || input === "wave") return input;
+  return "solid";
 }
 
 function clamp(value: number, min: number, max: number): number {

@@ -13,6 +13,10 @@ All layers share:
 - `opacity`: `0` to `1`.
 - `visible`: whether the layer renders.
 - `selectable`: whether the layer can be selected or edited.
+- `groupId` and `groupName`: optional group metadata.
+- `layerBlur`: whole-layer blur in CSS filter pixels.
+- `edgeBlur`: soft edge/shadow blur amount.
+- `cornerRadius`: rounded corner radius for image layers and rectangular shape layers.
 
 ## Image Layers
 
@@ -36,8 +40,11 @@ Text layers include:
 - `color`
 - `strokeColor`
 - `strokeWidth`
+- `strokeOpacity`
 - `align`: `left`, `center`, or `right`
 - `lineHeight`
+- `letterSpacing`: additional spacing between rendered characters.
+- `fillOpacity`
 
 Text layers can run a Fit text to box action. The action measures each line with the selected font, line height, and stroke width, then chooses the largest integer font size that fits within the layer width and height.
 
@@ -45,17 +52,20 @@ Text layers can run a Fit text to box action. The action measures each line with
 
 Shape layers include:
 
-- `shape`: `rect`, `ellipse`, or `triangle`
+- `shape`: `rect`, `ellipse`, `triangle`, or `line`
 - `fill`
+- `fillOpacity`
 - `strokeColor`
 - `strokeWidth`
+- `strokeOpacity`
+- `lineStyle`: `solid`, `dotted`, `dashed`, or `wave` for line shapes.
 
 ## CSV Layout Schema
 
 CSV rows support the following columns:
 
 ```text
-type,name,x,y,width,height,rotation,opacity,text,fontSize,fontFamily,fontWeight,color,strokeColor,strokeWidth,align,lineHeight,shape,fill,effect,image
+type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,cornerRadius,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
 ```
 
 Rules:
@@ -64,6 +74,7 @@ Rules:
 - Missing numbers fall back to safe defaults.
 - `effect` accepts semicolon-separated values such as `grayscale=1;blur=4;mosaic=12`.
 - `image` references an imported image name/key or a bundled sample key.
+- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `cornerRadius`, `groupId`, `groupName`, and `lineStyle` are optional and fall back to safe defaults.
 - Quoted CSV fields are supported.
 
 ## HTML Layout Schema
@@ -76,6 +87,7 @@ Examples:
 <div data-layer="text" data-name="Title" data-x="80" data-y="90" data-width="900" data-height="150" data-font-size="96" data-color="#ffffff" data-stroke-color="#111827" data-stroke-width="10">LIVE TONIGHT</div>
 <img data-layer="image" data-name="Hero" data-image="sample-bg" data-x="0" data-y="0" data-width="1280" data-height="720" data-effect="contrast=112;brightness=96" />
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
+<div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
 ```
 
 ## Export
@@ -114,6 +126,17 @@ The selected layer can be edited directly on the canvas:
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
 
+## Keyboard Shortcuts
+
+Global editor shortcuts are active when focus is outside text fields, select controls, and modals:
+
+- Delete or Backspace opens the same layer delete confirmation flow used by layer-row delete buttons.
+- Ctrl+C copies selected editable layers to the internal editor clipboard.
+- Ctrl+V pastes copied layers as offset independent copies.
+- Ctrl+X cuts selected editable layers when at least one layer remains.
+- Ctrl+D duplicates selected editable layers.
+- Ctrl+Z and Ctrl+Y undo and redo layer-list edits.
+
 ## Alignment
 
 Alignment controls support left, center, right, top, middle, and bottom:
@@ -129,7 +152,14 @@ Layer rows also include:
 
 - Visibility toggle.
 - Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
-- Delete button. Button deletion opens a confirmation dialog; keyboard Delete/Backspace on a focused editable layer row removes that row directly and moves selection to another selectable layer when needed.
+- Delete button. Button deletion and keyboard Delete/Backspace on a focused editable layer row open the same confirmation dialog before removing the layer.
+- Group metadata. Grouped rows show the group name, and selecting one grouped layer selects all editable members of that group.
+
+The Layers tab also includes:
+
+- Add line layer.
+- Fit selected image/shape layers to the canvas.
+- Group selected layers, rename the selected group, and ungroup it.
 
 ## Editor Information Architecture
 
@@ -234,6 +264,10 @@ Registered colors can be applied to:
 - Shape fill color.
 - Shape stroke color.
 
+Palette entries can be selected back into the Colors editor and updated in place. A palette entry stores optional `groupName` and `alpha` values. Applying a Fill or Stroke palette entry also applies that entry's opacity to supported text and shape layers.
+
+Palette groups are derived from entries with the same group name. Applying a group sets the selected text/shape fill and stroke colors together when the group has matching Fill and Stroke entries. The palette can generate analogous, complementary, split-complementary, and triad suggestions from the current draft color.
+
 ## Edit State Storage
 
 The current edit state is stored in browser `localStorage` under `thumbnail-generator.editState.v1`. The autosave preference is stored separately under `thumbnail-generator.editState.preferences.v1`.
@@ -258,9 +292,10 @@ The Image Lab modal workspace opens from the Images section in the sidebar. It p
 - Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.
 - Circular/elliptical cutout, with the ellipse bounds set by dragging on the preview or by sliders.
 - Polygon/free cutout by placing three or more points.
-- Drag-range rectangular cutout.
+- Rectangular and circular/elliptical cutout selections can be moved or resized after creation by dragging preview handles.
+- Polygon/free cutout points can be dragged after placement and Alt-clicked to delete a point.
 
-Processing outputs PNG data URLs and remains browser-only.
+Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.
 
 The modal workspace provides a larger preview canvas than the sidebar, plus close button, backdrop dismissal, and Escape-key dismissal. The left asset list can open Image Lab with the selected asset already active. Images imported inside Image Lab become the active processing target without requiring a second dropdown selection. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 

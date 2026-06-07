@@ -16,11 +16,15 @@ import {
   type CanvasPoint,
 } from "./lib/canvasInteraction";
 import {
+  addHarmonyColors,
   addPaletteColor as appendPaletteColor,
+  paletteGroups,
   readColorPalette,
   removePaletteColor,
+  updatePaletteColor,
   type PaletteColor,
   type PaletteTarget,
+  type HarmonyMode,
   writeColorPalette,
 } from "./lib/colorPalette";
 import {
@@ -75,6 +79,11 @@ interface ActiveCanvasInteraction {
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
+  const clipboardLayers = useRef<ThumbnailLayer[]>([]);
+  const historyPast = useRef<ThumbnailLayer[][]>([]);
+  const historyFuture = useRef<ThumbnailLayer[][]>([]);
+  const lastLayerSnapshot = useRef<ThumbnailLayer[] | null>(null);
+  const skipHistoryRecord = useRef(false);
   const didInitializeSelection = useRef(false);
   const didMountAutoSave = useRef(false);
   const initialLanguage = useMemo(() => detectInitialLanguage(), []);
@@ -117,6 +126,9 @@ function App() {
   const [paletteDraft, setPaletteDraft] = useState("#10b6d7");
   const [paletteNameDraft, setPaletteNameDraft] = useState("Accent fill");
   const [paletteTargetDraft, setPaletteTargetDraft] = useState<PaletteTarget>("fill");
+  const [paletteAlphaDraft, setPaletteAlphaDraft] = useState(1);
+  const [paletteGroupDraft, setPaletteGroupDraft] = useState("Action");
+  const [selectedPaletteColorId, setSelectedPaletteColorId] = useState<string | null>(null);
   const [customFonts, setCustomFonts] = useState<CustomFont[]>(() =>
     typeof window === "undefined" ? [] : readCustomFonts(),
   );
@@ -154,6 +166,21 @@ function App() {
       didInitializeSelection.current = true;
       return valid.length === current.length ? current : valid;
     });
+  }, [layers]);
+
+  useEffect(() => {
+    if (!lastLayerSnapshot.current) {
+      lastLayerSnapshot.current = structuredClone(layers);
+      return;
+    }
+    if (skipHistoryRecord.current) {
+      skipHistoryRecord.current = false;
+      lastLayerSnapshot.current = structuredClone(layers);
+      return;
+    }
+    historyPast.current = [...historyPast.current.slice(-49), structuredClone(lastLayerSnapshot.current)];
+    historyFuture.current = [];
+    lastLayerSnapshot.current = structuredClone(layers);
   }, [layers]);
 
   useEffect(() => {
@@ -251,6 +278,12 @@ function App() {
         return;
       }
       setSelectedIds((current) => {
+        if (!additive && layer.groupId) {
+          const groupIds = layers
+            .filter((candidate) => candidate.selectable && candidate.groupId === layer.groupId)
+            .map((candidate) => candidate.id);
+          return groupIds.length > 0 ? groupIds : [id];
+        }
         if (!additive) return [id];
         return current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id];
       });
@@ -414,6 +447,26 @@ function App() {
     setStatus("Shape layer added.");
   }, [settings.height, settings.width]);
 
+  const addLineLayer = useCallback(() => {
+    const layer = makeShapeLayer({
+      name: "Line",
+      shape: "line",
+      x: settings.width * 0.18,
+      y: settings.height * 0.5,
+      width: settings.width * 0.58,
+      height: 12,
+      strokeColor: "#ffffff",
+      strokeWidth: 10,
+      strokeOpacity: 1,
+      lineStyle: "solid",
+      fillOpacity: 0,
+      rotation: -2,
+    });
+    setLayers((current) => [...current, layer]);
+    setSelectedIds([layer.id]);
+    setStatus("Line layer added.");
+  }, [settings.height, settings.width]);
+
   const addQuickLayer = useCallback(
     (kind: "headline" | "subtitle" | "badge" | "divider") => {
       const layer =
@@ -560,6 +613,89 @@ function App() {
     });
   }, []);
 
+  const copySelectedLayers = useCallback(() => {
+    const copies = selectedIds
+      .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
+      .filter((layer): layer is ThumbnailLayer => Boolean(layer))
+      .map((layer) => structuredClone(layer));
+    clipboardLayers.current = copies;
+    setStatus(copies.length > 0 ? `Copied ${copies.length} layer${copies.length === 1 ? "" : "s"}.` : "No editable layer selected to copy.");
+  }, [layers, selectedIds]);
+
+  const pasteSelectedLayers = useCallback(() => {
+    if (clipboardLayers.current.length === 0) {
+      setStatus("Clipboard has no copied layers.");
+      return;
+    }
+    const pasted = clipboardLayers.current.map((layer) => cloneLayer({ ...layer, x: layer.x + 28, y: layer.y + 28 }));
+    setLayers((current) => [...current, ...pasted]);
+    setSelectedIds(pasted.map((layer) => layer.id));
+    setStatus(`Pasted ${pasted.length} layer${pasted.length === 1 ? "" : "s"}.`);
+  }, []);
+
+  const duplicateSelectedLayers = useCallback(() => {
+    const selectedCopies = selectedIds
+      .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
+      .filter((layer): layer is ThumbnailLayer => Boolean(layer))
+      .map((layer) => cloneLayer({ ...layer, x: layer.x + 24, y: layer.y + 24 }));
+    if (selectedCopies.length === 0) {
+      setStatus("No editable layer selected to duplicate.");
+      return;
+    }
+    setLayers((current) => [...current, ...selectedCopies]);
+    setSelectedIds(selectedCopies.map((layer) => layer.id));
+    setStatus(`Duplicated ${selectedCopies.length} selected layer${selectedCopies.length === 1 ? "" : "s"}.`);
+  }, [layers, selectedIds]);
+
+  const cutSelectedLayers = useCallback(() => {
+    const targets = selectedIds
+      .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
+      .filter((layer): layer is ThumbnailLayer => Boolean(layer));
+    if (targets.length === 0) {
+      setStatus("No editable layer selected to cut.");
+      return;
+    }
+    if (layers.length - targets.length < 1) {
+      setStatus("At least one layer is required.");
+      return;
+    }
+    const targetIds = new Set(targets.map((layer) => layer.id));
+    clipboardLayers.current = targets.map((layer) => structuredClone(layer));
+    setLayers((current) => {
+      const next = current.filter((layer) => !targetIds.has(layer.id));
+      setSelectedIds(selectTopSelectableLayerIds(next));
+      return next;
+    });
+    setStatus(`Cut ${targets.length} layer${targets.length === 1 ? "" : "s"}.`);
+  }, [layers, selectedIds]);
+
+  const undoLayers = useCallback(() => {
+    const previous = historyPast.current.pop();
+    if (!previous) {
+      setStatus("Nothing to undo.");
+      return;
+    }
+    historyFuture.current = [structuredClone(layers), ...historyFuture.current.slice(0, 49)];
+    skipHistoryRecord.current = true;
+    setLayers(structuredClone(previous));
+    setSelectedIds((current) => current.filter((id) => previous.some((layer) => layer.id === id && layer.selectable)));
+    setStatus("Undo complete.");
+  }, [layers]);
+
+  const redoLayers = useCallback(() => {
+    const [next, ...rest] = historyFuture.current;
+    if (!next) {
+      setStatus("Nothing to redo.");
+      return;
+    }
+    historyFuture.current = rest;
+    historyPast.current = [...historyPast.current.slice(-49), structuredClone(layers)];
+    skipHistoryRecord.current = true;
+    setLayers(structuredClone(next));
+    setSelectedIds((current) => current.filter((id) => next.some((layer) => layer.id === id && layer.selectable)));
+    setStatus("Redo complete.");
+  }, [layers]);
+
   const moveLayer = useCallback((id: string, direction: -1 | 1) => {
     setLayers((current) => {
       const index = current.findIndex((layer) => layer.id === id);
@@ -632,26 +768,133 @@ function App() {
     setStatus(`Matched ${selectedLayers.length} selected layer angles to ${reference.name}.`);
   }, [layers, selectedIds, selectedLayers.length]);
 
+  const createLayerGroup = useCallback(
+    (name: string) => {
+      const groupTargets = selectedLayers.filter((layer) => layer.selectable);
+      if (groupTargets.length < 2) {
+        setStatus("Select at least two editable layers to create a group.");
+        return;
+      }
+      const groupId = `group-${Date.now().toString(36)}`;
+      const groupName = name.trim() || "Layer group";
+      const targetIds = new Set(groupTargets.map((layer) => layer.id));
+      setLayers((current) =>
+        current.map((layer) => (targetIds.has(layer.id) ? { ...layer, groupId, groupName } : layer)),
+      );
+      setStatus(`Grouped ${groupTargets.length} layers as "${groupName}".`);
+    },
+    [selectedLayers],
+  );
+
+  const renameLayerGroup = useCallback(
+    (groupId: string, name: string) => {
+      const groupName = name.trim() || "Layer group";
+      setLayers((current) => current.map((layer) => (layer.groupId === groupId ? { ...layer, groupName } : layer)));
+      setStatus(`Renamed group to "${groupName}".`);
+    },
+    [],
+  );
+
+  const ungroupLayerGroup = useCallback((groupId: string) => {
+    setLayers((current) =>
+      current.map((layer) =>
+        layer.groupId === groupId ? { ...layer, groupId: undefined, groupName: undefined } : layer,
+      ),
+    );
+    setStatus("Layer group removed.");
+  }, []);
+
+  const fitSelectedLayersToCanvas = useCallback(() => {
+    const targetIds = new Set(
+      selectedLayers.filter((layer) => layer.type === "image" || layer.type === "shape").map((layer) => layer.id),
+    );
+    if (targetIds.size === 0) {
+      setStatus("Select an image or shape layer to fit it to the canvas.");
+      return;
+    }
+    setLayers((current) =>
+      current.map((layer) =>
+        targetIds.has(layer.id) ? { ...layer, x: 0, y: 0, width: settings.width, height: settings.height } : layer,
+      ),
+    );
+    setStatus(`Fit ${targetIds.size} selected image/shape layer${targetIds.size === 1 ? "" : "s"} to the canvas.`);
+  }, [selectedLayers, settings.height, settings.width]);
+
   const addPaletteColor = useCallback(() => {
     const next = appendPaletteColor(paletteColors, {
       value: paletteDraft,
       name: paletteNameDraft,
       target: paletteTargetDraft,
+      alpha: paletteAlphaDraft,
+      groupName: paletteGroupDraft,
     });
     writeColorPalette(next);
     setPaletteColors(next);
+    setSelectedPaletteColorId(next[0]?.id ?? null);
     setStatus(
       next.length === paletteColors.length
         ? "Palette color already exists for that target or is invalid."
         : `Palette color registered for ${paletteTargetDraft === "fill" ? "Fill" : "Stroke"}.`,
     );
-  }, [paletteColors, paletteDraft, paletteNameDraft, paletteTargetDraft]);
+  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft]);
+
+  const selectPaletteColor = useCallback(
+    (id: string) => {
+      const color = paletteColors.find((candidate) => candidate.id === id);
+      if (!color) return;
+      setSelectedPaletteColorId(id);
+      setPaletteDraft(color.value);
+      setPaletteNameDraft(color.name);
+      setPaletteTargetDraft(color.target);
+      setPaletteAlphaDraft(color.alpha);
+      setPaletteGroupDraft(color.groupName ?? "");
+      setStatus(`Selected palette color "${color.name}" for editing.`);
+    },
+    [paletteColors],
+  );
+
+  const saveSelectedPaletteColor = useCallback(() => {
+    if (!selectedPaletteColorId) {
+      setStatus("Select a registered color before updating it.");
+      return;
+    }
+    const next = updatePaletteColor(paletteColors, selectedPaletteColorId, {
+      value: paletteDraft,
+      name: paletteNameDraft,
+      target: paletteTargetDraft,
+      alpha: paletteAlphaDraft,
+      groupName: paletteGroupDraft,
+    });
+    writeColorPalette(next);
+    setPaletteColors(next);
+    setStatus("Palette color updated.");
+  }, [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft, selectedPaletteColorId]);
+
+  const generatePaletteHarmony = useCallback(
+    (mode: HarmonyMode) => {
+      const next = addHarmonyColors(
+        paletteColors,
+        {
+          value: paletteDraft,
+          target: paletteTargetDraft,
+          alpha: paletteAlphaDraft,
+          groupName: paletteGroupDraft,
+        },
+        mode,
+      );
+      writeColorPalette(next);
+      setPaletteColors(next);
+      setStatus(`Generated ${mode} palette suggestions.`);
+    },
+    [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteTargetDraft],
+  );
 
   const deletePaletteColor = useCallback(
     (id: string) => {
       const next = removePaletteColor(paletteColors, id);
       writeColorPalette(next);
       setPaletteColors(next);
+      setSelectedPaletteColorId((current) => (current === id ? null : current));
       setStatus("Palette color removed.");
     },
     [paletteColors],
@@ -663,17 +906,51 @@ function App() {
         current.map((layer) => {
           if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
           if (layer.type === "text") {
-            return target === "fill" ? { ...layer, color } : { ...layer, strokeColor: color };
+            const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
+            const opacity = palette?.alpha ?? 1;
+            return target === "fill" ? { ...layer, color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           if (layer.type === "shape") {
-            return target === "fill" ? { ...layer, fill: color } : { ...layer, strokeColor: color };
+            const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
+            const opacity = palette?.alpha ?? 1;
+            return target === "fill" ? { ...layer, fill: color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           return layer;
         }),
       );
       setStatus(target === "fill" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
     },
-    [selectedIds],
+    [paletteColors, selectedIds],
+  );
+
+  const applyPaletteGroup = useCallback(
+    (groupName: string) => {
+      const group = paletteGroups(paletteColors).find((candidate) => candidate.name === groupName);
+      if (!group) return;
+      setLayers((current) =>
+        current.map((layer) => {
+          if (!selectedIds.includes(layer.id) || !layer.selectable || (layer.type !== "text" && layer.type !== "shape")) return layer;
+          if (layer.type === "text") {
+            return {
+              ...layer,
+              color: group.fill?.value ?? layer.color,
+              fillOpacity: group.fill?.alpha ?? layer.fillOpacity,
+              strokeColor: group.stroke?.value ?? layer.strokeColor,
+              strokeOpacity: group.stroke?.alpha ?? layer.strokeOpacity,
+            };
+          }
+          return {
+            ...layer,
+            fill: group.fill?.value ?? layer.fill,
+            fillOpacity: group.fill?.alpha ?? layer.fillOpacity,
+            strokeColor: group.stroke?.value ?? layer.strokeColor,
+            strokeOpacity: group.stroke?.alpha ?? layer.strokeOpacity,
+          };
+        }),
+      );
+      setStatus(`Applied palette group "${groupName}".`);
+    },
+    [paletteColors, selectedIds],
   );
 
   const createProcessedAsset = useCallback(
@@ -880,6 +1157,43 @@ function App() {
     [assets, layers, settings],
   );
 
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (isShortcutSuppressed(event.target)) return;
+      const key = event.key.toLowerCase();
+      const command = event.ctrlKey || event.metaKey;
+      if (!command) return;
+
+      if (key === "c") {
+        event.preventDefault();
+        copySelectedLayers();
+      }
+      if (key === "v") {
+        event.preventDefault();
+        pasteSelectedLayers();
+      }
+      if (key === "x") {
+        event.preventDefault();
+        cutSelectedLayers();
+      }
+      if (key === "d") {
+        event.preventDefault();
+        duplicateSelectedLayers();
+      }
+      if (key === "z") {
+        event.preventDefault();
+        if (event.shiftKey) redoLayers();
+        else undoLayers();
+      }
+      if (key === "y") {
+        event.preventDefault();
+        redoLayers();
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [copySelectedLayers, cutSelectedLayers, duplicateSelectedLayers, pasteSelectedLayers, redoLayers, undoLayers]);
+
   return (
     <div className="app-shell">
       <TopToolbar
@@ -952,15 +1266,25 @@ function App() {
           paletteDraft={paletteDraft}
           paletteNameDraft={paletteNameDraft}
           paletteTargetDraft={paletteTargetDraft}
+          paletteAlphaDraft={paletteAlphaDraft}
+          paletteGroupDraft={paletteGroupDraft}
+          selectedPaletteColorId={selectedPaletteColorId}
           fontOptions={fontOptions}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteTargetDraftChange={setPaletteTargetDraft}
+          onPaletteAlphaDraftChange={setPaletteAlphaDraft}
+          onPaletteGroupDraftChange={setPaletteGroupDraft}
+          onSelectPaletteColor={selectPaletteColor}
           onAddPaletteColor={addPaletteColor}
+          onUpdatePaletteColor={saveSelectedPaletteColor}
           onDeletePaletteColor={deletePaletteColor}
           onApplyPaletteColor={applyPaletteColor}
+          onApplyPaletteGroup={applyPaletteGroup}
+          onGeneratePaletteHarmony={generatePaletteHarmony}
           onSelect={selectLayer}
           onUpdateLayer={updateLayer}
+          onAddLineLayer={addLineLayer}
           onDelete={deleteLayer}
           onDuplicate={duplicateLayer}
           onMove={moveLayer}
@@ -970,6 +1294,10 @@ function App() {
           onAlignSelection={alignSelection}
           onTransformSelection={transformSelection}
           onMatchSelectionRotation={matchSelectionRotation}
+          onCreateGroup={createLayerGroup}
+          onRenameGroup={renameLayerGroup}
+          onUngroup={ungroupLayerGroup}
+          onFitSelectedToCanvas={fitSelectedLayersToCanvas}
           onCustomFontFiles={handleCustomFontFiles}
           onFitTextToBounds={fitTextToBounds}
           t={t}
@@ -1043,6 +1371,13 @@ function safelySetPointerCapture(element: HTMLElement, pointerId: number): void 
   } catch {
     // Synthetic tests may dispatch pointer events without an active browser pointer.
   }
+}
+
+function isShortcutSuppressed(target: EventTarget | null): boolean {
+  if (typeof document !== "undefined" && document.querySelector(".modal-backdrop")) return true;
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.closest("input, textarea, select")) return true;
+  return target.isContentEditable;
 }
 
 function readImageFile(file: File): Promise<ImageAsset> {
