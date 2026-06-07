@@ -8,6 +8,7 @@
 - [x] `docs/test-plan.md` includes actual verification results.
 - [x] `docs/features.md` lists the primary features and quick usage paths.
 - [x] `docs/user-guide.md` covers manual app usage.
+- [x] `docs/screenshot-guide.md` covers screenshot-based feature walkthroughs.
 - [x] `docs/improvement-backlog.md` captures taskized follow-up improvement candidates.
 - [x] `docs/qcds-evaluation.md`, `docs/qcds-strict-metrics.json`, Code Starter QCDS summary, and Codex Work Dashboard QCDS evidence are current.
 - [x] `npm test` passes.

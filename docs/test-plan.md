@@ -150,3 +150,18 @@ Completed on 2026-06-07.
 - Runtime gate checks: nonblank initial canvas, primary workspace visible, CSV import, HTML import, Adjust X edit from `130` to `140`, and WebP export download.
 - Runtime gate export evidence: `thumbnail-1280x720-2026-06-07T13-15-49-232Z.webp`.
 - Manual note: if the VS Code Code Starter view is cached, reload/refresh the view after this repository update.
+
+### Screenshot Feature Guide
+
+Completed on 2026-06-07 for `Issues/0064-issue.md`.
+
+- Added screenshot-based feature walkthrough: `docs/screenshot-guide.md`.
+- Source captures were read from `dist/assets/screenshot/` and copied to tracked documentation assets named `docs/assets/screenshot-guide-*.png`.
+- README access path: `README.md` -> `docs/screenshot-guide.md`.
+- Markdown/image-link check: pass. All local image references in `docs/screenshot-guide.md` exist under `docs/assets/`.
+- UTF-8 check: pass. Updated Markdown files read successfully with UTF-8.
+- `npm test`: pass. 22 test files, 71 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Browser runtime gate: pass with Playwright headless Chromium at `http://127.0.0.1:4187/thumbnail-generator/`. Nonblank render, primary UI visible, CSV import, HTML import, layer edit, and WebP export path were exercised after the documentation update.
+- Runtime gate export evidence: `thumbnail-1280x720-2026-06-07T14-03-52-685Z.webp`.
+- Console health: no page errors and no app HTTP 4xx/5xx responses were reported.

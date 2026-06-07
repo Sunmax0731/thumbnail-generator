@@ -28,7 +28,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Switch text layers between horizontal and vertical writing, with vertical selection bounds following the visible text area.
 - Export to common video presets or custom output sizes.
 
-See [docs/features.md](docs/features.md) for the feature index and [docs/user-guide.md](docs/user-guide.md) for step-by-step usage.
+See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide.md](docs/user-guide.md) for step-by-step usage, and [docs/screenshot-guide.md](docs/screenshot-guide.md) for screenshot-based feature walkthroughs.
 
 ## Use The Published App
 
@@ -74,6 +74,7 @@ Useful reports include the browser name/version, viewport or device, what you im
 - [docs/design.md](docs/design.md): editor layout, visual tokens, and responsive behavior.
 - [docs/features.md](docs/features.md): user-facing feature overview.
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide.
+- [docs/screenshot-guide.md](docs/screenshot-guide.md): screenshot-based feature guide and use-case walkthroughs.
 - [docs/test-plan.md](docs/test-plan.md): automated and browser runtime validation plan and results.
 - [docs/qcds-evaluation.md](docs/qcds-evaluation.md): Quality, Cost, Delivery, and Satisfaction evaluation.
 - [docs/qcds-code-starter-summary.md](docs/qcds-code-starter-summary.md): VS Code Code Starter-facing QCDS display summary.

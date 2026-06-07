@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 10 bundled default templates, per-template nonblank rendering, supported image/text/shape/line parameters only, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 10 bundled default templates, per-template nonblank rendering, supported image/text/shape/line parameters only, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs including the screenshot-based feature guide, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -11,11 +11,11 @@
   },
   "delivery": {
     "rating": "A+",
-    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README and user guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README, user guide, and screenshot guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested 10 practical bundled templates passed validation. Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch are all available, visually distinct, and loaded by the runtime gate without blank output or missing layer rows. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested 10 practical bundled templates passed validation, and Issue 0064 adds a screenshot-based guide for feature explanation and use-case steps. Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch are all available, visually distinct, and loaded by the runtime gate without blank output or missing layer rows. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -76,6 +76,24 @@
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"
+    ]
+  },
+  "screenshotGuide": {
+    "status": "passed",
+    "workItem": "Issues/0064-issue.md",
+    "source": "docs/screenshot-guide.md",
+    "assetsPattern": "docs/assets/screenshot-guide-*.png",
+    "sourceCaptureDirectory": "dist/assets/screenshot/",
+    "checks": [
+      "README links to screenshot guide",
+      "guide image references resolve to tracked docs assets",
+      "UTF-8 Markdown read check",
+      "template workflow documented",
+      "asset and Image Lab workflow documented",
+      "canvas and layer editing workflow documented",
+      "CSV and HTML layout workflow documented",
+      "color workflow documented",
+      "export workflow documented"
     ]
   },
   "followUpCandidates": [
