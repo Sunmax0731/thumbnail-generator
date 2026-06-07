@@ -134,3 +134,8 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] Layers下部にキャンバスサイズ合わせ機能を追加 [Issue](Issues/0035-layers.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colors登録色の選択編集機能を追加 [Issue](Issues/0036-colors.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colors機能のグループ設定と配色支援を強化 [Issue](Issues/0037-colors.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 線機能をクイック追加へ統合 [Issue](Issues/0038-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:05-test] グループ追加と選択表示の修正 [Issue](Issues/0039-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:05-test] グループ追加と選択表示の修正 [Issue](Issues/0040-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Colorsのカラーパレット作成UI改善 [Issue](Issues/0041-colors-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 移動操作のUNDO/REDO履歴を確定位置のみ記録する [Issue](Issues/0042-undo-redo.md) [QCDS:Quality,Satisfaction] [Status:closed]

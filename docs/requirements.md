@@ -13,7 +13,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
-- Add common text and shape layers through expanded quick-add controls.
+- Add common text, shape, and line layers through expanded quick-add controls.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
 - Adjust layer blur, edge blur, and corner radius where applicable.
@@ -21,6 +21,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
+- Select a group from either Layers or the preview by choosing one editable grouped member.
 - Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
@@ -38,7 +39,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
-- Edit registered palette colors, assign palette groups, apply fill/stroke groups, set palette opacity, and generate basic color harmony suggestions.
+- Edit registered palette colors, assign palette groups, apply fill/stroke groups, set palette opacity, preview palette patterns, and generate grouped color harmony suggestions.
+- Treat canvas drag movement as one undo/redo history step from drag start to drag completion, not as intermediate pointer positions.
 
 ## Non-Functional Requirements
 

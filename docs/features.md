@@ -6,6 +6,7 @@ This page is the quick feature index for users and reviewers.
 
 - Select layers from the preview or Layers tab.
 - Drag selected layers on the canvas to move them.
+- Drag movement records undo/redo history only at the confirmed start and end positions.
 - Drag corner handles to resize one selected layer.
 - Drag the top rotation handle to rotate one selected layer.
 - Click blank preview space to clear selection.
@@ -17,7 +18,7 @@ This page is the quick feature index for users and reviewers.
 - Use Layers alignment controls to align one layer to the canvas or multiple layers to the selection bounds.
 - Use Adjust relative edit controls to apply live Move X, Move Y, and Rotation delta changes.
 - Use Match angle to first selected to copy the first selected editable layer's rotation to the other selected editable layers.
-- Group selected layers from Layers, rename the group, ungroup it, and select grouped rows as a multi-selection.
+- Group selected layers from Layers, rename the group, ungroup it, and select grouped rows or grouped preview objects as a multi-selection.
 - Fit selected image or shape layers to the canvas from Layers.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y when focus is outside text fields and modals.
 
@@ -43,8 +44,8 @@ This page is the quick feature index for users and reviewers.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
-- Add line layers and choose solid, dotted, dashed, or wave line styles.
-- Add text, headline, subtitle, shape, badge, divider, and selected image layers from Assets.
+- Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from Assets.
+- Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
@@ -56,5 +57,6 @@ This page is the quick feature index for users and reviewers.
 - Register and edit named Fill or Stroke colors in Colors.
 - Set palette opacity and group names.
 - Apply saved Fill or Stroke colors, or one-click Fill/Stroke groups, to selected text and shape layers.
-- Generate analogous, complementary, split-complementary, and triad palette suggestions from the draft color.
+- Preview a graphical palette pattern from the draft color and opacity.
+- Generate analogous, complementary, split-complementary, and triad palette suggestions as grouped palette blocks from the draft color.
 - Resize the Colors list area when reviewing many saved swatches.

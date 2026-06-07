@@ -1,5 +1,18 @@
 import { useState } from "react";
-import { Code2, FileText, FolderOpen, ImagePlus, LayoutTemplate, RefreshCw, Save, Scissors, Shapes, Trash2, Type } from "lucide-react";
+import {
+  Code2,
+  FileText,
+  FolderOpen,
+  GripHorizontal,
+  ImagePlus,
+  LayoutTemplate,
+  RefreshCw,
+  Save,
+  Scissors,
+  Shapes,
+  Trash2,
+  Type,
+} from "lucide-react";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
 import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
@@ -27,6 +40,7 @@ interface LeftPanelProps {
   onAddImageAssetLayer: (key: string) => void;
   onAddText: () => void;
   onAddShape: () => void;
+  onAddLineLayer: () => void;
   onAddQuickLayer: (kind: QuickLayerKind) => void;
   onResetTemplate: () => void;
   onLoadDefaultTemplate: (id: string) => void;
@@ -61,6 +75,7 @@ export function LeftPanel({
   onAddImageAssetLayer,
   onAddText,
   onAddShape,
+  onAddLineLayer,
   onAddQuickLayer,
   onResetTemplate,
   onLoadDefaultTemplate,
@@ -172,6 +187,9 @@ export function LeftPanel({
               </button>
               <button type="button" className="secondary-button icon-text" onClick={onAddShape}>
                 <Shapes size={16} /> {t("left.shape")}
+              </button>
+              <button type="button" className="secondary-button icon-text" onClick={onAddLineLayer}>
+                <GripHorizontal size={16} /> {t("left.line")}
               </button>
               <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("headline")}>
                 <Type size={16} /> {t("left.headline")}

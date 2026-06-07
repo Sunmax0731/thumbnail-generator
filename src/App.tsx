@@ -53,7 +53,7 @@ import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
 import { createTranslator, detectInitialLanguage, type Language } from "./lib/i18n";
 import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeLayerTransform } from "./lib/layerTransform";
-import { selectLayerIdsAfterDelete, selectTopSelectableLayerIds } from "./lib/layerOperations";
+import { selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { calculatePreviewPadding } from "./lib/previewPadding";
@@ -74,6 +74,9 @@ interface ActiveCanvasInteraction {
   layer?: ThumbnailLayer;
   layers: ThumbnailLayer[];
   start: CanvasPoint;
+  historyStart?: ThumbnailLayer[];
+  didTransform?: boolean;
+  latestLayers?: ThumbnailLayer[];
 }
 
 function App() {
@@ -277,16 +280,7 @@ function App() {
         setStatus(`${layer.name} is locked for selection and editing.`);
         return;
       }
-      setSelectedIds((current) => {
-        if (!additive && layer.groupId) {
-          const groupIds = layers
-            .filter((candidate) => candidate.selectable && candidate.groupId === layer.groupId)
-            .map((candidate) => candidate.id);
-          return groupIds.length > 0 ? groupIds : [id];
-        }
-        if (!additive) return [id];
-        return current.includes(id) ? current.filter((selectedId) => selectedId !== id) : [...current, id];
-      });
+      setSelectedIds((current) => selectLayerIdsForLayer(layers, current, id, additive));
     },
     [layers],
   );
@@ -872,21 +866,31 @@ function App() {
 
   const generatePaletteHarmony = useCallback(
     (mode: HarmonyMode) => {
+      const groupName = paletteGroupDraft.trim() || `${labelForHarmonyMode(mode)} palette`;
+      const withBase = appendPaletteColor(paletteColors, {
+        value: paletteDraft,
+        name: paletteNameDraft,
+        target: paletteTargetDraft,
+        alpha: paletteAlphaDraft,
+        groupName,
+      });
       const next = addHarmonyColors(
-        paletteColors,
+        withBase,
         {
           value: paletteDraft,
           target: paletteTargetDraft,
           alpha: paletteAlphaDraft,
-          groupName: paletteGroupDraft,
+          groupName,
         },
         mode,
       );
       writeColorPalette(next);
       setPaletteColors(next);
+      setPaletteGroupDraft(groupName);
+      setSelectedPaletteColorId(next[0]?.id ?? null);
       setStatus(`Generated ${mode} palette suggestions.`);
     },
-    [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteTargetDraft],
+    [paletteAlphaDraft, paletteColors, paletteDraft, paletteGroupDraft, paletteNameDraft, paletteTargetDraft],
   );
 
   const deletePaletteColor = useCallback(
@@ -1008,6 +1012,7 @@ function App() {
           layer: interaction.layer,
           layers: [interaction.layer],
           start: point,
+          historyStart: structuredClone(layers),
         };
         setActiveInteractionMode(interaction.mode);
         setHoverInteractionMode(interaction.mode);
@@ -1025,9 +1030,19 @@ function App() {
           return;
         }
         safelySetPointerCapture(canvas, event.pointerId);
-        const moveTargets = selectedIds.includes(picked.id) && selectedLayers.length > 1 ? selectedLayers : [picked];
+        const moveTargetIds =
+          selectedIds.includes(picked.id) && selectedLayers.length > 1
+            ? selectedLayers.map((layer) => layer.id)
+            : selectLayerIdsForLayer(layers, [], picked.id);
+        const moveTargetSet = new Set(moveTargetIds);
+        const moveTargets = layers.filter((layer) => moveTargetSet.has(layer.id));
         setSelectedIds(moveTargets.map((layer) => layer.id));
-        activeCanvasInteraction.current = { mode: "move", layers: moveTargets, start: point };
+        activeCanvasInteraction.current = {
+          mode: "move",
+          layers: moveTargets,
+          start: point,
+          historyStart: structuredClone(layers),
+        };
         setActiveInteractionMode("move");
         setHoverInteractionMode("move");
         setCanvasCursor("grabbing");
@@ -1053,7 +1068,13 @@ function App() {
         event.preventDefault();
         const nextLayers = transformLayersFromPointer(active, point);
         const nextById = new Map(nextLayers.map((layer) => [layer.id, layer]));
-        setLayers((current) => current.map((layer) => nextById.get(layer.id) ?? layer));
+        skipHistoryRecord.current = true;
+        active.didTransform = true;
+        setLayers((current) => {
+          const next = current.map((layer) => nextById.get(layer.id) ?? layer);
+          active.latestLayers = next;
+          return next;
+        });
         return;
       }
 
@@ -1079,6 +1100,16 @@ function App() {
     if (!active) return;
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
+    }
+    if (
+      active.didTransform &&
+      active.historyStart &&
+      active.latestLayers &&
+      !areLayerSnapshotsEqual(active.historyStart, active.latestLayers)
+    ) {
+      historyPast.current = [...historyPast.current.slice(-49), structuredClone(active.historyStart)];
+      historyFuture.current = [];
+      lastLayerSnapshot.current = structuredClone(active.latestLayers);
     }
     activeCanvasInteraction.current = null;
     setActiveInteractionMode(null);
@@ -1220,6 +1251,7 @@ function App() {
           onAddImageAssetLayer={addImageLayerFromAsset}
           onAddText={addTextLayer}
           onAddShape={addShapeLayer}
+          onAddLineLayer={addLineLayer}
           onAddQuickLayer={addQuickLayer}
           onResetTemplate={resetTemplate}
           defaultTemplates={defaultTemplates}
@@ -1284,7 +1316,6 @@ function App() {
           onGeneratePaletteHarmony={generatePaletteHarmony}
           onSelect={selectLayer}
           onUpdateLayer={updateLayer}
-          onAddLineLayer={addLineLayer}
           onDelete={deleteLayer}
           onDuplicate={duplicateLayer}
           onMove={moveLayer}
@@ -1352,6 +1383,10 @@ function transformLayersFromPointer(active: ActiveCanvasInteraction, point: Canv
   return [resizeLayer(active.layer, active.mode, point)];
 }
 
+function areLayerSnapshotsEqual(left: ThumbnailLayer[], right: ThumbnailLayer[]): boolean {
+  return JSON.stringify(left) === JSON.stringify(right);
+}
+
 function cursorForMode(mode: CanvasInteractionMode, active = false): string {
   if (mode === "move") return "grab";
   if (mode === "rotate") return active ? "grabbing" : "grab";
@@ -1363,6 +1398,13 @@ function labelForMode(mode: CanvasInteractionMode): string {
   if (mode === "move") return "Move";
   if (mode === "rotate") return "Rotate";
   return "Resize";
+}
+
+function labelForHarmonyMode(mode: HarmonyMode): string {
+  if (mode === "complementary") return "Complement";
+  if (mode === "analogous") return "Analogous";
+  if (mode === "split") return "Split";
+  return "Triad";
 }
 
 function safelySetPointerCapture(element: HTMLElement, pointerId: number): void {

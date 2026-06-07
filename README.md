@@ -9,20 +9,20 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 ## What You Can Do
 
 - Compose thumbnails with image, text, and shape layers.
-- Add line layers with solid, dotted, dashed, or wave strokes.
+- Add line layers from Quick Add with solid, dotted, dashed, or wave strokes.
 - Import local images and edit their position, size, rotation, opacity, and simple effects.
 - Adjust layer blur, edge blur, corner radius, fill/stroke opacity, and text kerning.
 - Select imported assets to add them as image layers or open them directly in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
-- Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle.
+- Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
 - Select multiple layers, move or rotate them together, align them, or match angles to the first selected layer.
-- Group selected layers, rename groups, ungroup them, and fit selected image/shape layers to the canvas.
+- Group selected layers, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, and fit selected image/shape layers to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load bundled default templates for livestream, review, tutorial, and portrait-short use cases.
-- Register, edit, group, and apply named Fill or Stroke colors in the browser-local palette, including opacity and harmony suggestions.
+- Register, edit, group, preview, and apply named Fill or Stroke colors in the browser-local palette, including opacity and grouped harmony suggestions.
 - Import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Export to common video presets or custom output sizes.
 

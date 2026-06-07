@@ -18,12 +18,12 @@ npm run preview
 ## Editor Layout
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, select imported assets, add image/text/shape starter layers, open Image Lab for the selected asset, and restore the sample template.
+- Assets: import image files, select imported assets, add image/text/shape/line starter layers, open Image Lab for the selected asset, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
-- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, add line layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
+- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, edge blur, corner radius, text, font, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named Fill or Stroke colors, set opacity and group names, generate harmony suggestions, apply single colors or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
+- Colors: register and edit named Fill or Stroke colors, preview palette patterns, set opacity and group names, generate harmony suggestions as grouped palette blocks, apply single colors or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -35,6 +35,7 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Click blank preview space to clear the current selection.
 - If layers overlap, the frontmost visible editable layer is selected.
 - Drag inside the selected layer to move it.
+- Drag movement uses one undo/redo step for the confirmed start and end positions.
 - Drag a corner handle to resize it.
 - Drag the top rotation handle to rotate it. The rotation handle shows a rotate mark and changes to a grab cursor on hover.
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
@@ -42,7 +43,7 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - With multiple layers selected, use Match angle to first selected to set every selected editable layer to the first selected editable layer's rotation.
 - Use Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y for copy, paste, cut, duplicate, undo, and redo when focus is outside text fields and modals.
 - Press Delete or Backspace while a layer is selected to open the layer delete confirmation dialog.
-- Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row selects the editable members of that group.
+- Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row or one grouped preview object selects the editable members of that group.
 - Use Fit to canvas in Layers to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
@@ -53,7 +54,7 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 Use Assets to add common starter layers quickly:
 
 - Text and Shape add basic editable layers.
-- Layers includes Line for adding an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
+- Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
 - Select an imported asset row, then use its add button to place that image as a layer.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
@@ -105,7 +106,7 @@ Open Image Lab from Assets or from an asset row. The modal supports chroma key, 
 
 Open Colors to select an existing swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied with that Fill or Stroke color, and Group to connect Fill and Stroke entries into one named set. Group buttons apply matching Fill and Stroke colors together to selected text or shape layers.
 
-Use Analogous, Complement, Split, or Triad to generate color-wheel suggestions from the current draft color. These suggestions are added as ordinary palette entries, so they can still be edited, deleted, or applied one at a time.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Use Analogous, Complement, Split, or Triad to generate color-wheel suggestions from the current draft color. These suggestions are saved with the base color as one grouped palette block while still appearing as ordinary palette entries that can be edited, deleted, or applied one at a time.
 
 ## Browser Storage
 

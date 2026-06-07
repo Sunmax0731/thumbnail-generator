@@ -5,6 +5,37 @@ export function selectTopSelectableLayerIds(layers: ThumbnailLayer[]): string[] 
   return top ? [top.id] : [];
 }
 
+export function selectLayerIdsForLayer(
+  layers: ThumbnailLayer[],
+  currentSelectedIds: string[],
+  layerId: string,
+  additive = false,
+): string[] {
+  const layer = layers.find((candidate) => candidate.id === layerId && candidate.selectable);
+  if (!layer) return currentSelectedIds.filter((id) => layers.some((candidate) => candidate.id === id && candidate.selectable));
+
+  const targetIds = layer.groupId
+    ? layers
+        .filter((candidate) => candidate.selectable && candidate.groupId === layer.groupId)
+        .map((candidate) => candidate.id)
+    : [layer.id];
+
+  if (!additive) return targetIds;
+
+  const validSelectedIds = currentSelectedIds.filter((id) =>
+    layers.some((candidate) => candidate.id === id && candidate.selectable),
+  );
+  const selected = new Set(validSelectedIds);
+  const allTargetsSelected = targetIds.every((id) => selected.has(id));
+
+  if (allTargetsSelected) {
+    targetIds.forEach((id) => selected.delete(id));
+    return validSelectedIds.filter((id) => selected.has(id));
+  }
+
+  return [...validSelectedIds, ...targetIds.filter((id) => !selected.has(id))];
+}
+
 export function selectLayerIdsAfterDelete(
   layers: ThumbnailLayer[],
   selectedIds: string[],

@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes line layers, layer blur, edge blur, corner radius, edit shortcuts, Image Lab range re-editing with Drag mode removal, text kerning, layer grouping, fit-to-canvas, editable palette colors, palette groups, palette opacity, harmony suggestions, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing README guidance, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes Quick Add line creation, duplicate Add line removal from Layers, grouped row and preview selection, repeated group creation, confirmed-position canvas drag undo/redo, palette maker preview, generated palette group blocks, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: line layers with style controls, layer blur, edge blur, corner radius, edit shortcuts, Image Lab range re-editing with Drag mode removal, text kerning, layer grouping, fit-to-canvas, editable palette colors, palette groups, palette opacity, harmony suggestions, CSV/HTML import/export persistence, WebP export, and QCDS evidence update. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: line creation moved into Quick Add, Layers no longer exposes a duplicate Add line button, repeated group creation works, grouped rows are folder-like, grouped preview objects select the whole group, Colors has a palette maker with grouped generated palettes, canvas drag undo/redo returns only to confirmed positions, CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -39,49 +39,35 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser backend returned Browser is not available: iab",
-    "url": "http://127.0.0.1:4174/thumbnail-generator/",
+    "url": "http://127.0.0.1:4175/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-edit-state-rotation-desktop.png",
-      "docs/assets/runtime-edit-state-rotation-mobile.png",
-      "docs/assets/runtime-dashboard-qcds-desktop.png",
-      "docs/assets/runtime-dashboard-qcds-mobile.png",
-      "docs/assets/runtime-backlog-20260607-desktop.png",
-      "docs/assets/runtime-backlog-20260607-mobile.png",
-      "docs/assets/runtime-open-work-items-20260607-desktop.png",
-      "docs/assets/runtime-open-work-items-20260607-mobile.png"
+      "docs/assets/runtime-final-p2-20260607-desktop.png",
+      "docs/assets/runtime-final-p2-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
-      "multiline text edit without null-value page error",
-      "disabled inert controls",
-      "Adjust rotation reset",
-      "Adjust opacity reset",
-      "expanded Quick Add",
-      "selected asset image-layer insertion",
-      "Image Lab selected-asset processing",
-      "default template loading",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
       "CSV import",
       "HTML import",
-      "inspector edit",
+      "Quick Add Line creates line layer",
+      "Layers tab duplicate Add line removed",
+      "first group creation",
+      "second group creation after first group",
+      "folder-like grouped row display",
+      "preview grouped object selects whole group",
+      "palette maker preview visible",
+      "Triad creates grouped palette block",
+      "canvas drag undo returns to drag start",
+      "canvas drag redo returns to drag completion",
       "WebP export download",
       "mobile viewport",
-      "mobile no horizontal overflow",
-      "README user-facing guidance",
-      "Codex Work Dashboard QCDS evidence"
-      ,
-      "line layer and line style editing",
-      "layer blur, edge blur, and corner radius",
-      "keyboard copy paste undo redo and delete modal",
-      "layer grouping and fit-to-canvas",
-      "palette edit, group, opacity, and harmony generation",
-      "Image Lab Rect handle editing and Drag mode removal"
+      "mobile no horizontal overflow"
     ]
   },
   "followUpCandidates": [

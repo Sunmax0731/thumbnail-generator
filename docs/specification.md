@@ -114,6 +114,7 @@ The selected layer can be edited directly on the canvas:
 - Drag inside the selected layer to move it.
 - Drag corner handles to resize it.
 - Drag the rotation handle above the layer to rotate it.
+- Canvas drag move, resize, and rotate interactions suppress intermediate pointermove history entries and commit one undo/redo history step at pointerup when the final layer state differs from the drag start state.
 - Handles are rendered in preview padding, so controls remain visible even when they extend outside the thumbnail document bounds.
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
@@ -135,7 +136,7 @@ Global editor shortcuts are active when focus is outside text fields, select con
 - Ctrl+V pastes copied layers as offset independent copies.
 - Ctrl+X cuts selected editable layers when at least one layer remains.
 - Ctrl+D duplicates selected editable layers.
-- Ctrl+Z and Ctrl+Y undo and redo layer-list edits.
+- Ctrl+Z and Ctrl+Y undo and redo layer edits. Canvas drag movement returns to the drag start position with one undo and returns to the drag completion position with one redo.
 
 ## Alignment
 
@@ -153,11 +154,10 @@ Layer rows also include:
 - Visibility toggle.
 - Selectable/editable lock toggle. Locked layers render and can be reordered, but cannot be selected or edited until unlocked.
 - Delete button. Button deletion and keyboard Delete/Backspace on a focused editable layer row open the same confirmation dialog before removing the layer.
-- Group metadata. Grouped rows show the group name, and selecting one grouped layer selects all editable members of that group.
+- Group metadata. Grouped rows show a folder-like group marker plus the group name, and selecting one grouped layer selects all editable members of that group.
 
 The Layers tab also includes:
 
-- Add line layer.
 - Fit selected image/shape layers to the canvas.
 - Group selected layers, rename the selected group, and ungroup it.
 
@@ -165,7 +165,7 @@ The Layers tab also includes:
 
 The left sidebar is grouped by task:
 
-- Assets: local image import, Image Lab launch for the selected asset, imported asset list, selected asset image-layer insertion, expanded quick text/shape creation, and sample restoration.
+- Assets: local image import, Image Lab launch for the selected asset, imported asset list, selected asset image-layer insertion, expanded quick text/shape/line creation, and sample restoration.
 - Layouts: generated CSV/HTML text, CSV import, and HTML import.
 - Templates: edit-state controls, bundled default templates, and browser-local template naming, saving, loading, and deletion.
 
@@ -173,7 +173,7 @@ The right inspector is grouped by task:
 
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
 - Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
-- Colors: browser-local color palette registration and quick application with saved names and Fill/Stroke targets. Saved colors are displayed in list rows similar to layer rows.
+- Colors: browser-local color palette registration, graphical palette maker preview, harmony group generation, and quick application with saved names and Fill/Stroke targets. Saved colors are displayed in list rows similar to layer rows.
 
 The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
@@ -187,6 +187,7 @@ Assets includes quick-add controls for:
 
 - Basic text layer.
 - Basic shape layer.
+- Basic line layer.
 - Headline text layer.
 - Subtitle text layer.
 - Badge shape.
@@ -266,7 +267,7 @@ Registered colors can be applied to:
 
 Palette entries can be selected back into the Colors editor and updated in place. A palette entry stores optional `groupName` and `alpha` values. Applying a Fill or Stroke palette entry also applies that entry's opacity to supported text and shape layers.
 
-Palette groups are derived from entries with the same group name. Applying a group sets the selected text/shape fill and stroke colors together when the group has matching Fill and Stroke entries. The palette can generate analogous, complementary, split-complementary, and triad suggestions from the current draft color.
+Palette groups are derived from entries with the same group name. Applying a group sets the selected text/shape fill and stroke colors together when the group has matching Fill and Stroke entries. Group blocks display all saved swatches in that group so generated palettes are visually separate from the registered-color list. The palette maker previews the current base color with generated companion colors, and harmony generation stores the base plus analogous, complementary, split-complementary, or triad suggestions in one group.
 
 ## Edit State Storage
 

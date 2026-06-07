@@ -9,6 +9,7 @@
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers keep selection on valid selectable layers.
+- Layer selection helpers select all editable grouped members from one grouped layer and toggle whole groups additively.
 - Relative layer transforms apply common movement and rotation deltas to selected editable layers.
 - Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
 - Live relative transform controls convert current UI values into incremental movement and rotation deltas.
@@ -40,9 +41,11 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Preview selection respects layer stacking order when layers overlap.
 - Layer inspector edits position, size, rotation, color, stroke, font, and effects.
 - Canvas direct editing supports drag move, corner resize, and rotation handle drag.
+- Canvas drag move records undo/redo history only at confirmed drag start and drag completion positions.
 - Preset changes fit tall canvases such as Shorts into the visible desktop stage.
 - Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
+- Grouped preview objects can be selected as a multi-selection, not only grouped rows in Layers.
 - Multi-selection supports live relative X/Y movement and relative rotation from the Adjust tab without Apply buttons.
 - Multi-selection supports matching selected layer angles to the first selected editable layer from the Adjust tab.
 - Single selection can align to the canvas.
@@ -68,13 +71,13 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Image import accepts a local image and creates an image layer.
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
-- Expanded quick add inserts headline, subtitle, badge, and divider starters.
+- Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
 - Bundled default templates can be loaded from Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
-- Layers supports adding line layers, choosing line styles, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
+- Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
-- Colors supports selecting and updating saved swatches, palette opacity, palette groups, group apply, and harmony suggestions.
+- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, generated palette group blocks, palette groups, group apply, and harmony suggestions.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
@@ -85,53 +88,41 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 20 test files, 57 tests.
+- `npm test`: pass. 20 test files, 59 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4174/thumbnail-generator/`
+- URL: `http://127.0.0.1:4175/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
-- Fallback used: Playwright 1.60.0 headless Chromium.
+- Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-backlog-20260607-desktop.png`
-  - `docs/assets/runtime-backlog-20260607-mobile.png`
-  - `docs/assets/runtime-open-work-items-20260607-desktop.png`
-  - `docs/assets/runtime-open-work-items-20260607-mobile.png`
+  - `docs/assets/runtime-final-p2-20260607-desktop.png`
+  - `docs/assets/runtime-final-p2-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 14 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 18 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
-- Text newline edit regression: pass. Editing a text layer to `LINE ONE`, `LINE TWO`, and `LINE THREE` produced no page errors and no `Cannot read properties of null (reading 'value')`.
-- Disabled inert controls: pass. Single-line text line height was disabled, then became enabled after multiline text input.
-- Adjust reset: pass. Reset rotation and Reset opacity controls were clickable from Adjust.
-- Quick Add: pass. Headline and Badge starters inserted editable layers.
-- Asset row action: pass. Selected asset was added as an image layer.
-- Image Lab selected asset path: pass. Asset-row scissors opened the modal with an editable preview; Rect drag selection and Create processed layer produced a processed image layer.
-- Default templates: pass. Product Review loaded from Templates and replaced the canvas state.
 - CSV import: pass. Status reported `CSV applied`.
 - HTML import: pass. Status reported `HTML applied`.
-- Line layer: pass. Added a line layer, edited line style to Wave, and edited layer blur, edge blur, and corner radius.
-- Shortcuts: pass. Ctrl+C/Ctrl+V added a copied layer, Ctrl+Z removed it, Ctrl+Y restored it, and Delete opened the confirmation modal.
-- Layers group and canvas fit: pass. Fit to canvas executed for a selected shape/image-compatible layer, selected layers were grouped as `QA group`, and the group pill appeared in Layers.
-- Colors editing and harmony: pass. Existing swatch was selected, renamed, recolored, given opacity/group metadata, updated, and Triad generated additional swatches.
-- Image Lab range editing: pass. Drag mode was absent, Rect selection was drag-created then handle-edited, and Create processed layer completed.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T04-11-11-165Z.webp`).
-- Mobile: pass. `390x844` viewport had horizontal overflow `0`; task tabs remained visible.
+- Quick Add Line: pass. `Line` from Assets created a line layer, and Layers no longer exposed an `Add line` button.
+- Group creation: pass. Created `QA group` and `QA group 2` after the first group already existed.
+- Group selection display: pass. Grouped rows rendered folder-like group markers and group pills.
+- Preview group selection: pass. Clicking a grouped preview object selected the group and the stage reported `2 layers selected`.
+- Colors palette maker: pass. `Palette maker` rendered, Triad generated `QA palette`, and the generated group block displayed at least 3 swatches together.
+- Drag undo/redo: pass. Badge drag moved X from `922` to `1012`; Ctrl+Z returned to `922`; Ctrl+Y restored `1012`.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T04-57-34-323Z.webp`).
+- Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:
 
-- No app errors, page errors, or console errors were reported.
-
-Documentation release evidence:
-
-- README user-facing release guidance: pass.
-- Codex Work Dashboard QCDS re-evaluation: pass. See `docs/codex-work-dashboard-qcds.md`.
+- No app errors or page errors were reported.
+- Chromium emitted one benign Canvas2D readback performance warning during the scripted nonblank pixel check.
 
 ### GitHub Pages
 

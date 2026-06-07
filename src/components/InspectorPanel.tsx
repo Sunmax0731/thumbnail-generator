@@ -12,6 +12,7 @@ import {
   Copy,
   Eye,
   EyeOff,
+  Folder,
   GripHorizontal,
   GripVertical,
   Layers,
@@ -29,7 +30,7 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
-import type { HarmonyMode, PaletteColor, PaletteTarget } from "../lib/colorPalette";
+import { generateHarmonyColors, normalizeColor, type HarmonyMode, type PaletteColor, type PaletteTarget } from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
 import {
   emptyLiveRelativeTransformState,
@@ -69,7 +70,6 @@ interface InspectorPanelProps {
   onGeneratePaletteHarmony: (mode: HarmonyMode) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
-  onAddLineLayer: () => void;
   onDelete: (id: string) => void;
   onDuplicate: (id: string) => void;
   onMove: (id: string, direction: -1 | 1) => void;
@@ -115,7 +115,6 @@ export function InspectorPanel({
   onGeneratePaletteHarmony,
   onSelect,
   onUpdateLayer,
-  onAddLineLayer,
   onDelete,
   onDuplicate,
   onMove,
@@ -226,7 +225,7 @@ export function InspectorPanel({
                   aria-disabled={!layer.selectable}
                   className={`layer-row ${selectedIds.includes(layer.id) ? "selected" : ""} ${
                     draggingId === layer.id ? "dragging" : ""
-                  } ${!layer.selectable ? "locked" : ""}`}
+                  } ${!layer.selectable ? "locked" : ""} ${layer.groupId ? "grouped" : ""}`}
                   onClick={(event) => onSelect(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
                   onKeyDown={(event) => {
                     if (event.key === "Enter" || event.key === " ") {
@@ -257,7 +256,9 @@ export function InspectorPanel({
                   onDragEnd={() => setDraggingId(null)}
                 >
                   <GripVertical size={14} className="drag-grip" />
-                  <span className={`layer-type ${layer.type}`}>{layer.type}</span>
+                  <span className={`layer-type ${layer.groupId ? "group" : layer.type}`}>
+                    {layer.groupId ? <Folder size={13} /> : layer.type}
+                  </span>
                   <span className="layer-name">
                     {layer.name}
                     {layer.groupName ? <small className="layer-group-pill">{layer.groupName}</small> : null}
@@ -306,9 +307,6 @@ export function InspectorPanel({
               onResize={(delta) => setLayerListHeight((height) => clampPanelHeight(height + delta))}
             />
             <div className="button-grid">
-              <button type="button" className="secondary-button icon-text" onClick={onAddLineLayer}>
-                <GripHorizontal size={16} /> {t("inspector.addLine")}
-              </button>
               <button
                 type="button"
                 className="secondary-button icon-text"
@@ -744,48 +742,68 @@ function PaletteControls({
   t: Translator;
 }) {
   const groups = groupPaletteRows(colors);
+  const previewBaseColor = normalizeColor(draft) ?? "#000000";
+  const previewColors = [previewBaseColor, ...generateHarmonyColors(previewBaseColor, "triad")];
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
         <SlidersHorizontal size={16} />
         <h2>{t("inspector.palette")}</h2>
       </div>
-      <div className="palette-register">
-        <label className="field palette-name-field">
-          <span>{t("inspector.paletteName")}</span>
-          <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
-        </label>
-        <label className="field color-field">
-          <span>{t("inspector.paletteColor")}</span>
-          <input type="color" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
-          <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
-        </label>
-        <label className="field palette-target-field">
-          <span>{t("inspector.paletteTarget")}</span>
-          <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
-            <option value="fill">{t("inspector.fill")}</option>
-            <option value="stroke">{t("inspector.stroke")}</option>
-          </select>
-        </label>
-        <SliderNumberInput
-          label={t("inspector.paletteAlpha")}
-          value={alphaDraft}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          onChange={onAlphaDraftChange}
-        />
-        <label className="field palette-name-field">
-          <span>{t("inspector.paletteGroup")}</span>
-          <input type="text" value={groupDraft} onChange={(event) => onGroupDraftChange(event.currentTarget.value)} />
-        </label>
-        <button type="button" className="secondary-button" onClick={onAdd}>
-          {t("inspector.addColor")}
-        </button>
-        <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
-          {t("inspector.updateColor")}
-        </button>
+      <div className="palette-maker">
+        <div className="palette-maker-heading">
+          <span>{t("inspector.paletteMaker")}</span>
+          <small>{t("inspector.palettePreview")}</small>
+        </div>
+        <div className="palette-maker-preview">
+          <span
+            className="palette-wheel"
+            aria-hidden="true"
+            style={{ background: `conic-gradient(${previewColors.join(", ")}, ${previewColors[0]})` }}
+          />
+          <div className="palette-preview-strip" aria-label={t("inspector.palettePreview")}>
+            {previewColors.map((color, index) => (
+              <span key={`${color}-${index}`} style={{ background: color, opacity: alphaDraft }} />
+            ))}
+          </div>
+        </div>
+        <div className="palette-register">
+          <label className="field palette-name-field">
+            <span>{t("inspector.paletteName")}</span>
+            <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
+          </label>
+          <label className="field color-field">
+            <span>{t("inspector.paletteColor")}</span>
+            <input type="color" value={previewBaseColor} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+            <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+          </label>
+          <label className="field palette-target-field">
+            <span>{t("inspector.paletteTarget")}</span>
+            <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
+              <option value="fill">{t("inspector.fill")}</option>
+              <option value="stroke">{t("inspector.stroke")}</option>
+            </select>
+          </label>
+          <SliderNumberInput
+            label={t("inspector.paletteAlpha")}
+            value={alphaDraft}
+            min={0}
+            max={1}
+            step={0.05}
+            decimals={2}
+            onChange={onAlphaDraftChange}
+          />
+          <label className="field palette-name-field">
+            <span>{t("inspector.paletteGroup")}</span>
+            <input type="text" value={groupDraft} onChange={(event) => onGroupDraftChange(event.currentTarget.value)} />
+          </label>
+          <button type="button" className="secondary-button" onClick={onAdd}>
+            {t("inspector.addColor")}
+          </button>
+          <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
+            {t("inspector.updateColor")}
+          </button>
+        </div>
       </div>
       <div className="button-grid harmony-grid">
         {(["analogous", "complementary", "split", "triad"] as HarmonyMode[]).map((mode) => (
@@ -806,9 +824,11 @@ function PaletteControls({
             >
               <span>{group.name}</span>
               <span className="palette-group-swatches">
-                {group.fill ? <i style={{ background: group.fill.value, opacity: group.fill.alpha }} /> : null}
-                {group.stroke ? <i style={{ background: group.stroke.value, opacity: group.stroke.alpha }} /> : null}
+                {group.colors.slice(0, 6).map((color) => (
+                  <i key={color.id} style={{ background: color.value, opacity: color.alpha }} />
+                ))}
               </span>
+              <small className="palette-group-count">{group.colors.length}</small>
             </button>
           ))}
         </div>
@@ -971,11 +991,12 @@ function harmonyLabelKey(mode: HarmonyMode) {
   return keys[mode];
 }
 
-function groupPaletteRows(colors: PaletteColor[]): Array<{ name: string; fill?: PaletteColor; stroke?: PaletteColor }> {
-  const groups = new Map<string, { name: string; fill?: PaletteColor; stroke?: PaletteColor }>();
+function groupPaletteRows(colors: PaletteColor[]): Array<{ name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }> {
+  const groups = new Map<string, { name: string; colors: PaletteColor[]; fill?: PaletteColor; stroke?: PaletteColor }>();
   for (const color of colors) {
     if (!color.groupName) continue;
-    const group = groups.get(color.groupName) ?? { name: color.groupName };
+    const group = groups.get(color.groupName) ?? { name: color.groupName, colors: [] };
+    group.colors.push(color);
     if (color.target === "fill" && !group.fill) group.fill = color;
     if (color.target === "stroke" && !group.stroke) group.stroke = color;
     groups.set(color.groupName, group);
