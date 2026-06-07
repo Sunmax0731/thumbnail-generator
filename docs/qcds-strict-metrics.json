@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes the attached Blur stroke null.checked runtime error fix, SVG favicon, Adobe-style color wheel and palette bars, synchronized HEX/RGB palette input, recent colors, immediate color preview application, vertical text visual selection bounds, CSV/HTML persistence, local image import, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes offscreen signed edge-blur rendering, Blur stroke toggle, equal-width Adjust reset controls, drag-capable Adobe-style color wheel and palette bars, synchronized HEX/RGB palette input, recent colors, immediate alpha-aware color preview application, deletable Fill/Stroke color groups, saved multi-color palette rows, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,14 +15,15 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: attached image runtime error no longer reproduces, Adobe-style palette UI includes visual color exploration plus HEX/RGB and recent-color reuse, palette choices preview immediately on selected layers, vertical text selection follows visible columns, CSV/HTML import/export persistence works, local image import works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: edge blur visibly changes preview/export, Adobe-style palette UI supports wheel drag plus HEX/RGB and recent-color reuse, palette choices preview immediately on selected layers with opacity, Fill/Stroke groups and multi-color palettes are distinct, color groups can be deleted, Adjust reset controls align and still reset values, CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
     "source": "docs/codex-work-dashboard-qcds.md",
     "openItemsBeforeReview": [
-      "README user-facing release update",
-      "Codex Work Dashboard QCDS re-evaluation and improvement"
+      "Colors palette/group improvements",
+      "Edge blur rendering",
+      "Adjust reset control layout"
     ],
     "closedByReview": true,
     "ratingsAfterReview": {
@@ -39,15 +40,15 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser backend returned Browser is not available: iab",
-    "url": "http://127.0.0.1:4181/thumbnail-generator/",
+    "url": "http://127.0.0.1:4182/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-all-work-items-20260607-desktop.png",
-      "docs/assets/runtime-all-work-items-20260607-colors.png",
-      "docs/assets/runtime-all-work-items-20260607-mobile.png"
+      "docs/assets/runtime-colors-edge-gate-20260607-desktop.png",
+      "docs/assets/runtime-colors-edge-gate-20260607-colors.png",
+      "docs/assets/runtime-colors-edge-gate-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -56,14 +57,15 @@
       "right Layers Adjust Colors tabs",
       "CSV import",
       "HTML import",
-      "local image import",
-      "vertical text writing mode",
-      "Blur stroke control without null.checked runtime error",
-      "Adobe-style color wheel points",
+      "edge blur slider changed canvas hash",
+      "Blur stroke control",
+      "Adjust reset rotation and opacity",
+      "Adobe-style color wheel drag",
       "large palette bars",
       "synchronized HEX/RGB input",
       "recent color swatches",
-      "saved palette row",
+      "Fill Stroke color group delete",
+      "saved multi-color palette row",
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"

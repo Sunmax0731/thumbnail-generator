@@ -16,7 +16,7 @@
 - Preview padding expands for visible off-canvas layer bounds.
 - Text fit chooses the largest font size that fits the text layer bounds.
 - Language detection selects Japanese or English from browser language tags and falls back to English.
-- Color palette registration preserves names, Fill/Stroke targets, uniqueness, and legacy storage migration.
+- Color palette registration preserves names, Fill/Stroke targets, uniqueness, legacy storage migration, and whole-group deletion.
 - Color palette editing preserves selected swatch updates, opacity, grouping, and harmony generation.
 - CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, and line styles.
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
@@ -84,8 +84,8 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
-- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved palette sets, generated palette group blocks, palette groups, group apply, and harmony suggestions.
-- Colors supports Adobe-style color wheel points, large palette bars, synchronized HEX/RGB input, recent-color reuse, and immediate preview application to selected text/shape layers.
+- Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, generated palette group blocks, Fill/Stroke color groups, group apply/delete, and harmony suggestions.
+- Colors supports Adobe-style color wheel points, wheel drag, large palette bars, synchronized HEX/RGB input, recent-color reuse, and immediate preview application to selected text/shape layers.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
@@ -103,34 +103,35 @@ Completed on 2026-06-07.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4181/thumbnail-generator/`
+- URL: `http://127.0.0.1:4182/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-all-work-items-20260607-desktop.png`
-  - `docs/assets/runtime-all-work-items-20260607-colors.png`
-  - `docs/assets/runtime-all-work-items-20260607-mobile.png`
+  - `docs/assets/runtime-colors-edge-gate-20260607-desktop.png`
+  - `docs/assets/runtime-colors-edge-gate-20260607-colors.png`
+  - `docs/assets/runtime-colors-edge-gate-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 216 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 560 distinct sampled colors on initial desktop render).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
-- CSV import: pass. Status reported `CSV applied: 3 layers.`
+- CSV import: pass. Status reported `CSV applied: 2 layers.`
 - HTML import: pass. Status reported `HTML applied: 3 layers.`
-- Local image import: pass. A browser-provided PNG file imported as `codex-local`.
-- Text editing: pass. Added a text layer, switched Writing mode to Vertical, and enabled Blur stroke without the `null.checked` runtime error from the attached screenshot.
-- Adobe-style Colors UI: pass. Runtime found 3 color-wheel points, 3 palette bars, 3 RGB numeric inputs, 9 recent swatches, and 1 saved palette row after saving the current pattern.
-- Color preview application: pass. HEX/RGB/bar selections previewed on the selected text layer for the active Fill target.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T06-42-39-439Z.webp`).
+- Edge blur editing: pass. Setting Edge blur to `28` and enabling Blur stroke changed the canvas hash from `3202979441` to `1322676249`.
+- Adjust reset layout and behavior: pass. Reset rotation returned the selected layer to `0`; Reset opacity returned it to `1`.
+- Colors wheel drag and preview: pass. Dragging the color wheel changed the draft to `#4841c9` and changed the canvas hash from `1322676249` to `3115334162`.
+- Colors group/palette distinction: pass. A `Gate` Fill/Stroke color group was created, then deleted (`1` row before delete, `0` after); one multi-color palette row was saved; registered single-color rows remained.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T07-59-23-396Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:
 
-- No relevant console errors, page errors, or HTTP 4xx/5xx responses were reported.
+- No page errors or HTTP 4xx/5xx responses were reported.
+- One Chromium warning came from the gate's repeated `getImageData` readbacks for canvas hashing; it is not an app runtime error.
 
 ### GitHub Pages
 

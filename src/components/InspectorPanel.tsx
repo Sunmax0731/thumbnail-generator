@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import type { ReactNode } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import {
   AlignHorizontalJustifyCenter,
   AlignHorizontalJustifyEnd,
@@ -88,9 +88,10 @@ interface InspectorPanelProps {
   onAddPaletteColor: () => void;
   onUpdatePaletteColor: () => void;
   onDeletePaletteColor: (id: string) => void;
+  onDeletePaletteGroup: (groupName: string) => void;
   onSaveCurrentColorPalette: () => void;
   onDeleteSavedColorPalette: (id: string) => void;
-  onApplyPaletteColor: (color: string, target: PaletteTarget) => void;
+  onApplyPaletteColor: (color: string, target: PaletteTarget, alpha?: number) => void;
   onApplyPaletteGroup: (groupName: string) => void;
   onGeneratePaletteHarmony: (mode: HarmonyMode) => void;
   onSelect: (id: string, additive?: boolean) => void;
@@ -139,6 +140,7 @@ export function InspectorPanel({
   onAddPaletteColor,
   onUpdatePaletteColor,
   onDeletePaletteColor,
+  onDeletePaletteGroup,
   onSaveCurrentColorPalette,
   onDeleteSavedColorPalette,
   onApplyPaletteColor,
@@ -440,6 +442,7 @@ export function InspectorPanel({
           onAdd={onAddPaletteColor}
           onUpdate={onUpdatePaletteColor}
           onDelete={onDeletePaletteColor}
+          onDeleteGroup={onDeletePaletteGroup}
           onSavePalette={onSaveCurrentColorPalette}
           onDeleteSavedPalette={onDeleteSavedColorPalette}
           onApply={onApplyPaletteColor}
@@ -788,6 +791,7 @@ function PaletteControls({
   onAdd,
   onUpdate,
   onDelete,
+  onDeleteGroup,
   onSavePalette,
   onDeleteSavedPalette,
   onApply,
@@ -817,9 +821,10 @@ function PaletteControls({
   onAdd: () => void;
   onUpdate: () => void;
   onDelete: (id: string) => void;
+  onDeleteGroup: (groupName: string) => void;
   onSavePalette: () => void;
   onDeleteSavedPalette: (id: string) => void;
-  onApply: (color: string, target: PaletteTarget) => void;
+  onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
   onApplyGroup: (groupName: string) => void;
   onGenerateHarmony: (mode: HarmonyMode) => void;
   onResizeList: (deltaY: number) => void;
@@ -830,10 +835,18 @@ function PaletteControls({
   const previewRgb = hexToRgbChannels(previewBaseColor) ?? { r: 0, g: 0, b: 0 };
   const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
   const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
-  const setDraftAndPreview = (value: string) => {
+  const setDraftAndPreview = (value: string, alpha = alphaDraft) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     onDraftChange(normalized ?? value);
-    if (normalized && selectedCount > 0) onApply(normalized, targetDraft);
+    if (normalized && selectedCount > 0) onApply(normalized, targetDraft, alpha);
+  };
+  const updateDraftFromWheelPointer = (event: ReactPointerEvent<HTMLElement>) => {
+    setDraftAndPreview(colorFromWheelPointer(event, event.currentTarget));
+  };
+  const handleAlphaDraftChange = (value: number) => {
+    onAlphaDraftChange(value);
+    const normalized = normalizeColor(draft);
+    if (normalized && selectedCount > 0) onApply(normalized, targetDraft, value);
   };
   const setRgbChannel = (channel: "r" | "g" | "b", value: number) => {
     const next = rgbChannelsToHex(
@@ -858,6 +871,19 @@ function PaletteControls({
           <div
             className="palette-wheel"
             aria-label={t("inspector.paletteScheme")}
+            onPointerDown={(event) => {
+              event.currentTarget.setPointerCapture(event.pointerId);
+              updateDraftFromWheelPointer(event);
+            }}
+            onPointerMove={(event) => {
+              if ((event.buttons & 1) !== 1 || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+              updateDraftFromWheelPointer(event);
+            }}
+            onPointerUp={(event) => {
+              if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+                event.currentTarget.releasePointerCapture(event.pointerId);
+              }
+            }}
           >
             {previewColors.map((color, index) => (
               <button
@@ -933,7 +959,7 @@ function PaletteControls({
             max={1}
             step={0.05}
             decimals={2}
-            onChange={onAlphaDraftChange}
+            onChange={handleAlphaDraftChange}
           />
           <label className="field palette-name-field">
             <span>{t("inspector.paletteGroup")}</span>
@@ -949,15 +975,17 @@ function PaletteControls({
               ))}
             </select>
           </label>
-          <button type="button" className="secondary-button" onClick={onAdd}>
-            {t("inspector.addColor")}
-          </button>
-          <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
-            {t("inspector.updateColor")}
-          </button>
-          <button type="button" className="secondary-button wide-button palette-save-button" onClick={onSavePalette}>
-            {t("inspector.savePalette")}
-          </button>
+          <div className="palette-actions">
+            <button type="button" className="secondary-button" onClick={onAdd}>
+              {t("inspector.addColor")}
+            </button>
+            <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
+              {t("inspector.updateColor")}
+            </button>
+            <button type="button" className="secondary-button" onClick={onSavePalette}>
+              {t("inspector.savePalette")}
+            </button>
+          </div>
         </div>
       </div>
       {recentColors.length > 0 ? (
@@ -977,8 +1005,53 @@ function PaletteControls({
           </button>
         ))}
       </div>
+      {groups.length > 0 ? (
+        <div className="palette-group-list" aria-label={t("inspector.paletteGroups")}>
+          <div className="palette-subheading">
+            <span>{t("inspector.paletteGroups")}</span>
+          </div>
+          {groups.map((group) => (
+            <div className="palette-group-row" key={group.name}>
+              <button
+                type="button"
+                className="secondary-button palette-group-button"
+                disabled={selectedCount === 0}
+                onClick={() => onApplyGroup(group.name)}
+              >
+                <span>{group.name}</span>
+                <span className="palette-group-swatches">
+                  <i
+                    className={!group.fill ? "missing" : ""}
+                    title={t("inspector.fill")}
+                    style={{ background: group.fill?.value ?? "transparent", opacity: group.fill?.alpha ?? 1 }}
+                  />
+                  <i
+                    className={!group.stroke ? "missing" : ""}
+                    title={t("inspector.stroke")}
+                    style={{ background: group.stroke?.value ?? "transparent", opacity: group.stroke?.alpha ?? 1 }}
+                  />
+                </span>
+                <small className="palette-group-count">
+                  {group.fill && group.stroke ? "2" : "1/2"}
+                </small>
+              </button>
+              <button
+                type="button"
+                className="mini-icon-button danger"
+                title={t("inspector.deletePaletteGroup", { name: group.name })}
+                onClick={() => onDeleteGroup(group.name)}
+              >
+                <Trash2 size={13} />
+              </button>
+            </div>
+          ))}
+        </div>
+      ) : null}
       {savedPalettes.length > 0 ? (
         <div className="saved-palette-list" aria-label={t("inspector.savedPalettes")}>
+          <div className="palette-subheading">
+            <span>{t("inspector.savedPalettes")}</span>
+          </div>
           {savedPalettes.map((palette) => (
             <div className="saved-palette-row" key={palette.id}>
               <div className="saved-palette-header">
@@ -1012,27 +1085,9 @@ function PaletteControls({
           ))}
         </div>
       ) : null}
-      {groups.length > 0 ? (
-        <div className="palette-group-list" aria-label={t("inspector.paletteGroups")}>
-          {groups.map((group) => (
-            <button
-              key={group.name}
-              type="button"
-              className="secondary-button palette-group-button"
-              disabled={selectedCount === 0}
-              onClick={() => onApplyGroup(group.name)}
-            >
-              <span>{group.name}</span>
-              <span className="palette-group-swatches">
-                {group.colors.slice(0, 6).map((color) => (
-                  <i key={color.id} style={{ background: color.value, opacity: color.alpha }} />
-                ))}
-              </span>
-              <small className="palette-group-count">{group.colors.length}</small>
-            </button>
-          ))}
-        </div>
-      ) : null}
+      <div className="palette-subheading">
+        <span>{t("inspector.registeredColors")}</span>
+      </div>
       <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
         {colors.map((color) => (
           <div className={`swatch-row ${selectedColorId === color.id ? "selected" : ""}`} key={color.id}>
@@ -1205,6 +1260,16 @@ function wheelPointStyle(color: string): { left: string; top: string } {
   };
 }
 
+function colorFromWheelPointer(event: ReactPointerEvent<HTMLElement>, element: HTMLElement): string {
+  const rect = element.getBoundingClientRect();
+  const x = event.clientX - rect.left - rect.width / 2;
+  const y = event.clientY - rect.top - rect.height / 2;
+  const distance = Math.sqrt(x * x + y * y);
+  const hue = normalizeHue((Math.atan2(y, x) * 180) / Math.PI + 90);
+  const saturation = clampUnit((distance - rect.width * 0.08) / (rect.width * 0.42));
+  return hslToHex(hue, saturation, 0.52);
+}
+
 function readableTextColor(color: string): string {
   const channels = hexToRgbChannels(color);
   if (!channels) return "#152033";
@@ -1229,6 +1294,33 @@ function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: n
         ? ((blue - red) / delta + 2) * 60
         : ((red - green) / delta + 4) * 60;
   return { h, s, l };
+}
+
+function hslToHex(h: number, s: number, l: number): string {
+  const c = (1 - Math.abs(2 * l - 1)) * s;
+  const x = c * (1 - Math.abs(((h / 60) % 2) - 1));
+  const m = l - c / 2;
+  const [red, green, blue] =
+    h < 60
+      ? [c, x, 0]
+      : h < 120
+        ? [x, c, 0]
+        : h < 180
+          ? [0, c, x]
+          : h < 240
+            ? [0, x, c]
+            : h < 300
+              ? [x, 0, c]
+              : [c, 0, x];
+  return rgbChannelsToHex((red + m) * 255, (green + m) * 255, (blue + m) * 255);
+}
+
+function normalizeHue(value: number): number {
+  return ((value % 360) + 360) % 360;
+}
+
+function clampUnit(value: number): number {
+  return Math.min(1, Math.max(0, value));
 }
 
 function harmonyLabelKey(mode: HarmonyMode) {

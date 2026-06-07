@@ -134,6 +134,12 @@ export function removePaletteColor(colors: PaletteColor[], id: string): PaletteC
   return colors.filter((color) => color.id !== id);
 }
 
+export function removePaletteGroupColors(colors: PaletteColor[], groupName: string): PaletteColor[] {
+  const normalized = normalizeOptionalGroupName(groupName);
+  if (!normalized) return colors;
+  return colors.filter((color) => normalizeOptionalGroupName(color.groupName) !== normalized);
+}
+
 export function paletteGroups(colors: PaletteColor[]): Array<{ name: string; fill?: PaletteColor; stroke?: PaletteColor }> {
   const grouped = new Map<string, { name: string; fill?: PaletteColor; stroke?: PaletteColor }>();
   for (const color of colors) {

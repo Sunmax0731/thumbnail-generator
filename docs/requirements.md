@@ -44,9 +44,9 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
-- Edit registered palette colors, assign palette groups, apply fill/stroke groups, set palette opacity, preview palette patterns, and generate grouped color harmony suggestions.
-- Use an Adobe-style visual color palette with color-wheel points, large palette bars, HEX/RGB synchronized input, and recent-color reuse.
-- Save the currently previewed palette pattern as one browser-local palette set and apply individual saved-palette colors as Fill or Stroke.
+- Edit registered single colors, assign and delete Fill/Stroke color groups, apply fill/stroke groups, set palette opacity, preview palette patterns, and generate grouped color harmony suggestions.
+- Use an Adobe-style visual color palette with color-wheel points, drag-based color selection, large palette bars, HEX/RGB synchronized input, and recent-color reuse.
+- Save the currently previewed palette pattern as one browser-local multi-color palette set and apply individual saved-palette colors as Fill or Stroke.
 - Use signed edge blur values to choose inner or outer edge blur, and optionally include text/shape strokes in the blur source.
 - Treat canvas drag movement as one undo/redo history step from drag start to drag completion, not as intermediate pointer positions.
 

@@ -12,6 +12,7 @@ import {
   paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
+  removePaletteGroupColors,
   removePaletteColor,
   removeSavedColorPalette,
   rgbChannelsToHex,
@@ -67,6 +68,7 @@ describe("colorPalette", () => {
       alpha: 0.5,
     });
     expect(paletteGroups(colors)).toEqual([{ name: "Brand", fill: colors[0], stroke: colors[1] }]);
+    expect(removePaletteGroupColors(colors, " Brand ")).toEqual([]);
     expect(generateHarmonyColors("#ff0000", "triad")).toEqual(["#00ff00", "#0000ff"]);
     expect(addHarmonyColors([], { value: "#ff0000", target: "fill" }, "complementary", 10)).toHaveLength(1);
   });

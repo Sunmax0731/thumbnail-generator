@@ -58,11 +58,12 @@ This page is the quick feature index for users and reviewers.
 
 ## Color Palette
 
-- Register and edit named Fill or Stroke colors in Colors.
-- Explore colors with an Adobe-style color wheel, generated palette bars, synchronized HEX/RGB inputs, and recent-color swatches.
+- Register, edit, and delete named Fill or Stroke single colors in Colors.
+- Explore colors with an Adobe-style drag-capable color wheel, generated palette bars, synchronized HEX/RGB inputs, and recent-color swatches.
 - Set palette opacity and group names.
-- Apply saved Fill or Stroke colors, or one-click Fill/Stroke groups, to selected text and shape layers.
+- Apply saved Fill or Stroke colors, or one-click Fill/Stroke color groups, to selected text and shape layers.
 - Preview graphical palette patterns from the draft color and opacity.
-- Save the currently displayed pattern as one palette set and apply each saved-palette color as Fill or Stroke.
+- Save the currently displayed pattern as one multi-color palette set and apply each saved-palette color as Fill or Stroke.
 - Generate analogous, complementary, split-complementary, triad, square, compound, shades, and monochromatic palette suggestions from the draft color.
+- Delete a Fill/Stroke color group without deleting unrelated saved palettes.
 - Resize the Colors list area when reviewing many saved swatches.

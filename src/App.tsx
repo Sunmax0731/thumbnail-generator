@@ -24,6 +24,7 @@ import {
   paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
+  removePaletteGroupColors,
   removePaletteColor,
   removeSavedColorPalette,
   updatePaletteColor,
@@ -991,20 +992,35 @@ function App() {
     [paletteColors],
   );
 
+  const deletePaletteGroup = useCallback(
+    (groupName: string) => {
+      const next = removePaletteGroupColors(paletteColors, groupName);
+      const nextIds = new Set(next.map((color) => color.id));
+      writeColorPalette(next);
+      setPaletteColors(next);
+      setSelectedPaletteColorId((current) => (current && !nextIds.has(current) ? null : current));
+      if (paletteGroupDraft.trim() === groupName) {
+        setPaletteGroupDraft("");
+      }
+      setStatus(`Palette group "${groupName}" removed.`);
+    },
+    [paletteColors, paletteGroupDraft],
+  );
+
   const applyPaletteColor = useCallback(
-    (color: string, target: PaletteTarget) => {
+    (color: string, target: PaletteTarget, alpha?: number) => {
       const normalizedDraft = normalizeColor(paletteDraft);
       setLayers((current) =>
         current.map((layer) => {
           if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
           if (layer.type === "text") {
             const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
-            const opacity = palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
+            const opacity = alpha ?? palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
             return target === "fill" ? { ...layer, color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           if (layer.type === "shape") {
             const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
-            const opacity = palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
+            const opacity = alpha ?? palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
             return target === "fill" ? { ...layer, fill: color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           return layer;
@@ -1403,6 +1419,7 @@ function App() {
           onAddPaletteColor={addPaletteColor}
           onUpdatePaletteColor={saveSelectedPaletteColor}
           onDeletePaletteColor={deletePaletteColor}
+          onDeletePaletteGroup={deletePaletteGroup}
           onSaveCurrentColorPalette={saveCurrentColorPalette}
           onDeleteSavedColorPalette={deleteSavedColorPalette}
           onApplyPaletteColor={applyPaletteColor}

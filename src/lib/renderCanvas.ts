@@ -3,7 +3,6 @@ import { getLayerVisualLocalBounds, getLayerVisualLocalCenter } from "./layerVis
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
-const edgeShadowOffset = 10000;
 
 export interface RenderOptions {
   selectedLayerId?: string | null;
@@ -86,34 +85,110 @@ async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLaye
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
 
-  if (layer.edgeBlur !== 0) {
-    await drawLayerEdgeBlur(context, layer, assets);
+  if (layer.edgeBlur < 0) {
+    await drawLayerInnerEdgeBlur(context, layer, assets);
+  } else {
+    if (layer.edgeBlur > 0) {
+      await drawLayerOuterEdgeBlur(context, layer, assets);
+    }
+    await drawLayerContent(context, layer, assets, {
+      includeFill: true,
+      includeStroke: true,
+      layerBlur: layer.layerBlur,
+    });
   }
-  await drawLayerContent(context, layer, assets, {
-    includeFill: true,
-    includeStroke: true,
-    layerBlur: layer.layerBlur,
-  });
   context.restore();
 }
 
-async function drawLayerEdgeBlur(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
+async function drawLayerOuterEdgeBlur(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
   const amount = Math.abs(layer.edgeBlur);
   if (amount <= 0) return;
-  context.save();
-  if (layer.edgeBlur < 0) {
-    clipLayerBounds(context, layer);
-  }
-  context.shadowBlur = amount;
-  context.shadowColor = "rgba(15, 23, 42, 0.36)";
-  context.shadowOffsetX = edgeShadowOffset;
-  context.translate(-edgeShadowOffset, 0);
-  await drawLayerContent(context, layer, assets, {
+  const blurred = await renderLayerToOffscreen(layer, assets, amount, {
     includeFill: true,
     includeStroke: shouldIncludeStrokeForEdgeBlur(layer),
     layerBlur: 0,
   });
+  context.save();
+  context.filter = `blur(${amount}px)`;
+  context.drawImage(blurred.canvas, blurred.left, blurred.top);
   context.restore();
+}
+
+async function drawLayerInnerEdgeBlur(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
+  const amount = Math.abs(layer.edgeBlur);
+  if (amount <= 0) return;
+  const includeStroke = shouldIncludeStrokeForEdgeBlur(layer);
+  const body = await renderLayerToOffscreen(layer, assets, amount, {
+    includeFill: true,
+    includeStroke,
+    layerBlur: layer.layerBlur,
+  });
+  const softened = createFeatheredAlphaCanvas(body.canvas, amount);
+  if (softened) {
+    context.drawImage(softened, body.left, body.top);
+  } else {
+    await drawLayerContent(context, layer, assets, {
+      includeFill: true,
+      includeStroke,
+      layerBlur: layer.layerBlur,
+    });
+  }
+  if (!includeStroke) {
+    await drawLayerContent(context, layer, assets, {
+      includeFill: false,
+      includeStroke: true,
+      layerBlur: layer.layerBlur,
+    });
+  }
+}
+
+async function renderLayerToOffscreen(
+  layer: ThumbnailLayer,
+  assets: ImageAsset[],
+  blurAmount: number,
+  options: { includeFill: boolean; includeStroke: boolean; layerBlur: number },
+): Promise<{ canvas: HTMLCanvasElement; left: number; top: number }> {
+  const bounds = getLayerVisualLocalBounds(layer);
+  const padding = Math.ceil(blurAmount * 3 + options.layerBlur + layerStrokePadding(layer) + 8);
+  const width = Math.max(1, Math.ceil(bounds.right - bounds.left + padding * 2));
+  const height = Math.max(1, Math.ceil(bounds.bottom - bounds.top + padding * 2));
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return { canvas, left: bounds.left - padding, top: bounds.top - padding };
+  context.translate(-bounds.left + padding, -bounds.top + padding);
+  await drawLayerContent(context, layer, assets, options);
+  return { canvas, left: bounds.left - padding, top: bounds.top - padding };
+}
+
+function createFeatheredAlphaCanvas(source: HTMLCanvasElement, amount: number): HTMLCanvasElement | null {
+  const mask = document.createElement("canvas");
+  mask.width = source.width;
+  mask.height = source.height;
+  const maskContext = mask.getContext("2d");
+  const result = document.createElement("canvas");
+  result.width = source.width;
+  result.height = source.height;
+  const resultContext = result.getContext("2d");
+  if (!maskContext || !resultContext) return null;
+
+  maskContext.filter = `blur(${amount}px)`;
+  maskContext.drawImage(source, 0, 0);
+  maskContext.filter = "none";
+  maskContext.globalCompositeOperation = "destination-in";
+  maskContext.drawImage(source, 0, 0);
+
+  resultContext.drawImage(source, 0, 0);
+  resultContext.globalCompositeOperation = "destination-in";
+  resultContext.drawImage(mask, 0, 0);
+  resultContext.globalCompositeOperation = "source-over";
+  return result;
+}
+
+function layerStrokePadding(layer: ThumbnailLayer): number {
+  if (layer.type === "text" || layer.type === "shape") return layer.strokeWidth;
+  return 0;
 }
 
 async function drawLayerContent(
@@ -350,24 +425,6 @@ function shouldIncludeStrokeForEdgeBlur(layer: ThumbnailLayer): boolean {
   if (layer.type === "image") return true;
   if (layer.type === "shape" && layer.shape === "line") return true;
   return layer.edgeBlurStroke;
-}
-
-function clipLayerBounds(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
-  context.beginPath();
-  if (layer.type === "shape" && layer.shape === "ellipse") {
-    context.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
-  } else if (layer.type === "shape" && layer.shape === "triangle") {
-    context.moveTo(0, -layer.height / 2);
-    context.lineTo(layer.width / 2, layer.height / 2);
-    context.lineTo(-layer.width / 2, layer.height / 2);
-    context.closePath();
-  } else if (layer.type === "shape" && layer.shape === "line") {
-    const halfHeight = Math.max(layer.height / 2, layer.strokeWidth / 2, 1);
-    context.rect(-layer.width / 2, -halfHeight, layer.width, halfHeight * 2);
-  } else {
-    context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, layer.cornerRadius);
-  }
-  context.clip();
 }
 
 function clipRoundedRect(

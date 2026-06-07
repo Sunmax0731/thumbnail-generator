@@ -15,7 +15,7 @@ All layers share:
 - `selectable`: whether the layer can be selected or edited.
 - `groupId` and `groupName`: optional group metadata.
 - `layerBlur`: whole-layer blur in CSS filter pixels.
-- `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw an outer blur, and negative values draw an inner blur clipped to the layer bounds or shape.
+- `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw a blurred layer copy behind the layer, and negative values draw the layer through a feathered alpha mask so inner edge softening is visible in preview and export.
 - `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
 - `cornerRadius`: rounded corner radius for image layers and rectangular shape layers.
 
@@ -180,7 +180,7 @@ The right inspector is grouped by task:
 
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
 - Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
-- Colors: browser-local color palette registration, graphical palette maker preview, harmony group generation, and quick application with saved names and Fill/Stroke targets. Saved colors are displayed in list rows similar to layer rows.
+- Colors: browser-local single-color registration, Fill/Stroke color groups, saved multi-color palettes, graphical palette maker preview, harmony group generation, and quick application with saved names and Fill/Stroke targets. Saved single colors are displayed in list rows similar to layer rows.
 
 The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
@@ -288,7 +288,7 @@ Registered colors can be applied to:
 
 Palette entries can be selected back into the Colors editor and updated in place. A palette entry stores optional `groupName` and `alpha` values. Applying a Fill or Stroke palette entry also applies that entry's opacity to supported text and shape layers.
 
-Palette groups are derived from entries with the same group name. Applying a group sets the selected text/shape fill and stroke colors together when the group has matching Fill and Stroke entries. Group blocks display all saved swatches in that group so generated palettes are visually separate from the registered-color list. The palette maker previews the current base color with generated companion colors, and harmony generation stores the base plus analogous, complementary, split-complementary, or triad suggestions in one group.
+Palette groups are derived from registered single-color entries with the same group name. A group is treated as a Fill + Stroke pair: applying a group sets the selected text/shape fill and stroke colors together when matching entries exist, and deleting a group removes the registered colors in that group. Group rows display the Fill and Stroke swatches separately from the registered single-color list and from saved multi-color palettes.
 
 Saved palette sets are stored separately under `thumbnail-generator.savedColorPalettes.v1`. A saved palette set stores:
 
@@ -299,9 +299,9 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 - Generated color list.
 - Created timestamp.
 
-The palette maker can save the currently displayed pattern as one palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
+The palette maker can save the currently displayed pattern as one multi-color palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
 
-The Colors tab also provides an Adobe-style color exploration surface: a color wheel with generated-color points, large palette bars with HEX labels, synchronized HEX and RGB inputs, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Choosing a generated, recent, HEX, RGB, or wheel color previews it immediately on the selected text or shape layer for the active Fill/Stroke target.
+The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars with HEX labels, synchronized HEX and RGB inputs, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Choosing or dragging to a generated, recent, HEX, RGB, or wheel color previews it immediately on the selected text or shape layer for the active Fill/Stroke target and current opacity.
 
 ## Edit State Storage
 
