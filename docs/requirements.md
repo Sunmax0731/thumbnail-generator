@@ -45,7 +45,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
 - Edit registered single colors, apply each saved single color directly as Fill or Stroke, set palette opacity, and preview palette patterns.
-- Use an Adobe-style visual color palette with selectable and drag-editable color-wheel points, explicit base-color controls, large palette bars, HEX/RGB synchronized input with sliders, and recent-color reuse.
+- Use an Adobe-style visual color palette with selectable and drag-editable linked color-wheel points, explicit base-color controls, large palette bars, HEX/RGB synchronized input with sliders, and recent-color reuse.
 - Save the currently previewed palette pattern as one browser-local multi-color palette set and apply individual saved-palette colors as Fill or Stroke.
 - Use signed edge blur values to choose inner or outer edge blur, and optionally include text/shape strokes in the blur source.
 - Treat canvas drag movement as one undo/redo history step from drag start to drag completion, not as intermediate pointer positions.

@@ -32,6 +32,7 @@ import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
 import {
+  derivePaletteBaseFromSchemeColor,
   generatePaletteSchemeColors,
   hexToRgbChannels,
   normalizeColor,
@@ -797,11 +798,9 @@ function PaletteControls({
 }) {
   const [activePointIndex, setActivePointIndex] = useState(0);
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
-  const [manualPreviewColors, setManualPreviewColors] = useState<Record<number, string>>({});
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
   const previewRgb = hexToRgbChannels(previewBaseColor) ?? { r: 0, g: 0, b: 0 };
-  const generatedColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
-  const previewColors = generatedColors.map((color, index) => manualPreviewColors[index] ?? color);
+  const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
   const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
   const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
 
@@ -809,25 +808,16 @@ function PaletteControls({
     if (activePointIndex >= previewColors.length) setActivePointIndex(0);
   }, [activePointIndex, previewColors.length]);
 
-  const setBaseDraft = (value: string, options: { preservePreviewPoints?: boolean } = {}) => {
+  const setBaseDraft = (value: string, options: { preserveActivePoint?: boolean } = {}) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     onDraftChange(normalized ?? value);
-    if (!options.preservePreviewPoints) {
-      setManualPreviewColors({});
-      setActivePointIndex(0);
-    }
+    if (!options.preserveActivePoint) setActivePointIndex(0);
   };
 
-  const updatePreviewPoint = (index: number, color: string) => {
-    setManualPreviewColors((current) => {
-      const seeded =
-        Object.keys(current).length > 0
-          ? current
-          : Object.fromEntries(previewColors.map((previewColor, previewIndex) => [previewIndex, previewColor]));
-      return { ...seeded, [index]: color };
-    });
+  const updateLinkedPreviewPoint = (index: number, color: string) => {
+    const linkedBase = derivePaletteBaseFromSchemeColor(color, index, modeDraft);
+    if (linkedBase) onDraftChange(linkedBase);
     setActivePointIndex(index);
-    if (index === 0) setBaseDraft(color, { preservePreviewPoints: true });
   };
 
   const handleAlphaDraftChange = (value: number) => {
@@ -869,7 +859,7 @@ function PaletteControls({
               if (draggingPointIndex === -1) {
                 setBaseDraft(color);
               } else {
-                updatePreviewPoint(draggingPointIndex, color);
+                updateLinkedPreviewPoint(draggingPointIndex, color);
               }
             }}
             onPointerUp={(event) => {
@@ -975,7 +965,6 @@ function PaletteControls({
             <select
               value={modeDraft}
               onChange={(event) => {
-                setManualPreviewColors({});
                 setActivePointIndex(0);
                 onModeDraftChange(event.currentTarget.value as HarmonyMode);
               }}

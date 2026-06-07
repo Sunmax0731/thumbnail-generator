@@ -85,7 +85,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
-- Colors supports Adobe-style color wheel point selection without base-color changes, single-point drag editing without moving other points, explicit base-color controls, large palette bars, synchronized HEX/RGB slider input, and recent-color reuse.
+- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, explicit base-color controls, large palette bars, synchronized HEX/RGB slider input, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
@@ -98,21 +98,21 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 22 test files, 70 tests.
+- `npm test`: pass. 22 test files, 71 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4183/thumbnail-generator/`
+- URL: `http://127.0.0.1:4184/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-final-colors-20260607-desktop.png`
-  - `docs/assets/runtime-final-colors-20260607-colors.png`
-  - `docs/assets/runtime-final-colors-20260607-mobile.png`
+  - `docs/assets/runtime-linked-colors-20260607-desktop.png`
+  - `docs/assets/runtime-linked-colors-20260607-colors.png`
+  - `docs/assets/runtime-linked-colors-20260607-mobile.png`
 
 Passed checks:
 
@@ -122,13 +122,13 @@ Passed checks:
 - CSV import: pass. Status reported `CSV applied: 2 layers.`
 - HTML import: pass. Status reported `HTML applied: 3 layers.`
 - Layer editing: pass. Adjust numeric edit changed the canvas hash from `1442555670` to `3150399104`.
-- Colors wheel point selection: pass. Selecting a generated wheel point did not change the base HEX value.
-- Colors wheel point drag: pass. Dragging one companion wheel point changed that point's style while another point and the base HEX stayed unchanged.
-- RGB slider editing: pass. Moving the red channel slider updated the draft HEX to `#20b6d7`.
+- Colors wheel point selection: pass. Selecting a generated wheel point did not change the base HEX value (`#10b6d7` stayed unchanged).
+- Colors linked wheel point drag: pass. Dragging one companion wheel point changed that point, changed another linked point, and derived the base HEX from `#10b6d7` to `#6d879d`.
+- RGB slider editing: pass. Moving the red channel slider updated the draft HEX to `#20879d`.
 - Colors single-color apply: pass. Registered swatch Fill/Stroke buttons are available; applying Fill changed the canvas hash from `3150399104` to `2962876288`.
 - Colors group removal: pass. Target/Group registration controls and Color groups rows were absent from the Colors panel.
 - Saved multi-color palette: pass. One multi-color palette row was saved from the displayed palette colors.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T09-30-10-702Z.webp`).
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T10-08-48-245Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:

@@ -166,6 +166,61 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
   return [normalized, ...(offsets[mode] ?? []).map((offset) => hslToHex({ ...hsl, h: normalizeHue(hsl.h + offset) }))];
 }
 
+export function derivePaletteBaseFromSchemeColor(
+  schemeColor: string,
+  pointIndex: number,
+  mode: HarmonyMode,
+): string | null {
+  const normalized = normalizeColor(schemeColor);
+  if (!normalized) return null;
+  if (pointIndex <= 0) return normalized;
+
+  const colorHsl = hexToHsl(normalized);
+  const hueOffsets: Partial<Record<HarmonyMode, number[]>> = {
+    analogous: [0, -30, 30],
+    complementary: [0, 180],
+    split: [0, 150, 210],
+    triad: [0, 120, 240],
+    square: [0, 90, 180, 270],
+    compound: [0, 30, 180],
+  };
+  const offsets = hueOffsets[mode];
+  if (offsets?.[pointIndex] !== undefined) {
+    return hslToHex({
+      h: normalizeHue(colorHsl.h - offsets[pointIndex]),
+      s: colorHsl.s,
+      l: colorHsl.l,
+    });
+  }
+
+  if (mode === "shades") {
+    const lightnessByIndex = [
+      colorHsl.l / 0.42,
+      colorHsl.l / 0.68,
+      colorHsl.l,
+      (colorHsl.l - 0.34) / 0.66,
+      (colorHsl.l - 0.58) / 0.42,
+    ];
+    return hslToHex({
+      h: colorHsl.h,
+      s: colorHsl.s,
+      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
+    });
+  }
+
+  if (mode === "monochromatic") {
+    const saturationByIndex = [colorHsl.s / 0.55, colorHsl.s, colorHsl.s / 1.2];
+    const lightnessByIndex = [colorHsl.l / 0.82, colorHsl.l, (colorHsl.l - 0.28) / 0.72];
+    return hslToHex({
+      h: colorHsl.h,
+      s: clampUnit(saturationByIndex[pointIndex] ?? colorHsl.s),
+      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
+    });
+  }
+
+  return normalized;
+}
+
 export function addHarmonyColors(
   colors: PaletteColor[],
   input: AddPaletteColorInput,

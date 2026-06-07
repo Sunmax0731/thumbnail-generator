@@ -156,3 +156,4 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] カラーパレット操作性のブラッシュアップ [Issue](Issues/0057-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colorsタブの単色適用UI改善 [Issue](Issues/0058-colors-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Colorsタブのグループ機能削除 [Issue](Issues/0059-colors.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] カラーパレットハンドル変更時の配色連動復元 [Issue](Issues/0060-colors-linked-handles.md) [QCDS:Quality,Satisfaction] [Status:closed]

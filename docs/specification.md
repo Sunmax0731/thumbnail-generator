@@ -300,7 +300,7 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 
 The palette maker can save the currently displayed pattern as one multi-color palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
 
-The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars with HEX labels, synchronized HEX and RGB slider/number inputs, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Selecting a wheel point only selects that point; dragging a point updates that point without changing the base color or other generated points. The base color changes through explicit base controls such as the wheel background, palette bars, HEX/RGB controls, recent colors, or Set selected as base.
+The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars with HEX labels, synchronized HEX and RGB slider/number inputs, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Selecting a wheel point only selects that point and does not change the base color. Dragging a point treats that point as the intended color, derives the matching base color for the active palette pattern, and regenerates the other points in the same scheme. The base color can also change through explicit base controls such as the wheel background, palette bars, HEX/RGB controls, recent colors, or Set selected as base.
 
 ## Edit State Storage
 

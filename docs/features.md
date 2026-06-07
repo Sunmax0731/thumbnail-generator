@@ -59,8 +59,8 @@ This page is the quick feature index for users and reviewers.
 ## Color Palette
 
 - Register, edit, and delete named single colors in Colors.
-- Explore colors with an Adobe-style drag-capable color wheel, generated palette bars, synchronized HEX/RGB slider inputs, and recent-color swatches.
-- Select a color-wheel point without changing the base color, drag one point without moving other points, and explicitly set a selected point as the base color when needed.
+- Explore colors with an Adobe-style drag-capable linked color wheel, generated palette bars, synchronized HEX/RGB slider inputs, and recent-color swatches.
+- Select a color-wheel point without changing the base color, drag one point to regenerate the other points in the same palette pattern, and explicitly set a selected point as the base color when needed.
 - Set palette opacity.
 - Apply each saved single color directly as Fill or Stroke to selected text and shape layers.
 - Preview graphical palette patterns from the draft color and opacity.

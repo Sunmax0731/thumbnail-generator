@@ -3,6 +3,7 @@ import {
   addHarmonyColors,
   addPaletteColor,
   addSavedColorPalette,
+  derivePaletteBaseFromSchemeColor,
   generateHarmonyColors,
   generatePaletteSchemeColors,
   hexToRgbChannels,
@@ -97,5 +98,18 @@ describe("colorPalette", () => {
     });
     expect(read).toEqual(palettes);
     expect(removeSavedColorPalette(palettes, palettes[0].id)).toEqual([]);
+  });
+
+  it("derives a linked palette base from a dragged scheme point", () => {
+    expect(derivePaletteBaseFromSchemeColor("#00ff00", 1, "triad")).toBe("#ff0000");
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#00ff00", 1, "triad") ?? "", "triad")[1]).toBe(
+      "#00ff00",
+    );
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#808080", 0, "square") ?? "", "square")[0]).toBe(
+      "#808080",
+    );
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#6c6c6c", 1, "shades") ?? "", "shades")[1]).toBe(
+      "#6c6c6c",
+    );
   });
 });
