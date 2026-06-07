@@ -50,6 +50,8 @@ Text layers include:
 
 Text layers can run a Fit text to box action. The action measures each line with the selected font, line height, and stroke width, then chooses the largest integer font size that fits within the layer width and height.
 
+For vertical text layers, the edit selection rectangle is calculated from the rendered vertical columns: column count, longest column character count, font size, line height, non-negative letter spacing, stroke width, and text alignment. Horizontal text layers continue to use the configured layer bounds for selection.
+
 ## Shape Layers
 
 Shape layers include:
@@ -129,6 +131,7 @@ The selected layer can be edited directly on the canvas:
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
+- Vertical text selection, hit testing, and edit padding use the same visual text bounds so the selection area follows the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts
 
@@ -297,6 +300,8 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 - Created timestamp.
 
 The palette maker can save the currently displayed pattern as one palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
+
+The Colors tab also provides an Adobe-style color exploration surface: a color wheel with generated-color points, large palette bars with HEX labels, synchronized HEX and RGB inputs, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Choosing a generated, recent, HEX, RGB, or wheel color previews it immediately on the selected text or shape layer for the active Fill/Stroke target.
 
 ## Edit State Storage
 

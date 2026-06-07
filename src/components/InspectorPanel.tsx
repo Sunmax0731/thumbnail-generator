@@ -33,7 +33,10 @@ import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
 import {
   generatePaletteSchemeColors,
+  hexToRgbChannels,
   normalizeColor,
+  parseRgbColorInput,
+  rgbChannelsToHex,
   type HarmonyMode,
   type PaletteColor,
   type PaletteTarget,
@@ -577,9 +580,10 @@ export function InspectorPanel({
                     type="checkbox"
                     checked={selected.edgeBlurStroke}
                     disabled={selected.type === "image"}
-                    onChange={(event) =>
-                      onUpdateLayer(selected.id, (layer) => ({ ...layer, edgeBlurStroke: event.currentTarget.checked }))
-                    }
+                    onChange={(event) => {
+                      const edgeBlurStroke = event.currentTarget.checked;
+                      onUpdateLayer(selected.id, (layer) => ({ ...layer, edgeBlurStroke }));
+                    }}
                   />
                   <span>{t("inspector.edgeBlurStroke")}</span>
                 </label>
@@ -823,7 +827,22 @@ function PaletteControls({
 }) {
   const groups = groupPaletteRows(colors);
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
+  const previewRgb = hexToRgbChannels(previewBaseColor) ?? { r: 0, g: 0, b: 0 };
   const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
+  const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
+  const setDraftAndPreview = (value: string) => {
+    const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
+    onDraftChange(normalized ?? value);
+    if (normalized && selectedCount > 0) onApply(normalized, targetDraft);
+  };
+  const setRgbChannel = (channel: "r" | "g" | "b", value: number) => {
+    const next = rgbChannelsToHex(
+      channel === "r" ? value : previewRgb.r,
+      channel === "g" ? value : previewRgb.g,
+      channel === "b" ? value : previewRgb.b,
+    );
+    setDraftAndPreview(next);
+  };
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
@@ -836,16 +855,45 @@ function PaletteControls({
           <small>{t("inspector.palettePreview")}</small>
         </div>
         <div className="palette-maker-preview">
-          <span
+          <div
             className="palette-wheel"
-            aria-hidden="true"
-            style={{ background: `conic-gradient(${previewColors.join(", ")}, ${previewColors[0]})` }}
-          />
-          <div className="palette-preview-strip" aria-label={t("inspector.palettePreview")}>
+            aria-label={t("inspector.paletteScheme")}
+          >
             {previewColors.map((color, index) => (
-              <span key={`${color}-${index}`} style={{ background: color, opacity: alphaDraft }} />
+              <button
+                key={`${color}-${index}`}
+                type="button"
+                className={`palette-wheel-point ${index === 0 ? "base" : ""}`}
+                style={{ ...wheelPointStyle(color), background: color }}
+                title={color}
+                onClick={() => setDraftAndPreview(color)}
+              />
             ))}
           </div>
+          <div className="palette-preview-strip" aria-label={t("inspector.palettePreview")}>
+            {previewColors.map((color, index) => (
+              <button
+                key={`${color}-${index}`}
+                type="button"
+                title={color}
+                style={{ background: color, opacity: alphaDraft }}
+                onClick={() => setDraftAndPreview(color)}
+              />
+            ))}
+          </div>
+        </div>
+        <div className="palette-spectrum-bars" aria-label={t("inspector.paletteScheme")}>
+          {previewColors.map((color, index) => (
+            <button
+              key={`bar-${color}-${index}`}
+              type="button"
+              style={{ background: color, color: readableTextColor(color) }}
+              onClick={() => setDraftAndPreview(color)}
+            >
+              <span>{index === 0 ? t("inspector.paletteBase") : t("inspector.paletteColor")}</span>
+              <strong>{color}</strong>
+            </button>
+          ))}
         </div>
         <div className="palette-register">
           <label className="field palette-name-field">
@@ -853,10 +901,24 @@ function PaletteControls({
             <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
           </label>
           <label className="field color-field">
-            <span>{t("inspector.paletteColor")}</span>
-            <input type="color" value={previewBaseColor} onChange={(event) => onDraftChange(event.currentTarget.value)} />
-            <input type="text" value={draft} onChange={(event) => onDraftChange(event.currentTarget.value)} />
+            <span>{t("inspector.paletteHex")}</span>
+            <input type="color" value={previewBaseColor} onChange={(event) => setDraftAndPreview(event.currentTarget.value)} />
+            <input type="text" value={draft} onChange={(event) => setDraftAndPreview(event.currentTarget.value)} />
           </label>
+          <div className="palette-rgb-fields" aria-label={t("inspector.paletteRgb")}>
+            <label>
+              <span>R</span>
+              <input type="number" min={0} max={255} value={previewRgb.r} onChange={(event) => setRgbChannel("r", Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              <span>G</span>
+              <input type="number" min={0} max={255} value={previewRgb.g} onChange={(event) => setRgbChannel("g", Number(event.currentTarget.value))} />
+            </label>
+            <label>
+              <span>B</span>
+              <input type="number" min={0} max={255} value={previewRgb.b} onChange={(event) => setRgbChannel("b", Number(event.currentTarget.value))} />
+            </label>
+          </div>
           <label className="field palette-target-field">
             <span>{t("inspector.paletteTarget")}</span>
             <select value={targetDraft} onChange={(event) => onTargetDraftChange(event.currentTarget.value as PaletteTarget)}>
@@ -898,6 +960,16 @@ function PaletteControls({
           </button>
         </div>
       </div>
+      {recentColors.length > 0 ? (
+        <div className="palette-recent">
+          <span>{t("inspector.paletteRecent")}</span>
+          <div>
+            {recentColors.map((color) => (
+              <button key={`recent-${color}`} type="button" title={color} style={{ background: color }} onClick={() => setDraftAndPreview(color)} />
+            ))}
+          </div>
+        </div>
+      ) : null}
       <div className="button-grid harmony-grid">
         {(["analogous", "complementary", "split", "triad"] as HarmonyMode[]).map((mode) => (
           <button key={mode} type="button" className="ghost-button" onClick={() => onGenerateHarmony(mode)}>
@@ -1107,6 +1179,56 @@ function DeleteLayerDialog({
 
 function paletteTargetLabel(target: PaletteTarget, t: Translator): string {
   return target === "fill" ? t("inspector.fill") : t("inspector.stroke");
+}
+
+function uniqueColors(colors: string[]): string[] {
+  const seen = new Set<string>();
+  const unique: string[] = [];
+  for (const color of colors) {
+    const normalized = normalizeColor(color);
+    if (!normalized || seen.has(normalized)) continue;
+    seen.add(normalized);
+    unique.push(normalized);
+  }
+  return unique;
+}
+
+function wheelPointStyle(color: string): { left: string; top: string } {
+  const channels = hexToRgbChannels(color);
+  if (!channels) return { left: "50%", top: "50%" };
+  const hsl = rgbToHsl(channels.r, channels.g, channels.b);
+  const angle = ((hsl.h - 90) * Math.PI) / 180;
+  const radius = 10 + hsl.s * 34;
+  return {
+    left: `calc(50% + ${Math.cos(angle) * radius}px)`,
+    top: `calc(50% + ${Math.sin(angle) * radius}px)`,
+  };
+}
+
+function readableTextColor(color: string): string {
+  const channels = hexToRgbChannels(color);
+  if (!channels) return "#152033";
+  const luminance = (channels.r * 299 + channels.g * 587 + channels.b * 114) / 1000;
+  return luminance > 145 ? "#152033" : "#ffffff";
+}
+
+function rgbToHsl(r: number, g: number, b: number): { h: number; s: number; l: number } {
+  const red = r / 255;
+  const green = g / 255;
+  const blue = b / 255;
+  const max = Math.max(red, green, blue);
+  const min = Math.min(red, green, blue);
+  const l = (max + min) / 2;
+  if (max === min) return { h: 0, s: 0, l };
+  const delta = max - min;
+  const s = l > 0.5 ? delta / (2 - max - min) : delta / (max + min);
+  const h =
+    max === red
+      ? ((green - blue) / delta + (green < blue ? 6 : 0)) * 60
+      : max === green
+        ? ((blue - red) / delta + 2) * 60
+        : ((red - green) / delta + 4) * 60;
+  return { h, s, l };
 }
 
 function harmonyLabelKey(mode: HarmonyMode) {

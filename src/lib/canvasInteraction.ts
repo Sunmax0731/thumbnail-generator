@@ -1,4 +1,5 @@
 import type { ThumbnailLayer } from "./types";
+import { getLayerVisualLocalBounds, getLayerVisualLocalCenter } from "./layerVisualBounds";
 
 export type CanvasInteractionMode =
   | "move"
@@ -27,12 +28,14 @@ export function pointToCanvas(canvas: HTMLCanvasElement, clientX: number, client
 
 export function getLayerInteractionAt(layer: ThumbnailLayer, point: CanvasPoint): CanvasInteractionMode | null {
   const local = toLayerLocalPoint(layer, point);
+  const bounds = getLayerVisualLocalBounds(layer);
+  const center = getLayerVisualLocalCenter(layer);
   const handles: Array<[CanvasInteractionMode, CanvasPoint]> = [
-    ["resize-nw", { x: -layer.width / 2, y: -layer.height / 2 }],
-    ["resize-ne", { x: layer.width / 2, y: -layer.height / 2 }],
-    ["resize-se", { x: layer.width / 2, y: layer.height / 2 }],
-    ["resize-sw", { x: -layer.width / 2, y: layer.height / 2 }],
-    ["rotate", { x: 0, y: -layer.height / 2 - rotateHandleOffset }],
+    ["resize-nw", { x: bounds.left, y: bounds.top }],
+    ["resize-ne", { x: bounds.right, y: bounds.top }],
+    ["resize-se", { x: bounds.right, y: bounds.bottom }],
+    ["resize-sw", { x: bounds.left, y: bounds.bottom }],
+    ["rotate", { x: center.x, y: bounds.top - rotateHandleOffset }],
   ];
 
   for (const [mode, handle] of handles) {
@@ -42,10 +45,10 @@ export function getLayerInteractionAt(layer: ThumbnailLayer, point: CanvasPoint)
   }
 
   if (
-    local.x >= -layer.width / 2 &&
-    local.x <= layer.width / 2 &&
-    local.y >= -layer.height / 2 &&
-    local.y <= layer.height / 2
+    local.x >= bounds.left &&
+    local.x <= bounds.right &&
+    local.y >= bounds.top &&
+    local.y <= bounds.bottom
   ) {
     return "move";
   }

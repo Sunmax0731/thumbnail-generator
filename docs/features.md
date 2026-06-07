@@ -50,6 +50,7 @@ This page is the quick feature index for users and reviewers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
 - Select hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
+- Vertical text selection bounds follow the visible vertical columns instead of the previous horizontal text box.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
 - Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.
@@ -58,6 +59,7 @@ This page is the quick feature index for users and reviewers.
 ## Color Palette
 
 - Register and edit named Fill or Stroke colors in Colors.
+- Explore colors with an Adobe-style color wheel, generated palette bars, synchronized HEX/RGB inputs, and recent-color swatches.
 - Set palette opacity and group names.
 - Apply saved Fill or Stroke colors, or one-click Fill/Stroke groups, to selected text and shape layers.
 - Preview graphical palette patterns from the draft color and opacity.

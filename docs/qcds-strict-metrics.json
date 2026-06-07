@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes signed inner/outer edge blur with text and stroke controls, saved palette sets, grouped-row individual editing, YouTube thumbnail import, Google Fonts options, vertical text writing, CSV/HTML persistence, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes the attached Blur stroke null.checked runtime error fix, SVG favicon, Adobe-style color wheel and palette bars, synchronized HEX/RGB palette input, recent colors, immediate color preview application, vertical text visual selection bounds, CSV/HTML persistence, local image import, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and browser storage quota edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested improvements passed: edge blur direction and text support, palette-level color management and application GUI, grouped object individual selection/editing, YouTube thumbnail import, Google Fonts options, CSV/HTML import/export persistence, WebP export, and QCDS evidence are updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
+    "rationale": "Requested improvements passed: attached image runtime error no longer reproduces, Adobe-style palette UI includes visual color exploration plus HEX/RGB and recent-color reuse, palette choices preview immediately on selected layers, vertical text selection follows visible columns, CSV/HTML import/export persistence works, local image import works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is storage quota behavior, broader real-user font files, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -39,14 +39,15 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser backend returned Browser is not available: iab",
-    "url": "http://127.0.0.1:4180/thumbnail-generator/",
+    "url": "http://127.0.0.1:4181/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-final-open-p2-20260607-desktop.png",
-      "docs/assets/runtime-final-open-p2-20260607-mobile.png"
+      "docs/assets/runtime-all-work-items-20260607-desktop.png",
+      "docs/assets/runtime-all-work-items-20260607-colors.png",
+      "docs/assets/runtime-all-work-items-20260607-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -55,14 +56,14 @@
       "right Layers Adjust Colors tabs",
       "CSV import",
       "HTML import",
-      "Google Fonts option selected",
+      "local image import",
       "vertical text writing mode",
-      "signed edge blur and Blur stroke control",
-      "group creation",
-      "grouped row individual edit button",
-      "saved Square palette set",
-      "saved palette Fill application",
-      "YouTube thumbnail import",
+      "Blur stroke control without null.checked runtime error",
+      "Adobe-style color wheel points",
+      "large palette bars",
+      "synchronized HEX/RGB input",
+      "recent color swatches",
+      "saved palette row",
       "WebP export download",
       "mobile viewport",
       "mobile no horizontal overflow"

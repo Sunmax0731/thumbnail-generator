@@ -1,4 +1,5 @@
 import { rotateHandleOffset, selectionHandleRadius, type CanvasInteractionMode } from "./canvasInteraction";
+import { getLayerVisualLocalBounds, getLayerVisualLocalCenter } from "./layerVisualBounds";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
@@ -434,28 +435,32 @@ function drawSelection(
   context.save();
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
+  const bounds = getLayerVisualLocalBounds(layer);
+  const center = getLayerVisualLocalCenter(layer);
+  const selectionWidth = bounds.right - bounds.left;
+  const selectionHeight = bounds.bottom - bounds.top;
   context.strokeStyle = "#10b6d7";
   context.lineWidth = 4;
   context.setLineDash([16, 10]);
-  context.strokeRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height);
+  context.strokeRect(bounds.left, bounds.top, selectionWidth, selectionHeight);
   context.setLineDash([]);
   if (drawHandles) {
     const rotateHot = state.activeMode === "rotate" || state.hoverMode === "rotate";
     context.beginPath();
-    context.moveTo(0, -layer.height / 2);
-    context.lineTo(0, -layer.height / 2 - rotateHandleOffset);
+    context.moveTo(center.x, bounds.top);
+    context.lineTo(center.x, bounds.top - rotateHandleOffset);
     context.strokeStyle = rotateHot ? "#ff4f5f" : "#10b6d7";
     context.lineWidth = rotateHot ? 5 : 4;
     context.stroke();
     for (const [x, y] of [
-      [-layer.width / 2, -layer.height / 2],
-      [layer.width / 2, -layer.height / 2],
-      [layer.width / 2, layer.height / 2],
-      [-layer.width / 2, layer.height / 2],
+      [bounds.left, bounds.top],
+      [bounds.right, bounds.top],
+      [bounds.right, bounds.bottom],
+      [bounds.left, bounds.bottom],
     ]) {
       drawResizeHandle(context, x, y);
     }
-    drawRotationHandle(context, 0, -layer.height / 2 - rotateHandleOffset, rotateHot, state.activeMode === "rotate");
+    drawRotationHandle(context, center.x, bounds.top - rotateHandleOffset, rotateHot, state.activeMode === "rotate");
   }
   context.restore();
 }

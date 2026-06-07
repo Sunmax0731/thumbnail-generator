@@ -144,3 +144,6 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:03-design] グループ内オブジェクトの個別選択と編集 [Issue](Issues/0045-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] YouTubeサムネイル取得と編集機能拡張 [Issue](Issues/0046-youtube.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Google Fonts対応フォントの追加 [Issue](Issues/0047-google-fonts.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 添付画像エラーの原因調査と修正 [Issue](Issues/0048-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Adobe風カラーパレットUI改修 [Issue](Issues/0049-adobe-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 縦書き文字の選択範囲を表示領域に合わせる [Issue](Issues/0050-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]

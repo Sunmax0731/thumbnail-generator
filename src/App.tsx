@@ -20,6 +20,7 @@ import {
   addPaletteColor as appendPaletteColor,
   addSavedColorPalette,
   generatePaletteSchemeColors,
+  normalizeColor,
   paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
@@ -992,17 +993,18 @@ function App() {
 
   const applyPaletteColor = useCallback(
     (color: string, target: PaletteTarget) => {
+      const normalizedDraft = normalizeColor(paletteDraft);
       setLayers((current) =>
         current.map((layer) => {
           if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
           if (layer.type === "text") {
             const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
-            const opacity = palette?.alpha ?? 1;
+            const opacity = palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
             return target === "fill" ? { ...layer, color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           if (layer.type === "shape") {
             const palette = paletteColors.find((entry) => entry.value === color && entry.target === target);
-            const opacity = palette?.alpha ?? 1;
+            const opacity = palette?.alpha ?? (normalizedDraft === normalizeColor(color) ? paletteAlphaDraft : 1);
             return target === "fill" ? { ...layer, fill: color, fillOpacity: opacity } : { ...layer, strokeColor: color, strokeOpacity: opacity };
           }
           return layer;
@@ -1010,7 +1012,7 @@ function App() {
       );
       setStatus(target === "fill" ? "Applied palette color to fill/text." : "Applied palette color to stroke/outline.");
     },
-    [paletteColors, selectedIds],
+    [paletteAlphaDraft, paletteColors, paletteDraft, selectedIds],
   );
 
   const applyPaletteGroup = useCallback(

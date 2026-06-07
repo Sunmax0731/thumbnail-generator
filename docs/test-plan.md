@@ -22,9 +22,11 @@
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
 - Text fit accounts for vertical text column width and character height.
+- Vertical text visual bounds drive selection hit testing and preview padding while horizontal text keeps configured bounds.
 - YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
+- Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide multiple use-case layouts with exportable CSV/HTML.
 
@@ -83,6 +85,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved palette sets, generated palette group blocks, palette groups, group apply, and harmony suggestions.
+- Colors supports Adobe-style color wheel points, large palette bars, synchronized HEX/RGB input, recent-color reuse, and immediate preview application to selected text/shape layers.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
@@ -95,39 +98,39 @@ Completed on 2026-06-07.
 
 ### Automated
 
-- `npm test`: pass. 21 test files, 64 tests.
+- `npm test`: pass. 22 test files, 70 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4180/thumbnail-generator/`
+- URL: `http://127.0.0.1:4181/thumbnail-generator/`
 - Browser path attempted first: Browser plugin through node_repl.
 - Browser fallback reason: Browser backend returned `Browser is not available: iab`.
 - Fallback used: Playwright headless Chromium.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-final-open-p2-20260607-desktop.png`
-  - `docs/assets/runtime-final-open-p2-20260607-mobile.png`
+  - `docs/assets/runtime-all-work-items-20260607-desktop.png`
+  - `docs/assets/runtime-all-work-items-20260607-colors.png`
+  - `docs/assets/runtime-all-work-items-20260607-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
-- Nonblank canvas pixel check: pass (`1500x940`, 65 distinct sampled colors).
+- Nonblank canvas pixel check: pass (`1500x940`, 216 distinct sampled colors).
 - Primary UI visible: app title, Assets/Layouts/Templates tabs, Layers/Adjust/Colors tabs, canvas, layers, and WebP export button.
 - CSV import: pass. Status reported `CSV applied: 3 layers.`
 - HTML import: pass. Status reported `HTML applied: 3 layers.`
-- Text editing: pass. Added a text layer, selected Anton from Google Fonts, switched Writing mode to Vertical, set signed inner edge blur, and enabled Blur stroke.
-- Group individual editing: pass. Created `QA group`, used the grouped row individual-edit pointer, and the grouped row displayed the individual selection badge.
-- Saved palette set: pass. Square pattern saved as one 4-color palette set and a saved-palette Fill button applied to the selected text layer.
-- YouTube thumbnail import: pass. `https://youtu.be/dQw4w9WgXcQ` imported as `YouTube dQw4w9WgXcQ` and became editable as an image layer.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T06-01-35-160Z.webp`).
+- Local image import: pass. A browser-provided PNG file imported as `codex-local`.
+- Text editing: pass. Added a text layer, switched Writing mode to Vertical, and enabled Blur stroke without the `null.checked` runtime error from the attached screenshot.
+- Adobe-style Colors UI: pass. Runtime found 3 color-wheel points, 3 palette bars, 3 RGB numeric inputs, 9 recent swatches, and 1 saved palette row after saving the current pattern.
+- Color preview application: pass. HEX/RGB/bar selections previewed on the selected text layer for the active Fill target.
+- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T06-42-39-439Z.webp`).
 - Mobile: pass. `390x844` viewport had horizontal overflow `0`.
 
 Console health:
 
-- No app errors or page errors were reported.
-- Chromium emitted one benign Canvas2D readback performance warning during the scripted nonblank pixel check.
+- No relevant console errors, page errors, or HTTP 4xx/5xx responses were reported.
 
 ### GitHub Pages
 

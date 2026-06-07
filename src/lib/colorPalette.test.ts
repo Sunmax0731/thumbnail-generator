@@ -5,13 +5,16 @@ import {
   addSavedColorPalette,
   generateHarmonyColors,
   generatePaletteSchemeColors,
+  hexToRgbChannels,
   normalizeColor,
   normalizePaletteName,
+  parseRgbColorInput,
   paletteGroups,
   readColorPalette,
   readSavedColorPalettes,
   removePaletteColor,
   removeSavedColorPalette,
+  rgbChannelsToHex,
   updatePaletteColor,
 } from "./colorPalette";
 
@@ -20,6 +23,15 @@ describe("colorPalette", () => {
     expect(normalizeColor("#ABC")).toBe("#aabbcc");
     expect(normalizeColor("#12abef")).toBe("#12abef");
     expect(normalizeColor("red")).toBeNull();
+  });
+
+  it("converts HEX and RGB input for numeric palette controls", () => {
+    expect(hexToRgbChannels("#58a0ed")).toEqual({ r: 88, g: 160, b: 237 });
+    expect(rgbChannelsToHex(88, 160, 237)).toBe("#58a0ed");
+    expect(rgbChannelsToHex(300, -4, 12.4)).toBe("#ff000c");
+    expect(parseRgbColorInput("rgb(88, 160, 237)")).toBe("#58a0ed");
+    expect(parseRgbColorInput("88 160 237")).toBe("#58a0ed");
+    expect(parseRgbColorInput("88 160")).toBeNull();
   });
 
   it("adds unique colors and removes by id", () => {

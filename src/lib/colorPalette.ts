@@ -57,6 +57,33 @@ export function normalizeColor(input: string): string | null {
   return null;
 }
 
+export function hexToRgbChannels(hex: string): { r: number; g: number; b: number } | null {
+  const normalized = normalizeColor(hex);
+  if (!normalized) return null;
+  return {
+    r: Number.parseInt(normalized.slice(1, 3), 16),
+    g: Number.parseInt(normalized.slice(3, 5), 16),
+    b: Number.parseInt(normalized.slice(5, 7), 16),
+  };
+}
+
+export function rgbChannelsToHex(r: number, g: number, b: number): string {
+  return `#${[r, g, b].map((channel) => clampByte(channel).toString(16).padStart(2, "0")).join("")}`;
+}
+
+export function parseRgbColorInput(input: string): string | null {
+  const parts = input
+    .trim()
+    .replace(/^rgb\(/i, "")
+    .replace(/\)$/, "")
+    .split(/[,\s]+/)
+    .filter(Boolean);
+  if (parts.length !== 3) return null;
+  const channels = parts.map((part) => Number.parseInt(part, 10));
+  if (channels.some((channel) => !Number.isFinite(channel) || channel < 0 || channel > 255)) return null;
+  return rgbChannelsToHex(channels[0], channels[1], channels[2]);
+}
+
 export function normalizePaletteName(input: string | undefined, fallback: string): string {
   const value = input?.trim() ?? "";
   return value.length > 0 ? value.slice(0, 48) : fallback;
@@ -340,6 +367,11 @@ function normalizeHue(value: number): number {
 
 function clampUnit(value: number): number {
   return Math.min(1, Math.max(0, value));
+}
+
+function clampByte(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return Math.min(255, Math.max(0, Math.round(value)));
 }
 
 function capitalize(value: string): string {

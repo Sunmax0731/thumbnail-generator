@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeShapeLayer } from "./layerFactory";
+import { makeShapeLayer, makeTextLayer } from "./layerFactory";
 import { calculatePreviewPadding } from "./previewPadding";
 
 describe("previewPadding", () => {
@@ -21,5 +21,27 @@ describe("previewPadding", () => {
     );
 
     expect(padding).toBeGreaterThanOrEqual(220);
+  });
+
+  it("accounts for vertical text visual bounds when computing edit padding", () => {
+    const padding = calculatePreviewPadding(
+      [
+        makeTextLayer({
+          x: 20,
+          y: 80,
+          width: 300,
+          height: 80,
+          text: "VERTICAL",
+          fontSize: 48,
+          lineHeight: 1,
+          writingMode: "vertical",
+          align: "left",
+        }),
+      ],
+      { width: 1280, height: 720 },
+      { minimum: 30, margin: 30 },
+    );
+
+    expect(padding).toBeGreaterThan(30);
   });
 });

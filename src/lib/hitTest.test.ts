@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { makeShapeLayer } from "./layerFactory";
+import { makeShapeLayer, makeTextLayer } from "./layerFactory";
 import { pickLayerAt, pickLayerInteractionAt } from "./hitTest";
 
 describe("hit testing", () => {
@@ -27,5 +27,25 @@ describe("hit testing", () => {
       layer: selected,
       mode: "resize-nw",
     });
+  });
+
+  it("uses vertical text visual bounds instead of the old horizontal box", () => {
+    const vertical = makeTextLayer({
+      id: "vertical",
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 120,
+      text: "ABCD\nEF",
+      fontSize: 40,
+      lineHeight: 1.2,
+      letterSpacing: 8,
+      strokeWidth: 6,
+      writingMode: "vertical",
+      align: "left",
+    });
+
+    expect(pickLayerAt([vertical], 120, 160)?.id).toBe("vertical");
+    expect(pickLayerAt([vertical], 300, 160)).toBeUndefined();
   });
 });

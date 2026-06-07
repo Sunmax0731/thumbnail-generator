@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { getLayerInteractionAt, moveLayer, resizeLayer, rotateLayer } from "./canvasInteraction";
-import { makeShapeLayer } from "./layerFactory";
+import { makeShapeLayer, makeTextLayer } from "./layerFactory";
 
 describe("canvasInteraction", () => {
   it("detects move and resize handles", () => {
@@ -27,5 +27,24 @@ describe("canvasInteraction", () => {
     const layer = makeShapeLayer({ x: 100, y: 100, width: 200, height: 100 });
     const rotated = rotateLayer(layer, { x: 200, y: 50 }, { x: 300, y: 150 });
     expect(rotated.rotation).toBeGreaterThan(80);
+  });
+
+  it("detects vertical text interactions from visual text bounds", () => {
+    const layer = makeTextLayer({
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 120,
+      text: "ABCD\nEF",
+      fontSize: 40,
+      lineHeight: 1.2,
+      letterSpacing: 8,
+      strokeWidth: 6,
+      writingMode: "vertical",
+      align: "left",
+    });
+
+    expect(getLayerInteractionAt(layer, { x: 120, y: 160 })).toBe("move");
+    expect(getLayerInteractionAt(layer, { x: 300, y: 160 })).toBeNull();
   });
 });

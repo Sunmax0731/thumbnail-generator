@@ -1028,26 +1028,47 @@ button:disabled {
 
 .palette-maker-preview {
   display: grid;
-  grid-template-columns: 58px minmax(0, 1fr);
+  grid-template-columns: 104px minmax(0, 1fr);
   gap: 10px;
-  align-items: center;
+  align-items: stretch;
 }
 
 .palette-wheel {
-  width: 58px;
-  height: 58px;
+  position: relative;
+  width: 104px;
+  height: 104px;
   border: 1px solid rgba(17, 24, 39, 0.16);
   border-radius: 999px;
+  background:
+    radial-gradient(circle, rgba(255, 255, 255, 0.92) 0 9%, rgba(255, 255, 255, 0.26) 25%, rgba(255, 255, 255, 0) 62%),
+    conic-gradient(#ff3d5a, #ffd166, #22c55e, #10b6d7, #7c3aed, #ff3d5a);
   box-shadow:
-    inset 0 0 0 8px rgba(255, 255, 255, 0.5),
+    inset 0 0 0 10px rgba(255, 255, 255, 0.34),
     0 7px 16px rgba(21, 32, 51, 0.12);
+}
+
+.palette-wheel-point {
+  position: absolute;
+  width: 18px;
+  height: 18px;
+  padding: 0;
+  border: 2px solid #ffffff;
+  border-radius: 999px;
+  box-shadow: 0 0 0 1px rgba(15, 23, 42, 0.4), 0 4px 10px rgba(15, 23, 42, 0.24);
+  transform: translate(-50%, -50%);
+}
+
+.palette-wheel-point.base {
+  width: 22px;
+  height: 22px;
+  box-shadow: 0 0 0 2px var(--accent), 0 4px 12px rgba(15, 23, 42, 0.26);
 }
 
 .palette-preview-strip {
   display: grid;
   grid-auto-flow: column;
   grid-auto-columns: minmax(0, 1fr);
-  min-height: 58px;
+  min-height: 104px;
   overflow: hidden;
   border: 1px solid rgba(17, 24, 39, 0.14);
   border-radius: 8px;
@@ -1065,8 +1086,54 @@ button:disabled {
   background-size: 12px 12px;
 }
 
-.palette-preview-strip span {
+.palette-preview-strip button {
   min-width: 0;
+  padding: 0;
+  border: 0;
+  border-radius: 0;
+}
+
+.palette-spectrum-bars {
+  display: grid;
+  grid-template-columns: repeat(5, minmax(0, 1fr));
+  min-height: 76px;
+  overflow: hidden;
+  border: 1px solid rgba(17, 24, 39, 0.16);
+  border-radius: 8px;
+}
+
+.palette-spectrum-bars button {
+  display: grid;
+  align-content: end;
+  min-width: 0;
+  min-height: 76px;
+  padding: 8px;
+  border: 0;
+  border-right: 1px solid rgba(255, 255, 255, 0.72);
+  border-radius: 0;
+  text-align: left;
+}
+
+.palette-spectrum-bars button:last-child {
+  border-right: 0;
+}
+
+.palette-spectrum-bars span {
+  overflow: hidden;
+  font-size: 9px;
+  font-weight: 900;
+  opacity: 0.76;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.palette-spectrum-bars strong {
+  overflow: hidden;
+  font-size: 10px;
+  font-weight: 950;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .palette-register {
@@ -1078,6 +1145,32 @@ button:disabled {
 
 .palette-name-field {
   grid-column: 1 / -1;
+}
+
+.palette-rgb-fields {
+  display: grid;
+  grid-column: 1 / -1;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.palette-rgb-fields label {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+  gap: 4px;
+}
+
+.palette-rgb-fields span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 950;
+}
+
+.palette-rgb-fields input {
+  min-width: 0;
+  height: 32px;
+  padding: 0 6px;
 }
 
 .palette-register .secondary-button {
@@ -1096,6 +1189,33 @@ button:disabled {
   min-height: 30px;
   padding: 0 5px;
   font-size: 10px;
+}
+
+.palette-recent {
+  display: grid;
+  gap: 6px;
+}
+
+.palette-recent > span {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 950;
+  text-transform: uppercase;
+}
+
+.palette-recent > div {
+  display: grid;
+  grid-template-columns: repeat(8, minmax(0, 1fr));
+  gap: 5px;
+}
+
+.palette-recent button {
+  aspect-ratio: 1;
+  min-height: 24px;
+  padding: 0;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: 5px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38);
 }
 
 .palette-group-list {

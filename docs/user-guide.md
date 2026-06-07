@@ -23,7 +23,7 @@ npm run preview
 - Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named Fill or Stroke colors, preview and save palette patterns, set opacity and group names, generate harmony suggestions as grouped palette blocks, apply single colors, saved-palette colors, or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
+- Colors: register and edit named Fill or Stroke colors, explore colors with a color wheel and generated palette bars, use synchronized HEX/RGB inputs, reuse recent colors, preview and save palette patterns, set opacity and group names, generate harmony suggestions as grouped palette blocks, apply single colors, saved-palette colors, or color groups to selected text or shape layers, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -98,7 +98,7 @@ When a text layer is selected during import, the new font is applied to that lay
 
 ## Google Fonts And Vertical Text
 
-Select a text layer, open Adjust, and use Font to choose hosted Google Fonts options such as Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, or Roboto Condensed. Use Writing mode to switch the selected text layer between Horizontal and Vertical. Vertical text is rendered in the preview and export path and is saved through CSV/HTML, templates, and edit state.
+Select a text layer, open Adjust, and use Font to choose hosted Google Fonts options such as Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, or Roboto Condensed. Use Writing mode to switch the selected text layer between Horizontal and Vertical. Vertical text is rendered in the preview and export path and is saved through CSV/HTML, templates, and edit state. When a vertical text layer is selected, the selection frame, hit testing, handles, and edit padding follow the rendered vertical columns.
 
 ## Edge Blur
 
@@ -116,7 +116,7 @@ Open Image Lab from Assets or from an asset row. The modal supports chroma key, 
 
 Open Colors to select an existing swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied with that Fill or Stroke color, and Group to connect Fill and Stroke entries into one named set. Group buttons apply matching Fill and Stroke colors together to selected text or shape layers.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one palette set. Each saved-palette color has Fill and Stroke buttons, and the older Analogous/Complement/Split/Triad buttons still generate editable grouped swatch entries from the current draft color.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. The color wheel points and large palette bars select generated colors, HEX and RGB inputs stay synchronized, and recent colors provide a quick reuse row. Selecting a generated, recent, HEX, RGB, or wheel color previews it immediately on the selected text or shape layer for the active Fill/Stroke target. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one palette set. Each saved-palette color has Fill and Stroke buttons, and the older Analogous/Complement/Split/Triad buttons still generate editable grouped swatch entries from the current draft color.
 
 ## Browser Storage
 

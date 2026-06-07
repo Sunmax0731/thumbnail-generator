@@ -1,4 +1,5 @@
 import { rotateHandleOffset, selectionHandleRadius } from "./canvasInteraction";
+import { getLayerVisualLocalBounds, getLayerVisualLocalCenter, getLayerVisualLocalCorners } from "./layerVisualBounds";
 import type { OutputSettings, ThumbnailLayer } from "./types";
 
 export interface PreviewPaddingOptions {
@@ -38,12 +39,11 @@ export function calculatePreviewPadding(
 }
 
 function transformedLayerBounds(layer: ThumbnailLayer): { left: number; top: number; right: number; bottom: number } {
+  const bounds = getLayerVisualLocalBounds(layer);
+  const center = getLayerVisualLocalCenter(layer);
   const corners = [
-    { x: -layer.width / 2, y: -layer.height / 2 },
-    { x: layer.width / 2, y: -layer.height / 2 },
-    { x: layer.width / 2, y: layer.height / 2 },
-    { x: -layer.width / 2, y: layer.height / 2 },
-    { x: 0, y: -layer.height / 2 - rotateHandleOffset - selectionHandleRadius },
+    ...getLayerVisualLocalCorners(layer),
+    { x: center.x, y: bounds.top - rotateHandleOffset - selectionHandleRadius },
   ].map((point) => fromLayerLocalPoint(layer, point));
 
   return {
