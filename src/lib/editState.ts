@@ -59,6 +59,23 @@ export function writeSavedEditState(
   storage.setItem(editStateStorageKey, JSON.stringify(state));
 }
 
+export function deleteSavedEditState(storage: Pick<Storage, "removeItem"> = window.localStorage): void {
+  storage.removeItem(editStateStorageKey);
+}
+
+export function serializeEditState(state: SavedEditState): string {
+  return JSON.stringify(state, null, 2);
+}
+
+export function parseEditStateJson(text: string): SavedEditState | null {
+  try {
+    const parsed = JSON.parse(text);
+    return isSavedEditState(parsed) ? normalizeSavedEditState(parsed) : null;
+  } catch {
+    return null;
+  }
+}
+
 export function readEditStatePreferences(
   storage: Pick<Storage, "getItem"> = window.localStorage,
 ): EditStatePreferences {

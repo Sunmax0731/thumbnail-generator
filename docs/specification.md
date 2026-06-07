@@ -218,6 +218,42 @@ Bundled default templates are static browser assets, not localStorage records. L
 - Event Countdown
 - Minimal Launch
 
+Each bundled template also carries browser-rendered catalog metadata:
+
+- Category: `youtube`, `shorts`, `stream`, or `cutout`.
+- Preview colors: three representative swatches used by the compact template preview.
+- Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
+
+The Templates panel provides a guided start strip for Template, Image, Title, Brand, and Layout actions. These controls route to existing browser-only editor actions and do not create server state.
+
+## Brand Kit
+
+The brand kit is stored in browser `localStorage` under `thumbnail-generator.brandKit.v1`. It stores:
+
+- Channel name.
+- Primary color.
+- Accent color.
+- Brand font.
+- Shadow/outline color.
+- Optional logo asset key.
+
+Capture style reads the current canvas text/shape styles into the kit. Apply kit updates selected editable text and shape layers with the kit font/colors; when no compatible layer is selected it targets all editable text/shape layers. If a logo asset is selected in the kit, applying the kit inserts that asset as an editable image layer.
+
+## Quality Warnings
+
+The status bar can show rule-based warnings while editing:
+
+- Many layers.
+- 4K-size export.
+- Large saved edit-state estimate.
+- Long text that may be hard to read on mobile.
+- Low text/background contrast when there is no outline.
+- Visible layers close to platform safe-area edges.
+- Hidden important layers such as title, headline, logo, brand, CTA, date, or text.
+- Large image assets that may increase memory or browser storage use.
+
+Warnings are advisory and do not block export.
+
 ## Font Choices
 
 Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
@@ -328,6 +364,8 @@ A saved edit state stores:
 - Current template-name draft.
 
 The saved edit state is separate from named templates. Manual Save state overwrites this one work-in-progress slot. When Autosave current edit state is enabled, editor changes are saved after a short debounce. Reloading the app restores the saved edit state when one exists.
+
+The Templates panel also supports edit-state JSON export, JSON import, and explicit saved-state deletion. Large snapshots show a backup warning before users rely on browser storage alone. Save failures include recovery guidance to export JSON, delete old browser data, or remove large image/font assets.
 
 ## Image Lab
 

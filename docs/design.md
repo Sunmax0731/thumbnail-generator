@@ -34,9 +34,15 @@ The Layers tab keeps layer-list actions below the list: Fit to canvas and group 
 
 The Templates tab separates three concepts: bundled default templates for immediate use-case starts, Edit state as one work-in-progress save slot with an autosave toggle, and Browser templates as named reusable snapshots. This keeps fast recovery close to templates without making every autosave into a template entry.
 
+The Templates tab now also includes a compact guided start strip, template category filters, miniature preview swatches, and output-size badges. The flow keeps beginner work in a short path: choose a template, add or replace an image, add a title, apply brand styling, then generate/export layout text. Template filters use `All`, `YouTube`, `Shorts`, `Stream`, and `Cutout` labels so creators can quickly narrow the 10 bundled starts.
+
+The Brand kit section lives in Templates because it is reusable project setup, not one-off layer editing. It stores channel name, brand font, primary/accent/shadow colors, and an optional logo asset. Capture style and Apply kit are explicit actions so users can either derive a kit from the current thumbnail or apply a saved kit to selected layers.
+
 Inspector controls use disabled states when an input cannot affect the current layer state, keeping inert settings visually distinct without hiding the surrounding workflow. The Adjust tab exposes advanced but compact layer appearance controls for layer blur, signed inner/outer edge blur, optional stroke/outline blur participation, corner radius, text writing mode, text kerning, line style, and fill/stroke opacity.
 
 The Colors tab treats registered single colors as editable rows. Selecting a row loads it into the editor, Update writes it back, and each registered row exposes direct Fill and Stroke apply buttons for the current text/shape selection. Saved multi-color palette rows stay visually separate from the single-color list. The palette maker shows an Adobe-style color exploration area with selectable and drag-editable linked color wheel points, explicit base-color controls, large palette bars, HEX/RGB synchronized slider and number inputs, recent colors, and a full-width opacity control. RGB channel controls stack as full-width rows so the slider tracks remain precise in the compact inspector. Selecting a point is non-destructive; dragging a point updates the whole palette pattern around that intended color. Users can save the displayed pattern as a palette-level set, then apply any saved-palette color as Fill or Stroke without replacing the single-swatch workflow.
+
+The status bar can show compact warning chips for long text, low contrast, hidden important layers, edge-safe-area risk, heavy assets, many layers, 4K output, and large storage estimates. These warnings are intentionally advisory and sit beside the status message without blocking the export controls.
 
 ## UI Principles
 
@@ -66,6 +72,7 @@ The Colors tab treats registered single colors as editable rows. Selecting a row
 
 - Desktop: three-column editor with canvas centered.
 - Tablet/mobile: stack tools above the canvas and inspector below it.
+- Mobile: place the canvas workbench before the left and right panels so the first scroll position prioritizes the thumbnail being edited.
 - Image Lab modal uses a two-column workspace on desktop and a single-column workspace on mobile.
 - Left and right task tabs remain visible at the top of their panels and collapse without horizontal overflow on mobile.
 - Canvas preserves aspect ratio and never overlaps controls.

@@ -31,6 +31,13 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Load 10 bundled default templates for common thumbnail use cases without depending on localStorage.
+- Filter bundled templates by use case and show compact template previews before loading.
+- Provide a guided beginner creation path for template selection, image replacement, title creation, brand application, and layout generation.
+- Save and apply a browser-local brand kit with channel name, font, colors, shadow/outline color, and optional logo asset.
+- Show advisory quality warnings for text length, low contrast, hidden important layers, safe-area edges, heavy assets, large storage, many layers, and 4K export.
+- Export, import, and delete browser-local edit-state JSON for backup and recovery.
+- Show a GitHub Issues path for bug reports and feature requests.
+- Show browser-only privacy/storage guidance inside the app.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
 - Make the direct rotation handle visually recognizable through cursor and handle states.

@@ -7,6 +7,8 @@ export interface DefaultTemplateDefinition {
   id: string;
   name: string;
   description: string;
+  category: "youtube" | "shorts" | "stream" | "cutout";
+  previewColors: [string, string, string];
   settings: OutputSettings;
   createLayers: () => ThumbnailLayer[];
 }
@@ -16,6 +18,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "creator-live",
     name: "Creator Live",
     description: "Bold livestream thumbnail with title plate and platform tag.",
+    category: "stream",
+    previewColors: ["#152033", "#10b6d7", "#ff4f5f"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: createInitialLayers,
   },
@@ -23,6 +27,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "product-review",
     name: "Product Review",
     description: "Review layout with large product area, score badge, and verdict text.",
+    category: "youtube",
+    previewColors: ["#ffffff", "#ffd166", "#111827"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeImageLayer({
@@ -108,6 +114,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "tutorial-steps",
     name: "Tutorial Steps",
     description: "Structured how-to thumbnail with numbered chips and a clear action title.",
+    category: "youtube",
+    previewColors: ["#152033", "#ffffff", "#ff4f5f"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeImageLayer({
@@ -179,6 +187,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "shorts-quote",
     name: "Shorts Quote",
     description: "Vertical quote-first layout for Shorts, Reels, and portrait clips.",
+    category: "shorts",
+    previewColors: ["#111827", "#ffffff", "#ff4f5f"],
     settings: { ...defaultOutputSettings, presetId: "portrait", width: 1080, height: 1920 },
     createLayers: () => [
       makeImageLayer({
@@ -248,6 +258,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "breaking-news",
     name: "Breaking News",
     description: "Urgent news thumbnail with a high-contrast ticker and headline lockup.",
+    category: "stream",
+    previewColors: ["#d92d20", "#111827", "#ffffff"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeImageLayer({
@@ -337,6 +349,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "versus-comparison",
     name: "Versus Comparison",
     description: "Two-column comparison layout with a central VS badge and clear choices.",
+    category: "youtube",
+    previewColors: ["#10b6d7", "#ffd166", "#ff4f5f"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeShapeLayer({
@@ -454,6 +468,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "gaming-highlight",
     name: "Gaming Highlight",
     description: "Action thumbnail with neon frame, play marker, and score callout.",
+    category: "stream",
+    previewColors: ["#111827", "#7c3aed", "#10b6d7"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeImageLayer({
@@ -537,6 +553,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "podcast-guest",
     name: "Podcast Guest",
     description: "Square interview card with guest placeholder, topic title, and episode tag.",
+    category: "youtube",
+    previewColors: ["#ffffff", "#152033", "#10b6d7"],
     settings: { ...defaultOutputSettings, presetId: "square", width: 1080, height: 1080 },
     createLayers: () => [
       makeShapeLayer({
@@ -616,6 +634,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "event-countdown",
     name: "Event Countdown",
     description: "Countdown announcement layout with date badge and strong event title.",
+    category: "stream",
+    previewColors: ["#111827", "#ffd166", "#ffffff"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeImageLayer({
@@ -713,6 +733,8 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
     id: "minimal-launch",
     name: "Minimal Launch",
     description: "Clean product or feature launch layout with calm whitespace and accent lines.",
+    category: "cutout",
+    previewColors: ["#ffffff", "#152033", "#10b6d7"],
     settings: { ...defaultOutputSettings, presetId: "youtube-720" },
     createLayers: () => [
       makeShapeLayer({

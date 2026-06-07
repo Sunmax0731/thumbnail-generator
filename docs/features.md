@@ -33,11 +33,22 @@ This page is the quick feature index for users and reviewers.
 ## Browser Storage
 
 - Load 10 bundled default templates for creator live, product review, tutorial steps, portrait-short quote, breaking news, versus comparison, gaming highlight, podcast guest, event countdown, and minimal launch starting layouts.
+- Filter bundled templates by All, YouTube, Shorts, Stream, or Cutout, with mini preview swatches and output-size badges.
+- Use Guided start for the Template, Image, Title, Brand, and Layout creation path.
 - Use Templates to save named browser-local templates.
 - Use Edit state to save the current work-in-progress state without creating a named template.
+- Export, import, or delete edit-state JSON for backup and recovery.
 - Enable Autosave current edit state to save the active editor state after changes.
 - Reloading the app restores the saved edit state when one exists.
 - Browser storage is local to the current browser profile and can be removed by clearing site data.
+
+## Brand Kit And Quality Warnings
+
+- Store a browser-local brand kit with channel name, brand font, primary color, accent color, shadow/outline color, and optional logo asset.
+- Capture the current canvas style into the brand kit.
+- Apply the brand kit to selected text/shape layers, all compatible layers, or a logo image layer.
+- Show advisory warning chips for long text, low contrast, hidden important layers, safe-area edges, many layers, large image assets, large storage estimates, and 4K export.
+- Link to GitHub Issues from the app for bug reports and feature requests.
 
 ## Image And Text Tools
 

@@ -1,4 +1,4 @@
-import { Download, FileDown, ImageDown, Monitor, SquareStack } from "lucide-react";
+import { Download, ExternalLink, FileDown, ImageDown, Monitor, SquareStack } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
 import type { ExportFormat, OutputSettings } from "../lib/types";
@@ -33,6 +33,9 @@ export function TopToolbar({
         <div>
           <h1>{t("app.title")}</h1>
           <p>{t("app.subtitle")}</p>
+          <a className="brand-issue-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
+            <ExternalLink size={12} /> {t("app.reportIssue")}
+          </a>
         </div>
       </div>
 

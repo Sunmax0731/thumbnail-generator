@@ -16,3 +16,5 @@
 - [x] Browser runtime gate passes.
 - [x] Docs ZIP is generated.
 - [x] Git branch is pushed.
+
+Latest validation note: 2026-06-08 work items 0065-0068 passed `npm test` (24 files, 78 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4188/thumbnail-generator/`. Browser plugin was attempted first and failed with `Browser is not available: iab`.

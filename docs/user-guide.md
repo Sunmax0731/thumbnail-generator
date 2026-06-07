@@ -65,15 +65,41 @@ Use Assets to add common starter layers quickly:
 
 Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 10 practical starts: Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch. Browser templates remain separate named snapshots saved in localStorage.
 
+Use the template filters to narrow the list by All, YouTube, Shorts, Stream, or Cutout. Each row shows a miniature color preview and output size so you can pick a start before loading it.
+
+Use Guided start for a short beginner flow:
+
+1. Template opens the template list.
+2. Image jumps to Assets.
+3. Title inserts a headline layer.
+4. Brand applies the current brand kit.
+5. Layout regenerates CSV and HTML from the current canvas.
+
+## Brand Kit
+
+Open Templates and edit Brand kit to store a reusable channel style:
+
+- Channel name.
+- Brand font.
+- Primary, accent, and shadow/outline colors.
+- Optional logo asset from the imported asset list.
+
+Capture style reads the current canvas text/shape style into the brand kit. Apply kit updates selected editable text and shape layers. If no compatible layer is selected, it applies to all editable text and shape layers. If a logo asset is set, applying the kit inserts it as an image layer.
+
 ## Save Current Edit State
 
 Open Templates and use Edit state:
 
 - Save state stores the current output settings, layers, image assets, CSV/HTML text, and template-name draft in browser localStorage.
 - Restore state reloads the saved work-in-progress state.
+- Export state downloads the work-in-progress as JSON for backup or transfer.
+- Import state reads a previously exported JSON state file.
+- Delete saved state clears only the saved browser work-in-progress slot; the current open canvas remains.
 - Autosave current edit state saves editor changes after a short delay while the toggle is on.
 
 This edit state is a single recovery slot. Browser templates remain separate named snapshots.
+
+Large image-heavy states can exceed browser storage limits. When the app estimates a large saved state or a save fails, export state JSON and remove old browser data or large imported assets before relying on localStorage.
 
 ## Text Alignment
 
@@ -108,6 +134,8 @@ Select a layer and open Adjust. Edge blur accepts signed values: `0` disables it
 
 Select an output preset from the top toolbar. Tall presets such as Shorts automatically reduce the preview zoom so the whole canvas fits the visible stage. Use PNG, JPG, WebP, or Export to download the rendered thumbnail.
 
+The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important layers, edge-safe-area risk, many layers, large image assets, 4K output, or large browser-storage estimates.
+
 ## Image Lab
 
 Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
@@ -120,4 +148,12 @@ Use the palette maker preview to check the current draft color, opacity, and com
 
 ## Browser Storage
 
-The app stores the current edit state, autosave preference, templates, color palette entries, saved palette sets, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.
+The app stores the current edit state, autosave preference, templates, brand kit, color palette entries, saved palette sets, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.
+
+## Service And Privacy
+
+Use the Report issue link in the app header or Templates service section to open GitHub Issues:
+
+<https://github.com/Sunmax0731/thumbnail-generator/issues>
+
+The app is browser-only. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.

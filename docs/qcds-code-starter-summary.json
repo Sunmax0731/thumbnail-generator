@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-07T13:11:44.700Z",
+  "generatedAt": "2026-06-08T01:12:01.946+09:00",
   "sourceWorkItem": {
     "kind": "issue",
     "title": "QCDS評価のCode Starter可視化",
@@ -26,7 +26,7 @@
       "label": "Quality",
       "rating": "A+",
       "state": "pass",
-      "summary": "Feature coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
+      "summary": "Feature coverage, guided start, brand kit, quality warnings, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
       "evidence": [
         "docs/qcds-evaluation.md",
         "docs/qcds-strict-metrics.json",
@@ -48,7 +48,7 @@
       "label": "Delivery",
       "rating": "A+",
       "state": "pass",
-      "summary": "TODO, Issues, docs, QCDS evidence, tests, build, and runtime gate records are synchronized.",
+      "summary": "TODO, Issues 0065-0068, docs, QCDS evidence, tests, build, and runtime gate records are synchronized.",
       "evidence": [
         "TODO.md",
         "Issues/0063-qcds-code-starter.md",
@@ -59,7 +59,7 @@
       "label": "Satisfaction",
       "rating": "A+",
       "state": "pass",
-      "summary": "Primary editing/export workflows, mobile layout, templates, and user-facing documentation are validated.",
+      "summary": "Primary editing/export workflows, mobile layout, templates, brand reuse, warnings, issue reporting, and user-facing documentation are validated.",
       "evidence": [
         "docs/user-guide.md",
         "docs/features.md",
@@ -84,7 +84,7 @@
   "validation": {
     "npmTest": "pass",
     "npmRunBuild": "pass",
-    "browserRuntimeGate": "pass; existing Playwright headless Chromium gate remains current for app behavior",
+    "browserRuntimeGate": "pass; Browser plugin attempted and unavailable (iab), Playwright headless Chromium gate passed at http://127.0.0.1:4188/thumbnail-generator/",
     "manualCodeStarterCheck": "repo-side source files added; reload VS Code Code Starter if the view is cached"
   }
 }

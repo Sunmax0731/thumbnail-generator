@@ -29,6 +29,10 @@
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide exactly 10 distinct use-case layouts with exportable CSV/HTML and supported layer types.
+- Default template metadata exposes categories and mini-preview colors for guided selection.
+- Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
+- Edit state helpers serialize, parse, and delete portable JSON recovery files.
+- Quality warning helpers flag long text, low contrast, safe-area edges, many layers, large exports, large assets, and large storage estimates.
 
 ## Manual Browser Runtime Gate
 
@@ -91,6 +95,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Desktop and mobile viewports have no incoherent overlap.
+- Template filters, guided start controls, brand kit capture/apply, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
 ## Current Results
 
@@ -165,3 +170,21 @@ Completed on 2026-06-07 for `Issues/0064-issue.md`.
 - Browser runtime gate: pass with Playwright headless Chromium at `http://127.0.0.1:4187/thumbnail-generator/`. Nonblank render, primary UI visible, CSV import, HTML import, layer edit, and WebP export path were exercised after the documentation update.
 - Runtime gate export evidence: `thumbnail-1280x720-2026-06-07T14-03-52-685Z.webp`.
 - Console health: no page errors and no app HTTP 4xx/5xx responses were reported.
+
+### Work Items 0065-0068 UIUX, Creator, Reliability, Service Display
+
+Completed on 2026-06-08.
+
+- Issues closed: `Issues/0065-uiux.md`, `Issues/0066-issue.md`, `Issues/0067-issue.md`, and `Issues/0068-issues.md`.
+- `npm test`: pass. 24 test files, 78 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Runtime gate URL: `http://127.0.0.1:4188/thumbnail-generator/`.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260608-desktop.png`
+  - `docs/assets/runtime-20260608-mobile.png`
+- Runtime gate checks: pass. Nonblank initial canvas, primary workspace visible, English language switch, template filter count, Brand kit capture/apply, GitHub Issues URL, privacy notice, CSV import, HTML import, Adjust X edit from `90` to `100`, WebP export download, mobile canvas-first layout, and mobile horizontal overflow `0`.
+- Runtime gate export evidence: `output/runtime-downloads-20260608/thumbnail-1280x720-2026-06-07T16-12-01-946Z.webp`.
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported.

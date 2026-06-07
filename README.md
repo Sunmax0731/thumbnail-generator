@@ -23,6 +23,10 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load 10 bundled default templates for livestream, review, tutorial, portrait-short, news, comparison, gaming, podcast, event, and launch use cases.
+- Filter bundled templates by YouTube, Shorts, stream, or cutout use case and start from a compact guided creation flow.
+- Save a browser-local brand kit with channel name, brand font, brand colors, shadow color, and optional logo asset, then apply it to selected layers.
+- See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
+- Export, import, or delete the browser-local edit state JSON for backup and recovery.
 - Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, HEX/RGB synchronized input with sliders, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Select bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical selection bounds following the visible text area.
@@ -32,7 +36,9 @@ See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide
 
 ## Use The Published App
 
-Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, colors, and imported fonts stay in the current browser profile unless you export a thumbnail or clear site data.
+Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data.
+
+Use the in-app GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data.
 
 ## Run Locally
 

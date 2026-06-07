@@ -161,3 +161,7 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] 実現可能テンプレート10件作成 [Issue](Issues/0062-10.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] QCDS評価のCode Starter可視化 [Issue](Issues/0063-qcds-code-starter.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] 画面キャプチャに基づく機能説明資料の作成 [Issue](Issues/0064-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 初心者向け制作導線とUIUX改善 [Issue](Issues/0065-uiux.md) [QCDS:Quality,Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 配信者向けサムネ機能拡充 [Issue](Issues/0066-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:06-release] サムネイル生成アプリの信頼性・性能・運用品質改善 [Issue](Issues/0067-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Issues導線と正式サービス表示の追加 [Issue](Issues/0068-issues.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]

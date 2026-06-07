@@ -1,10 +1,13 @@
 import { describe, expect, it } from "vitest";
 import {
   createEditStateSnapshot,
+  deleteSavedEditState,
   editStatePreferenceStorageKey,
   editStateStorageKey,
+  parseEditStateJson,
   readEditStatePreferences,
   readSavedEditState,
+  serializeEditState,
   writeEditStatePreferences,
   writeSavedEditState,
 } from "./editState";
@@ -57,12 +60,32 @@ describe("editState", () => {
     expect(readSavedEditState(storage)).toBeNull();
     expect(readEditStatePreferences(storage).autoSaveEnabled).toBe(false);
   });
+
+  it("serializes, parses, and deletes saved edit state JSON", () => {
+    const storage = createMemoryStorage();
+    const snapshot = createEditStateSnapshot(
+      [makeTextLayer({ text: "PORTABLE" })],
+      [],
+      defaultOutputSettings,
+      "csv",
+      "html",
+      "Portable",
+    );
+
+    const parsed = parseEditStateJson(serializeEditState(snapshot));
+    expect(parsed?.templateName).toBe("Portable");
+
+    writeSavedEditState(snapshot, storage);
+    deleteSavedEditState(storage);
+    expect(storage.getItem(editStateStorageKey)).toBeNull();
+  });
 });
 
-function createMemoryStorage(): Pick<Storage, "getItem" | "setItem"> {
+function createMemoryStorage(): Pick<Storage, "getItem" | "setItem" | "removeItem"> {
   const records = new Map<string, string>();
   return {
     getItem: (key) => records.get(key) ?? null,
     setItem: (key, value) => records.set(key, value),
+    removeItem: (key) => records.delete(key),
   };
 }

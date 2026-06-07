@@ -1,11 +1,14 @@
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import {
   Code2,
+  Download,
+  ExternalLink,
   FileText,
   FolderOpen,
   GripHorizontal,
   ImagePlus,
   LayoutTemplate,
+  Paintbrush,
   RefreshCw,
   Save,
   Scissors,
@@ -14,11 +17,13 @@ import {
   Type,
 } from "lucide-react";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
+import type { FontOption } from "../lib/fonts";
 import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
-import type { ImageAsset } from "../lib/types";
+import type { BrandKit, ImageAsset } from "../lib/types";
 
 type LeftPanelSection = "assets" | "layouts" | "templates";
+type TemplateFilter = "all" | DefaultTemplateDefinition["category"];
 export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
@@ -29,6 +34,8 @@ interface LeftPanelProps {
   templateName: string;
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
+  brandKit: BrandKit;
+  fontOptions: FontOption[];
   autoSaveEnabled: boolean;
   savedEditStateUpdatedAt: string | null;
   onCsvTextChange: (value: string) => void;
@@ -50,6 +57,12 @@ interface LeftPanelProps {
   onSaveTemplate: () => void;
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
+  onBrandKitChange: (next: BrandKit) => void;
+  onCaptureBrandKit: () => void;
+  onApplyBrandKit: () => void;
+  onExportEditState: () => void;
+  onImportEditState: (file: File | null) => void;
+  onDeleteEditState: () => void;
   onAutoSaveChange: (enabled: boolean) => void;
   onSaveEditState: () => void;
   onRestoreEditState: () => void;
@@ -65,6 +78,8 @@ export function LeftPanel({
   templateName,
   templates,
   defaultTemplates,
+  brandKit,
+  fontOptions,
   autoSaveEnabled,
   savedEditStateUpdatedAt,
   onCsvTextChange,
@@ -86,6 +101,12 @@ export function LeftPanel({
   onSaveTemplate,
   onLoadTemplate,
   onDeleteTemplate,
+  onBrandKitChange,
+  onCaptureBrandKit,
+  onApplyBrandKit,
+  onExportEditState,
+  onImportEditState,
+  onDeleteEditState,
   onAutoSaveChange,
   onSaveEditState,
   onRestoreEditState,
@@ -94,6 +115,14 @@ export function LeftPanel({
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("assets");
   const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [templateFilter, setTemplateFilter] = useState<TemplateFilter>("all");
+  const filteredDefaultTemplates = useMemo(
+    () =>
+      templateFilter === "all"
+        ? defaultTemplates
+        : defaultTemplates.filter((template) => template.category === templateFilter),
+    [defaultTemplates, templateFilter],
+  );
 
   return (
     <aside className="side-panel left-panel" aria-label={t("left.aria")}>
@@ -302,7 +331,17 @@ export function LeftPanel({
               <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
                 <FolderOpen size={16} /> {t("left.restoreEditState")}
               </button>
+              <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
+                <Download size={16} /> {t("left.exportState")}
+              </button>
+              <label className="secondary-button icon-text file-action">
+                <FolderOpen size={16} /> {t("left.importState")}
+                <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
+              </label>
             </div>
+            <button type="button" className="ghost-button wide-button danger-text" onClick={onDeleteEditState}>
+              <Trash2 size={15} /> {t("left.deleteEditState")}
+            </button>
             <p className="edit-state-meta">
               {savedEditStateUpdatedAt
                 ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
@@ -310,24 +349,113 @@ export function LeftPanel({
             </p>
           </section>
 
+          <section className="panel-section guided-start-section">
+            <div className="section-heading">
+              <LayoutTemplate size={16} />
+              <h2>{t("left.guidedStart")}</h2>
+            </div>
+            <div className="guided-steps">
+              <button type="button" onClick={() => setActiveSection("templates")}>1 {t("left.stepTemplate")}</button>
+              <button type="button" onClick={() => setActiveSection("assets")}>2 {t("left.stepImage")}</button>
+              <button type="button" onClick={() => onAddQuickLayer("headline")}>3 {t("left.stepTitle")}</button>
+              <button type="button" onClick={onApplyBrandKit}>4 {t("left.stepBrand")}</button>
+              <button type="button" onClick={onSyncLayoutText}>5 {t("left.stepExport")}</button>
+            </div>
+          </section>
+
           <section className="panel-section default-template-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
               <h2>{t("left.defaultTemplates")}</h2>
-              <span className="section-count">{defaultTemplates.length}</span>
+              <span className="section-count">{filteredDefaultTemplates.length}</span>
+            </div>
+            <div className="template-filter-tabs" role="tablist" aria-label={t("left.templateFilters")}>
+              {templateFilterOptions.map((option) => (
+                <button
+                  type="button"
+                  key={option.id}
+                  className={templateFilter === option.id ? "selected" : ""}
+                  onClick={() => setTemplateFilter(option.id)}
+                >
+                  {t(option.labelKey)}
+                </button>
+              ))}
             </div>
             <div className="default-template-list" aria-label={t("left.defaultTemplates")}>
-              {defaultTemplates.map((template) => (
+              {filteredDefaultTemplates.map((template) => (
                 <button
                   type="button"
                   className="template-preset-row"
                   key={template.id}
                   onClick={() => onLoadDefaultTemplate(template.id)}
                 >
-                  <span>{template.name}</span>
-                  <small>{template.description}</small>
+                  <span className="template-mini-preview" aria-hidden="true">
+                    {template.previewColors.map((color) => (
+                      <span key={color} style={{ background: color }} />
+                    ))}
+                  </span>
+                  <span className="template-copy">
+                    <strong>{template.name}</strong>
+                    <small>{template.description}</small>
+                  </span>
+                  <em>{template.settings.width}x{template.settings.height}</em>
                 </button>
               ))}
+            </div>
+          </section>
+
+          <section className="panel-section brand-kit-section">
+            <div className="section-heading">
+              <Paintbrush size={16} />
+              <h2>{t("left.brandKit")}</h2>
+            </div>
+            <label className="field">
+              <span>{t("left.channelName")}</span>
+              <input
+                type="text"
+                value={brandKit.channelName}
+                onChange={(event) => onBrandKitChange({ ...brandKit, channelName: event.currentTarget.value })}
+              />
+            </label>
+            <label className="field">
+              <span>{t("left.brandFont")}</span>
+              <select
+                value={brandKit.fontFamily}
+                onChange={(event) => onBrandKitChange({ ...brandKit, fontFamily: event.currentTarget.value })}
+              >
+                {fontOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {option.label}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="brand-color-grid">
+              <ColorField label={t("left.primaryColor")} value={brandKit.primaryColor} onChange={(value) => onBrandKitChange({ ...brandKit, primaryColor: value })} />
+              <ColorField label={t("left.accentColor")} value={brandKit.accentColor} onChange={(value) => onBrandKitChange({ ...brandKit, accentColor: value })} />
+              <ColorField label={t("left.shadowColor")} value={brandKit.shadowColor} onChange={(value) => onBrandKitChange({ ...brandKit, shadowColor: value })} />
+            </div>
+            <label className="field">
+              <span>{t("left.logoAsset")}</span>
+              <select
+                value={brandKit.logoAssetKey ?? ""}
+                onChange={(event) => onBrandKitChange({ ...brandKit, logoAssetKey: event.currentTarget.value || undefined })}
+              >
+                <option value="">{t("left.noLogoAsset")}</option>
+                {assets.map((asset) => (
+                  <option key={asset.key} value={asset.key}>
+                    {asset.name}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div className="button-grid">
+              <button type="button" className="secondary-button icon-text" onClick={onCaptureBrandKit}>
+                <Save size={16} /> {t("left.captureBrand")}
+              </button>
+              <button type="button" className="primary-button icon-text" onClick={onApplyBrandKit}>
+                <Paintbrush size={16} /> {t("left.applyBrand")}
+              </button>
             </div>
           </section>
 
@@ -371,9 +499,29 @@ export function LeftPanel({
               )}
             </div>
           </section>
+
+          <section className="panel-section service-section">
+            <div className="section-heading">
+              <ExternalLink size={16} />
+              <h2>{t("left.service")}</h2>
+            </div>
+            <a className="service-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
+              <ExternalLink size={15} /> {t("left.reportIssue")}
+            </a>
+            <p className="privacy-note">{t("left.privacyNotice")}</p>
+          </section>
         </>
       ) : null}
     </aside>
+  );
+}
+
+function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+  return (
+    <label className="field color-field">
+      <span>{label}</span>
+      <input type="color" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
+    </label>
   );
 }
 
@@ -382,3 +530,11 @@ function formatSavedAt(value: string): string {
   if (Number.isNaN(date.getTime())) return value;
   return date.toLocaleString();
 }
+
+const templateFilterOptions: { id: TemplateFilter; labelKey: Parameters<Translator>[0] }[] = [
+  { id: "all", labelKey: "left.filter.all" },
+  { id: "youtube", labelKey: "left.filter.youtube" },
+  { id: "shorts", labelKey: "left.filter.shorts" },
+  { id: "stream", labelKey: "left.filter.stream" },
+  { id: "cutout", labelKey: "left.filter.cutout" },
+];

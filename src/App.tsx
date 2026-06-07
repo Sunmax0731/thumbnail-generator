@@ -16,6 +16,13 @@ import {
   type CanvasPoint,
 } from "./lib/canvasInteraction";
 import {
+  applyBrandKitToLayers,
+  createBrandKitFromCurrentState,
+  defaultBrandKit,
+  readBrandKit,
+  writeBrandKit,
+} from "./lib/brandKit";
+import {
   addPaletteColor as appendPaletteColor,
   addSavedColorPalette,
   generatePaletteSchemeColors,
@@ -45,8 +52,11 @@ import {
 import { defaultTemplates } from "./lib/defaultTemplates";
 import {
   createEditStateSnapshot,
+  deleteSavedEditState,
+  parseEditStateJson,
   readEditStatePreferences,
   readSavedEditState,
+  serializeEditState,
   writeEditStatePreferences,
   writeSavedEditState,
 } from "./lib/editState";
@@ -66,6 +76,7 @@ import {
 } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
+import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
 import { calculatePreviewPadding } from "./lib/previewPadding";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
@@ -77,7 +88,7 @@ import {
   writeSavedTemplates,
 } from "./lib/templates";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
-import type { ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+import type { BrandKit, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
 interface ActiveCanvasInteraction {
@@ -102,6 +113,7 @@ function App() {
   const didMountAutoSave = useRef(false);
   const initialLanguage = useMemo(() => detectInitialLanguage(), []);
   const initialSavedEditState = useMemo(() => (typeof window === "undefined" ? null : readSavedEditState()), []);
+  const initialBrandKit = useMemo(() => (typeof window === "undefined" ? defaultBrandKit : readBrandKit()), []);
   const initialEditStatePreferences = useMemo(
     () => (typeof window === "undefined" ? { autoSaveEnabled: false } : readEditStatePreferences()),
     [],
@@ -141,6 +153,7 @@ function App() {
   const [paletteNameDraft, setPaletteNameDraft] = useState("Accent");
   const [paletteAlphaDraft, setPaletteAlphaDraft] = useState(1);
   const [paletteModeDraft, setPaletteModeDraft] = useState<HarmonyMode>("triad");
+  const [brandKit, setBrandKit] = useState<BrandKit>(initialBrandKit);
   const [selectedPaletteColorId, setSelectedPaletteColorId] = useState<string | null>(null);
   const [savedColorPalettes, setSavedColorPalettes] = useState<SavedColorPalette[]>(() =>
     typeof window === "undefined" ? [] : readSavedColorPalettes(),
@@ -170,7 +183,15 @@ function App() {
       ? t("selection.none")
       : selectedLayers.length === 1
         ? selectedLayers[0].name
-        : t("selection.multiple", { count: selectedLayers.length });
+      : t("selection.multiple", { count: selectedLayers.length });
+  const estimatedStorageBytes = useMemo(
+    () => estimateProjectStorageBytes(createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName)),
+    [assets, csvText, htmlText, layers, settings, templateName],
+  );
+  const qualityWarnings = useMemo(
+    () => evaluateThumbnailWarnings({ layers, assets, settings, estimatedStorageBytes }),
+    [assets, estimatedStorageBytes, layers, settings],
+  );
 
   useEffect(() => {
     setSelectedIds((current) => {
@@ -607,13 +628,20 @@ function App() {
     (mode: "manual" | "auto" = "manual") => {
       try {
         const snapshot = createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName);
+        const snapshotSize = estimateProjectStorageBytes(snapshot);
         writeSavedEditState(snapshot);
         setSavedEditStateUpdatedAt(snapshot.updatedAt);
         if (mode === "manual") {
-          setStatus(`Saved current edit state at ${formatSavedAt(snapshot.updatedAt)}.`);
+          setStatus(
+            snapshotSize >= 4_500_000
+              ? `Saved current edit state, but it is large (${formatBytes(snapshotSize)}). Export JSON as a backup.`
+              : `Saved current edit state at ${formatSavedAt(snapshot.updatedAt)}.`,
+          );
         }
       } catch (error) {
-        setStatus(`Edit state save failed: ${error instanceof Error ? error.message : String(error)}`);
+        setStatus(
+          `Edit state save failed: ${error instanceof Error ? error.message : String(error)} Export state JSON, delete old browser data, or remove large image/font assets.`,
+        );
       }
     },
     [assets, csvText, htmlText, layers, settings, templateName],
@@ -635,6 +663,96 @@ function App() {
     setSavedEditStateUpdatedAt(snapshot.updatedAt);
     setStatus(`Restored saved edit state from ${formatSavedAt(snapshot.updatedAt)}.`);
   }, []);
+
+  const exportEditState = useCallback(() => {
+    const snapshot = createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName);
+    downloadTextFile(
+      serializeEditState(snapshot),
+      `thumbnail-generator-state-${snapshot.updatedAt.replace(/[:.]/g, "-")}.json`,
+      "application/json",
+    );
+    setStatus(`Exported edit state JSON (${formatBytes(estimateProjectStorageBytes(snapshot))}).`);
+  }, [assets, csvText, htmlText, layers, settings, templateName]);
+
+  const importEditState = useCallback(async (file: File | null) => {
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const snapshot = parseEditStateJson(text);
+      if (!snapshot) {
+        setStatus("Edit state import failed: JSON did not match the saved state schema.");
+        return;
+      }
+      writeSavedEditState(snapshot);
+      setSettings(snapshot.settings);
+      setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
+      setLayers(snapshot.layers);
+      setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
+      setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
+      setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
+      setTemplateName(snapshot.templateName);
+      setSavedEditStateUpdatedAt(snapshot.updatedAt);
+      setStatus(`Imported edit state from ${file.name}.`);
+    } catch (error) {
+      setStatus(`Edit state import failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, []);
+
+  const deleteEditState = useCallback(() => {
+    try {
+      deleteSavedEditState();
+      setSavedEditStateUpdatedAt(null);
+      setStatus("Deleted the saved browser edit state. Current canvas remains open.");
+    } catch (error) {
+      setStatus(`Edit state delete failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, []);
+
+  const updateBrandKit = useCallback((next: BrandKit) => {
+    const normalized = { ...next };
+    setBrandKit(normalized);
+    try {
+      writeBrandKit(normalized);
+    } catch (error) {
+      setStatus(`Brand kit save failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, []);
+
+  const captureBrandKit = useCallback(() => {
+    const next = createBrandKitFromCurrentState(layers, customFonts, brandKit);
+    updateBrandKit(next);
+    setStatus("Captured brand kit from the current selected style.");
+  }, [brandKit, customFonts, layers, updateBrandKit]);
+
+  const applyBrandKit = useCallback(() => {
+    const compatibleIds = selectedIds.length
+      ? selectedIds
+      : layers.filter((layer) => layer.selectable && (layer.type === "text" || layer.type === "shape")).map((layer) => layer.id);
+    if (compatibleIds.length === 0 && !brandKit.logoAssetKey) {
+      setStatus("No editable text, shape, or logo asset is available for brand kit application.");
+      return;
+    }
+    setLayers((current) => {
+      let next = applyBrandKitToLayers(current, compatibleIds, brandKit);
+      const logoAsset = brandKit.logoAssetKey ? assets.find((asset) => asset.key === brandKit.logoAssetKey) : undefined;
+      if (logoAsset) {
+        const logoWidth = Math.min(settings.width * 0.18, logoAsset.width ?? settings.width * 0.18);
+        const ratio = logoAsset.width && logoAsset.height ? logoAsset.height / logoAsset.width : 1;
+        const logoLayer = makeImageLayer({
+          name: `${brandKit.channelName} logo`,
+          imageKey: logoAsset.key,
+          x: settings.width * 0.055,
+          y: settings.height * 0.78,
+          width: logoWidth,
+          height: logoWidth * ratio,
+        });
+        next = [...next, logoLayer];
+        setSelectedIds([logoLayer.id]);
+      }
+      return next;
+    });
+    setStatus(`Applied brand kit "${brandKit.channelName}" to ${compatibleIds.length || 1} target${compatibleIds.length === 1 ? "" : "s"}.`);
+  }, [assets, brandKit, layers, selectedIds, settings.height, settings.width]);
 
   const duplicateLayer = useCallback(
     (id: string) => {
@@ -1278,11 +1396,19 @@ function App() {
           onLoadDefaultTemplate={loadDefaultTemplate}
           templateName={templateName}
           templates={templates}
+          brandKit={brandKit}
+          fontOptions={fontOptions}
           onTemplateNameChange={setTemplateName}
           onSyncLayoutText={syncLayoutTextFromLayers}
           onSaveTemplate={saveCurrentTemplate}
           onLoadTemplate={loadTemplate}
           onDeleteTemplate={deleteTemplate}
+          onBrandKitChange={updateBrandKit}
+          onCaptureBrandKit={captureBrandKit}
+          onApplyBrandKit={applyBrandKit}
+          onExportEditState={exportEditState}
+          onImportEditState={importEditState}
+          onDeleteEditState={deleteEditState}
           autoSaveEnabled={autoSaveEnabled}
           savedEditStateUpdatedAt={savedEditStateUpdatedAt}
           onAutoSaveChange={setAutoSaveEnabled}
@@ -1391,7 +1517,7 @@ function App() {
           </section>
         </div>
       ) : null}
-      <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} t={t} />
+      <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} warnings={qualityWarnings} t={t} />
     </div>
   );
 }
@@ -1426,6 +1552,24 @@ function safelySetPointerCapture(element: HTMLElement, pointerId: number): void 
   } catch {
     // Synthetic tests may dispatch pointer events without an active browser pointer.
   }
+}
+
+function downloadTextFile(text: string, filename: string, type: string): void {
+  const blob = new Blob([text], { type });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement("a");
+  link.href = url;
+  link.download = filename;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
+}
+
+function formatBytes(bytes: number): string {
+  if (bytes >= 1_000_000) return `${(bytes / 1_000_000).toFixed(1)} MB`;
+  if (bytes >= 1_000) return `${Math.round(bytes / 1_000)} KB`;
+  return `${bytes} B`;
 }
 
 function isShortcutSuppressed(target: EventTarget | null): boolean {

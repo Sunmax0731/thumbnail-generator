@@ -93,6 +93,15 @@ export interface OutputSettings {
   background: string;
 }
 
+export interface BrandKit {
+  channelName: string;
+  primaryColor: string;
+  accentColor: string;
+  fontFamily: string;
+  shadowColor: string;
+  logoAssetKey?: string;
+}
+
 export interface LayoutParseOptions {
   baseWidth: number;
   baseHeight: number;

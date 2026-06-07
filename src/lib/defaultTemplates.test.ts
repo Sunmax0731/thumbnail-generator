@@ -11,6 +11,8 @@ describe("defaultTemplates", () => {
       const layers = template.createLayers();
       expect(template.name).not.toEqual("");
       expect(template.description).not.toEqual("");
+      expect(["youtube", "shorts", "stream", "cutout"]).toContain(template.category);
+      expect(template.previewColors).toHaveLength(3);
       expect(template.settings.width).toBeGreaterThan(0);
       expect(template.settings.height).toBeGreaterThan(0);
       expect(layers.length).toBeGreaterThan(0);

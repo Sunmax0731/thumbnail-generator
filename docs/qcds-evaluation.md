@@ -69,3 +69,17 @@ Completed on 2026-06-07.
 - Quality: A+. `docs/screenshot-guide.md` links tracked screenshot assets from `docs/assets/`, documents the source captures from `dist/assets/screenshot/`, and covers the main app surfaces without relying on ignored `dist/` paths at render time.
 - Satisfaction: A+. The guide gives image-backed workflows for starting from templates, adding assets, using Image Lab, editing the canvas, managing layers, adjusting text/images/shapes, reusing CSV/HTML layouts, applying colors, and exporting thumbnails.
 - Validation evidence: Markdown/image-link check passed, UTF-8 reads passed, `npm test` passed with 22 test files and 71 tests, `npm run build` passed, and the Playwright browser runtime gate at `http://127.0.0.1:4187/thumbnail-generator/` exercised nonblank render, primary UI visibility, CSV import, HTML import, layer edit, and WebP export (`thumbnail-1280x720-2026-06-07T14-03-52-685Z.webp`) with no page errors or app HTTP 4xx/5xx responses.
+
+## Issues 0065-0068 Backlog Closure Evidence
+
+Completed on 2026-06-08.
+
+- Scope: beginner guided creation flow, template filtering and previews, creator brand kit, rule-based quality warnings, edit-state JSON recovery, GitHub Issues link, and browser-only privacy/service notice.
+- Quality: A+. Added focused unit coverage for Brand kit, quality warnings, edit-state JSON parsing/deletion, and template metadata. `npm test` passed with 24 test files and 78 tests; `npm run build` passed.
+- Cost: A+. The work remains static, browser-only, GitHub Pages compatible, and uses existing React/Vite/localStorage patterns without backend services or paid dependencies.
+- Delivery: A+. All four open TODO/Issue backlog items are closed, docs are synchronized, and the runtime gate result is recorded.
+- Satisfaction: A+. Creators now have a shorter guided start path, use-case template filters, browser-local brand reuse, visible quality warnings, portable edit-state recovery, and an in-app issue reporting path.
+- Browser runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4188/thumbnail-generator/`.
+- Runtime checks: nonblank render, primary UI visibility, template filter, Brand kit capture/apply, GitHub Issues URL, privacy notice, CSV import, HTML import, Adjust X edit from `90` to `100`, WebP export, mobile canvas-first layout, and mobile overflow `0`.
+- Evidence screenshots: `docs/assets/runtime-20260608-desktop.png` and `docs/assets/runtime-20260608-mobile.png`.
+- Export evidence: `output/runtime-downloads-20260608/thumbnail-1280x720-2026-06-07T16-12-01-946Z.webp`.
