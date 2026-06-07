@@ -174,7 +174,7 @@ The left sidebar is grouped by task:
 
 - Assets: local image import, Image Lab launch for the selected asset, imported asset list, selected asset image-layer insertion, expanded quick text/shape/line creation, and sample restoration.
 - Layouts: generated CSV/HTML text, CSV import, and HTML import.
-- Templates: edit-state controls, bundled default templates, and browser-local template naming, saving, loading, and deletion.
+- Templates: bundled default templates, brand kit controls, and browser-local template naming, saving, loading, and deletion.
 
 The right inspector is grouped by task:
 
@@ -205,18 +205,12 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 10 practical layouts built only from supported image, text, shape, and line layers:
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 20 practical layouts built only from supported image, text, shape, and line layers, with five entries per category:
 
-- Creator Live
-- Product Review
-- Tutorial Steps
-- Shorts Quote
-- Breaking News
-- Versus Comparison
-- Gaming Highlight
-- Podcast Guest
-- Event Countdown
-- Minimal Launch
+- YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
+- Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
+- Stream: Creator Live, Breaking News, Gaming Highlight, Event Countdown, Music Premiere.
+- Cutout: Minimal Launch, Profile Cutout, Product Cutout, Food Cutout, Fashion Cutout.
 
 Each bundled template also carries browser-rendered catalog metadata:
 
@@ -224,7 +218,7 @@ Each bundled template also carries browser-rendered catalog metadata:
 - Preview colors: three representative swatches used by the compact template preview.
 - Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
 
-The Templates panel provides a guided start strip for Template, Image, Title, Brand, and Layout actions. These controls route to existing browser-only editor actions and do not create server state.
+The left panel keeps a guided start strip visible above the active task tab for Template, Image, Title, Brand, and Layout actions. These controls route to existing browser-only editor actions and do not create server state.
 
 ## Brand Kit
 
@@ -238,6 +232,8 @@ The brand kit is stored in browser `localStorage` under `thumbnail-generator.bra
 - Optional logo asset key.
 
 Capture style reads the current canvas text/shape styles into the kit. Apply kit updates selected editable text and shape layers with the kit font/colors; when no compatible layer is selected it targets all editable text/shape layers. If a logo asset is selected in the kit, applying the kit inserts that asset as an editable image layer.
+
+Colors can register the current palette draft, saved palette colors, or registered single-color rows into the Brand kit primary, accent, or shadow/outline color slots without leaving the Colors tab.
 
 ## Quality Warnings
 
@@ -365,7 +361,7 @@ A saved edit state stores:
 
 The saved edit state is separate from named templates. Manual Save state overwrites this one work-in-progress slot. When Autosave current edit state is enabled, editor changes are saved after a short debounce. Reloading the app restores the saved edit state when one exists.
 
-The Templates panel also supports edit-state JSON export, JSON import, and explicit saved-state deletion. Large snapshots show a backup warning before users rely on browser storage alone. Save failures include recovery guidance to export JSON, delete old browser data, or remove large image/font assets.
+The canvas preview pane contains the edit-state section. It supports edit-state JSON export, JSON import, and explicit saved-state deletion while the current thumbnail remains visible. Large snapshots show a backup warning before users rely on browser storage alone. Save failures include recovery guidance to export JSON, delete old browser data, or remove large image/font assets.
 
 ## Image Lab
 

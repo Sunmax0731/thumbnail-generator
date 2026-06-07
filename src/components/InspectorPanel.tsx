@@ -56,6 +56,7 @@ import type {
   ImageEffects,
   LineStyle,
   OutputSettings,
+  BrandKitColorRole,
   ShapeKind,
   TextAlign,
   TextWritingMode,
@@ -88,6 +89,7 @@ interface InspectorPanelProps {
   onSaveCurrentColorPalette: (colors?: string[]) => void;
   onDeleteSavedColorPalette: (id: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget, alpha?: number) => void;
+  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onSelectIndividual: (id: string) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
@@ -133,6 +135,7 @@ export function InspectorPanel({
   onSaveCurrentColorPalette,
   onDeleteSavedColorPalette,
   onApplyPaletteColor,
+  onRegisterBrandKitColor,
   onSelect,
   onSelectIndividual,
   onUpdateLayer,
@@ -428,6 +431,7 @@ export function InspectorPanel({
           onSavePalette={onSaveCurrentColorPalette}
           onDeleteSavedPalette={onDeleteSavedColorPalette}
           onApply={onApplyPaletteColor}
+          onRegisterBrandKitColor={onRegisterBrandKitColor}
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
@@ -770,6 +774,7 @@ function PaletteControls({
   onSavePalette,
   onDeleteSavedPalette,
   onApply,
+  onRegisterBrandKitColor,
   onResizeList,
   t,
 }: {
@@ -793,6 +798,7 @@ function PaletteControls({
   onSavePalette: (colors?: string[]) => void;
   onDeleteSavedPalette: (id: string) => void;
   onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
+  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
   onResizeList: (deltaY: number) => void;
   t: Translator;
 }) {
@@ -990,6 +996,12 @@ function PaletteControls({
               {t("inspector.savePalette")}
             </button>
           </div>
+          <BrandKitColorActions
+            color={activePointColor}
+            label={t("inspector.addToBrandKit")}
+            onRegisterBrandKitColor={onRegisterBrandKitColor}
+            t={t}
+          />
         </div>
       </div>
       {recentColors.length > 0 ? (
@@ -1033,6 +1045,7 @@ function PaletteControls({
                     <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "stroke")}>
                       {t("inspector.stroke")}
                     </button>
+                    <BrandKitColorActions color={color} onRegisterBrandKitColor={onRegisterBrandKitColor} t={t} compact />
                   </div>
                 ))}
               </div>
@@ -1078,6 +1091,7 @@ function PaletteControls({
                 </span>
               </button>
             </div>
+            <BrandKitColorActions color={color.value} onRegisterBrandKitColor={onRegisterBrandKitColor} t={t} compact />
             <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
               <Trash2 size={13} />
             </button>
@@ -1086,6 +1100,37 @@ function PaletteControls({
       </div>
       <ResizeHandle label={t("inspector.resizeColorList")} onResize={onResizeList} />
     </section>
+  );
+}
+
+function BrandKitColorActions({
+  color,
+  label,
+  compact = false,
+  onRegisterBrandKitColor,
+  t,
+}: {
+  color: string;
+  label?: string;
+  compact?: boolean;
+  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
+  t: Translator;
+}) {
+  return (
+    <div className={`brand-color-actions ${compact ? "compact" : ""}`} aria-label={label ?? t("inspector.addToBrandKit")}>
+      {label ? <span>{label}</span> : null}
+      {brandKitColorRoles.map((role) => (
+        <button
+          key={role}
+          type="button"
+          className="ghost-button"
+          onClick={() => onRegisterBrandKitColor(color, role)}
+          title={t("inspector.addColorToBrandRole", { role: t(brandKitColorRoleLabels[role]) })}
+        >
+          {t(brandKitColorRoleShortLabels[role])}
+        </button>
+      ))}
+    </div>
   );
 }
 
@@ -1304,6 +1349,20 @@ const palettePatternModes: HarmonyMode[] = [
   "shades",
   "monochromatic",
 ];
+
+const brandKitColorRoles: BrandKitColorRole[] = ["primaryColor", "accentColor", "shadowColor"];
+
+const brandKitColorRoleLabels = {
+  primaryColor: "inspector.brandPrimary",
+  accentColor: "inspector.brandAccent",
+  shadowColor: "inspector.brandShadow",
+} as const;
+
+const brandKitColorRoleShortLabels = {
+  primaryColor: "inspector.brandPrimaryShort",
+  accentColor: "inspector.brandAccentShort",
+  shadowColor: "inspector.brandShadowShort",
+} as const;
 
 function isKeyboardInputTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;

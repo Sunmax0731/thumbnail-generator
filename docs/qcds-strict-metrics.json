@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 10 bundled default templates, template metadata, guided start, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser and real-device edge cases remain future work."
+    "rationale": "Open P2 backlog is implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 20 bundled default templates with five per category, template metadata, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser and real-device edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,13 +15,13 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested 10 practical bundled templates passed validation, Issue 0064 adds a screenshot-based guide, and Issues 0065-0068 add beginner guided creation, template filters/previews, creator brand reuse, quality warnings, state JSON recovery, and in-app issue/privacy display. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, and non-Chromium browser coverage."
+    "rationale": "Requested P2 backlog passed validation: 20 practical bundled templates with five per category, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, and Templates service-section removal. Issue 0064 adds a screenshot-based guide, and Issues 0065-0068 add beginner guided creation, template filters/previews, creator brand reuse, quality warnings, state JSON recovery, and in-app issue/privacy display through the header and preview storage note. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, and non-Chromium browser coverage."
   },
   "codexWorkDashboard": {
     "status": "passed",
     "source": "docs/codex-work-dashboard-qcds.md",
     "openItemsBeforeReview": [
-      "Default templates 10 practical layouts"
+      "Default templates 20 practical layouts"
     ],
     "closedByReview": true,
     "ratingsAfterReview": {
@@ -54,14 +54,14 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4188/thumbnail-generator/",
+    "url": "http://127.0.0.1:4191/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260608-desktop.png",
-      "docs/assets/runtime-20260608-mobile.png"
+      "docs/assets/runtime-20260608-open-p2-desktop.png",
+      "docs/assets/runtime-20260608-open-p2-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -69,7 +69,12 @@
       "English language switch",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
-      "10 bundled default templates",
+      "20 bundled default templates",
+      "5 templates per category",
+      "always-visible guided start",
+      "preview-pane edit state",
+      "Colors-to-Brand-kit registration",
+      "Templates service section removed",
       "template filter",
       "brand kit capture and apply",
       "GitHub Issues URL",

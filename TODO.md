@@ -165,3 +165,8 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:03-design] 配信者向けサムネ機能拡充 [Issue](Issues/0066-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:06-release] サムネイル生成アプリの信頼性・性能・運用品質改善 [Issue](Issues/0067-issue.md) [QCDS:Quality,Cost,Delivery,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] Issues導線と正式サービス表示の追加 [Issue](Issues/0068-issues.md) [QCDS:Quality,Delivery,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 制作導線セクションの常時表示化 [Issue](Issues/0069-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] 標準テンプレートを各カテゴリ5件に拡充 [Issue](Issues/0070-5.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] 編集状態セクションをプレビューペインに表示 [Issue](Issues/0071-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:03-design] Colorsタブからブランドキットカラーを登録する [Issue](Issues/0072-colors.md) [QCDS:Cost,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] テンプレタブのサービスセクション削除 [Issue](Issues/0073-issue.md) [QCDS:Cost,Satisfaction] [Status:closed]

@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Maximize2, MousePointer2, ZoomIn, ZoomOut } from "lucide-react";
+import { Download, FolderOpen, Maximize2, MousePointer2, Save, Trash2, ZoomIn, ZoomOut } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
 import type { OutputSettings } from "../lib/types";
@@ -12,10 +12,18 @@ interface CanvasStageProps {
   zoom: number;
   cursor: string;
   previewPadding: number;
+  autoSaveEnabled: boolean;
+  savedEditStateUpdatedAt: string | null;
   onZoomChange: (zoom: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
+  onAutoSaveChange: (enabled: boolean) => void;
+  onSaveEditState: () => void;
+  onRestoreEditState: () => void;
+  onExportEditState: () => void;
+  onImportEditState: (file: File | null) => void;
+  onDeleteEditState: () => void;
   t: Translator;
 }
 
@@ -27,10 +35,18 @@ export function CanvasStage({
   zoom,
   cursor,
   previewPadding,
+  autoSaveEnabled,
+  savedEditStateUpdatedAt,
   onZoomChange,
   onPointerDown,
   onPointerMove,
   onPointerUp,
+  onAutoSaveChange,
+  onSaveEditState,
+  onRestoreEditState,
+  onExportEditState,
+  onImportEditState,
+  onDeleteEditState,
   t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -117,8 +133,54 @@ export function CanvasStage({
           />
         </div>
       </div>
+      <section className="stage-edit-state" aria-label={t("left.editState")}>
+        <div className="stage-edit-state-header">
+          <div className="section-heading">
+            <Save size={16} />
+            <h2>{t("left.editState")}</h2>
+          </div>
+          <p className="edit-state-meta">
+            {savedEditStateUpdatedAt
+              ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
+              : t("left.noSavedEditState")}
+          </p>
+        </div>
+        <label className="checkbox-row autosave-row">
+          <input
+            type="checkbox"
+            checked={autoSaveEnabled}
+            onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
+          />
+          <span>{t("left.autoSaveEditState")}</span>
+        </label>
+        <div className="stage-edit-actions">
+          <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
+            <Save size={16} /> {t("left.saveEditState")}
+          </button>
+          <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
+            <FolderOpen size={16} /> {t("left.restoreEditState")}
+          </button>
+          <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
+            <Download size={16} /> {t("left.exportState")}
+          </button>
+          <label className="secondary-button icon-text file-action">
+            <FolderOpen size={16} /> {t("left.importState")}
+            <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
+          </label>
+          <button type="button" className="ghost-button danger-text icon-text" onClick={onDeleteEditState}>
+            <Trash2 size={15} /> {t("left.deleteEditState")}
+          </button>
+        </div>
+        <p className="privacy-note">{t("left.privacyNotice")}</p>
+      </section>
     </section>
   );
+}
+
+function formatSavedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
 }
 
 function cssPixels(value: string): number {

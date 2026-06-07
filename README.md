@@ -22,9 +22,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
-- Load 10 bundled default templates for livestream, review, tutorial, portrait-short, news, comparison, gaming, podcast, event, and launch use cases.
+- Load 20 bundled default templates with five starts each for YouTube, Shorts, stream, and cutout use cases.
 - Filter bundled templates by YouTube, Shorts, stream, or cutout use case and start from a compact guided creation flow.
-- Save a browser-local brand kit with channel name, brand font, brand colors, shadow color, and optional logo asset, then apply it to selected layers.
+- Save a browser-local brand kit with channel name, brand font, brand colors, shadow color, and optional logo asset, register Brand kit colors from Colors, then apply it to selected layers.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery.
 - Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, HEX/RGB synchronized input with sliders, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.

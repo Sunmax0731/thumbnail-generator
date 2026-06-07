@@ -1,8 +1,6 @@
 import { useMemo, useState } from "react";
 import {
   Code2,
-  Download,
-  ExternalLink,
   FileText,
   FolderOpen,
   GripHorizontal,
@@ -36,8 +34,6 @@ interface LeftPanelProps {
   defaultTemplates: DefaultTemplateDefinition[];
   brandKit: BrandKit;
   fontOptions: FontOption[];
-  autoSaveEnabled: boolean;
-  savedEditStateUpdatedAt: string | null;
   onCsvTextChange: (value: string) => void;
   onHtmlTextChange: (value: string) => void;
   onApplyCsv: () => void;
@@ -60,12 +56,6 @@ interface LeftPanelProps {
   onBrandKitChange: (next: BrandKit) => void;
   onCaptureBrandKit: () => void;
   onApplyBrandKit: () => void;
-  onExportEditState: () => void;
-  onImportEditState: (file: File | null) => void;
-  onDeleteEditState: () => void;
-  onAutoSaveChange: (enabled: boolean) => void;
-  onSaveEditState: () => void;
-  onRestoreEditState: () => void;
   onOpenImageLab: (assetKey?: string) => void;
   t: Translator;
 }
@@ -80,8 +70,6 @@ export function LeftPanel({
   defaultTemplates,
   brandKit,
   fontOptions,
-  autoSaveEnabled,
-  savedEditStateUpdatedAt,
   onCsvTextChange,
   onHtmlTextChange,
   onApplyCsv,
@@ -104,12 +92,6 @@ export function LeftPanel({
   onBrandKitChange,
   onCaptureBrandKit,
   onApplyBrandKit,
-  onExportEditState,
-  onImportEditState,
-  onDeleteEditState,
-  onAutoSaveChange,
-  onSaveEditState,
-  onRestoreEditState,
   onOpenImageLab,
   t,
 }: LeftPanelProps) {
@@ -155,6 +137,20 @@ export function LeftPanel({
           <Save size={15} /> {t("left.templates")}
         </button>
       </div>
+
+      <section className="panel-section guided-start-section">
+        <div className="section-heading">
+          <LayoutTemplate size={16} />
+          <h2>{t("left.guidedStart")}</h2>
+        </div>
+        <div className="guided-steps">
+          <button type="button" onClick={() => setActiveSection("templates")}>1 {t("left.stepTemplate")}</button>
+          <button type="button" onClick={() => setActiveSection("assets")}>2 {t("left.stepImage")}</button>
+          <button type="button" onClick={() => onAddQuickLayer("headline")}>3 {t("left.stepTitle")}</button>
+          <button type="button" onClick={onApplyBrandKit}>4 {t("left.stepBrand")}</button>
+          <button type="button" onClick={onSyncLayoutText}>5 {t("left.stepExport")}</button>
+        </div>
+      </section>
 
       {activeSection === "assets" ? (
         <>
@@ -311,58 +307,6 @@ export function LeftPanel({
 
       {activeSection === "templates" ? (
         <>
-          <section className="panel-section edit-state-section">
-            <div className="section-heading">
-              <Save size={16} />
-              <h2>{t("left.editState")}</h2>
-            </div>
-            <label className="checkbox-row autosave-row">
-              <input
-                type="checkbox"
-                checked={autoSaveEnabled}
-                onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
-              />
-              <span>{t("left.autoSaveEditState")}</span>
-            </label>
-            <div className="button-grid">
-              <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
-                <Save size={16} /> {t("left.saveEditState")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
-                <FolderOpen size={16} /> {t("left.restoreEditState")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
-                <Download size={16} /> {t("left.exportState")}
-              </button>
-              <label className="secondary-button icon-text file-action">
-                <FolderOpen size={16} /> {t("left.importState")}
-                <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
-              </label>
-            </div>
-            <button type="button" className="ghost-button wide-button danger-text" onClick={onDeleteEditState}>
-              <Trash2 size={15} /> {t("left.deleteEditState")}
-            </button>
-            <p className="edit-state-meta">
-              {savedEditStateUpdatedAt
-                ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
-                : t("left.noSavedEditState")}
-            </p>
-          </section>
-
-          <section className="panel-section guided-start-section">
-            <div className="section-heading">
-              <LayoutTemplate size={16} />
-              <h2>{t("left.guidedStart")}</h2>
-            </div>
-            <div className="guided-steps">
-              <button type="button" onClick={() => setActiveSection("templates")}>1 {t("left.stepTemplate")}</button>
-              <button type="button" onClick={() => setActiveSection("assets")}>2 {t("left.stepImage")}</button>
-              <button type="button" onClick={() => onAddQuickLayer("headline")}>3 {t("left.stepTitle")}</button>
-              <button type="button" onClick={onApplyBrandKit}>4 {t("left.stepBrand")}</button>
-              <button type="button" onClick={onSyncLayoutText}>5 {t("left.stepExport")}</button>
-            </div>
-          </section>
-
           <section className="panel-section default-template-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
@@ -500,16 +444,6 @@ export function LeftPanel({
             </div>
           </section>
 
-          <section className="panel-section service-section">
-            <div className="section-heading">
-              <ExternalLink size={16} />
-              <h2>{t("left.service")}</h2>
-            </div>
-            <a className="service-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
-              <ExternalLink size={15} /> {t("left.reportIssue")}
-            </a>
-            <p className="privacy-note">{t("left.privacyNotice")}</p>
-          </section>
         </>
       ) : null}
     </aside>
@@ -523,12 +457,6 @@ function ColorField({ label, value, onChange }: { label: string; value: string; 
       <input type="color" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
     </label>
   );
-}
-
-function formatSavedAt(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
 }
 
 const templateFilterOptions: { id: TemplateFilter; labelKey: Parameters<Translator>[0] }[] = [

@@ -20,10 +20,11 @@ npm run preview
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add image/text/shape/line starter layers, open Image Lab for the selected asset, and restore the sample template.
 - Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
-- Templates: load bundled default templates, save or restore the current edit state, enable autosave, and save/load/delete browser-local templates.
+- Templates: load bundled default templates, edit the brand kit, and save/load/delete browser-local templates.
+- Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars, use synchronized HEX/RGB sliders and number inputs, reuse recent colors, preview and save multi-color palette patterns, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
+- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars, use synchronized HEX/RGB sliders and number inputs, reuse recent colors, preview and save multi-color palette patterns, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, register colors into Brand kit primary/accent/shadow slots, and resize the color list area with the handle below the list.
 
 ## Import Layouts
 
@@ -63,11 +64,11 @@ Use Assets to add common starter layers quickly:
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 10 practical starts: Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch. Browser templates remain separate named snapshots saved in localStorage.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 20 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories. Browser templates remain separate named snapshots saved in localStorage.
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, or Cutout. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
-Use Guided start for a short beginner flow:
+Use the always-visible Guided start strip for a short beginner flow:
 
 1. Template opens the template list.
 2. Image jumps to Assets.
@@ -86,9 +87,11 @@ Open Templates and edit Brand kit to store a reusable channel style:
 
 Capture style reads the current canvas text/shape style into the brand kit. Apply kit updates selected editable text and shape layers. If no compatible layer is selected, it applies to all editable text and shape layers. If a logo asset is set, applying the kit inserts it as an image layer.
 
+Open Colors to send the current palette preview color, a saved-palette color, or a registered single-color row into the Brand kit Primary, Accent, or Shadow slot. This keeps color exploration and reusable brand setup connected without leaving Colors.
+
 ## Save Current Edit State
 
-Open Templates and use Edit state:
+Use Edit state in the preview pane:
 
 - Save state stores the current output settings, layers, image assets, CSV/HTML text, and template-name draft in browser localStorage.
 - Restore state reloads the saved work-in-progress state.
@@ -152,7 +155,7 @@ The app stores the current edit state, autosave preference, templates, brand kit
 
 ## Service And Privacy
 
-Use the Report issue link in the app header or Templates service section to open GitHub Issues:
+Use the Report issue link in the app header to open GitHub Issues:
 
 <https://github.com/Sunmax0731/thumbnail-generator/issues>
 

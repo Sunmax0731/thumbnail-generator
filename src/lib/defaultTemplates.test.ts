@@ -4,8 +4,14 @@ import { layersToCsv, layersToHtml } from "./layoutExport";
 
 describe("defaultTemplates", () => {
   it("provides multiple use-case templates with renderable layers", () => {
-    expect(defaultTemplates).toHaveLength(10);
+    expect(defaultTemplates).toHaveLength(20);
     expect(new Set(defaultTemplates.map((template) => template.id)).size).toBe(defaultTemplates.length);
+    expect(countByCategory()).toEqual({
+      cutout: 5,
+      shorts: 5,
+      stream: 5,
+      youtube: 5,
+    });
 
     for (const template of defaultTemplates) {
       const layers = template.createLayers();
@@ -38,6 +44,23 @@ describe("defaultTemplates", () => {
       "podcast-guest",
       "event-countdown",
       "minimal-launch",
+      "before-after-reveal",
+      "music-premiere",
+      "vertical-tip",
+      "reaction-clip",
+      "daily-vlog",
+      "fitness-challenge",
+      "profile-cutout",
+      "product-cutout",
+      "food-cutout",
+      "fashion-cutout",
     ]);
   });
 });
+
+function countByCategory() {
+  return defaultTemplates.reduce<Record<string, number>>((counts, template) => {
+    counts[template.category] = (counts[template.category] ?? 0) + 1;
+    return counts;
+  }, {});
+}

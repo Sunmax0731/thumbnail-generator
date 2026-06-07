@@ -28,7 +28,7 @@
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
-- Default template definitions provide exactly 10 distinct use-case layouts with exportable CSV/HTML and supported layer types.
+- Default template definitions provide exactly 20 distinct use-case layouts, five per category, with exportable CSV/HTML and supported layer types.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
 - Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
 - Edit state helpers serialize, parse, and delete portable JSON recovery files.
@@ -82,7 +82,9 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
 - Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
-- All 10 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- All 20 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- Guided start remains visible when Assets, Layouts, or Templates is active.
+- Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
@@ -96,39 +98,45 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Export path creates a data URL/download for the selected format.
 - Top toolbar exposes PNG, JPG, and WebP as direct export buttons without a separate format selector or generic export button.
 - Desktop and mobile viewports have no incoherent overlap.
-- Template filters, guided start controls, brand kit capture/apply, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
+- Template filters, guided start controls, brand kit capture/apply, Colors-to-Brand-kit color registration, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
 ## Current Results
 
-Completed on 2026-06-07.
+Completed on 2026-06-08.
 
 ### Automated
 
-- `npm test`: pass. 22 test files, 71 tests.
+- `npm test`: pass. 24 test files, 78 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Browser Runtime Gate
 
-- URL: `http://127.0.0.1:4186/thumbnail-generator/`
+- URL: `http://127.0.0.1:4191/thumbnail-generator/`
 - Tool: Playwright headless Chromium.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
 - Desktop viewport: `1440x900`
 - Mobile viewport: `390x844`
 - Evidence screenshots:
-  - `docs/assets/runtime-default-templates-20260607-desktop.png`
-  - `docs/assets/runtime-default-templates-20260607-mobile.png`
+  - `docs/assets/runtime-20260608-open-p2-desktop.png`
+  - `docs/assets/runtime-20260608-open-p2-mobile.png`
 
 Passed checks:
 
 - Page title: `Thumbnail Generator`.
 - Nonblank canvas pixel check: pass on initial render and after every bundled default template load.
-- Default template count: pass. Templates panel exposed exactly 10 bundled templates.
-- Default template load: pass for Creator Live, Product Review, Tutorial Steps, Shorts Quote, Breaking News, Versus Comparison, Gaming Highlight, Podcast Guest, Event Countdown, and Minimal Launch.
+- Default template count: pass. Templates panel exposed exactly 20 bundled templates.
+- Default template category filters: pass. YouTube, Shorts, Stream, and Cutout each exposed exactly 5 templates.
+- Default template load: pass for all 20 templates, with nonblank canvas and visible layer rows after each load.
+- Guided start visibility: pass. The guided start section remained visible on Assets, Layouts, and Templates.
+- Edit state placement: pass. Save, restore, export/import, delete, autosave, saved-state metadata, and privacy/storage guidance were visible in the preview pane.
+- Colors-to-Brand-kit registration: pass. The Colors tab registered a preview color as the Brand kit primary color and reported the status.
+- Templates service section removal: pass. No `.service-section` rendered in the Templates tab.
 - Layer list after template load: pass. Each loaded template exposed editable layer rows.
 - CSV import: pass. Status reported `CSV applied: 2 layers.`
 - HTML import: pass. Status reported `HTML applied: 2 layers.`
 - Layer editing: pass. Adjust numeric X edit accepted in the inspector and canvas remained nonblank.
-- Export: pass. WebP download created (`thumbnail-1280x720-2026-06-07T11-36-17-278Z.webp` during export selector verification; full gate also produced a `.webp` download).
-- Mobile: pass. `390x844` viewport exposed all 10 templates, rendered a nonblank canvas, and had horizontal overflow `0`.
+- Export: pass. WebP download created at `output/runtime-downloads-20260608-open-p2/thumbnail-1080x1920-2026-06-07T21-02-02-508Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas, showed Guided start and preview-pane Edit state, and had horizontal overflow `0`.
 
 Console health:
 

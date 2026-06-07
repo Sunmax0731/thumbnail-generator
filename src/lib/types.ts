@@ -102,6 +102,8 @@ export interface BrandKit {
   logoAssetKey?: string;
 }
 
+export type BrandKitColorRole = "primaryColor" | "accentColor" | "shadowColor";
+
 export interface LayoutParseOptions {
   baseWidth: number;
   baseHeight: number;
