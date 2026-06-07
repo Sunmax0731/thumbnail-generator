@@ -94,6 +94,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
+- Top toolbar exposes PNG, JPG, and WebP as direct export buttons without a separate format selector or generic export button.
 - Desktop and mobile viewports have no incoherent overlap.
 - Template filters, guided start controls, brand kit capture/apply, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
@@ -188,3 +189,14 @@ Completed on 2026-06-08.
 - Runtime gate checks: pass. Nonblank initial canvas, primary workspace visible, English language switch, template filter count, Brand kit capture/apply, GitHub Issues URL, privacy notice, CSV import, HTML import, Adjust X edit from `90` to `100`, WebP export download, mobile canvas-first layout, and mobile horizontal overflow `0`.
 - Runtime gate export evidence: `output/runtime-downloads-20260608/thumbnail-1280x720-2026-06-07T16-12-01-946Z.webp`.
 - Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported.
+
+### Toolbar Export Integration
+
+Completed on 2026-06-08.
+
+- Change: removed the redundant top-toolbar format selector and generic Export button. PNG, JPG, and WebP buttons now choose the format and export directly.
+- `npm test`: pass. 24 test files, 78 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Runtime gate URL: `http://127.0.0.1:4189/thumbnail-generator/`.
+- Runtime gate checks: pass. The `.format-field` count was `0`, the generic `出力` button count was `0`, PNG/JPG/WebP export buttons were each present once, WebP direct export downloaded a `.webp` file, and no page errors or relevant console warnings were reported.

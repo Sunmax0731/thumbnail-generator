@@ -132,7 +132,7 @@ Select a layer and open Adjust. Edge blur accepts signed values: `0` disables it
 
 ## Presets And Export
 
-Select an output preset from the top toolbar. Tall presets such as Shorts automatically reduce the preview zoom so the whole canvas fits the visible stage. Use PNG, JPG, WebP, or Export to download the rendered thumbnail.
+Select an output preset from the top toolbar. Tall presets such as Shorts automatically reduce the preview zoom so the whole canvas fits the visible stage. Use PNG, JPG, or WebP to download the rendered thumbnail directly in that format.
 
 The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important layers, edge-safe-area risk, many layers, large image assets, 4K output, or large browser-storage estimates.
 

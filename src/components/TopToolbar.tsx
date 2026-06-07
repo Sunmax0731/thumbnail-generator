@@ -1,4 +1,4 @@
-import { Download, ExternalLink, FileDown, ImageDown, Monitor, SquareStack } from "lucide-react";
+import { ExternalLink, FileDown, ImageDown, Monitor, SquareStack } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
 import type { ExportFormat, OutputSettings } from "../lib/types";
@@ -108,17 +108,6 @@ export function TopToolbar({
             }
           />
         </label>
-        <label className="field format-field">
-          <span>{t("toolbar.format")}</span>
-          <select
-            value={settings.format}
-            onChange={(event) => onSettingsChange({ format: event.target.value as ExportFormat })}
-          >
-            <option value="png">PNG</option>
-            <option value="jpeg">JPEG</option>
-            <option value="webp">WebP</option>
-          </select>
-        </label>
         <label className="field quality-field">
           <span>{t("toolbar.quality")}</span>
           <input
@@ -141,9 +130,6 @@ export function TopToolbar({
         </button>
         <button className="secondary-button icon-text" type="button" onClick={() => onExport("webp")} disabled={isExporting}>
           <FileDown size={16} /> WebP
-        </button>
-        <button className="primary-button icon-text" type="button" onClick={() => onExport()} disabled={isExporting}>
-          <Download size={17} /> {t("toolbar.export")}
         </button>
       </div>
     </header>

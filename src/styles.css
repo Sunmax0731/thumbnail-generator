@@ -331,10 +331,6 @@ button:disabled {
   width: 128px;
 }
 
-.format-field {
-  width: 98px;
-}
-
 .quality-field {
   width: 118px;
 }
@@ -1798,7 +1794,6 @@ button:disabled {
   .compact-field,
   .language-field,
   .size-field,
-  .format-field,
   .quality-field {
     width: auto;
     min-width: 0;

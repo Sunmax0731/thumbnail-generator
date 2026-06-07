@@ -8,7 +8,7 @@ The concept uses a functional editor as the first screen:
 
 - Left input rail for image, CSV, HTML, and template operations.
 - Center canvas workbench with thumbnail preview.
-- Top toolbar for output size and export format.
+- Top toolbar for output size and direct format-specific export actions.
 - Right inspector for layer order and selected layer properties.
 - Bottom status row for validation, zoom, and export state.
 - Image Lab opens as a modal workspace from the left rail for precise image cutout work.

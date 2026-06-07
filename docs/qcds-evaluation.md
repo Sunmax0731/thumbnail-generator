@@ -83,3 +83,14 @@ Completed on 2026-06-08.
 - Runtime checks: nonblank render, primary UI visibility, template filter, Brand kit capture/apply, GitHub Issues URL, privacy notice, CSV import, HTML import, Adjust X edit from `90` to `100`, WebP export, mobile canvas-first layout, and mobile overflow `0`.
 - Evidence screenshots: `docs/assets/runtime-20260608-desktop.png` and `docs/assets/runtime-20260608-mobile.png`.
 - Export evidence: `output/runtime-downloads-20260608/thumbnail-1280x720-2026-06-07T16-12-01-946Z.webp`.
+
+## Toolbar Export Integration Evidence
+
+Completed on 2026-06-08.
+
+- Quality: A+. The top toolbar no longer duplicates format selection and export; PNG, JPG, and WebP buttons directly perform format-specific export.
+- Cost: A+. The change is scoped to existing React toolbar markup, CSS cleanup, and documentation; no dependency or service change was introduced.
+- Delivery: A+. `npm test` passed with 24 test files and 78 tests, `npm run build` passed, and a Playwright headless Chromium gate validated the rendered toolbar.
+- Satisfaction: A+. The toolbar now matches the requested simpler mental model: choose the desired file button once and the download starts in that format.
+- Runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright fallback passed at `http://127.0.0.1:4189/thumbnail-generator/`.
+- Runtime checks: `.format-field` count `0`, generic `出力` button count `0`, one each of PNG/JPG/WebP, WebP direct export produced a `.webp` download, and no page errors or relevant console warnings were reported.
