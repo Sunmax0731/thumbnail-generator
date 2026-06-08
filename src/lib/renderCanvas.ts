@@ -1,5 +1,5 @@
 import { rotateHandleOffset, selectionHandleRadius, type CanvasInteractionMode } from "./canvasInteraction";
-import { getLayerVisualLocalBounds, getLayerVisualLocalCenter } from "./layerVisualBounds";
+import { getLayerSelectionLocalBounds, getLayerSelectionLocalCenter, getLayerVisualLocalBounds } from "./layerVisualBounds";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
 const imageCache = new Map<string, Promise<HTMLImageElement>>();
@@ -492,8 +492,8 @@ function drawSelection(
   context.save();
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
-  const bounds = getLayerVisualLocalBounds(layer);
-  const center = getLayerVisualLocalCenter(layer);
+  const bounds = getLayerSelectionLocalBounds(layer);
+  const center = getLayerSelectionLocalCenter(layer);
   const selectionWidth = bounds.right - bounds.left;
   const selectionHeight = bounds.bottom - bounds.top;
   context.strokeStyle = "#10b6d7";

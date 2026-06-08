@@ -29,7 +29,7 @@ describe("canvasInteraction", () => {
     expect(rotated.rotation).toBeGreaterThan(80);
   });
 
-  it("detects vertical text interactions from visual text bounds", () => {
+  it("detects vertical text interactions from the editable layer bounds", () => {
     const layer = makeTextLayer({
       x: 100,
       y: 100,
@@ -45,6 +45,24 @@ describe("canvasInteraction", () => {
     });
 
     expect(getLayerInteractionAt(layer, { x: 120, y: 160 })).toBe("move");
-    expect(getLayerInteractionAt(layer, { x: 300, y: 160 })).toBeNull();
+    expect(getLayerInteractionAt(layer, { x: 300, y: 160 })).toBe("move");
+    expect(getLayerInteractionAt(layer, { x: 100, y: 100 })).toBe("resize-nw");
+    expect(getLayerInteractionAt(layer, { x: 90, y: 160 })).toBeNull();
+  });
+
+  it("resizes vertical text bounds without translating the anchored corner", () => {
+    const layer = makeTextLayer({
+      x: 100,
+      y: 100,
+      width: 300,
+      height: 120,
+      text: "ABCD",
+      fontSize: 40,
+      writingMode: "vertical",
+    });
+
+    const resized = resizeLayer(layer, "resize-se", { x: 450, y: 260 });
+
+    expect(resized).toMatchObject({ x: 100, y: 100, width: 350, height: 160 });
   });
 });

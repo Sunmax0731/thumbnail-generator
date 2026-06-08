@@ -22,7 +22,8 @@
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
 - Text fit accounts for vertical text column width and character height.
-- Vertical text visual bounds drive selection hit testing and preview padding while horizontal text keeps configured bounds.
+- Vertical text uses configured layer bounds for selection hit testing, preview resize handles, and Adjust width/height edits while preview padding still accounts for rendered vertical columns.
+- Vertical text preview resizing changes the configured display bounds without translating the anchored corner unexpectedly.
 - YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
@@ -90,6 +91,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
+- Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
 - Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, explicit base-color controls, large palette bars, synchronized HEX/RGB slider input with practical slider width, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
@@ -106,8 +108,31 @@ Latest completed on 2026-06-09.
 
 ### Automated
 
-- `npm test`: pass. 25 test files, 82 tests.
+- `npm test`: pass. 25 test files, 84 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
+
+### Vertical Text Bounds
+
+Completed on 2026-06-09.
+
+- Scope: vertical text display bounds now resize like horizontal text from both Adjust width/height controls and preview resize handles.
+- Added unit coverage: `src/lib/canvasInteraction.test.ts`, `src/lib/hitTest.test.ts`, and `src/lib/layerVisualBounds.test.ts`.
+- `npm test`: pass. 25 test files, 84 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4193/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- HTML import: pass. Status reported `HTML applied: 2 layers.`
+- Adjust vertical text bounds edit: pass. The selected vertical layer changed from `120x220` to `180x260` while X/Y stayed `180/120`.
+- Preview handle vertical text resize: pass. Dragging the bottom-right preview handle changed the layer to `240x310` while X/Y stayed `180/120`.
+- CSV import: pass. Status reported `CSV applied: 2 layers.`
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-vertical-bounds/thumbnail-1280x720-2026-06-08T17-18-05-440Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-vertical-bounds-desktop.png`
+  - `docs/assets/runtime-20260609-vertical-bounds-mobile.png`
+- Console health: no page errors or relevant console warnings were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### Expanded Font Options
 

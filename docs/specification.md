@@ -50,7 +50,7 @@ Text layers include:
 
 Text layers can run a Fit text to box action. The action measures each line with the selected font, line height, and stroke width, then chooses the largest integer font size that fits within the layer width and height.
 
-For vertical text layers, the edit selection rectangle is calculated from the rendered vertical columns: column count, longest column character count, font size, line height, non-negative letter spacing, stroke width, and text alignment. Horizontal text layers continue to use the configured layer bounds for selection.
+Text layer edit selection rectangles, hit testing, and resize handles use the configured layer `width` and `height` for both horizontal and vertical writing. Vertical text still renders as columns, and render padding/offscreen blur measurement also accounts for the rendered vertical text content so visible text is not lost while editing.
 
 ## Shape Layers
 
@@ -131,7 +131,7 @@ The selected layer can be edited directly on the canvas:
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
-- Vertical text selection, hit testing, and edit padding use the same visual text bounds so the selection area follows the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
+- Vertical text selection, hit testing, resize handles, and Adjust width/height edits use the configured layer display bounds so preview resizing behaves like horizontal text. Edit padding still accounts for the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts
 

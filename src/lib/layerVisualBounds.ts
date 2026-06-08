@@ -53,6 +53,28 @@ export function getLayerVisualLocalCenter(layer: ThumbnailLayer): { x: number; y
   };
 }
 
+export function getLayerSelectionLocalBounds(layer: ThumbnailLayer): LocalLayerBounds {
+  return defaultLayerBounds(layer);
+}
+
+export function getLayerSelectionLocalCorners(layer: ThumbnailLayer): Array<{ x: number; y: number }> {
+  const bounds = getLayerSelectionLocalBounds(layer);
+  return [
+    { x: bounds.left, y: bounds.top },
+    { x: bounds.right, y: bounds.top },
+    { x: bounds.right, y: bounds.bottom },
+    { x: bounds.left, y: bounds.bottom },
+  ];
+}
+
+export function getLayerSelectionLocalCenter(layer: ThumbnailLayer): { x: number; y: number } {
+  const bounds = getLayerSelectionLocalBounds(layer);
+  return {
+    x: (bounds.left + bounds.right) / 2,
+    y: (bounds.top + bounds.bottom) / 2,
+  };
+}
+
 function defaultLayerBounds(layer: ThumbnailLayer): LocalLayerBounds {
   return {
     left: -layer.width / 2,

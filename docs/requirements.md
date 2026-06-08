@@ -13,7 +13,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
 - Select expanded hosted Google Fonts options from the font dropdown for text layers.
 - Switch text layers between horizontal and vertical writing mode.
-- Show vertical text selection bounds from the rendered vertical text area instead of the old horizontal layer box.
+- Resize and select vertical text with the same configured display bounds used by horizontal text, while preserving vertical column rendering.
 - Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.

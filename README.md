@@ -29,7 +29,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Export, import, or delete the browser-local edit state JSON for backup and recovery.
 - Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, HEX/RGB synchronized input with sliders, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
-- Switch text layers between horizontal and vertical writing, with vertical selection bounds following the visible text area.
+- Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Export to common video presets or custom output sizes.
 
 See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide.md](docs/user-guide.md) for step-by-step usage, and [docs/screenshot-guide.md](docs/screenshot-guide.md) for screenshot-based feature walkthroughs.

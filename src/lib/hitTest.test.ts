@@ -29,7 +29,7 @@ describe("hit testing", () => {
     });
   });
 
-  it("uses vertical text visual bounds instead of the old horizontal box", () => {
+  it("uses the configured vertical text display bounds for selection", () => {
     const vertical = makeTextLayer({
       id: "vertical",
       x: 100,
@@ -46,6 +46,7 @@ describe("hit testing", () => {
     });
 
     expect(pickLayerAt([vertical], 120, 160)?.id).toBe("vertical");
-    expect(pickLayerAt([vertical], 300, 160)).toBeUndefined();
+    expect(pickLayerAt([vertical], 300, 160)?.id).toBe("vertical");
+    expect(pickLayerAt([vertical], 90, 160)).toBeUndefined();
   });
 });

@@ -1,5 +1,5 @@
 import type { ThumbnailLayer } from "./types";
-import { getLayerVisualLocalBounds, getLayerVisualLocalCenter } from "./layerVisualBounds";
+import { getLayerSelectionLocalBounds, getLayerSelectionLocalCenter } from "./layerVisualBounds";
 
 export type CanvasInteractionMode =
   | "move"
@@ -28,8 +28,8 @@ export function pointToCanvas(canvas: HTMLCanvasElement, clientX: number, client
 
 export function getLayerInteractionAt(layer: ThumbnailLayer, point: CanvasPoint): CanvasInteractionMode | null {
   const local = toLayerLocalPoint(layer, point);
-  const bounds = getLayerVisualLocalBounds(layer);
-  const center = getLayerVisualLocalCenter(layer);
+  const bounds = getLayerSelectionLocalBounds(layer);
+  const center = getLayerSelectionLocalCenter(layer);
   const handles: Array<[CanvasInteractionMode, CanvasPoint]> = [
     ["resize-nw", { x: bounds.left, y: bounds.top }],
     ["resize-ne", { x: bounds.right, y: bounds.top }],

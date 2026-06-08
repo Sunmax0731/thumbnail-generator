@@ -62,7 +62,7 @@ This page is the quick feature index for users and reviewers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
 - Select expanded hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
-- Vertical text selection bounds follow the visible vertical columns instead of the previous horizontal text box.
+- Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
 - Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.

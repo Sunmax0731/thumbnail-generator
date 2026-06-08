@@ -1,6 +1,6 @@
 import type { ThumbnailLayer } from "./types";
 import { getLayerInteractionAt, type CanvasInteractionMode, type CanvasPoint } from "./canvasInteraction";
-import { getLayerVisualLocalBounds } from "./layerVisualBounds";
+import { getLayerSelectionLocalBounds } from "./layerVisualBounds";
 
 export interface LayerInteractionPick {
   layer: ThumbnailLayer;
@@ -17,7 +17,7 @@ export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): Thu
     const dy = y - centerY;
     const localX = dx * Math.cos(radians) - dy * Math.sin(radians);
     const localY = dx * Math.sin(radians) + dy * Math.cos(radians);
-    const bounds = getLayerVisualLocalBounds(layer);
+    const bounds = getLayerSelectionLocalBounds(layer);
     if (
       localX >= bounds.left &&
       localX <= bounds.right &&
