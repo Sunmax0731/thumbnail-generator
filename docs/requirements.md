@@ -11,7 +11,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
-- Select hosted Google Fonts options from the font dropdown for text layers.
+- Select expanded hosted Google Fonts options from the font dropdown for text layers.
 - Switch text layers between horizontal and vertical writing mode.
 - Show vertical text selection bounds from the rendered vertical text area instead of the old horizontal layer box.
 - Adjust text layer kerning/letter spacing.

@@ -254,7 +254,7 @@ Warnings are advisory and do not block export.
 
 Text layers use a predefined font dropdown so common thumbnail fonts can be selected without typing CSS font-family values.
 
-The predefined options are declared in `src/lib/fonts.ts`. The dropdown includes local/system fallback stacks plus hosted Google Fonts options loaded from `index.html`: Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, and Roboto Condensed. Additional values can enter the layer model through CSV import, HTML import, saved templates, or browser-local custom font import.
+The predefined options are declared in `src/lib/fonts.ts`. The dropdown includes local/system fallback stacks plus hosted Google Fonts options loaded from `index.html`: Anton, Bangers, Bebas Neue, Dela Gothic One, DotGothic16, Luckiest Guy, M PLUS Rounded 1c, Mochiy Pop One, Montserrat, Noto Sans JP, Oswald, Permanent Marker, Playfair Display, Poppins, Rampart One, Roboto Condensed, Yusei Magic, and Zen Kaku Gothic New. Additional values can enter the layer model through CSV import, HTML import, saved templates, or browser-local custom font import.
 
 Text `writingMode` defaults to `horizontal`. `vertical` draws each line as a vertical column and is reflected in preview, layout export, saved templates, edit state, and thumbnail export.
 

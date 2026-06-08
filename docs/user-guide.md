@@ -127,7 +127,7 @@ When a text layer is selected during import, the new font is applied to that lay
 
 ## Google Fonts And Vertical Text
 
-Select a text layer, open Adjust, and use Font to choose hosted Google Fonts options such as Anton, Bangers, Bebas Neue, Noto Sans JP, Oswald, or Roboto Condensed. Use Writing mode to switch the selected text layer between Horizontal and Vertical. Vertical text is rendered in the preview and export path and is saved through CSV/HTML, templates, and edit state. When a vertical text layer is selected, the selection frame, hit testing, handles, and edit padding follow the rendered vertical columns.
+Select a text layer, open Adjust, and use Font to choose hosted Google Fonts options such as Anton, Bebas Neue, Dela Gothic One, M PLUS Rounded 1c, Mochiy Pop One, Montserrat, Noto Sans JP, Poppins, Rampart One, or Zen Kaku Gothic New. Use Writing mode to switch the selected text layer between Horizontal and Vertical. Vertical text is rendered in the preview and export path and is saved through CSV/HTML, templates, and edit state. When a vertical text layer is selected, the selection frame, hit testing, handles, and edit padding follow the rendered vertical columns.
 
 ## Edge Blur
 

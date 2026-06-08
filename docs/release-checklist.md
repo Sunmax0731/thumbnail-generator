@@ -17,4 +17,4 @@
 - [x] Docs ZIP is generated.
 - [x] Git branch is pushed.
 
-Latest validation note: 2026-06-08 work items 0069-0073 passed `npm test` (24 files, 78 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4191/thumbnail-generator/`. Browser plugin was attempted first and failed with `Browser is not available: iab`.
+Latest validation note: 2026-06-09 expanded font options passed `npm test` (25 files, 82 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4192/thumbnail-generator/`. Browser plugin was attempted first and failed with `Browser is not available: iab`.

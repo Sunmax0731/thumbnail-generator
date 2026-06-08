@@ -1,6 +1,6 @@
 # QCDS Evaluation
 
-Completed on 2026-06-08.
+Completed on 2026-06-09.
 
 ## Scores
 
@@ -11,7 +11,7 @@ Completed on 2026-06-08.
 
 ## Rationale
 
-Quality is A+ because the app covers CSV/HTML layout import, image/text/shape/line layers, local image import, YouTube thumbnail import, selected asset insertion, expanded quick add with line creation, 20 bundled default templates with five entries per YouTube/Shorts/Stream/Cutout category, always-visible Guided start, preview-pane Edit state controls, direct canvas move/resize/rotate with confirmed-position undo/redo history, blank-click deselection, z-order-aware preview selection, grouped preview-object selection, individual grouped-row editing, multi-selection alignment plus live relative movement/rotation controls, multi-selection angle matching, layer grouping and fit-to-canvas, folder-like grouped rows, saved edit state with autosave and reload restore, off-canvas edit preview visibility with clipped export, layer blur, signed inner/outer edge blur, corner radius, text kerning, horizontal/vertical text writing mode, vertical text visual selection bounds, text fit-to-box, three-button text alignment, disabled inert inspector controls, Adjust reset buttons, Japanese/English UI switching, layer locking and deletion confirmation, edit shortcuts, named browser-local single colors with opacity, in-place editing, per-row Fill/Stroke apply buttons, Colors-to-Brand-kit registration, Adobe-style linked palette maker, saved multi-color palette sets, resizable inspector lists, Google Fonts and custom font import, preset fit for tall canvases, Image Lab selected asset handoff plus editable cutouts and chroma key, named browser-local templates, canvas rendering, PNG/JPEG/WebP export, responsive layout, user-facing README guidance, automated tests, production build, and headless Chromium runtime gate. It is not S tier because broader cross-browser, real-device, and browser storage quota edge cases remain future work.
+Quality is A+ because the app covers CSV/HTML layout import, image/text/shape/line layers, local image import, YouTube thumbnail import, selected asset insertion, expanded quick add with line creation, 20 bundled default templates with five entries per YouTube/Shorts/Stream/Cutout category, always-visible Guided start, preview-pane Edit state controls, direct canvas move/resize/rotate with confirmed-position undo/redo history, blank-click deselection, z-order-aware preview selection, grouped preview-object selection, individual grouped-row editing, multi-selection alignment plus live relative movement/rotation controls, multi-selection angle matching, layer grouping and fit-to-canvas, folder-like grouped rows, saved edit state with autosave and reload restore, off-canvas edit preview visibility with clipped export, layer blur, signed inner/outer edge blur, corner radius, text kerning, horizontal/vertical text writing mode, vertical text visual selection bounds, text fit-to-box, three-button text alignment, disabled inert inspector controls, Adjust reset buttons, Japanese/English UI switching, layer locking and deletion confirmation, edit shortcuts, named browser-local single colors with opacity, in-place editing, per-row Fill/Stroke apply buttons, Colors-to-Brand-kit registration, Adobe-style linked palette maker, saved multi-color palette sets, resizable inspector lists, expanded Google Fonts and custom font import, preset fit for tall canvases, Image Lab selected asset handoff plus editable cutouts and chroma key, named browser-local templates, canvas rendering, PNG/JPEG/WebP export, responsive layout, user-facing README guidance, automated tests, production build, and headless Chromium runtime gate. It is not S tier because broader cross-browser, real-device, and browser storage quota edge cases remain future work.
 
 Cost is A+ because the app remains static, browser-only, GitHub Pages compatible, and has no backend or paid service dependency. YouTube thumbnail import is client-side, Google Fonts are loaded as static browser resources, and edit state, templates, colors, saved palettes, and custom fonts are stored browser-locally without hosted storage infrastructure.
 
@@ -49,6 +49,20 @@ Latest measured checks:
 - Default template load: pass for all 20 templates with nonblank canvas and visible layer rows.
 - Guided start visibility on Assets/Layouts/Templates, preview-pane Edit state, Colors-to-Brand-kit registration, Templates service section removal, CSV import, HTML import, Adjust numeric editing, WebP export, desktop screenshot, mobile screenshot, and mobile no-overflow checks: pass.
 - Console health: no page errors and no app HTTP 4xx/5xx responses; one test-induced `getImageData` warning may be produced by canvas sampling.
+
+## Expanded Font Options Evidence
+
+Completed on 2026-06-09.
+
+- Scope: expanded hosted Google Fonts choices in `src/lib/fonts.ts` and the `index.html` Google Fonts stylesheet request.
+- Quality: A+. Added `src/lib/fonts.test.ts` coverage for dropdown labels, expanded font presence, and `index.html` hosted-family synchronization.
+- Cost: A+. The app remains static and browser-only. The change uses Google Fonts as existing static browser resources and does not add backend or paid dependencies.
+- Delivery: A+. `npm test` passed with 25 test files and 82 tests; `npm run build` passed; runtime evidence is recorded in `docs/test-plan.md`.
+- Satisfaction: A+. The text-layer Font dropdown now exposes 26 options, including additional Japanese and display fonts for thumbnail work.
+- Browser runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright fallback passed at `http://127.0.0.1:4192/thumbnail-generator/`.
+- Runtime checks: nonblank render, primary UI visibility, expanded font dropdown presence, `Poppins 900 (Google Fonts)` selection, CSV import, HTML import, Adjust X edit, WebP export download, mobile nonblank canvas, and mobile horizontal overflow `0`.
+- Evidence screenshots: `docs/assets/runtime-20260609-fonts-desktop.png` and `docs/assets/runtime-20260609-fonts-mobile.png`.
+- Export evidence: `output/runtime-downloads-20260609-fonts/thumbnail-1280x720-2026-06-08T16-55-33-752Z.webp`.
 
 ## Follow-Up Candidates
 

@@ -28,7 +28,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery.
 - Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, HEX/RGB synchronized input with sliders, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
-- Select bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
+- Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical selection bounds following the visible text area.
 - Export to common video presets or custom output sizes.
 

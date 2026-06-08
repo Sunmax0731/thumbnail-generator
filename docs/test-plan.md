@@ -102,12 +102,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 ## Current Results
 
-Completed on 2026-06-08.
+Latest completed on 2026-06-09.
 
 ### Automated
 
-- `npm test`: pass. 24 test files, 78 tests.
+- `npm test`: pass. 25 test files, 82 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
+
+### Expanded Font Options
+
+Completed on 2026-06-09.
+
+- Scope: expanded hosted Google Fonts choices in the text-layer font dropdown and Brand kit font selector.
+- Added unit coverage: `src/lib/fonts.test.ts`.
+- `npm test`: pass. 25 test files, 82 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4192/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Font dropdown count: pass. The text-layer Font dropdown exposed 26 options.
+- Added font option visibility: pass. Dela Gothic One, M PLUS Rounded 1c, Mochiy Pop One, Montserrat, Poppins, Rampart One, and Zen Kaku Gothic New were present.
+- Font selection: pass. The text-layer Font dropdown selected `Poppins 900 (Google Fonts)` and the canvas stayed nonblank.
+- CSV import: pass. Status reported `CSV applied: 2 layers.`
+- HTML import: pass. Status reported `HTML applied: 2 layers.`
+- Layer editing: pass. Adjust numeric X edit accepted and the canvas stayed nonblank.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-fonts/thumbnail-1280x720-2026-06-08T16-55-33-752Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-fonts-desktop.png`
+  - `docs/assets/runtime-20260609-fonts-mobile.png`
+- Console health: no page errors or relevant console warnings were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### Browser Runtime Gate
 

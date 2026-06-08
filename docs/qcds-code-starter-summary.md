@@ -1,6 +1,6 @@
 # QCDS Code Starter Summary
 
-Completed on 2026-06-07. Refreshed on 2026-06-08 after closing Issues 0065-0073.
+Completed on 2026-06-07. Refreshed on 2026-06-09 after expanding hosted font options.
 
 ## Code Starter Result
 
@@ -21,12 +21,12 @@ This work item closes that gap by adding a Code Starter-specific summary with ex
 
 | Axis | Rating | State | Evidence |
 | --- | --- | --- | --- |
-| Quality | A+ | pass | Automated tests, production build, 20 default templates, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
+| Quality | A+ | pass | Automated tests, production build, 20 default templates, expanded hosted font choices, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
 | Cost | A+ | pass | The app remains static, browser-only, GitHub Pages compatible, and has no backend or paid-service dependency. |
-| Delivery | A+ | pass | TODO, Issues 0065-0073, docs, QCDS evidence, tests, build, and runtime gate are synchronized for the current release state. |
-| Satisfaction | A+ | pass | CSV/HTML import, layer editing, export, mobile layout, 20 bundled templates, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing docs are validated and visible in the release evidence. |
+| Delivery | A+ | pass | Docs, QCDS evidence, tests, build, and runtime gate are synchronized for the current release state. |
+| Satisfaction | A+ | pass | CSV/HTML import, layer editing, export, mobile layout, 20 bundled templates, expanded font selection, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing docs are validated and visible in the release evidence. |
 
-Latest runtime gate: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright headless Chromium passed at `http://127.0.0.1:4191/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260608-open-p2-*.png`.
+Latest runtime gate: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright headless Chromium passed at `http://127.0.0.1:4192/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260609-fonts-*.png`.
 
 ## Code Starter Visibility Contract
 
