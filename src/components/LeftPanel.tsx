@@ -123,9 +123,6 @@ export function LeftPanel({
                 <ImagePlus size={16} /> {t("left.importYoutube")}
               </button>
             </div>
-            <button type="button" className="secondary-button icon-text wide-button" onClick={() => onOpenImageLab(selectedAssetKey)}>
-              <Scissors size={16} /> {t("left.openImageLab")}
-            </button>
             <div className="asset-list" aria-label={t("left.assetsList")}>
               {assets.map((asset) => (
                 <div className={`asset-row ${asset.key === selectedAssetKey ? "selected" : ""}`} key={asset.key}>

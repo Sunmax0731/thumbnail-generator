@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState, type MutableRefObject } from "react";
-import { ImagePlus, MousePointer2, Scissors, Sparkles } from "lucide-react";
+import { MousePointer2, Scissors, Sparkles, X } from "lucide-react";
 import {
   processImageAsset,
   type CropMode,
@@ -15,8 +15,8 @@ type RectDragMode = "new" | "move" | "nw" | "ne" | "sw" | "se";
 interface ImageLabPanelProps {
   assets: ImageAsset[];
   initialAssetKey?: string;
-  onImportAssetFiles: (files: FileList | null) => Promise<ImageAsset[]>;
   onCreateProcessedAsset: (asset: ImageAsset) => void;
+  onClose: () => void;
   t: Translator;
 }
 
@@ -31,7 +31,7 @@ interface PreviewRect {
 const previewWidth = 900;
 const previewHeight = 560;
 
-export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onCreateProcessedAsset, t }: ImageLabPanelProps) {
+export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset, onClose, t }: ImageLabPanelProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const previewRect = useRef<PreviewRect>({ x: 0, y: 0, width: 0, height: 0, scale: 1 });
   const dragStart = useRef<ImagePoint | null>(null);
@@ -201,39 +201,26 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
   ]);
 
   return (
-    <div className="image-lab" aria-label={t("imageLab.aria")}>
-      <section className="panel-section image-source-section">
-        <div className="section-heading">
-          <ImagePlus size={16} />
-          <h2>{t("imageLab.source")}</h2>
+    <>
+      <div className="modal-header image-lab-header">
+        <div className="modal-title-block">
+          <h2 id="image-lab-title">{t("imageLab.title")}</h2>
         </div>
-        <label className="file-drop compact-drop">
-          <ImagePlus size={18} />
-          <span>{t("left.importImages")}</span>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={async (event) => {
-              const input = event.currentTarget;
-              const loaded = await onImportAssetFiles(input.files);
-              if (loaded[0]) setAssetKey(loaded[0].key);
-              input.value = "";
-            }}
-          />
-        </label>
-        <label className="field">
-          <span>{t("imageLab.asset")}</span>
-          <select value={selectedAsset?.key ?? ""} onChange={(event) => setAssetKey(event.currentTarget.value)}>
-            {assets.map((asset) => (
-              <option key={asset.key} value={asset.key}>
-                {asset.name}
-              </option>
-            ))}
-          </select>
-        </label>
-      </section>
-
+        <div className="modal-actions">
+          <button
+            type="button"
+            className="primary-button icon-text"
+            onClick={applyProcessing}
+            disabled={!selectedAsset || isProcessing || (mode === "polygon" && polygonPoints.length < 3)}
+          >
+            <Scissors size={16} /> {isProcessing ? t("imageLab.processing") : t("imageLab.createLayer")}
+          </button>
+          <button type="button" className="icon-button modal-close" aria-label={t("imageLab.close")} onClick={onClose}>
+            <X size={18} />
+          </button>
+        </div>
+      </div>
+      <div className="image-lab" aria-label={t("imageLab.aria")}>
       <section className="panel-section image-cutout-section">
         <div className="section-heading">
           <Scissors size={16} />
@@ -280,53 +267,47 @@ export function ImageLabPanel({ assets, initialAssetKey, onImportAssetFiles, onC
             </button>
           </div>
         ) : null}
-        <div className="field-grid two">
-          <LabSlider label="X" value={cropRect.x} min={0} max={imageSize.width} onChange={(x) => setCropRect((rect) => ({ ...rect, x }))} />
-          <LabSlider label="Y" value={cropRect.y} min={0} max={imageSize.height} onChange={(y) => setCropRect((rect) => ({ ...rect, y }))} />
-          <LabSlider
-            label="W"
-            value={Math.abs(cropRect.width)}
-            min={1}
-            max={imageSize.width}
-            onChange={(width) => setCropRect((rect) => ({ ...rect, width }))}
-          />
-          <LabSlider
-            label="H"
-            value={Math.abs(cropRect.height)}
-            min={1}
-            max={imageSize.height}
-            onChange={(height) => setCropRect((rect) => ({ ...rect, height }))}
-          />
+        <div className="image-lab-adjust-grid">
+          <div className="field-grid two image-lab-position-fields">
+            <LabSlider label="X" value={cropRect.x} min={0} max={imageSize.width} onChange={(x) => setCropRect((rect) => ({ ...rect, x }))} />
+            <LabSlider label="Y" value={cropRect.y} min={0} max={imageSize.height} onChange={(y) => setCropRect((rect) => ({ ...rect, y }))} />
+            <LabSlider
+              label="W"
+              value={Math.abs(cropRect.width)}
+              min={1}
+              max={imageSize.width}
+              onChange={(width) => setCropRect((rect) => ({ ...rect, width }))}
+            />
+            <LabSlider
+              label="H"
+              value={Math.abs(cropRect.height)}
+              min={1}
+              max={imageSize.height}
+              onChange={(height) => setCropRect((rect) => ({ ...rect, height }))}
+            />
+          </div>
+          <section className="image-chroma-inline" aria-label={t("imageLab.chroma")}>
+            <div className="section-heading compact-heading">
+              <Sparkles size={16} />
+              <h2>{t("imageLab.chroma")}</h2>
+            </div>
+            <label className="checkbox-row">
+              <input type="checkbox" checked={chromaEnabled} onChange={(event) => setChromaEnabled(event.currentTarget.checked)} />
+              {t("imageLab.enableTransparent")}
+            </label>
+            <div className="field-grid two">
+              <label className="field color-field">
+                <span>{t("imageLab.keyColor")}</span>
+                <input type="color" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
+                <input type="text" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
+              </label>
+              <LabSlider label={t("imageLab.tolerance")} value={chromaTolerance} min={0} max={180} onChange={setChromaTolerance} />
+            </div>
+          </section>
         </div>
       </section>
-
-      <section className="panel-section image-chroma-section">
-        <div className="section-heading">
-          <Sparkles size={16} />
-          <h2>{t("imageLab.chroma")}</h2>
-        </div>
-        <label className="checkbox-row">
-          <input type="checkbox" checked={chromaEnabled} onChange={(event) => setChromaEnabled(event.currentTarget.checked)} />
-          {t("imageLab.enableTransparent")}
-        </label>
-        <div className="field-grid two">
-          <label className="field color-field">
-            <span>{t("imageLab.keyColor")}</span>
-            <input type="color" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
-            <input type="text" value={chromaColor} onChange={(event) => setChromaColor(event.currentTarget.value)} />
-          </label>
-          <LabSlider label={t("imageLab.tolerance")} value={chromaTolerance} min={0} max={180} onChange={setChromaTolerance} />
-        </div>
-        <button
-          type="button"
-          className="primary-button icon-text wide-button"
-          onClick={applyProcessing}
-          disabled={!selectedAsset || isProcessing || (mode === "polygon" && polygonPoints.length < 3)}
-        >
-          <Scissors size={16} /> {isProcessing ? t("imageLab.processing") : t("imageLab.createLayer")}
-        </button>
-      </section>
-    </div>
+      </div>
+    </>
   );
 }
 

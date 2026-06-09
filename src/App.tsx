@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { X } from "lucide-react";
 import { CanvasStage } from "./components/CanvasStage";
 import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel } from "./components/InspectorPanel";
@@ -77,7 +76,6 @@ import {
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
-import { calculatePreviewPadding } from "./lib/previewPadding";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
 import {
@@ -180,10 +178,7 @@ function App() {
     () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
     [customFonts],
   );
-  const previewPadding = useMemo(
-    () => calculatePreviewPadding(layers, settings, { minimum: 88, margin: 40 }),
-    [layers, settings],
-  );
+  const previewPadding = 0;
   const selectionLabel =
     selectedLayers.length === 0
       ? t("selection.none")
@@ -1334,7 +1329,11 @@ function App() {
       return;
     }
 
-    const previewWindow = window.open("", "thumbnail-generator-obs-preview", "width=1280,height=720,popup=yes");
+    const previewWindow = window.open(
+      "",
+      "thumbnail-generator-obs-preview",
+      "popup=yes,width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes",
+    );
     if (!previewWindow) {
       setStatus("OBS preview could not open. Allow popups for this site and try again.");
       return;
@@ -1405,6 +1404,13 @@ function App() {
   </body>
 </html>`);
     previewWindow.document.close();
+    try {
+      previewWindow.moveTo(0, 0);
+      previewWindow.resizeTo(window.screen.availWidth, window.screen.availHeight);
+      void previewWindow.document.documentElement.requestFullscreen?.().catch(() => undefined);
+    } catch {
+      // Browser chrome/fullscreen behavior is controlled by the user's browser and OBS capture mode.
+    }
     previewWindow.focus();
     setStatus("OBS preview window opened. Capture that window in OBS.");
   }, []);
@@ -1594,24 +1600,11 @@ function App() {
             aria-labelledby="image-lab-title"
             onMouseDown={(event) => event.stopPropagation()}
           >
-            <div className="modal-header">
-              <div className="modal-title-block">
-                <h2 id="image-lab-title">{t("imageLab.title")}</h2>
-              </div>
-              <button
-                type="button"
-                className="icon-button modal-close"
-                aria-label={t("imageLab.close")}
-                onClick={() => setIsImageLabOpen(false)}
-              >
-                <X size={18} />
-              </button>
-            </div>
             <ImageLabPanel
               assets={assets}
               initialAssetKey={selectedAssetKey}
-              onImportAssetFiles={importImageAssets}
               onCreateProcessedAsset={createProcessedAsset}
+              onClose={() => setIsImageLabOpen(false)}
               t={t}
             />
           </section>

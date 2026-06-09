@@ -54,14 +54,14 @@ This page is the quick feature index for users and reviewers.
 
 - Import local image files from Assets.
 - Import a YouTube video thumbnail from Assets with a YouTube URL or video id.
-- Select an imported asset, add it directly as an image layer, or open it in Image Lab.
+- Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from the collapsible Quick Add section in Layers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
-- Click Fill or Stroke color displays in Adjust to open the shared palette-wheel and Sketch-style color picker with alpha.
+- Click Fill or Stroke color displays in Adjust to open a compact Sketch-style single-color picker with alpha.
 - Select expanded hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
 - Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
@@ -75,8 +75,8 @@ This page is the quick feature index for users and reviewers.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
 - Review the selected-object Motion preview and easing graph before opening the OBS preview.
 - Choose direction None to keep movement disabled; distance is greyed out while None is active.
-- Open OBS preview from the canvas toolbar to show the current animated canvas in a separate window without selection handles.
-- Capture the OBS preview window in OBS with Window Capture for browser-only live display.
+- Open OBS preview from the canvas toolbar to show the current animated canvas in a popup-style window without editor controls or selection handles.
+- Capture the OBS preview window in OBS with Window Capture for browser-only live display. Browser and OBS settings still decide whether OS/browser chrome is capturable.
 
 ## Color Palette
 

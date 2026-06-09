@@ -763,7 +763,6 @@ export function InspectorPanel({
       {layerColorPicker ? (
         <LayerColorPickerDialog
           state={layerColorPicker}
-          initialMode={paletteModeDraft}
           onApply={applyLayerColorPicker}
           onClose={() => setLayerColorPicker(null)}
           t={t}
@@ -2004,6 +2003,14 @@ function ShapeControls({
 }) {
   return (
     <>
+      <SliderNumberInput
+        label={t("inspector.strokeWidth")}
+        value={selected.strokeWidth}
+        min={0}
+        max={48}
+        step={1}
+        onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
+      />
       <label className="field">
         <span>{t("inspector.shape")}</span>
         <select
@@ -2070,14 +2077,6 @@ function ShapeControls({
               alpha: selected.strokeOpacity,
             })
           }
-        />
-        <SliderNumberInput
-          label={t("inspector.strokeWidth")}
-          value={selected.strokeWidth}
-          min={0}
-          max={48}
-          step={1}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
         />
       </div>
     </>
@@ -2213,47 +2212,27 @@ function ColorEditButton({
 
 function LayerColorPickerDialog({
   state,
-  initialMode,
   onApply,
   onClose,
   t,
 }: {
   state: LayerColorPickerState;
-  initialMode: HarmonyMode;
   onApply: (color: string, alpha: number) => void;
   onClose: () => void;
   t: Translator;
 }) {
   const [draft, setDraft] = useState(normalizeColor(state.color) ?? "#000000");
   const [alpha, setAlpha] = useState(clampUnit(state.alpha));
-  const [mode, setMode] = useState<HarmonyMode>(initialMode);
-  const [activePointIndex, setActivePointIndex] = useState(0);
-  const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
-  const previewBaseColor = normalizeColor(draft) ?? "#000000";
-  const previewColors = generatePaletteSchemeColors(previewBaseColor, mode);
-  const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
-  const sketchColor = { ...hexToHsva(previewBaseColor), a: alpha };
+  const sketchColor = { ...hexToHsva(normalizeColor(draft) ?? "#000000"), a: alpha };
 
   useEffect(() => {
     setDraft(normalizeColor(state.color) ?? "#000000");
     setAlpha(clampUnit(state.alpha));
-    setActivePointIndex(0);
   }, [state]);
 
-  useEffect(() => {
-    if (activePointIndex >= previewColors.length) setActivePointIndex(0);
-  }, [activePointIndex, previewColors.length]);
-
-  const setBaseDraft = (value: string, options: { preserveActivePoint?: boolean } = {}) => {
+  const setBaseDraft = (value: string) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     setDraft(normalized ?? value);
-    if (!options.preserveActivePoint) setActivePointIndex(0);
-  };
-
-  const updateLinkedPreviewPoint = (index: number, color: string) => {
-    const linkedBase = derivePaletteBaseFromSchemeColor(color, index, mode);
-    if (linkedBase) setDraft(linkedBase);
-    setActivePointIndex(index);
   };
 
   return (
@@ -2261,84 +2240,9 @@ function LayerColorPickerDialog({
       <section className="confirm-dialog layer-color-dialog" role="dialog" aria-modal="true" aria-labelledby="layer-color-picker-title">
         <div className="modal-title-block">
           <h2 id="layer-color-picker-title">{state.label}</h2>
-          <p>{t("inspector.palette")}</p>
+          <p>{t("inspector.paletteColor")}</p>
         </div>
-        <div className="palette-maker layer-color-picker">
-          <div className="palette-maker-preview">
-            <label className="field palette-target-field palette-wheel-pattern-field">
-              <span>{t("inspector.palettePattern")}</span>
-              <select
-                value={mode}
-                onChange={(event) => {
-                  setActivePointIndex(0);
-                  setMode(event.currentTarget.value as HarmonyMode);
-                }}
-              >
-                {palettePatternModes.map((candidate) => (
-                  <option key={candidate} value={candidate}>
-                    {t(harmonyLabelKey(candidate))}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div
-              className="palette-wheel"
-              aria-label={t("inspector.paletteScheme")}
-              onPointerDown={(event) => {
-                if (event.target !== event.currentTarget) return;
-                event.currentTarget.setPointerCapture(event.pointerId);
-                setDraggingPointIndex(-1);
-                setBaseDraft(colorFromWheelPointer(event, event.currentTarget));
-              }}
-              onPointerMove={(event) => {
-                if ((event.buttons & 1) !== 1 || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
-                const color = colorFromWheelPointer(event, event.currentTarget);
-                if (draggingPointIndex === null) return;
-                if (draggingPointIndex === -1) setBaseDraft(color);
-                else updateLinkedPreviewPoint(draggingPointIndex, color);
-              }}
-              onPointerUp={(event) => {
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-                setDraggingPointIndex(null);
-              }}
-              onPointerCancel={(event) => {
-                if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
-                setDraggingPointIndex(null);
-              }}
-            >
-              {previewColors.map((color, index) => (
-                <button
-                  key={`${color}-${index}`}
-                  type="button"
-                  className={`palette-wheel-point ${index === 0 ? "base" : ""} ${activePointIndex === index ? "selected" : ""}`}
-                  style={{ ...wheelPointStyle(color), background: color }}
-                  title={color}
-                  onPointerDown={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    const wheel = event.currentTarget.parentElement;
-                    if (!wheel) return;
-                    wheel.setPointerCapture(event.pointerId);
-                    setDraggingPointIndex(index);
-                    setActivePointIndex(index);
-                  }}
-                  onClick={(event) => {
-                    event.preventDefault();
-                    event.stopPropagation();
-                    setActivePointIndex(index);
-                  }}
-                />
-              ))}
-            </div>
-          </div>
-          <div className="palette-spectrum-bars" aria-label={t("inspector.paletteScheme")}>
-            {previewColors.map((color, index) => (
-              <button key={`dialog-bar-${color}-${index}`} type="button" style={{ background: color, color: readableTextColor(color) }} onClick={() => setBaseDraft(color)}>
-                <span>{index === 0 ? t("inspector.paletteBase") : t("inspector.paletteColor")}</span>
-                <strong>{color}</strong>
-              </button>
-            ))}
-          </div>
+        <div className="layer-color-picker">
           <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
             <Sketch
               color={sketchColor}
@@ -2353,7 +2257,7 @@ function LayerColorPickerDialog({
           <button type="button" className="secondary-button" onClick={onClose}>
             {t("inspector.cancel")}
           </button>
-          <button type="button" className="primary-button" onClick={() => onApply(activePointColor, alpha)}>
+          <button type="button" className="primary-button" onClick={() => onApply(normalizeColor(draft) ?? "#000000", alpha)}>
             {t("inspector.applyColorChoice")}
           </button>
         </div>

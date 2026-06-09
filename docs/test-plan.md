@@ -14,7 +14,7 @@
 - Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
 - Multi-selection distribution spaces three or more selected layers evenly by horizontal or vertical centers.
 - Live relative transform controls convert current UI values into incremental movement and rotation deltas.
-- Preview padding expands for visible off-canvas layer bounds.
+- Preview zoom and output-frame sizing remain stable when layers move off canvas.
 - Text fit chooses the largest font size that fits the text layer bounds.
 - Language detection selects Japanese or English from browser language tags and falls back to English.
 - Color palette registration preserves names, color-value uniqueness, opacity, legacy storage migration, and per-row Fill/Stroke application.
@@ -23,7 +23,7 @@
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
 - Text fit accounts for vertical text column width and character height.
-- Vertical text uses configured layer bounds for selection hit testing, preview resize handles, and Adjust width/height edits while preview padding still accounts for rendered vertical columns.
+- Vertical text uses configured layer bounds for selection hit testing, preview resize handles, and Adjust width/height edits.
 - Vertical text preview resizing changes the configured display bounds without translating the anchored corner unexpectedly.
 - YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
@@ -62,7 +62,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Canvas drag move records undo/redo history only at confirmed drag start and drag completion positions.
 - Preset changes keep the current preview zoom until Fit canvas is selected.
 - Preview pan works through the Pan button, Space-drag, or Alt-drag without changing zoom.
-- Dragging a layer outside the document expands the edit-only preview area without changing the displayed zoom or effective canvas scale.
+- Dragging a layer outside the document keeps the displayed zoom, effective canvas scale, and output frame stable.
 - Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
 - Grouped preview objects can be selected as a multi-selection, not only grouped rows in Layers.
@@ -70,8 +70,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Multi-selection supports matching selected layer angles to the first selected editable layer from the Adjust tab.
 - Multi-selection supports horizontal and vertical even distribution from Layers.
 - Single selection can align to the canvas.
-- Selection handles remain visible in preview padding outside the thumbnail document area.
-- Off-canvas layer overflow remains visible and editable in the preview while export remains clipped to the output canvas.
+- The preview does not stretch a surrounding edit-only checker area around off-canvas layer overflow, and export remains clipped to the output canvas.
 - Text layers can run Fit text to box and remain inside the configured bounds.
 - The rotation handle has distinct normal, hover, and drag states and uses a grab/grabbing cursor.
 - Layers panel supports drag-and-drop stacking order edits.
@@ -84,14 +83,14 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Named templates can be saved to browser storage, loaded, and deleted.
 - Multiple saved templates with the same display name are preserved.
 - Current edit state can be manually saved, restored after reload, and autosaved when the autosave toggle is on.
-- Image Lab opens from the sidebar in a modal workspace and supports chroma key, rectangle/circle cutout, and polygon/free cutout.
+- Image Lab opens from imported asset rows in a modal workspace and supports chroma key, rectangle/circle cutout, and polygon/free cutout.
 - Image Lab Rect and Circle modes support direct drag selection on the preview, then preview-handle move/resize.
 - Image Lab Polygon mode supports point dragging and point deletion.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
-- Image Lab imports make the new image the active processing target.
+- Image Lab does not duplicate image import or asset-selection controls; source changes stay in Assets before opening the modal.
 - Expanded quick add in Layers inserts text, shape, line, headline, subtitle, badge, divider, and selected-image starters.
 - All 38 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
@@ -99,13 +98,13 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
 - Motion tab can assign a selected-layer animation preset, preview the selected object, and show the easing graph.
 - Motion tab exposes 12 animation types, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- OBS preview opens in a separate window and renders a nonblank animated canvas without editor selection handles.
+- OBS preview opens in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
 - Guided start is not visible in the left panel.
 - Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
-- Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open the shared palette picker with alpha.
+- Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open a compact single-color picker with alpha.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
@@ -121,6 +120,31 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### Image Lab, Single-Color Picker, And OBS Preview Follow-Up
+
+Completed on 2026-06-09.
+
+- Scope: moved Shape stroke width above the shape dropdown, replaced Adjust Fill/Stroke color menus with compact single-color Sketch-style pickers, kept the preview output frame fixed when objects move off canvas, removed the standalone Assets Image Lab button, removed Image Lab import and asset-selection controls, separated chroma-key settings from processed-layer creation, moved processed-layer creation to the Image Lab header, placed chroma-key settings beside position/size controls, and changed OBS preview to a popup-style canvas-only window with fullscreen request.
+- `npm test`: pass. 26 test files, 98 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4199/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x1100`.
+- Mobile viewport: `390x844`.
+- Primary UI: pass. Header, Assets/Templates tabs, preview, inspector tabs, and export controls were visible.
+- Adjust shape order: pass. The selected shape controls showed Stroke width before the Shape dropdown.
+- Adjust color picker: pass. Fill/Stroke color display opened one Sketch-style single-color picker with five inputs, `0` color wheels, and `0` palette bars.
+- Preview output frame: pass. Runtime canvas dimensions stayed `1280x720`, and the surrounding edit-only checker/padding was not stretched around off-canvas content.
+- Assets/Image Lab entry: pass. Standalone Assets Image Lab buttons count was `0`; imported asset-row Image Lab button count was `1`.
+- Image Lab cleanup: pass. Source/import sections, file inputs, and asset-selection dropdowns count were `0`; the processed-layer button was present in the modal header; chroma-key settings rendered inline beside position/size controls.
+- OBS preview: pass. The preview document contained one canvas, no toolbar/header/nav-like controls, and no body text. The app opened the preview with popup/no-toolbar feature flags and requested fullscreen; actual browser chrome capture remains controlled by the browser and OBS.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-imagelab-color-obs/thumbnail-1280x720-2026-06-09T10-58-13-045Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-imagelab-color-obs-desktop.png`
+  - `docs/assets/runtime-20260609-imagelab-color-obs-mobile.png`
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported.
 
 ### Colors, Adjust, Shape, And Preview Follow-Up
 

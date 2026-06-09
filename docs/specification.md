@@ -137,7 +137,7 @@ The selected layer can be edited directly on the canvas:
 - Drag corner handles to resize it.
 - Drag the rotation handle above the layer to rotate it.
 - Canvas drag move, resize, and rotate interactions suppress intermediate pointermove history entries and commit one undo/redo history step at pointerup when the final layer state differs from the drag start state.
-- Handles are rendered in preview padding, so controls remain visible even when they extend outside the thumbnail document bounds.
+- The preview frame is the output document area; it does not stretch a surrounding edit-only area when layers move outside the document.
 - Ctrl/Meta/Shift click toggles layers into or out of a multi-selection.
 - Dragging a selected layer in a multi-selection moves the selected group.
 - The Adjust tab exposes live Relative edit controls for multi-selection. Move X and Move Y apply coordinate deltas to each selected editable layer as the control value changes. Rotation delta adds the same degree delta to each selected editable layer's current rotation as the control value changes. The UI tracks incremental deltas, so changing a live value from `12` to `5` applies `-7` rather than another absolute `5`.
@@ -147,8 +147,7 @@ The selected layer can be edited directly on the canvas:
 - Clicking preview space that is not a selectable layer or active handle clears the current selection.
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
-- Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
-- Preview padding growth does not change the user-selected zoom scale. The canvas frame width is based on padded pixel size multiplied by zoom, so dragging an object outside the document reveals the edit-only area without auto-shrinking the document.
+- Dragging an object outside the document does not change the user-selected zoom scale or expand the output frame.
 - Vertical text selection, hit testing, resize handles, and Adjust width/height edits use the configured layer display bounds so preview resizing behaves like horizontal text. Edit padding still accounts for the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts
@@ -191,7 +190,7 @@ The Layers tab also includes:
 
 The left sidebar is grouped by task:
 
-- Assets: local image import, Image Lab launch for the selected asset, imported asset list, and selected asset image-layer insertion.
+- Assets: local image import, imported asset list, selected asset image-layer insertion, and Image Lab launch from imported asset rows.
 - Templates: bundled default templates plus browser-local template naming, saving, loading, and deletion.
 - The previous left-panel Layouts tab is hidden from the GUI. Generated CSV/HTML text, CSV import, and HTML import are available from the preview-pane Layout I/O section.
 - The previous guided creation strip is removed from the left panel.
@@ -199,7 +198,7 @@ The left sidebar is grouped by task:
 The right inspector is grouped by task:
 
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open the shared palette-wheel and Sketch-style picker with alpha, so separate fill/stroke opacity sliders are not duplicated in Adjust.
+- Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a compact Sketch-style single-color picker with alpha, so separate fill/stroke opacity sliders are not duplicated in Adjust.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
 - Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
@@ -245,7 +244,7 @@ The left panel no longer shows a guided start strip. Template filters remain the
 
 ## OBS Preview
 
-The canvas toolbar can open an OBS preview window. The child window displays only a canvas on a black background, draws without editor selection handles or preview padding, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. OBS users can capture this separate window with Window Capture. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
+The canvas toolbar can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays only a canvas on a black background, draws without editor controls or selection handles, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It also requests fullscreen after opening; browser and OBS capture settings ultimately decide whether OS or browser chrome is captured. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
 
 ## Brand Kit
 
@@ -392,7 +391,7 @@ The canvas preview pane contains the edit-state section. It supports edit-state 
 
 ## Image Lab
 
-The Image Lab modal workspace opens from the Images section in the sidebar. It processes imported or bundled images in the browser and creates a processed image asset plus a new image layer. Supported operations:
+The Image Lab modal workspace opens from an imported asset row in the Assets tab. It processes the selected image in the browser and creates a processed image asset plus a new image layer. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
 - Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.
@@ -403,7 +402,7 @@ The Image Lab modal workspace opens from the Images section in the sidebar. It p
 
 Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.
 
-The modal workspace provides a larger preview canvas than the sidebar, plus close button, backdrop dismissal, and Escape-key dismissal. The left asset list can open Image Lab with the selected asset already active. Images imported inside Image Lab become the active processing target without requiring a second dropdown selection. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
+The modal workspace provides a larger preview canvas than the sidebar, plus a header-level processed-layer creation button, close button, backdrop dismissal, and Escape-key dismissal. Image import and asset switching stay in the Assets tab, so the modal does not duplicate those controls. Chroma-key settings sit beside the position and size controls, while the processed-layer creation action stays separated in the modal header. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 
 ## Slider Controls
 

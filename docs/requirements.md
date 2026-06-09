@@ -8,7 +8,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 
 - Import local image files and use them as editable thumbnail layers.
 - Import YouTube video thumbnails by URL or video id and use them as editable image layers.
-- Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab.
+- Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab from its asset row.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
 - Select expanded hosted Google Fonts options from the font dropdown for text layers.
@@ -21,7 +21,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Add simple shapes with fill color, stroke color, size, position, rotation, and shape kinds for rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
 - Adjust layer blur, edge blur, and corner radius where applicable, including rounded polygon corners for non-rect shape kinds.
-- Adjust text/shape fill and stroke alpha through the shared palette-wheel color picker opened from Fill and Stroke color displays.
+- Adjust text/shape fill and stroke alpha through a compact single-color picker opened from Fill and Stroke color displays.
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
@@ -32,7 +32,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Load 38 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, eight schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting templates, without depending on localStorage.
 - Filter bundled templates by use case and show compact template previews before loading.
-- Configure per-layer animation presets with easings.net-style easing choices, selected-object Motion preview, easing graph, a default `none` movement direction, disabled distance controls when movement direction is `none`, and a separate OBS preview window without editor selection handles.
+- Configure per-layer animation presets with easings.net-style easing choices, selected-object Motion preview, easing graph, a default `none` movement direction, disabled distance controls when movement direction is `none`, and a popup-style OBS preview window without editor controls or selection handles.
 - Keep the left panel focused on Assets and Templates by hiding the Layouts tab, removing the guided creation strip, and keeping CSV/HTML layout import/export in the preview pane.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
 - Show advisory quality warnings for text length, low contrast, hidden important layers, safe-area edges, heavy assets, large storage, many layers, and 4K export.
@@ -40,7 +40,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Show a GitHub Issues path for bug reports and feature requests.
 - Show browser-only privacy/storage guidance inside the app without requiring a Templates service section.
 - Select text alignment with direct Left, Center, and Right buttons.
-- Show layer overflow outside the document bounds during editing while preserving clipped document-only export.
+- Keep the preview frame fixed to the output document area while preserving clipped document-only export and user-controlled zoom.
 - Make the direct rotation handle visually recognizable through cursor and handle states.
 - Switch major UI labels between Japanese and English, auto-selecting from browser/OS language when supported and falling back clearly when unsupported.
 - Define or replace layouts from CSV.

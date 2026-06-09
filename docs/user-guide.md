@@ -18,12 +18,12 @@ npm run preview
 ## Editor Layout
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab for the selected asset.
+- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab from an imported asset row.
 - Templates: load bundled default templates and save/load/delete browser-local templates.
 - Preview pane Layout I/O: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
-- Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through the shared color picker, shape, and image effects.
+- Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a compact single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
 
@@ -50,7 +50,7 @@ Open Layout I/O in the preview pane to paste CSV or HTML definitions, then selec
 - For a grouped row, use the small pointer button to select only that layer. Adjust then edits that one grouped object while the group metadata remains intact.
 - Use Fit to canvas in Adjust to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Use the Pan button, Space-drag, or Alt-drag to move around a zoomed or tall preview. Preset and output-size changes keep the current zoom until you select Fit canvas.
-- Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
+- Layers can extend outside the document while editing; the preview keeps the output frame and zoom stable instead of stretching around off-canvas content. Exported images still include only the configured canvas size.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees.
 - Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
 
@@ -134,11 +134,11 @@ The status bar can show quality warning chips while you work. Check these before
 5. Use the selected-object preview and easing graph to check motion timing. Direction defaults to None; distance is disabled until Left, Right, Up, or Down is selected.
 6. Select Open OBS preview in the canvas toolbar.
 
-The OBS preview opens a separate browser window that contains only the animated canvas on a black background. It does not draw editor selection handles or preview padding. Capture that window in OBS with Window Capture. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
+The OBS preview opens a popup-style browser window that contains only the animated canvas on a black background. It does not draw editor controls or selection handles, and the app requests fullscreen where the browser permits it. Capture that window in OBS with Window Capture. Browser and OBS settings still decide whether OS or browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 
 ## Image Lab
 
-Open Image Lab from Assets or from an asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Images imported inside Image Lab become the active edit target immediately. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from the scissors button on an imported asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Importing and switching source images stay in Assets; Image Lab focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
 
 ## Color Palette
 
@@ -146,7 +146,7 @@ Open Colors to select an existing single-color swatch row for editing. Update ch
 
 Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. The Pattern dropdown beside the wheel chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space.
 
-When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the same palette-wheel and Sketch-style color picker. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
+When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the compact Sketch-style single-color picker. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
 
 Shape layers support Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, and Line. Corner radius rounds Rect and polygon shape corners; Line remains controlled by stroke width and line style.
 
