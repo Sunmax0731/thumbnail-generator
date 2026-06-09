@@ -11,13 +11,13 @@ Completed on 2026-06-09.
 
 ## Rationale
 
-Quality is A+ because the app covers CSV/HTML layout import, image/text/shape/line layers, local image import, YouTube thumbnail import, selected asset insertion, expanded quick add with line creation, 26 bundled default templates with five entries per YouTube/Shorts/Stream/Cutout category plus six Schedule templates, always-visible Guided start, preview-pane Edit state controls, direct canvas move/resize/rotate with confirmed-position undo/redo history, blank-click deselection, z-order-aware preview selection, grouped preview-object selection, individual grouped-row editing, multi-selection alignment plus live relative movement/rotation controls, multi-selection angle matching, layer grouping and fit-to-canvas, folder-like grouped rows, saved edit state with autosave and reload restore, off-canvas edit preview visibility with clipped export, layer blur, signed inner/outer edge blur, corner radius, text kerning, horizontal/vertical text writing mode, vertical text display bounds that resize like horizontal text from Adjust and preview handles, text fit-to-box, three-button text alignment, Motion animation metadata, separate OBS preview window playback, disabled inert inspector controls, Adjust reset buttons, Japanese/English UI switching, layer locking and deletion confirmation, edit shortcuts, named browser-local single colors with opacity, in-place editing, per-row Fill/Stroke apply buttons, Colors-to-Brand-kit registration, Adobe-style linked palette maker, saved multi-color palette sets, resizable inspector lists, expanded Google Fonts and custom font import, preset fit for tall canvases, Image Lab selected asset handoff plus editable cutouts and chroma key, named browser-local templates, canvas rendering, PNG/JPEG/WebP export, responsive layout, user-facing README guidance, automated tests, production build, and headless Chromium runtime gate. It is not S tier because broader cross-browser, real-device, browser storage quota, and OBS production-environment checks remain future work.
+Quality is A+ because the app covers CSV/HTML layout import, image/text/shape/line layers, local image import, YouTube thumbnail import, selected asset insertion, expanded quick add with line creation, 28 bundled default templates with five entries per YouTube/Shorts/Stream/Cutout category plus eight Schedule templates including Sunday-start weekly landscape and portrait layouts, always-visible Guided start, preview-pane Edit state controls, direct canvas move/resize/rotate with confirmed-position undo/redo history, blank-click deselection, z-order-aware preview selection, grouped preview-object selection, individual grouped-row editing, multi-selection alignment plus live relative movement/rotation controls, multi-selection angle matching, layer grouping and fit-to-canvas, folder-like grouped rows, saved edit state with autosave and reload restore, off-canvas edit preview visibility with clipped export, layer blur, signed inner/outer edge blur, corner radius, text kerning, horizontal/vertical text writing mode, vertical text display bounds that resize like horizontal text from Adjust and preview handles, text fit-to-box, three-button text alignment, Motion animation metadata, separate OBS preview window playback, disabled inert inspector controls, Adjust reset buttons, Japanese/English UI switching, layer locking and deletion confirmation, edit shortcuts, named browser-local single colors with opacity, in-place editing, per-row Fill/Stroke apply buttons, Colors-to-Brand-kit registration, Adobe-style linked palette maker, saved multi-color palette sets, resizable inspector lists, expanded Google Fonts and custom font import, preset fit for tall canvases, Image Lab selected asset handoff plus editable cutouts and chroma key, named browser-local templates, canvas rendering, PNG/JPEG/WebP export, responsive layout, user-facing README guidance, automated tests, production build, and headless Chromium runtime gate. It is not S tier because broader cross-browser, real-device, browser storage quota, and OBS production-environment checks remain future work.
 
 Cost is A+ because the app remains static, browser-only, GitHub Pages compatible, and has no backend or paid service dependency. YouTube thumbnail import is client-side, Google Fonts are loaded as static browser resources, and edit state, templates, colors, saved palettes, and custom fonts are stored browser-locally without hosted storage infrastructure.
 
 Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, and docs can be packaged with the repo workflow. It is not S tier until a fresh remote Pages workflow run is observed after this commit.
 
-Satisfaction is A+ because the open P2 backlog is closed and this pass adds the requested Schedule and Motion/OBS paths: Guided start stays visible outside Templates, the shipped template set now has 26 practical starts including six Schedule templates, Edit state is visible in the preview pane, Colors can register colors into Brand kit primary/accent/shadow slots, and the Templates service section has been removed while the header Issue link and browser-storage guidance remain available. The runtime gate loaded every Schedule template without blank output, verified CSV/HTML persistence, inspector editing, Motion fade assignment, OBS preview window rendering, WebP export, mobile layout, and QCDS/user-guide/test-plan documentation. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
+Satisfaction is A+ because the open P2 backlog is closed and this pass adds the requested weekly Schedule paths: Guided start stays visible outside Templates, the shipped template set now has 28 practical starts including eight Schedule templates, Weekly Schedule Landscape and Weekly Schedule Portrait are Sunday-start, Edit state is visible in the preview pane, Colors can register colors into Brand kit primary/accent/shadow slots, and the Templates service section has been removed while the header Issue link and browser-storage guidance remain available. The runtime gate loaded the weekly templates without blank output, verified Sunday-start generated CSV order, CSV/HTML persistence, inspector editing, WebP export, mobile layout, and QCDS/user-guide/test-plan documentation. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
 
 ## Codex Work Dashboard Re-Evaluation
 
@@ -37,19 +37,34 @@ Browser automation path: Playwright headless Chromium.
 
 Evidence:
 
-- `docs/assets/runtime-20260608-open-p2-desktop.png`
-- `docs/assets/runtime-20260608-open-p2-mobile.png`
+- `docs/assets/runtime-20260609-weekly-schedule-desktop.png`
+- `docs/assets/runtime-20260609-weekly-schedule-mobile.png`
 
 Latest measured checks:
 
-- `npm test`: pass. 24 test files, 78 tests.
+- `npm test`: pass. 26 test files, 89 tests.
 - `npm run build`: pass.
-- Default template count: pass, exactly 26.
-- Default template category filters: pass, exactly 5 each for YouTube, Shorts, Stream, and Cutout plus 6 for Schedule.
-- Schedule template load: pass for all 6 Schedule templates with nonblank canvas.
-- Motion/OBS: pass. Motion assigned `fade` to a selected layer, and the separate OBS preview window rendered a nonblank canvas.
+- Default template count: pass, exactly 28.
+- Default template category filters: pass, exactly 5 each for YouTube, Shorts, Stream, and Cutout plus 8 for Schedule.
+- Weekly Schedule template load: pass for Weekly Schedule Landscape and Weekly Schedule Portrait with nonblank canvas.
+- Weekly Sunday-start order: pass for both weekly templates with generated CSV labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
+- Motion/OBS: previously verified in the Schedule Templates, Motion, and OBS preview runtime gate; the weekly-specific gate did not change that implementation path.
 - Guided start visibility on Assets/Layouts/Templates, preview-pane Edit state, Colors-to-Brand-kit registration, Templates service section removal, CSV import, HTML import, Adjust numeric editing, WebP export, desktop screenshot, mobile screenshot, and mobile no-overflow checks: pass.
 - Console health: no page errors and no app HTTP 4xx/5xx responses; one test-induced `getImageData` warning may be produced by canvas sampling.
+
+## Weekly Schedule Evidence
+
+Completed on 2026-06-09.
+
+- Scope: added Weekly Schedule Landscape and Weekly Schedule Portrait with Sunday-start day labels.
+- Quality: A+. Added unit coverage for 28 default templates, eight Schedule templates, and weekly day label order.
+- Cost: A+. The change stays in static browser-only template data, tests, CSS, and docs with no dependency or service addition.
+- Delivery: A+. `npm test` passed with 26 test files and 89 tests; `npm run build` passed; runtime evidence is recorded in `docs/test-plan.md`.
+- Satisfaction: A+. The Schedule filter now exposes eight rows, and both weekly orientations render nonblank with `SUN` through `SAT` order.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4195/thumbnail-generator/`.
+- Runtime checks: nonblank render, primary UI visibility, default template count 28, Schedule filter count 8, Weekly Schedule Landscape load, Weekly Schedule Portrait load, generated CSV Sunday-start order, CSV import, HTML import, Adjust X edit, WebP export download, mobile nonblank canvas, mobile warning-chip wrap, and mobile horizontal overflow `0`.
+- Evidence screenshots: `docs/assets/runtime-20260609-weekly-schedule-desktop.png` and `docs/assets/runtime-20260609-weekly-schedule-mobile.png`.
+- Export evidence: `output/runtime-downloads-20260609-weekly-schedule/thumbnail-1080x1920-2026-06-09T00-34-47-979Z.webp`.
 
 ## Vertical Text Bounds Evidence
 

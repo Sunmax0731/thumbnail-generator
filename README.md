@@ -22,7 +22,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
-- Load 26 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases plus six schedule starts for yearly, monthly, and daily layouts.
+- Load 28 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases plus eight schedule starts for yearly, monthly, weekly, and daily layouts.
 - Filter bundled templates by YouTube, Shorts, stream, cutout, or schedule use case and start from a compact guided creation flow.
 - Add layer animation presets from Motion and open a separate OBS preview window that loops the current canvas without editor selection handles.
 - Save a browser-local brand kit with channel name, brand font, brand colors, shadow color, and optional logo asset, register Brand kit colors from Colors, then apply it to selected layers.

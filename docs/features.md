@@ -32,7 +32,7 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Load 26 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories plus six Schedule starts for yearly, monthly, and daily layouts.
+- Load 28 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories plus eight Schedule starts for yearly, monthly, weekly, and daily layouts.
 - Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, or Schedule, with mini preview swatches and output-size badges.
 - Use the always-visible Guided start strip for the Template, Image, Title, Brand, and Layout creation path.
 - Use Templates to save named browser-local templates.

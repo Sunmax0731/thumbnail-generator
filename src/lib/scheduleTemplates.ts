@@ -44,6 +44,24 @@ export const scheduleTemplates: DefaultTemplateDefinition[] = [
     createLayers: () => createMonthlySchedule(true),
   },
   {
+    id: "schedule-week-landscape",
+    name: "Weekly Schedule Landscape",
+    description: "Wide Sunday-start weekly board with seven editable day columns.",
+    category: "schedule",
+    previewColors: ["#f7fafc", "#10b6d7", "#ffd166"],
+    settings: { ...defaultOutputSettings, presetId: "youtube-720", width: 1280, height: 720 },
+    createLayers: () => createWeeklySchedule(false),
+  },
+  {
+    id: "schedule-week-portrait",
+    name: "Weekly Schedule Portrait",
+    description: "Portrait Sunday-start weekly agenda with stacked day rows.",
+    category: "schedule",
+    previewColors: ["#111827", "#ffffff", "#10b6d7"],
+    settings: { ...defaultOutputSettings, presetId: "portrait", width: 1080, height: 1920 },
+    createLayers: () => createWeeklySchedule(true),
+  },
+  {
     id: "schedule-day-landscape",
     name: "Daily Schedule Landscape",
     description: "OBS-friendly daily timeline with now and next cards.",
@@ -126,6 +144,63 @@ function createMonthlySchedule(portrait: boolean): ThumbnailLayer[] {
     layers.push(rect("Monthly note", 70, 1636, 940, 180, "#152033", 12));
     layers.push(text("Monthly note text", 104, 1684, 872, 72, "Notes / announcements", 44, "#ffffff", "center"));
   }
+  return layers;
+}
+
+function createWeeklySchedule(portrait: boolean): ThumbnailLayer[] {
+  const width = portrait ? 1080 : 1280;
+  const height = portrait ? 1920 : 720;
+  const days = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  if (portrait) {
+    const layers: ThumbnailLayer[] = [
+      rect("Weekly background", 0, 0, width, height, "#111827", 0),
+      text("Weekly title", 72, 82, 680, 142, "WEEKLY SCHEDULE", 88, "#ffffff", "left"),
+      ...pill("Week badge", 760, 96, 190, 82, "WEEK", "#10b6d7", "#ffffff", 34),
+    ];
+    const startX = 70;
+    const startY = 300;
+    const rowW = 940;
+    const rowH = 206;
+    const gap = 22;
+    days.forEach((day, index) => {
+      const y = startY + index * (rowH + gap);
+      const highlight = index === 0;
+      layers.push(rect(`Week day ${day} row`, startX, y, rowW, rowH, highlight ? "#fff7d6" : "#ffffff", 10, highlight ? "#ffd166" : "#d8e0e7"));
+      layers.push(rect(`Week day ${day} block`, startX + 24, y + 26, 150, 154, highlight ? "#ff4f5f" : "#152033", 8));
+      layers.push(text(`Week day ${day} label`, startX + 24, y + 42, 150, 54, day, 34, "#ffffff", "center"));
+      layers.push(text(`Week day ${day} date`, startX + 24, y + 102, 150, 52, `${index + 1}`, 42, "#ffffff", "center"));
+      layers.push(text(`Week day ${day} time`, startX + 210, y + 46, 180, 48, "20:00", 40, "#152033", "left"));
+      layers.push(text(`Week day ${day} plan`, startX + 410, y + 46, 500, 58, "Plan / event", 44, "#152033", "left"));
+      layers.push(rect(`Week day ${day} memo line`, startX + 210, y + 128, 680, 4, highlight ? "#ff4f5f" : "#10b6d7", 2));
+    });
+    return layers;
+  }
+
+  const layers: ThumbnailLayer[] = [
+    rect("Weekly background", 0, 0, width, height, "#f7fafc", 0),
+    text("Weekly title", 64, 44, 690, 86, "WEEKLY SCHEDULE", 66, "#152033", "left"),
+    ...pill("Week badge", 930, 54, 208, 58, "WEEK", "#10b6d7", "#ffffff", 28),
+  ];
+  const startX = 64;
+  const startY = 158;
+  const cardW = 154;
+  const cardH = 450;
+  const gap = 10;
+  days.forEach((day, index) => {
+    const x = startX + index * (cardW + gap);
+    const highlight = index === 0;
+    layers.push(rect(`Week day ${day} card`, x, startY, cardW, cardH, highlight ? "#fff7d6" : "#ffffff", 8, highlight ? "#ffd166" : "#d8e0e7"));
+    layers.push(rect(`Week day ${day} header`, x, startY, cardW, 64, highlight ? "#ff4f5f" : "#152033", 8));
+    layers.push(text(`Week day ${day} label`, x, startY + 15, cardW, 34, day, 24, "#ffffff", "center"));
+    layers.push(text(`Week day ${day} date`, x + 18, startY + 90, cardW - 36, 42, `${index + 1}`, 32, "#152033", "center"));
+    for (let itemIndex = 0; itemIndex < 3; itemIndex += 1) {
+      const itemY = startY + 158 + itemIndex * 92;
+      const fill = itemIndex === 1 ? "#10b6d7" : "#edf2f6";
+      const color = itemIndex === 1 ? "#ffffff" : "#334155";
+      layers.push(rect(`Week day ${day} slot ${itemIndex + 1}`, x + 16, itemY, cardW - 32, 58, fill, 6));
+      layers.push(text(`Week day ${day} slot ${itemIndex + 1} text`, x + 22, itemY + 13, cardW - 44, 28, itemIndex === 0 ? "10:00" : itemIndex === 1 ? "14:00" : "20:00", 18, color, "center", 0));
+    }
+  });
   return layers;
 }
 

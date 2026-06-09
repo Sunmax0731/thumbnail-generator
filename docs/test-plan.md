@@ -29,7 +29,8 @@
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
-- Default template definitions provide exactly 26 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout plus six Schedule templates, with exportable CSV/HTML and supported layer types.
+- Default template definitions provide exactly 28 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout plus eight Schedule templates, with exportable CSV/HTML and supported layer types.
+- Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
 - Layer animation helpers apply fade, slide, and pop transforms without mutating source layer state.
 - CSV/HTML import and layout export preserve optional layer animation metadata.
@@ -85,8 +86,9 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
 - Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
-- All 26 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
-- Schedule filter shows exactly six bundled templates and each schedule template renders nonblank.
+- All 28 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
+- Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
 - Motion tab can assign a selected-layer animation preset.
 - OBS preview opens in a separate window and renders a nonblank animated canvas without editor selection handles.
 - Guided start remains visible when Assets, Layouts, or Templates is active.
@@ -110,6 +112,32 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### Weekly Schedule Templates
+
+Completed on 2026-06-09.
+
+- Scope: added Weekly Schedule Landscape and Weekly Schedule Portrait to the Schedule default-template category, both Sunday-start.
+- `npm test`: pass. 26 test files, 89 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4195/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Default template count: pass. The Templates panel exposed exactly 28 bundled rows.
+- Schedule filter: pass. The Templates panel exposed exactly 8 Schedule rows.
+- Weekly template load: pass. Weekly Schedule Landscape and Weekly Schedule Portrait each rendered a nonblank canvas.
+- Sunday-start order: pass. Generated CSV for both weekly templates listed `Week day SUN label`, `MON`, `TUE`, `WED`, `THU`, `FRI`, and `SAT` in order.
+- CSV import: pass. A two-layer CSV layout rendered nonblank.
+- HTML import: pass. A two-layer HTML layout rendered nonblank.
+- Layer editing: pass. Adjust numeric X edit accepted and the canvas stayed nonblank.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-weekly-schedule/thumbnail-1080x1920-2026-06-09T00-34-47-979Z.webp`.
+- Mobile: pass. `390x844` viewport loaded Weekly Schedule Portrait, rendered a nonblank canvas, and had horizontal overflow `0`.
+- Mobile warning layout: pass. Status warning chips wrap within the viewport after the high-layer-count weekly template is loaded.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-weekly-schedule-desktop.png`
+  - `docs/assets/runtime-20260609-weekly-schedule-mobile.png`
+- Console health: no page errors or relevant console warnings were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### Schedule Templates, Motion, And OBS Preview
 

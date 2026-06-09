@@ -65,7 +65,7 @@ Use Assets to add common starter layers quickly:
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 26 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories plus six Schedule entries for yearly, monthly, and daily layouts. Browser templates remain separate named snapshots saved in localStorage.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 28 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories plus eight Schedule entries for yearly, monthly, weekly, and daily layouts. Browser templates remain separate named snapshots saved in localStorage.
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, or Schedule. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 

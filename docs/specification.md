@@ -222,13 +222,13 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 26 practical layouts built only from supported image, text, shape, and line layers:
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 28 practical layouts built only from supported image, text, shape, and line layers:
 
 - YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
 - Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
 - Stream: Creator Live, Breaking News, Gaming Highlight, Event Countdown, Music Premiere.
 - Cutout: Minimal Launch, Profile Cutout, Product Cutout, Food Cutout, Fashion Cutout.
-- Schedule: Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Daily Schedule Landscape, Daily Schedule Portrait.
+- Schedule: Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Weekly Schedule Landscape, Weekly Schedule Portrait, Daily Schedule Landscape, Daily Schedule Portrait.
 
 Each bundled template also carries browser-rendered catalog metadata:
 

@@ -1948,6 +1948,17 @@ button:disabled {
     flex-direction: column;
   }
 
+  .status-warnings {
+    width: 100%;
+    flex: 0 1 auto;
+    flex-wrap: wrap;
+  }
+
+  .status-warnings span {
+    max-width: 100%;
+    min-width: 0;
+  }
+
   .canvas-scroll {
     padding: 12px;
     place-items: start;

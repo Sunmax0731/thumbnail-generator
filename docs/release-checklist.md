@@ -17,4 +17,4 @@
 - [x] Docs ZIP is generated.
 - [x] Git branch is pushed.
 
-Latest validation note: 2026-06-09 Schedule templates, Motion, and OBS preview passed `npm test` (26 files, 88 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4194/thumbnail-generator/`. Browser plugin was attempted first and failed with `Browser is not available: iab`.
+Latest validation note: 2026-06-09 Weekly Schedule templates passed `npm test` (26 files, 89 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4195/thumbnail-generator/`. The gate confirmed 28 bundled templates, 8 Schedule templates, Sunday-start Weekly Landscape/Portrait output, CSV/HTML import, layer editing, WebP export, and mobile horizontal overflow `0`.

@@ -4,11 +4,11 @@ import { layersToCsv, layersToHtml } from "./layoutExport";
 
 describe("defaultTemplates", () => {
   it("provides multiple use-case templates with renderable layers", () => {
-    expect(defaultTemplates).toHaveLength(26);
+    expect(defaultTemplates).toHaveLength(28);
     expect(new Set(defaultTemplates.map((template) => template.id)).size).toBe(defaultTemplates.length);
     expect(countByCategory()).toEqual({
       cutout: 5,
-      schedule: 6,
+      schedule: 8,
       shorts: 5,
       stream: 5,
       youtube: 5,
@@ -59,25 +59,42 @@ describe("defaultTemplates", () => {
       "schedule-year-portrait",
       "schedule-month-landscape",
       "schedule-month-portrait",
+      "schedule-week-landscape",
+      "schedule-week-portrait",
       "schedule-day-landscape",
       "schedule-day-portrait",
     ]);
   });
 
-  it("adds six editable schedule templates for year, month, and day in both orientations", () => {
+  it("adds eight editable schedule templates for year, month, week, and day in both orientations", () => {
     const scheduleTemplates = defaultTemplates.filter((template) => template.category === "schedule");
     expect(scheduleTemplates.map((template) => template.id)).toEqual([
       "schedule-year-landscape",
       "schedule-year-portrait",
       "schedule-month-landscape",
       "schedule-month-portrait",
+      "schedule-week-landscape",
+      "schedule-week-portrait",
       "schedule-day-landscape",
       "schedule-day-portrait",
     ]);
-    expect(scheduleTemplates.filter((template) => template.settings.width === 1280 && template.settings.height === 720)).toHaveLength(3);
-    expect(scheduleTemplates.filter((template) => template.settings.width === 1080 && template.settings.height === 1920)).toHaveLength(3);
+    expect(scheduleTemplates.filter((template) => template.settings.width === 1280 && template.settings.height === 720)).toHaveLength(4);
+    expect(scheduleTemplates.filter((template) => template.settings.width === 1080 && template.settings.height === 1920)).toHaveLength(4);
     for (const template of scheduleTemplates) {
       expect(template.createLayers().every((layer) => layer.type === "text" || layer.type === "shape")).toBe(true);
+    }
+  });
+
+  it("keeps weekly schedule templates Sunday-start", () => {
+    const expectedDays = ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+    for (const templateId of ["schedule-week-landscape", "schedule-week-portrait"]) {
+      const template = defaultTemplates.find((entry) => entry.id === templateId);
+      expect(template).toBeDefined();
+      const dayLabels = template
+        ?.createLayers()
+        .filter((layer) => layer.type === "text" && layer.name.startsWith("Week day ") && layer.name.endsWith(" label"))
+        .map((layer) => (layer.type === "text" ? layer.text : ""));
+      expect(dayLabels).toEqual(expectedDays);
     }
   });
 });
