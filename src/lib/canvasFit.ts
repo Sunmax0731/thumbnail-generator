@@ -21,8 +21,9 @@ export function calculateCanvasFitZoom({
   const frameHeight = Math.max(1, documentHeight + previewPadding * 2);
   const availableWidth = Math.max(1, containerWidth);
   const availableHeight = Math.max(1, containerHeight);
-  const fitByHeight = (availableHeight * frameWidth) / (availableWidth * frameHeight);
-  const next = Math.min(maxZoom, fitByHeight);
+  const fitByWidth = availableWidth / frameWidth;
+  const fitByHeight = availableHeight / frameHeight;
+  const next = Math.min(maxZoom, fitByWidth, fitByHeight);
 
   if (!Number.isFinite(next)) return maxZoom;
   return round(clamp(next, minZoom, maxZoom), 2);

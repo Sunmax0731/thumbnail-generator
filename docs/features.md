@@ -46,7 +46,7 @@ This page is the quick feature index for users and reviewers.
 ## Brand Kit And Quality Warnings
 
 - Keep browser-local brand kit data compatible with existing saved state.
-- Register Colors tab preview colors, saved palette colors, or registered single colors into Brand kit primary, accent, or shadow colors.
+- Keep Brand kit setup and Colors-side Brand kit registration buttons hidden.
 - Show advisory warning chips for long text, low contrast, hidden important layers, safe-area edges, many layers, large image assets, large storage estimates, and 4K export.
 - Link to GitHub Issues from the app for bug reports and feature requests.
 
@@ -59,12 +59,14 @@ This page is the quick feature index for users and reviewers.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from the collapsible Quick Add section in Layers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
+- Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
+- Click Fill or Stroke color displays in Adjust to open the shared palette-wheel and Sketch-style color picker with alpha.
 - Select expanded hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
 - Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
-- Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.
+- Use Adjust reset controls to return selected-layer rotation to 0 degrees.
 - Controls that do not affect the current layer state are disabled, such as single-line text line height.
 
 ## Motion And OBS Preview
@@ -79,7 +81,7 @@ This page is the quick feature index for users and reviewers.
 ## Color Palette
 
 - Register, edit, and delete named single colors in Colors.
-- Explore colors with an Adobe-style drag-capable linked color wheel, generated palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color swatches.
+- Explore colors with an Adobe-style drag-capable linked color wheel, a palette-pattern dropdown beside the wheel, generated palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color swatches.
 - Select a color-wheel point without changing the base color, drag one point to regenerate the other points in the same palette pattern, and explicitly set a selected point as the base color when needed.
 - Set palette opacity.
 - Apply each saved single color directly as Fill or Stroke to selected text and shape layers.

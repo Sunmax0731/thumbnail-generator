@@ -68,7 +68,6 @@ import type {
   LayerAnimationType,
   LineStyle,
   OutputSettings,
-  BrandKitColorRole,
   ShapeKind,
   TextAlign,
   TextWritingMode,
@@ -76,6 +75,15 @@ import type {
 } from "../lib/types";
 
 type InspectorSection = "layers" | "edit" | "colors" | "motion";
+type LayerColorTarget = "textFill" | "textStroke" | "shapeFill" | "shapeStroke";
+
+interface LayerColorPickerState {
+  layerId: string;
+  target: LayerColorTarget;
+  label: string;
+  color: string;
+  alpha: number;
+}
 
 interface InspectorPanelProps {
   assets: ImageAsset[];
@@ -101,7 +109,6 @@ interface InspectorPanelProps {
   onSaveCurrentColorPalette: (colors?: string[]) => void;
   onDeleteSavedColorPalette: (id: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget, alpha?: number) => void;
-  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onSelectIndividual: (id: string) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
@@ -154,7 +161,6 @@ export function InspectorPanel({
   onSaveCurrentColorPalette,
   onDeleteSavedColorPalette,
   onApplyPaletteColor,
-  onRegisterBrandKitColor,
   onSelect,
   onSelectIndividual,
   onUpdateLayer,
@@ -193,6 +199,7 @@ export function InspectorPanel({
   const [colorListHeight, setColorListHeight] = useState(320);
   const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(true);
   const [isLayerListExpanded, setIsLayerListExpanded] = useState(true);
+  const [layerColorPicker, setLayerColorPicker] = useState<LayerColorPickerState | null>(null);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
   const selectedIdsKey = selectedIds.join("|");
   const selectedGroupIds = Array.from(new Set(selectedLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
@@ -225,6 +232,23 @@ export function InspectorPanel({
     const { nextState, transform } = updateLiveRelativeTransformState(relativeTransform, axis, value);
     setRelativeTransform(nextState);
     if (hasLiveRelativeTransformDelta(transform)) onTransformSelection(transform);
+  };
+
+  const openLayerColorPicker = (state: LayerColorPickerState) => {
+    setLayerColorPicker(state);
+  };
+
+  const applyLayerColorPicker = (color: string, alpha: number) => {
+    const target = layerColorPicker;
+    if (!target) return;
+    onUpdateLayer(target.layerId, (layer) => {
+      if (target.target === "textFill" && layer.type === "text") return { ...layer, color, fillOpacity: alpha };
+      if (target.target === "textStroke" && layer.type === "text") return { ...layer, strokeColor: color, strokeOpacity: alpha };
+      if (target.target === "shapeFill" && layer.type === "shape") return { ...layer, fill: color, fillOpacity: alpha };
+      if (target.target === "shapeStroke" && layer.type === "shape") return { ...layer, strokeColor: color, strokeOpacity: alpha };
+      return layer;
+    });
+    setLayerColorPicker(null);
   };
 
   return (
@@ -528,7 +552,6 @@ export function InspectorPanel({
           onSavePalette={onSaveCurrentColorPalette}
           onDeleteSavedPalette={onDeleteSavedColorPalette}
           onApply={onApplyPaletteColor}
-          onRegisterBrandKitColor={onRegisterBrandKitColor}
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
@@ -640,24 +663,6 @@ export function InspectorPanel({
                   <RotateCcw size={15} /> {t("inspector.resetRotation")}
                 </button>
               </div>
-              <div className="field-with-action">
-                <SliderNumberInput
-                  label={t("inspector.opacity")}
-                  value={selected.opacity}
-                  min={0}
-                  max={1}
-                  step={0.01}
-                  decimals={2}
-                  onChange={(value) => updateNumber(selected, "opacity", value, onUpdateLayer)}
-                />
-                <button
-                  type="button"
-                  className="secondary-button icon-text reset-button"
-                  onClick={() => updateNumber(selected, "opacity", 1, onUpdateLayer)}
-                >
-                  <RotateCcw size={15} /> {t("inspector.resetOpacity")}
-                </button>
-              </div>
               <div className="field-grid two">
                 <SliderNumberInput
                   label={t("inspector.layerBlur")}
@@ -711,10 +716,13 @@ export function InspectorPanel({
                   onUpdateLayer={onUpdateLayer}
                   onCustomFontFiles={onCustomFontFiles}
                   onFitTextToBounds={onFitTextToBounds}
+                  onOpenColorPicker={openLayerColorPicker}
                   t={t}
                 />
               )}
-              {selected.type === "shape" && <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />}
+              {selected.type === "shape" && (
+                <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} onOpenColorPicker={openLayerColorPicker} t={t} />
+              )}
             </div>
           </section>
         ) : selectedLayers.length > 1 ? (
@@ -749,6 +757,15 @@ export function InspectorPanel({
             onDelete(deleteCandidate.id);
             setDeleteCandidateId(null);
           }}
+          t={t}
+        />
+      ) : null}
+      {layerColorPicker ? (
+        <LayerColorPickerDialog
+          state={layerColorPicker}
+          initialMode={paletteModeDraft}
+          onApply={applyLayerColorPicker}
+          onClose={() => setLayerColorPicker(null)}
           t={t}
         />
       ) : null}
@@ -892,7 +909,6 @@ function PaletteControls({
   onSavePalette,
   onDeleteSavedPalette,
   onApply,
-  onRegisterBrandKitColor,
   onResizeList,
   t,
 }: {
@@ -916,7 +932,6 @@ function PaletteControls({
   onSavePalette: (colors?: string[]) => void;
   onDeleteSavedPalette: (id: string) => void;
   onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
-  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
   onResizeList: (deltaY: number) => void;
   t: Translator;
 }) {
@@ -958,6 +973,22 @@ function PaletteControls({
           <small>{t("inspector.palettePreview")}</small>
         </div>
         <div className="palette-maker-preview">
+          <label className="field palette-target-field palette-wheel-pattern-field">
+            <span>{t("inspector.palettePattern")}</span>
+            <select
+              value={modeDraft}
+              onChange={(event) => {
+                setActivePointIndex(0);
+                onModeDraftChange(event.currentTarget.value as HarmonyMode);
+              }}
+            >
+              {palettePatternModes.map((mode) => (
+                <option key={mode} value={mode}>
+                  {t(harmonyLabelKey(mode))}
+                </option>
+              ))}
+            </select>
+          </label>
           <div
             className="palette-wheel"
             aria-label={t("inspector.paletteScheme")}
@@ -1029,22 +1060,6 @@ function PaletteControls({
           ))}
         </div>
         <div className="palette-register">
-          <label className="field palette-target-field">
-            <span>{t("inspector.palettePattern")}</span>
-            <select
-              value={modeDraft}
-              onChange={(event) => {
-                setActivePointIndex(0);
-                onModeDraftChange(event.currentTarget.value as HarmonyMode);
-              }}
-            >
-              {palettePatternModes.map((mode) => (
-                <option key={mode} value={mode}>
-                  {t(harmonyLabelKey(mode))}
-                </option>
-              ))}
-            </select>
-          </label>
           <label className="field palette-name-field">
             <span>{t("inspector.paletteName")}</span>
             <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
@@ -1072,12 +1087,6 @@ function PaletteControls({
               {t("inspector.savePalette")}
             </button>
           </div>
-          <BrandKitColorActions
-            color={activePointColor}
-            label={t("inspector.addToBrandKit")}
-            onRegisterBrandKitColor={onRegisterBrandKitColor}
-            t={t}
-          />
         </div>
       </div>
       {recentColors.length > 0 ? (
@@ -1127,7 +1136,6 @@ function PaletteControls({
                     <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "stroke")}>
                       {t("inspector.stroke")}
                     </button>
-                    <BrandKitColorActions color={color} onRegisterBrandKitColor={onRegisterBrandKitColor} t={t} compact />
                   </div>
                 ))}
               </div>
@@ -1181,7 +1189,6 @@ function PaletteControls({
                 </span>
               </button>
             </div>
-            <BrandKitColorActions color={color.value} onRegisterBrandKitColor={onRegisterBrandKitColor} t={t} compact />
             <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
               <Trash2 size={13} />
             </button>
@@ -1192,37 +1199,6 @@ function PaletteControls({
         </>
       ) : null}
     </section>
-  );
-}
-
-function BrandKitColorActions({
-  color,
-  label,
-  compact = false,
-  onRegisterBrandKitColor,
-  t,
-}: {
-  color: string;
-  label?: string;
-  compact?: boolean;
-  onRegisterBrandKitColor: (color: string, role: BrandKitColorRole) => void;
-  t: Translator;
-}) {
-  return (
-    <div className={`brand-color-actions ${compact ? "compact" : ""}`} aria-label={label ?? t("inspector.addToBrandKit")}>
-      {label ? <span>{label}</span> : null}
-      {brandKitColorRoles.map((role) => (
-        <button
-          key={role}
-          type="button"
-          className="ghost-button"
-          onClick={() => onRegisterBrandKitColor(color, role)}
-          title={t("inspector.addColorToBrandRole", { role: t(brandKitColorRoleLabels[role]) })}
-        >
-          {t(brandKitColorRoleShortLabels[role])}
-        </button>
-      ))}
-    </div>
   );
 }
 
@@ -1453,20 +1429,6 @@ const palettePatternModes: HarmonyMode[] = [
   "shades",
   "monochromatic",
 ];
-
-const brandKitColorRoles: BrandKitColorRole[] = ["primaryColor", "accentColor", "shadowColor"];
-
-const brandKitColorRoleLabels = {
-  primaryColor: "inspector.brandPrimary",
-  accentColor: "inspector.brandAccent",
-  shadowColor: "inspector.brandShadow",
-} as const;
-
-const brandKitColorRoleShortLabels = {
-  primaryColor: "inspector.brandPrimaryShort",
-  accentColor: "inspector.brandAccentShort",
-  shadowColor: "inspector.brandShadowShort",
-} as const;
 
 const animationTypes: LayerAnimationType[] = [
   "none",
@@ -1829,6 +1791,7 @@ function TextControls({
   onUpdateLayer,
   onCustomFontFiles,
   onFitTextToBounds,
+  onOpenColorPicker,
   t,
 }: {
   selected: Extract<ThumbnailLayer, { type: "text" }>;
@@ -1836,6 +1799,7 @@ function TextControls({
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
   onCustomFontFiles: InspectorPanelProps["onCustomFontFiles"];
   onFitTextToBounds: InspectorPanelProps["onFitTextToBounds"];
+  onOpenColorPicker: (state: LayerColorPickerState) => void;
   t: Translator;
 }) {
   return (
@@ -1925,35 +1889,34 @@ function TextControls({
         />
       </label>
       <div className="field-grid two">
-        <ColorInput
+        <ColorEditButton
           label={t("inspector.fill")}
-          value={selected.color}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, color: value }))}
+          color={selected.color}
+          alpha={selected.fillOpacity}
+          onClick={() =>
+            onOpenColorPicker({
+              layerId: selected.id,
+              target: "textFill",
+              label: t("inspector.fill"),
+              color: selected.color,
+              alpha: selected.fillOpacity,
+            })
+          }
         />
-        <ColorInput
+        <ColorEditButton
           label={t("inspector.outline")}
-          value={selected.strokeColor}
+          color={selected.strokeColor}
+          alpha={selected.strokeOpacity}
           disabled={selected.strokeWidth <= 0}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
-        />
-        <SliderNumberInput
-          label={t("inspector.fillOpacity")}
-          value={selected.fillOpacity}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, fillOpacity: value } : layer))}
-        />
-        <SliderNumberInput
-          label={t("inspector.strokeOpacity")}
-          value={selected.strokeOpacity}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          disabled={selected.strokeWidth <= 0}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "text" ? { ...layer, strokeOpacity: value } : layer))}
+          onClick={() =>
+            onOpenColorPicker({
+              layerId: selected.id,
+              target: "textStroke",
+              label: t("inspector.outline"),
+              color: selected.strokeColor,
+              alpha: selected.strokeOpacity,
+            })
+          }
         />
       </div>
       <SliderNumberInput
@@ -2031,10 +1994,12 @@ function TextAlignButton({
 function ShapeControls({
   selected,
   onUpdateLayer,
+  onOpenColorPicker,
   t,
 }: {
   selected: Extract<ThumbnailLayer, { type: "shape" }>;
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  onOpenColorPicker: (state: LayerColorPickerState) => void;
   t: Translator;
 }) {
   return (
@@ -2051,6 +2016,10 @@ function ShapeControls({
           <option value="rect">{t("inspector.rect")}</option>
           <option value="ellipse">{t("inspector.ellipse")}</option>
           <option value="triangle">{t("inspector.triangle")}</option>
+          <option value="diamond">{t("inspector.diamond")}</option>
+          <option value="pentagon">{t("inspector.pentagon")}</option>
+          <option value="hexagon">{t("inspector.hexagon")}</option>
+          <option value="star">{t("inspector.star")}</option>
           <option value="line">{t("inspector.line")}</option>
         </select>
       </label>
@@ -2072,27 +2041,35 @@ function ShapeControls({
         </label>
       ) : null}
       <div className="field-grid two">
-        <ColorInput
+        <ColorEditButton
           label={t("inspector.fill")}
-          value={selected.fill}
+          color={selected.fill}
+          alpha={selected.fillOpacity}
           disabled={selected.shape === "line"}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, fill: value }))}
+          onClick={() =>
+            onOpenColorPicker({
+              layerId: selected.id,
+              target: "shapeFill",
+              label: t("inspector.fill"),
+              color: selected.fill,
+              alpha: selected.fillOpacity,
+            })
+          }
         />
-        <ColorInput
+        <ColorEditButton
           label={t("inspector.stroke")}
-          value={selected.strokeColor}
+          color={selected.strokeColor}
+          alpha={selected.strokeOpacity}
           disabled={selected.strokeWidth <= 0}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeColor: value }))}
-        />
-        <SliderNumberInput
-          label={t("inspector.fillOpacity")}
-          value={selected.fillOpacity}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          disabled={selected.shape === "line"}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, fillOpacity: value } : layer))}
+          onClick={() =>
+            onOpenColorPicker({
+              layerId: selected.id,
+              target: "shapeStroke",
+              label: t("inspector.stroke"),
+              color: selected.strokeColor,
+              alpha: selected.strokeOpacity,
+            })
+          }
         />
         <SliderNumberInput
           label={t("inspector.strokeWidth")}
@@ -2101,16 +2078,6 @@ function ShapeControls({
           max={48}
           step={1}
           onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, strokeWidth: value }))}
-        />
-        <SliderNumberInput
-          label={t("inspector.strokeOpacity")}
-          value={selected.strokeOpacity}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          disabled={selected.strokeWidth <= 0}
-          onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, strokeOpacity: value } : layer))}
         />
       </div>
     </>
@@ -2218,23 +2185,180 @@ function TextInput({ label, value, onChange }: { label: string; value: string; o
   );
 }
 
-function ColorInput({
+function ColorEditButton({
   label,
-  value,
+  color,
+  alpha,
   disabled = false,
-  onChange,
+  onClick,
 }: {
   label: string;
-  value: string;
+  color: string;
+  alpha: number;
   disabled?: boolean;
-  onChange: (value: string) => void;
+  onClick: () => void;
 }) {
   return (
-    <label className={`field color-field ${disabled ? "field-disabled" : ""}`}>
+    <div className={`field color-edit-field ${disabled ? "field-disabled" : ""}`}>
       <span>{label}</span>
-      <input type="color" value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)} />
-      <input type="text" value={value} disabled={disabled} onChange={(event) => onChange(event.currentTarget.value)} />
-    </label>
+      <button type="button" className="color-edit-button" disabled={disabled} onClick={onClick}>
+        <span className="color-edit-swatch" style={{ background: color }} />
+        <span className="color-edit-value">
+          {color} / {Math.round(alpha * 100)}%
+        </span>
+      </button>
+    </div>
+  );
+}
+
+function LayerColorPickerDialog({
+  state,
+  initialMode,
+  onApply,
+  onClose,
+  t,
+}: {
+  state: LayerColorPickerState;
+  initialMode: HarmonyMode;
+  onApply: (color: string, alpha: number) => void;
+  onClose: () => void;
+  t: Translator;
+}) {
+  const [draft, setDraft] = useState(normalizeColor(state.color) ?? "#000000");
+  const [alpha, setAlpha] = useState(clampUnit(state.alpha));
+  const [mode, setMode] = useState<HarmonyMode>(initialMode);
+  const [activePointIndex, setActivePointIndex] = useState(0);
+  const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
+  const previewBaseColor = normalizeColor(draft) ?? "#000000";
+  const previewColors = generatePaletteSchemeColors(previewBaseColor, mode);
+  const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
+  const sketchColor = { ...hexToHsva(previewBaseColor), a: alpha };
+
+  useEffect(() => {
+    setDraft(normalizeColor(state.color) ?? "#000000");
+    setAlpha(clampUnit(state.alpha));
+    setActivePointIndex(0);
+  }, [state]);
+
+  useEffect(() => {
+    if (activePointIndex >= previewColors.length) setActivePointIndex(0);
+  }, [activePointIndex, previewColors.length]);
+
+  const setBaseDraft = (value: string, options: { preserveActivePoint?: boolean } = {}) => {
+    const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
+    setDraft(normalized ?? value);
+    if (!options.preserveActivePoint) setActivePointIndex(0);
+  };
+
+  const updateLinkedPreviewPoint = (index: number, color: string) => {
+    const linkedBase = derivePaletteBaseFromSchemeColor(color, index, mode);
+    if (linkedBase) setDraft(linkedBase);
+    setActivePointIndex(index);
+  };
+
+  return (
+    <div className="confirm-backdrop" role="presentation">
+      <section className="confirm-dialog layer-color-dialog" role="dialog" aria-modal="true" aria-labelledby="layer-color-picker-title">
+        <div className="modal-title-block">
+          <h2 id="layer-color-picker-title">{state.label}</h2>
+          <p>{t("inspector.palette")}</p>
+        </div>
+        <div className="palette-maker layer-color-picker">
+          <div className="palette-maker-preview">
+            <label className="field palette-target-field palette-wheel-pattern-field">
+              <span>{t("inspector.palettePattern")}</span>
+              <select
+                value={mode}
+                onChange={(event) => {
+                  setActivePointIndex(0);
+                  setMode(event.currentTarget.value as HarmonyMode);
+                }}
+              >
+                {palettePatternModes.map((candidate) => (
+                  <option key={candidate} value={candidate}>
+                    {t(harmonyLabelKey(candidate))}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <div
+              className="palette-wheel"
+              aria-label={t("inspector.paletteScheme")}
+              onPointerDown={(event) => {
+                if (event.target !== event.currentTarget) return;
+                event.currentTarget.setPointerCapture(event.pointerId);
+                setDraggingPointIndex(-1);
+                setBaseDraft(colorFromWheelPointer(event, event.currentTarget));
+              }}
+              onPointerMove={(event) => {
+                if ((event.buttons & 1) !== 1 || !event.currentTarget.hasPointerCapture(event.pointerId)) return;
+                const color = colorFromWheelPointer(event, event.currentTarget);
+                if (draggingPointIndex === null) return;
+                if (draggingPointIndex === -1) setBaseDraft(color);
+                else updateLinkedPreviewPoint(draggingPointIndex, color);
+              }}
+              onPointerUp={(event) => {
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+                setDraggingPointIndex(null);
+              }}
+              onPointerCancel={(event) => {
+                if (event.currentTarget.hasPointerCapture(event.pointerId)) event.currentTarget.releasePointerCapture(event.pointerId);
+                setDraggingPointIndex(null);
+              }}
+            >
+              {previewColors.map((color, index) => (
+                <button
+                  key={`${color}-${index}`}
+                  type="button"
+                  className={`palette-wheel-point ${index === 0 ? "base" : ""} ${activePointIndex === index ? "selected" : ""}`}
+                  style={{ ...wheelPointStyle(color), background: color }}
+                  title={color}
+                  onPointerDown={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    const wheel = event.currentTarget.parentElement;
+                    if (!wheel) return;
+                    wheel.setPointerCapture(event.pointerId);
+                    setDraggingPointIndex(index);
+                    setActivePointIndex(index);
+                  }}
+                  onClick={(event) => {
+                    event.preventDefault();
+                    event.stopPropagation();
+                    setActivePointIndex(index);
+                  }}
+                />
+              ))}
+            </div>
+          </div>
+          <div className="palette-spectrum-bars" aria-label={t("inspector.paletteScheme")}>
+            {previewColors.map((color, index) => (
+              <button key={`dialog-bar-${color}-${index}`} type="button" style={{ background: color, color: readableTextColor(color) }} onClick={() => setBaseDraft(color)}>
+                <span>{index === 0 ? t("inspector.paletteBase") : t("inspector.paletteColor")}</span>
+                <strong>{color}</strong>
+              </button>
+            ))}
+          </div>
+          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
+            <Sketch
+              color={sketchColor}
+              onChange={(color) => {
+                setBaseDraft(color.hex);
+                setAlpha(color.hsva.a);
+              }}
+            />
+          </div>
+        </div>
+        <div className="confirm-actions">
+          <button type="button" className="secondary-button" onClick={onClose}>
+            {t("inspector.cancel")}
+          </button>
+          <button type="button" className="primary-button" onClick={() => onApply(activePointColor, alpha)}>
+            {t("inspector.applyColorChoice")}
+          </button>
+        </div>
+      </section>
+    </div>
   );
 }
 

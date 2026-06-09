@@ -154,6 +154,8 @@ export function CanvasStage({
   };
 
   const shouldPan = (event: React.PointerEvent<HTMLElement>) => isPanMode || isSpacePanning || event.altKey;
+  const frameWidth = settings.width + previewPadding * 2;
+  const frameHeight = settings.height + previewPadding * 2;
 
   return (
     <section className="stage-panel" aria-label={t("stage.aria")}>
@@ -227,9 +229,8 @@ export function CanvasStage({
         <div
           className="canvas-frame"
           style={{
-            aspectRatio: `${settings.width + previewPadding * 2} / ${settings.height + previewPadding * 2}`,
-            width: `${Math.round(100 * zoom)}%`,
-            minWidth: settings.height > settings.width ? "290px" : "520px",
+            aspectRatio: `${frameWidth} / ${frameHeight}`,
+            width: `${Math.max(1, Math.round(frameWidth * zoom))}px`,
           }}
         >
           <canvas

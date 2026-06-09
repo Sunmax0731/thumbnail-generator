@@ -29,4 +29,4 @@ Improve the Colors tab by concentrating palette controls around the wheel, remov
 
 ## Notes
 
-- The existing linked wheel, Sketch-style input, recent colors, Fill/Stroke buttons, and Brand kit color registration remain available.
+- Superseded by Issue 0081 for Brand kit actions: the linked wheel, Sketch-style input, recent colors, and Fill/Stroke buttons remain available, while Colors-side Brand kit registration buttons are now hidden.

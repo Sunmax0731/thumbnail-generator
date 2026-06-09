@@ -80,4 +80,17 @@ shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
       strokeWidth: 12,
     });
   });
+
+  it("accepts expanded shape kinds", () => {
+    const result = parseCsvLayout(
+      `type,name,shape
+shape,Star,star
+shape,Diamond,diamond
+shape,Pentagon,pentagon
+shape,Hexagon,hexagon`,
+      { baseWidth: 1280, baseHeight: 720 },
+    );
+
+    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon"]);
+  });
 });

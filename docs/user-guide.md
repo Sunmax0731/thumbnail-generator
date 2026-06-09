@@ -23,8 +23,8 @@ npm run preview
 - Preview pane Layout I/O: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
-- Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, register colors into Brand kit primary/accent/shadow slots, and resize the color list area with the handle below the list.
+- Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through the shared color picker, shape, and image effects.
+- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
 
 ## Import Layouts
@@ -51,7 +51,7 @@ Open Layout I/O in the preview pane to paste CSV or HTML definitions, then selec
 - Use Fit to canvas in Adjust to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Use the Pan button, Space-drag, or Alt-drag to move around a zoomed or tall preview. Preset and output-size changes keep the current zoom until you select Fit canvas.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
-- In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
+- In Adjust, use Reset rotation to return the selected layer to `0` degrees.
 - Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
 
 ## Quick Add And Assets
@@ -144,7 +144,11 @@ Open Image Lab from Assets or from an asset row. The modal supports chroma key, 
 
 Open Colors to select an existing single-color swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied when that color is used. Each registered swatch row has Fill and Stroke buttons, so the same saved single color can be applied directly to either style of the selected text or shape layer.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. The Pattern dropdown beside the wheel chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space.
+
+When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the same palette-wheel and Sketch-style color picker. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
+
+Shape layers support Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, and Line. Corner radius rounds Rect and polygon shape corners; Line remains controlled by stroke width and line style.
 
 ## Browser Storage
 

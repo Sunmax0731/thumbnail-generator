@@ -177,3 +177,4 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] Layerタブに均等配置を追加 [Issue](Issues/0078-layer.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] プレビューの自動拡大率調整を無効化しパン操作を追加 [Issue](Issues/0079-issue.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:03-design] Colorsタブの配色UI配置を改善する [Issue](Issues/0080-colors-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] Colors/Adjust/Shape/Previewフォローアップ修正 [Issue](Issues/0081-shape-color-preview-followup.md) [QCDS:Quality,Satisfaction] [Status:closed]

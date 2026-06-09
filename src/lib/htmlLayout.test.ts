@@ -47,4 +47,18 @@ describe("parseHtmlLayout", () => {
     });
     expect(result.layers[1]).toMatchObject({ type: "shape", shape: "line", lineStyle: "dotted", cornerRadius: 18 });
   });
+
+  it("accepts expanded shape kinds", () => {
+    const result = parseHtmlLayout(
+      `<section>
+        <div data-layer="shape" data-shape="star"></div>
+        <div data-layer="shape" data-shape="diamond"></div>
+        <div data-layer="shape" data-shape="pentagon"></div>
+        <div data-layer="shape" data-shape="hexagon"></div>
+      </section>`,
+      { baseWidth: 1280, baseHeight: 720 },
+    );
+
+    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon"]);
+  });
 });

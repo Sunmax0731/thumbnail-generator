@@ -88,7 +88,7 @@ import {
   writeSavedTemplates,
 } from "./lib/templates";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
-import type { BrandKit, BrandKitColorRole, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+import type { BrandKit, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
 interface ActiveCanvasInteraction {
@@ -1114,22 +1114,6 @@ function App() {
     [paletteAlphaDraft, paletteColors, paletteDraft, selectedIds],
   );
 
-  const registerBrandKitColor = useCallback(
-    (color: string, role: BrandKitColorRole) => {
-      const normalized = normalizeColor(color);
-      if (!normalized) {
-        setStatus("Brand kit color was not updated because the color is invalid.");
-        return;
-      }
-      const next = { ...brandKit, [role]: normalized };
-      updateBrandKit(next);
-      const roleLabel =
-        role === "primaryColor" ? "primary" : role === "accentColor" ? "accent" : "shadow";
-      setStatus(`Registered ${normalized} as the Brand kit ${roleLabel} color.`);
-    },
-    [brandKit, updateBrandKit],
-  );
-
   const createProcessedAsset = useCallback(
     (asset: ImageAsset) => {
       setAssets((current) => [...current, asset]);
@@ -1568,7 +1552,6 @@ function App() {
           onSaveCurrentColorPalette={saveCurrentColorPalette}
           onDeleteSavedColorPalette={deleteSavedColorPalette}
           onApplyPaletteColor={applyPaletteColor}
-          onRegisterBrandKitColor={registerBrandKitColor}
           onSelect={selectLayer}
           onSelectIndividual={selectIndividualLayer}
           onUpdateLayer={updateLayer}

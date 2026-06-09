@@ -1292,17 +1292,40 @@ button:disabled {
   resize: vertical;
 }
 
-.color-field {
+.color-edit-field {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 6px;
+}
+
+.color-edit-button {
+  display: grid;
   grid-template-columns: 34px minmax(0, 1fr);
+  align-items: center;
+  min-width: 0;
+  min-height: 36px;
+  padding: 4px 8px 4px 4px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #ffffff;
+  color: var(--text);
+  text-align: left;
 }
 
-.color-field span {
-  grid-column: 1 / -1;
-}
-
-.color-field input[type="color"] {
+.color-edit-swatch {
   width: 34px;
-  padding: 2px;
+  height: 26px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: 6px;
+}
+
+.color-edit-value {
+  overflow: hidden;
+  font-size: 11px;
+  font-weight: 850;
+  text-overflow: ellipsis;
+  text-transform: uppercase;
+  white-space: nowrap;
 }
 
 .palette-maker {
@@ -1334,9 +1357,14 @@ button:disabled {
 
 .palette-maker-preview {
   display: grid;
+  grid-template-columns: minmax(112px, 1fr) 104px;
   justify-content: center;
   gap: 10px;
   align-items: stretch;
+}
+
+.palette-wheel-pattern-field {
+  align-self: center;
 }
 
 .palette-wheel {
@@ -1481,6 +1509,15 @@ button:disabled {
   min-width: 0;
 }
 
+.layer-color-dialog {
+  width: min(430px, calc(100vw - 24px));
+}
+
+.layer-color-picker {
+  max-height: 70vh;
+  overflow: auto;
+}
+
 .palette-register .secondary-button {
   min-height: 34px;
 }
@@ -1499,33 +1536,6 @@ button:disabled {
 .palette-actions .secondary-button {
   min-width: 0;
   padding: 0 6px;
-}
-
-.brand-color-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) repeat(3, minmax(54px, auto));
-  gap: 5px;
-  align-items: center;
-}
-
-.brand-color-actions.compact {
-  grid-template-columns: repeat(3, minmax(30px, auto));
-}
-
-.brand-color-actions > span {
-  overflow: hidden;
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 850;
-  text-overflow: ellipsis;
-  white-space: nowrap;
-}
-
-.brand-color-actions .ghost-button {
-  min-height: 26px;
-  padding: 3px 6px;
-  font-size: 10px;
-  font-weight: 850;
 }
 
 .palette-recent {
@@ -2035,6 +2045,7 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
+  .palette-maker-preview,
   .palette-register {
     grid-template-columns: 1fr;
   }
@@ -2043,9 +2054,7 @@ button:disabled {
   .palette-actions,
   .stage-layout-grid,
   .stage-edit-actions,
-  .stage-edit-state-header,
-  .brand-color-actions,
-  .brand-color-actions.compact {
+  .stage-edit-state-header {
     grid-template-columns: 1fr;
   }
 
@@ -2108,10 +2117,6 @@ button:disabled {
   .canvas-scroll {
     padding: 12px;
     place-items: start;
-  }
-
-  .canvas-frame {
-    min-width: 300px !important;
   }
 
   .status-message span {

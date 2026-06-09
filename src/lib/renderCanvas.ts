@@ -288,10 +288,15 @@ function drawShapeLayer(
   if (layer.shape === "ellipse") {
     context.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
   } else if (layer.shape === "triangle") {
-    context.moveTo(0, -layer.height / 2);
-    context.lineTo(layer.width / 2, layer.height / 2);
-    context.lineTo(-layer.width / 2, layer.height / 2);
-    context.closePath();
+    drawRoundedPolygonPath(context, regularPolygonPoints(layer.width, layer.height, 3, -90), layer.cornerRadius);
+  } else if (layer.shape === "diamond") {
+    drawRoundedPolygonPath(context, regularPolygonPoints(layer.width, layer.height, 4, -90), layer.cornerRadius);
+  } else if (layer.shape === "pentagon") {
+    drawRoundedPolygonPath(context, regularPolygonPoints(layer.width, layer.height, 5, -90), layer.cornerRadius);
+  } else if (layer.shape === "hexagon") {
+    drawRoundedPolygonPath(context, regularPolygonPoints(layer.width, layer.height, 6, -90), layer.cornerRadius);
+  } else if (layer.shape === "star") {
+    drawRoundedPolygonPath(context, starPoints(layer.width, layer.height), layer.cornerRadius);
   } else {
     context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, layer.cornerRadius);
   }
@@ -309,6 +314,65 @@ function drawShapeLayer(
     context.stroke();
   }
   context.globalAlpha = baseAlpha;
+}
+
+function regularPolygonPoints(width: number, height: number, sides: number, startAngleDeg: number): Array<{ x: number; y: number }> {
+  const radiusX = width / 2;
+  const radiusY = height / 2;
+  return Array.from({ length: sides }, (_, index) => {
+    const angle = ((startAngleDeg + (360 / sides) * index) * Math.PI) / 180;
+    return {
+      x: Math.cos(angle) * radiusX,
+      y: Math.sin(angle) * radiusY,
+    };
+  });
+}
+
+function starPoints(width: number, height: number): Array<{ x: number; y: number }> {
+  const points: Array<{ x: number; y: number }> = [];
+  const outerX = width / 2;
+  const outerY = height / 2;
+  const innerX = outerX * 0.48;
+  const innerY = outerY * 0.48;
+  for (let index = 0; index < 10; index += 1) {
+    const angle = ((-90 + 36 * index) * Math.PI) / 180;
+    const radiusX = index % 2 === 0 ? outerX : innerX;
+    const radiusY = index % 2 === 0 ? outerY : innerY;
+    points.push({ x: Math.cos(angle) * radiusX, y: Math.sin(angle) * radiusY });
+  }
+  return points;
+}
+
+function drawRoundedPolygonPath(context: CanvasRenderingContext2D, points: Array<{ x: number; y: number }>, cornerRadius: number): void {
+  if (points.length < 3) return;
+  const radius = Math.max(0, cornerRadius);
+  if (radius <= 0) {
+    context.moveTo(points[0].x, points[0].y);
+    for (const point of points.slice(1)) context.lineTo(point.x, point.y);
+    context.closePath();
+    return;
+  }
+
+  points.forEach((point, index) => {
+    const previous = points[(index - 1 + points.length) % points.length];
+    const next = points[(index + 1) % points.length];
+    const previousLength = Math.hypot(point.x - previous.x, point.y - previous.y);
+    const nextLength = Math.hypot(next.x - point.x, next.y - point.y);
+    const corner = Math.min(radius, previousLength / 2, nextLength / 2);
+    const before = interpolatePoint(point, previous, corner / Math.max(1, previousLength));
+    const after = interpolatePoint(point, next, corner / Math.max(1, nextLength));
+    if (index === 0) context.moveTo(before.x, before.y);
+    else context.lineTo(before.x, before.y);
+    context.quadraticCurveTo(point.x, point.y, after.x, after.y);
+  });
+  context.closePath();
+}
+
+function interpolatePoint(from: { x: number; y: number }, to: { x: number; y: number }, amount: number): { x: number; y: number } {
+  return {
+    x: from.x + (to.x - from.x) * amount,
+    y: from.y + (to.y - from.y) * amount,
+  };
 }
 
 function drawTextLayer(

@@ -1,5 +1,5 @@
 export type LayerType = "image" | "text" | "shape";
-export type ShapeKind = "rect" | "ellipse" | "triangle" | "line";
+export type ShapeKind = "rect" | "ellipse" | "triangle" | "diamond" | "pentagon" | "hexagon" | "star" | "line";
 export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
 export type TextWritingMode = "horizontal" | "vertical";

@@ -17,4 +17,4 @@
 - [x] Docs ZIP is generated.
 - [x] Git branch is pushed.
 
-Latest validation note: 2026-06-09 UI reposition, preview pan, and Colors layout passed `npm test` (26 files, 95 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4197/thumbnail-generator/`. The gate confirmed hidden left Layouts tab, hidden guided start, hidden Templates Brand kit setup, Layers Quick Add collapse, layer-list collapse, even distribution, manual zoom stability with pan, preview-pane CSV/HTML import, layer editing, Colors collapses, WebP export, and mobile horizontal overflow `0`.
+Latest validation note: 2026-06-09 Colors/Adjust/Shape/Preview follow-up passed `npm test` (26 files, 98 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4198/thumbnail-generator/`. The gate confirmed the Colors pattern dropdown left of the wheel, hidden Colors Brand kit buttons, expanded Shape options, shared Adjust Fill/Stroke color picker with alpha, removed redundant opacity controls, off-canvas drag zoom stability, WebP export, and mobile horizontal overflow `0`.

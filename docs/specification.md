@@ -17,7 +17,7 @@ All layers share:
 - `layerBlur`: whole-layer blur in CSS filter pixels.
 - `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw a blurred layer copy behind the layer, and negative values draw the layer through a feathered alpha mask so inner edge softening is visible in preview and export.
 - `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
-- `cornerRadius`: rounded corner radius for image layers and rectangular shape layers.
+- `cornerRadius`: rounded corner radius for image layers and supported shape paths. Rectangles use rounded rectangles; triangle, diamond, pentagon, hexagon, and star shapes use rounded polygon corners.
 - `animation`: optional per-layer animation settings used by Motion and OBS preview. Static PNG/JPEG/WebP export ignores animation time and renders the base layer state.
 
 ## Layer Animation
@@ -71,7 +71,7 @@ Text layer edit selection rectangles, hit testing, and resize handles use the co
 
 Shape layers include:
 
-- `shape`: `rect`, `ellipse`, `triangle`, or `line`
+- `shape`: `rect`, `ellipse`, `triangle`, `diamond`, `pentagon`, `hexagon`, `star`, or `line`
 - `fill`
 - `fillOpacity`
 - `strokeColor`
@@ -106,6 +106,7 @@ Examples:
 <div data-layer="text" data-name="Title" data-x="80" data-y="90" data-width="900" data-height="150" data-font-size="96" data-color="#ffffff" data-stroke-color="#111827" data-stroke-width="10">LIVE TONIGHT</div>
 <img data-layer="image" data-name="Hero" data-image="sample-bg" data-x="0" data-y="0" data-width="1280" data-height="720" data-effect="contrast=112;brightness=96" />
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
+<div data-layer="shape" data-shape="star" data-corner-radius="18" data-fill="#ffd166"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
 <div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true">MOTION</div>
@@ -147,6 +148,7 @@ The selected layer can be edited directly on the canvas:
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Editing preview padding grows from visible layer bounds so layer content and handles extending outside the document remain visible and hit-testable.
+- Preview padding growth does not change the user-selected zoom scale. The canvas frame width is based on padded pixel size multiplied by zoom, so dragging an object outside the document reveals the edit-only area without auto-shrinking the document.
 - Vertical text selection, hit testing, resize handles, and Adjust width/height edits use the configured layer display bounds so preview resizing behaves like horizontal text. Edit padding still accounts for the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts
@@ -197,7 +199,7 @@ The left sidebar is grouped by task:
 The right inspector is grouped by task:
 
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
+- Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open the shared palette-wheel and Sketch-style picker with alpha, so separate fill/stroke opacity sliders are not duplicated in Adjust.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
 - Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 

@@ -15,7 +15,7 @@ describe("canvas fit zoom", () => {
     expect(zoom).toBeGreaterThanOrEqual(0.25);
   });
 
-  it("keeps landscape presets at the preferred fit when height allows it", () => {
+  it("shrinks landscape presets by the visible width when needed", () => {
     expect(
       calculateCanvasFitZoom({
         containerWidth: 960,
@@ -23,6 +23,18 @@ describe("canvas fit zoom", () => {
         documentWidth: 1280,
         documentHeight: 720,
         previewPadding: 88,
+      }),
+    ).toBe(0.66);
+  });
+
+  it("keeps smaller documents at the preferred fit when both axes allow it", () => {
+    expect(
+      calculateCanvasFitZoom({
+        containerWidth: 960,
+        containerHeight: 640,
+        documentWidth: 640,
+        documentHeight: 360,
+        previewPadding: 40,
       }),
     ).toBe(0.94);
   });

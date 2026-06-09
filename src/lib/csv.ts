@@ -203,7 +203,17 @@ function parseWritingMode(input = ""): TextWritingMode {
 }
 
 function parseShape(input = "") {
-  if (input === "ellipse" || input === "triangle" || input === "line") return input;
+  if (
+    input === "ellipse" ||
+    input === "triangle" ||
+    input === "diamond" ||
+    input === "pentagon" ||
+    input === "hexagon" ||
+    input === "star" ||
+    input === "line"
+  ) {
+    return input;
+  }
   return "rect";
 }
 

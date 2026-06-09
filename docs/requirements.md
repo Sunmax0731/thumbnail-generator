@@ -18,10 +18,10 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
 - Add common text, shape, line, headline, subtitle, badge, divider, and selected-asset image layers through expanded quick-add controls in the Layers inspector.
-- Add simple shapes with fill color, stroke color, size, position, and rotation.
+- Add simple shapes with fill color, stroke color, size, position, rotation, and shape kinds for rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
-- Adjust layer blur, edge blur, and corner radius where applicable.
-- Adjust text/shape fill and stroke opacity independently.
+- Adjust layer blur, edge blur, and corner radius where applicable, including rounded polygon corners for non-rect shape kinds.
+- Adjust text/shape fill and stroke alpha through the shared palette-wheel color picker opened from Fill and Stroke color displays.
 - Clear the current selection by clicking non-layer blank space in the preview.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
@@ -34,8 +34,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Filter bundled templates by use case and show compact template previews before loading.
 - Configure per-layer animation presets with easings.net-style easing choices, selected-object Motion preview, easing graph, a default `none` movement direction, disabled distance controls when movement direction is `none`, and a separate OBS preview window without editor selection handles.
 - Keep the left panel focused on Assets and Templates by hiding the Layouts tab, removing the guided creation strip, and keeping CSV/HTML layout import/export in the preview pane.
-- Keep browser-local brand kit data and Colors-to-Brand-kit color registration available while hiding Brand kit setup controls from Templates.
-- Register the current Colors tab draft, saved palette colors, or registered single colors into Brand kit primary, accent, or shadow colors.
+- Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
 - Show advisory quality warnings for text length, low contrast, hidden important layers, safe-area edges, heavy assets, large storage, many layers, and 4K export.
 - Export, import, and delete browser-local edit-state JSON for backup and recovery.
 - Show a GitHub Issues path for bug reports and feature requests.
@@ -51,11 +50,11 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
 - Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
 - Disable controls that do not affect the current selected layer or selected state.
-- Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
+- Reset selected layer rotation to `0` degrees from the Adjust tab.
 - Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
 - Edit registered single colors, apply each saved single color directly as Fill or Stroke, set palette opacity, and preview palette patterns.
-- Use an Adobe-style visual color palette with selectable and drag-editable linked color-wheel points, explicit base-color controls, large palette bars, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
+- Use an Adobe-style visual color palette with selectable and drag-editable linked color-wheel points, a palette-pattern dropdown to the left of the wheel, explicit base-color controls, large palette bars, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
 - Save the currently previewed palette pattern as one browser-local multi-color palette set and apply individual saved-palette colors as Fill or Stroke.
 - Use signed edge blur values to choose inner or outer edge blur, and optionally include text/shape strokes in the blur source.
 - Treat canvas drag movement as one undo/redo history step from drag start to drag completion, not as intermediate pointer positions.

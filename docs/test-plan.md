@@ -5,7 +5,7 @@
 - CSV parser handles quoted fields, numeric defaults, image references, and effect strings.
 - HTML parser handles text, image, and shape layers.
 - Export presets resolve to expected width/height/format settings.
-- Canvas fit calculation shrinks tall presets and preserves landscape fit when height allows it.
+- Canvas fit calculation shrinks tall or wide presets by visible width/height and preserves preferred fit only when both axes allow it.
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers keep selection on valid selectable layers.
@@ -19,7 +19,7 @@
 - Language detection selects Japanese or English from browser language tags and falls back to English.
 - Color palette registration preserves names, color-value uniqueness, opacity, legacy storage migration, and per-row Fill/Stroke application.
 - Color palette editing preserves selected swatch updates, opacity, saved multi-color palette generation, and legacy group metadata tolerance.
-- CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, and line styles.
+- CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, expanded shape kinds, and line styles.
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
 - Text fit accounts for vertical text column width and character height.
@@ -62,6 +62,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Canvas drag move records undo/redo history only at confirmed drag start and drag completion positions.
 - Preset changes keep the current preview zoom until Fit canvas is selected.
 - Preview pan works through the Pan button, Space-drag, or Alt-drag without changing zoom.
+- Dragging a layer outside the document expands the edit-only preview area without changing the displayed zoom or effective canvas scale.
 - Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
 - Grouped preview objects can be selected as a multi-selection, not only grouped rows in Layers.
@@ -102,24 +103,48 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Guided start is not visible in the left panel.
 - Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
-- Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
+- Adjust reset controls return selected-layer rotation to 0 degrees.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
-- Adjust supports layer blur, edge blur, corner radius, text kerning, and fill/stroke opacity.
+- Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open the shared palette picker with alpha.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
-- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
+- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, a palette-pattern dropdown to the left of the wheel, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Top toolbar exposes PNG, JPG, and WebP as direct export buttons without a separate format selector or generic export button.
 - Desktop and mobile viewports have no incoherent overlap.
-- Template filters, hidden Brand kit setup in Templates, Colors-to-Brand-kit color registration, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
+- Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### Colors, Adjust, Shape, And Preview Follow-Up
+
+Completed on 2026-06-09.
+
+- Scope: moved the Colors palette-pattern dropdown to the left of the color wheel, removed Colors Brand kit Primary/Accent/Shadow registration buttons, fixed off-canvas preview drag so zoom and canvas scale remain stable, added Japanese labels for distribution buttons, added Diamond/Pentagon/Hexagon/Star shape choices, rounded polygon corners through `cornerRadius`, removed overall Adjust opacity plus separate Fill/Stroke opacity sliders, and opened the shared palette-wheel/Sketch color picker from Adjust Fill and Stroke color displays.
+- `npm test`: pass. 26 test files, 98 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4198/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x1100`.
+- Mobile viewport: `390x844`.
+- Primary UI: pass. Header, left Assets/Templates tabs, preview, inspector tabs, and export controls were visible.
+- Colors UI: pass. The palette-pattern dropdown was the first item in `.palette-maker-preview`, immediately before `.palette-wheel`; `.brand-color-actions` count was `0`; old `.palette-preview-strip` count was `0`.
+- Shape UI: pass. Shape options included `diamond`, `pentagon`, `hexagon`, and `star`; Star accepted `cornerRadius: 32`.
+- Adjust cleanup: pass. Adjust no longer showed overall `Opacity`, `Fill opacity`, or `Stroke opacity` controls for the selected shape.
+- Adjust color picker: pass. Fill and Stroke color display buttons opened the shared palette-wheel and Sketch-style picker. Fill changed to `#D710B6 / 100%`; supplementary Stroke check changed Stroke to `#C7D435 / 100%`.
+- Preview off-canvas drag: pass. Dragging the selected shape outside the document kept zoom `94%` to `94%`; effective canvas scale stayed stable within tolerance.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-shape-color-followup/thumbnail-1280x720-2026-06-09T10-01-08-547Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-shape-color-followup-desktop.png`
+  - `docs/assets/runtime-20260609-shape-color-followup-mobile.png`
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported.
 
 ### UI Reposition, Preview Pan, And Colors Layout
 

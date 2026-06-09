@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, preview-pane Layout I/O, preview pan, user-controlled zoom on preset changes, Colors layout cleanup, Schedule templates, expanded Motion/easing controls, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
+    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, preview-pane Layout I/O, preview pan, user-controlled zoom on preset changes, off-canvas drag zoom stability, Colors layout cleanup, shared Adjust color picker, hidden Colors-side Brand kit registration buttons, expanded shape kinds, rounded polygon corners, Schedule templates, expanded Motion/easing controls, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested UI cleanup and layout changes passed validation: left Layouts is hidden, guided start is removed, Templates Brand kit setup is hidden, Quick Add is moved to Layers with collapse controls, the layer list collapses, even distribution is added, preview zoom stays user-controlled with pan available, and Colors no longer renders the wheel-side color strip while saved palettes and registered colors collapse. CSV/HTML import/export persistence works from the preview pane, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
+    "rationale": "Requested UI cleanup and follow-up changes passed validation: left Layouts is hidden, guided start is removed, Templates Brand kit setup is hidden, Quick Add is moved to Layers with collapse controls, the layer list collapses, even distribution is added, preview zoom stays user-controlled with pan available, off-canvas dragging keeps zoom scale stable, Colors places the pattern dropdown beside the wheel and removes Brand kit registration buttons, Adjust opens a shared alpha-capable color picker from Fill/Stroke displays, redundant opacity controls are removed, and Shape supports Diamond/Pentagon/Hexagon/Star with rounded polygon corners. CSV/HTML import/export persistence works from the preview pane, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -54,14 +54,14 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4197/thumbnail-generator/",
+    "url": "http://127.0.0.1:4198/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x1100",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260609-ui-pan-colors-desktop.png",
-      "docs/assets/runtime-20260609-ui-pan-colors-mobile.png"
+      "docs/assets/runtime-20260609-shape-color-followup-desktop.png",
+      "docs/assets/runtime-20260609-shape-color-followup-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -94,11 +94,16 @@
       "5 templates per core category plus 8 Schedule templates plus 10 Motion templates",
       "preview-pane Layout I/O",
       "preview-pane edit state",
-      "Colors-to-Brand-kit registration",
+      "hidden Colors-side Brand kit registration buttons",
+      "Colors pattern dropdown before color wheel",
+      "shared Adjust Fill and Stroke color picker",
+      "expanded shape kind options",
+      "rounded polygon corner radius",
+      "off-canvas drag keeps zoom scale stable",
       "Templates service section removed",
       "template filter",
       "hidden Templates Brand kit setup",
-      "Colors-to-Brand-kit registration",
+      "hidden Colors-side Brand kit registration buttons",
       "GitHub Issues URL",
       "privacy notice",
       "CSV import",
