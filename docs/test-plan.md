@@ -123,6 +123,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Bottom Preview Actions Layout
+
+Completed on 2026-06-10 for the requested bottom preview Output and Edit state button layout.
+
+- `npm test`: pass. 27 test files, 103 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4216/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: primary UI visible in Japanese, initial canvas nonblank, Output section buttons rendered on one horizontal row, Edit state action buttons rendered on one horizontal row, all eight Output/Edit state buttons measured the same `136px` width and `36px` height, the autosave checkbox stayed on a separate row above Edit state actions, button-row overflow was `0` in the desktop three-panel preview width, Adjust X editing changed the selected layer from `890` to `900`, Save state reported a saved timestamp, WebP export downloaded, mobile canvas was nonblank, mobile button widths stayed equal, mobile horizontal overflow was `0`, and no page errors or app console errors were reported.
+- CSV/HTML note: GUI layout text inputs remain hidden by design; CSV/HTML parser and compatibility coverage passed through `npm test`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-bottom-actions-desktop.png`
+  - `docs/assets/runtime-20260610-bottom-actions-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-bottom-actions/thumbnail-1280x720-2026-06-09T22-57-10-819Z.webp`.
+
 ### Template Modal Localization, Autofit, And Browser Template Delete Confirmation
 
 Completed on 2026-06-10 for the requested template confirmation localization, preview auto-fit after template application, and browser-template delete confirmation.

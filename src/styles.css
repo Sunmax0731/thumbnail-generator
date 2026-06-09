@@ -22,6 +22,7 @@
   --warning: #f6b73c;
   --danger: #d92d20;
   --shadow: 0 18px 42px rgba(31, 41, 55, 0.12);
+  --stage-action-button-width: 136px;
 }
 
 :root[data-theme="dark"] {
@@ -824,6 +825,7 @@ button:disabled {
 }
 
 .stage-panel {
+  container-type: inline-size;
   display: flex;
   overflow: hidden;
   flex-direction: column;
@@ -927,7 +929,7 @@ button:disabled {
 
 .stage-bottom-row {
   display: grid;
-  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
+  grid-template-columns: max-content minmax(0, 1fr);
   gap: 0;
   border-top: 1px solid var(--line);
   background: var(--panel);
@@ -955,12 +957,17 @@ button:disabled {
 }
 
 .stage-export-actions {
-  display: grid;
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
 }
 
 .stage-export-actions .icon-text {
+  flex: 0 0 var(--stage-action-button-width);
+  width: var(--stage-action-button-width);
   justify-content: center;
+  min-height: 36px;
 }
 
 .stage-edit-state {
@@ -1011,14 +1018,29 @@ button:disabled {
 }
 
 .stage-edit-actions {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  overflow-x: auto;
 }
 
 .stage-edit-actions .icon-text {
+  flex: 0 0 var(--stage-action-button-width);
+  width: var(--stage-action-button-width);
   justify-content: center;
   min-width: 0;
+  min-height: 36px;
+}
+
+@container (max-width: 1180px) {
+  .stage-bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-export-panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
 }
 
 .layer-section {
