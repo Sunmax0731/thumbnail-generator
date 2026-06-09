@@ -12,6 +12,7 @@
 - Layer selection helpers select all editable grouped members from one grouped layer and toggle whole groups additively.
 - Relative layer transforms apply common movement and rotation deltas to selected editable layers.
 - Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
+- Multi-selection distribution spaces three or more selected layers evenly by horizontal or vertical centers.
 - Live relative transform controls convert current UI values into incremental movement and rotation deltas.
 - Preview padding expands for visible off-canvas layer bounds.
 - Text fit chooses the largest font size that fits the text layer bounds.
@@ -48,8 +49,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Japanese and English UI labels can be switched from the top toolbar.
 - Initial language detection chooses a supported language, and unsupported language tags fall back to English in unit coverage.
 - Clicking blank preview space clears selection and updates the stage/inspector state.
-- Left sidebar task tabs expose Assets, Layouts, and Templates without crowding the first viewport.
+- Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
+- Preview-pane Layout I/O exposes generated CSV/HTML text plus CSV and HTML import.
 - Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
+- Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
@@ -57,12 +60,14 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layer inspector edits position, size, rotation, color, stroke, font, and effects.
 - Canvas direct editing supports drag move, corner resize, and rotation handle drag.
 - Canvas drag move records undo/redo history only at confirmed drag start and drag completion positions.
-- Preset changes fit tall canvases such as Shorts into the visible desktop stage.
+- Preset changes keep the current preview zoom until Fit canvas is selected.
+- Preview pan works through the Pan button, Space-drag, or Alt-drag without changing zoom.
 - Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
 - Grouped preview objects can be selected as a multi-selection, not only grouped rows in Layers.
 - Multi-selection supports live relative X/Y movement and relative rotation from the Adjust tab without Apply buttons.
 - Multi-selection supports matching selected layer angles to the first selected editable layer from the Adjust tab.
+- Multi-selection supports horizontal and vertical even distribution from Layers.
 - Single selection can align to the canvas.
 - Selection handles remain visible in preview padding outside the thumbnail document area.
 - Off-canvas layer overflow remains visible and editable in the preview while export remains clipped to the output canvas.
@@ -86,7 +91,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Image import accepts a local image and creates an image layer.
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
-- Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
+- Expanded quick add in Layers inserts text, shape, line, headline, subtitle, badge, divider, and selected-image starters.
 - All 38 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
@@ -94,7 +99,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Motion tab can assign a selected-layer animation preset, preview the selected object, and show the easing graph.
 - Motion tab exposes 12 animation types, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
 - OBS preview opens in a separate window and renders a nonblank animated canvas without editor selection handles.
-- Guided start remains visible when Assets, Layouts, or Templates is active.
+- Guided start is not visible in the left panel.
 - Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees and opacity to 100%.
@@ -110,11 +115,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Export path creates a data URL/download for the selected format.
 - Top toolbar exposes PNG, JPG, and WebP as direct export buttons without a separate format selector or generic export button.
 - Desktop and mobile viewports have no incoherent overlap.
-- Template filters, guided start controls, brand kit capture/apply, Colors-to-Brand-kit color registration, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
+- Template filters, hidden Brand kit setup in Templates, Colors-to-Brand-kit color registration, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### UI Reposition, Preview Pan, And Colors Layout
+
+Completed on 2026-06-09.
+
+- Scope: hid the left Layouts tab, removed the left guided start strip, hid Templates Brand kit setup, moved Quick Add to the top of Layers with collapse controls, made the Layers list collapsible, added horizontal and vertical even distribution, moved Fit to canvas into Adjust, disabled automatic preview zoom changes on preset changes, added preview pan, and reorganized Colors with palette bars below the wheel plus collapsible saved palette and registered color lists.
+- `npm test`: pass. 26 test files, 95 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4197/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x1100`.
+- Mobile viewport: `390x844`.
+- Primary UI: pass. Header, left Assets/Templates tabs, preview, Layers/Adjust/Colors inspector, and export controls were visible.
+- Left panel cleanup: pass. Layouts tab, guided start, Templates Brand kit setup, and Assets-side Quick Add were not rendered.
+- Layers UI: pass. Quick Add rendered at the top of Layers, collapsed and expanded, added Text/Shape/Line layers, and the layer list collapsed and expanded.
+- Distribution: pass. Distribute H and Distribute V ran on a three-layer multi-selection.
+- Preview zoom and pan: pass. Switching to the Shorts portrait preset kept zoom at `94%`; Pan drag moved the preview scroll area without changing zoom.
+- Layout I/O: pass. Preview-pane CSV import reported `CSV applied: 3 layers`; preview-pane HTML import reported `HTML applied: 3 layers`.
+- Layer editing: pass. Adjust numeric X edit accepted and the canvas stayed nonblank.
+- Colors UI: pass. The old wheel-side color strip was absent, saved palettes and registered colors exposed collapsible headings, and both lists collapsed.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-ui-pan-colors/thumbnail-1080x1920-2026-06-09T09-14-14-576Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-ui-pan-colors-desktop.png`
+  - `docs/assets/runtime-20260609-ui-pan-colors-mobile.png`
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### UIW React Color Palette Input
 

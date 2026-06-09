@@ -27,4 +27,26 @@ describe("alignment", () => {
 
     expect(aligned.x).toBe(40);
   });
+
+  it("distributes selected layers evenly by horizontal centers", () => {
+    const layers = [
+      makeShapeLayer({ id: "a", x: 20, y: 20, width: 40, height: 40 }),
+      makeShapeLayer({ id: "b", x: 80, y: 20, width: 40, height: 40 }),
+      makeShapeLayer({ id: "c", x: 260, y: 20, width: 40, height: 40 }),
+    ];
+    const distributed = alignLayers(layers, ["a", "b", "c"], { width: 500, height: 300 }, "distribute-horizontal");
+
+    expect(distributed.map((layer) => layer.x)).toEqual([20, 140, 260]);
+  });
+
+  it("distributes selected layers evenly by vertical centers", () => {
+    const layers = [
+      makeShapeLayer({ id: "a", x: 20, y: 20, width: 40, height: 40 }),
+      makeShapeLayer({ id: "b", x: 20, y: 80, width: 40, height: 40 }),
+      makeShapeLayer({ id: "c", x: 20, y: 260, width: 40, height: 40 }),
+    ];
+    const distributed = alignLayers(layers, ["a", "b", "c"], { width: 500, height: 300 }, "distribute-vertical");
+
+    expect(distributed.map((layer) => layer.y)).toEqual([20, 140, 260]);
+  });
 });

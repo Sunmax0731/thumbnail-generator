@@ -1,6 +1,6 @@
 import type { OutputSettings, ThumbnailLayer } from "./types";
 
-export type AlignmentMode = "left" | "center" | "right" | "top" | "middle" | "bottom";
+export type AlignmentMode = "left" | "center" | "right" | "top" | "middle" | "bottom" | "distribute-horizontal" | "distribute-vertical";
 
 interface Bounds {
   left: number;
@@ -19,6 +19,7 @@ export function alignLayers(
 ): ThumbnailLayer[] {
   const selected = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   if (selected.length === 0) return layers;
+  if (mode === "distribute-horizontal" || mode === "distribute-vertical") return distributeLayers(layers, selectedIds, mode);
 
   const anchor =
     selected.length === 1
@@ -28,6 +29,36 @@ export function alignLayers(
   return layers.map((layer) => {
     if (!selectedIds.includes(layer.id) || !layer.selectable) return layer;
     return alignLayer(layer, anchor, mode);
+  });
+}
+
+function distributeLayers(layers: ThumbnailLayer[], selectedIds: string[], mode: "distribute-horizontal" | "distribute-vertical"): ThumbnailLayer[] {
+  const selected = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
+  if (selected.length < 3) return layers;
+
+  const axis = mode === "distribute-horizontal" ? "x" : "y";
+  const sizeKey = mode === "distribute-horizontal" ? "width" : "height";
+  const sorted = [...selected].sort((left, right) => {
+    const leftCenter = left[axis] + left[sizeKey] / 2;
+    const rightCenter = right[axis] + right[sizeKey] / 2;
+    return leftCenter - rightCenter;
+  });
+  const first = sorted[0];
+  const last = sorted[sorted.length - 1];
+  const firstCenter = first[axis] + first[sizeKey] / 2;
+  const lastCenter = last[axis] + last[sizeKey] / 2;
+  const step = (lastCenter - firstCenter) / (sorted.length - 1);
+  if (!Number.isFinite(step) || step === 0) return layers;
+
+  const nextPositions = new Map<string, number>();
+  sorted.forEach((layer, index) => {
+    nextPositions.set(layer.id, firstCenter + step * index - layer[sizeKey] / 2);
+  });
+
+  return layers.map((layer) => {
+    const position = nextPositions.get(layer.id);
+    if (position === undefined) return layer;
+    return mode === "distribute-horizontal" ? { ...layer, x: position } : { ...layer, y: position };
   });
 }
 

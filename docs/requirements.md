@@ -17,7 +17,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
-- Add common text, shape, and line layers through expanded quick-add controls.
+- Add common text, shape, line, headline, subtitle, badge, divider, and selected-asset image layers through expanded quick-add controls in the Layers inspector.
 - Add simple shapes with fill color, stroke color, size, position, and rotation.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
 - Adjust layer blur, edge blur, and corner radius where applicable.
@@ -33,8 +33,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Load 38 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, eight schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting templates, without depending on localStorage.
 - Filter bundled templates by use case and show compact template previews before loading.
 - Configure per-layer animation presets with easings.net-style easing choices, selected-object Motion preview, easing graph, a default `none` movement direction, disabled distance controls when movement direction is `none`, and a separate OBS preview window without editor selection handles.
-- Keep a guided beginner creation path visible from the left panel for template selection, image replacement, title creation, brand application, and layout generation.
-- Save and apply a browser-local brand kit with channel name, font, colors, shadow/outline color, and optional logo asset.
+- Keep the left panel focused on Assets and Templates by hiding the Layouts tab, removing the guided creation strip, and keeping CSV/HTML layout import/export in the preview pane.
+- Keep browser-local brand kit data and Colors-to-Brand-kit color registration available while hiding Brand kit setup controls from Templates.
 - Register the current Colors tab draft, saved palette colors, or registered single colors into Brand kit primary, accent, or shadow colors.
 - Show advisory quality warnings for text length, low contrast, hidden important layers, safe-area edges, heavy assets, large storage, many layers, and 4K export.
 - Export, import, and delete browser-local edit-state JSON for backup and recovery.
@@ -48,10 +48,11 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Define or replace layouts from HTML-like markup.
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
 - Provide common presets and custom output dimensions.
-- Automatically fit the preview when preset aspect ratio changes would otherwise push the canvas outside the visible stage.
+- Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
 - Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees and opacity to `100%` from the Adjust tab.
+- Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.
 - Use common editing shortcuts outside text fields and modals: Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y.
 - Edit registered single colors, apply each saved single color directly as Fill or Stroke, set palette opacity, and preview palette patterns.
 - Use an Adobe-style visual color palette with selectable and drag-editable linked color-wheel points, explicit base-color controls, large palette bars, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.

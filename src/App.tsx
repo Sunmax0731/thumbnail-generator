@@ -922,7 +922,11 @@ function App() {
   const alignSelection = useCallback(
     (mode: AlignmentMode) => {
       setLayers((current) => alignLayers(current, selectedIds, settings, mode));
-      setStatus(selectedIds.length > 1 ? `Aligned ${selectedIds.length} layers.` : "Aligned layer to canvas.");
+      if (mode === "distribute-horizontal" || mode === "distribute-vertical") {
+        setStatus(selectedIds.length >= 3 ? `Distributed ${selectedIds.length} layers evenly.` : "Select at least three editable layers to distribute.");
+      } else {
+        setStatus(selectedIds.length > 1 ? `Aligned ${selectedIds.length} layers.` : "Aligned layer to canvas.");
+      }
     },
     [selectedIds, settings],
   );
@@ -1490,36 +1494,19 @@ function App() {
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
         <LeftPanel
-          csvText={csvText}
-          htmlText={htmlText}
-          onCsvTextChange={setCsvText}
-          onHtmlTextChange={setHtmlText}
-          onApplyCsv={applyCsv}
-          onApplyHtml={applyHtml}
           onImageFiles={handleImageFiles}
           onImportYouTubeThumbnail={importYouTubeThumbnail}
           selectedAssetKey={selectedAssetKey}
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
-          onAddText={addTextLayer}
-          onAddShape={addShapeLayer}
-          onAddLineLayer={addLineLayer}
-          onAddQuickLayer={addQuickLayer}
-          onResetTemplate={resetTemplate}
           defaultTemplates={defaultTemplates}
           onLoadDefaultTemplate={loadDefaultTemplate}
           templateName={templateName}
           templates={templates}
-          brandKit={brandKit}
-          fontOptions={fontOptions}
           onTemplateNameChange={setTemplateName}
-          onSyncLayoutText={syncLayoutTextFromLayers}
           onSaveTemplate={saveCurrentTemplate}
           onLoadTemplate={loadTemplate}
           onDeleteTemplate={deleteTemplate}
-          onBrandKitChange={updateBrandKit}
-          onCaptureBrandKit={captureBrandKit}
-          onApplyBrandKit={applyBrandKit}
           onOpenImageLab={(assetKey) => {
             if (assetKey) setSelectedAssetKey(assetKey);
             setIsImageLabOpen(true);
@@ -1535,12 +1522,19 @@ function App() {
           zoom={zoom}
           cursor={canvasCursor}
           previewPadding={previewPadding}
+          csvText={csvText}
+          htmlText={htmlText}
           autoSaveEnabled={autoSaveEnabled}
           savedEditStateUpdatedAt={savedEditStateUpdatedAt}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
+          onCsvTextChange={setCsvText}
+          onHtmlTextChange={setHtmlText}
+          onApplyCsv={applyCsv}
+          onApplyHtml={applyHtml}
+          onSyncLayoutText={syncLayoutTextFromLayers}
           onAutoSaveChange={setAutoSaveEnabled}
           onSaveEditState={() => saveEditState("manual")}
           onRestoreEditState={restoreEditState}
@@ -1584,6 +1578,13 @@ function App() {
           onReorderLayer={reorderLayer}
           onToggleVisible={toggleLayerVisible}
           onToggleSelectable={toggleLayerSelectable}
+          selectedAssetKey={selectedAssetKey}
+          onAddText={addTextLayer}
+          onAddShape={addShapeLayer}
+          onAddLineLayer={addLineLayer}
+          onAddQuickLayer={addQuickLayer}
+          onAddImageAssetLayer={addImageLayerFromAsset}
+          onResetTemplate={resetTemplate}
           onAlignSelection={alignSelection}
           onTransformSelection={transformSelection}
           onMatchSelectionRotation={matchSelectionRotation}

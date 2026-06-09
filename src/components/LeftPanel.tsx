@@ -1,97 +1,55 @@
 import { useMemo, useState } from "react";
 import {
-  Code2,
-  FileText,
   FolderOpen,
-  GripHorizontal,
   ImagePlus,
   LayoutTemplate,
-  Paintbrush,
-  RefreshCw,
   Save,
   Scissors,
-  Shapes,
   Trash2,
-  Type,
 } from "lucide-react";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
-import type { FontOption } from "../lib/fonts";
 import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
-import type { BrandKit, ImageAsset } from "../lib/types";
+import type { ImageAsset } from "../lib/types";
 
-type LeftPanelSection = "assets" | "layouts" | "templates";
+type LeftPanelSection = "assets" | "templates";
 type TemplateFilter = "all" | DefaultTemplateDefinition["category"];
 export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
-  csvText: string;
-  htmlText: string;
   assets: ImageAsset[];
   selectedAssetKey: string;
   templateName: string;
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
-  brandKit: BrandKit;
-  fontOptions: FontOption[];
-  onCsvTextChange: (value: string) => void;
-  onHtmlTextChange: (value: string) => void;
-  onApplyCsv: () => void;
-  onApplyHtml: () => void;
   onImageFiles: (files: FileList | null) => void;
   onImportYouTubeThumbnail: (url: string) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
-  onAddText: () => void;
-  onAddShape: () => void;
-  onAddLineLayer: () => void;
-  onAddQuickLayer: (kind: QuickLayerKind) => void;
-  onResetTemplate: () => void;
   onLoadDefaultTemplate: (id: string) => void;
   onTemplateNameChange: (value: string) => void;
-  onSyncLayoutText: () => void;
   onSaveTemplate: () => void;
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
-  onBrandKitChange: (next: BrandKit) => void;
-  onCaptureBrandKit: () => void;
-  onApplyBrandKit: () => void;
   onOpenImageLab: (assetKey?: string) => void;
   t: Translator;
 }
 
 export function LeftPanel({
-  csvText,
-  htmlText,
   assets,
   selectedAssetKey,
   templateName,
   templates,
   defaultTemplates,
-  brandKit,
-  fontOptions,
-  onCsvTextChange,
-  onHtmlTextChange,
-  onApplyCsv,
-  onApplyHtml,
   onImageFiles,
   onImportYouTubeThumbnail,
   onSelectAsset,
   onAddImageAssetLayer,
-  onAddText,
-  onAddShape,
-  onAddLineLayer,
-  onAddQuickLayer,
-  onResetTemplate,
   onLoadDefaultTemplate,
   onTemplateNameChange,
-  onSyncLayoutText,
   onSaveTemplate,
   onLoadTemplate,
   onDeleteTemplate,
-  onBrandKitChange,
-  onCaptureBrandKit,
-  onApplyBrandKit,
   onOpenImageLab,
   t,
 }: LeftPanelProps) {
@@ -121,15 +79,6 @@ export function LeftPanel({
         <button
           type="button"
           role="tab"
-          aria-selected={activeSection === "layouts"}
-          className={activeSection === "layouts" ? "selected" : ""}
-          onClick={() => setActiveSection("layouts")}
-        >
-          <Code2 size={15} /> {t("left.layouts")}
-        </button>
-        <button
-          type="button"
-          role="tab"
           aria-selected={activeSection === "templates"}
           className={activeSection === "templates" ? "selected" : ""}
           onClick={() => setActiveSection("templates")}
@@ -137,20 +86,6 @@ export function LeftPanel({
           <Save size={15} /> {t("left.templates")}
         </button>
       </div>
-
-      <section className="panel-section guided-start-section">
-        <div className="section-heading">
-          <LayoutTemplate size={16} />
-          <h2>{t("left.guidedStart")}</h2>
-        </div>
-        <div className="guided-steps">
-          <button type="button" onClick={() => setActiveSection("templates")}>1 {t("left.stepTemplate")}</button>
-          <button type="button" onClick={() => setActiveSection("assets")}>2 {t("left.stepImage")}</button>
-          <button type="button" onClick={() => onAddQuickLayer("headline")}>3 {t("left.stepTitle")}</button>
-          <button type="button" onClick={onApplyBrandKit}>4 {t("left.stepBrand")}</button>
-          <button type="button" onClick={onSyncLayoutText}>5 {t("left.stepExport")}</button>
-        </div>
-      </section>
 
       {activeSection === "assets" ? (
         <>
@@ -221,87 +156,6 @@ export function LeftPanel({
               ))}
             </div>
           </section>
-
-          <section className="panel-section">
-            <div className="section-heading">
-              <LayoutTemplate size={16} />
-              <h2>{t("left.quickLayers")}</h2>
-            </div>
-            <div className="button-grid">
-              <button type="button" className="secondary-button icon-text" onClick={onAddText}>
-                <Type size={16} /> {t("left.text")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={onAddShape}>
-                <Shapes size={16} /> {t("left.shape")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={onAddLineLayer}>
-                <GripHorizontal size={16} /> {t("left.line")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("headline")}>
-                <Type size={16} /> {t("left.headline")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("subtitle")}>
-                <Type size={16} /> {t("left.subtitle")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("badge")}>
-                <Shapes size={16} /> {t("left.badge")}
-              </button>
-              <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("divider")}>
-                <Shapes size={16} /> {t("left.divider")}
-              </button>
-            </div>
-            <button type="button" className="ghost-button wide-button" onClick={onResetTemplate}>
-              {t("left.restoreSample")}
-            </button>
-          </section>
-        </>
-      ) : null}
-
-      {activeSection === "layouts" ? (
-        <>
-          <section className="panel-section">
-            <div className="section-heading">
-              <RefreshCw size={16} />
-              <h2>{t("left.generatedLayout")}</h2>
-            </div>
-            <button type="button" className="secondary-button icon-text wide-button" onClick={onSyncLayoutText}>
-              <RefreshCw size={16} /> {t("left.generateLayout")}
-            </button>
-          </section>
-
-          <section className="panel-section grow-section">
-            <div className="section-heading">
-              <FileText size={16} />
-              <h2>{t("left.csvLayout")}</h2>
-            </div>
-            <textarea
-              className="layout-textarea"
-              spellCheck={false}
-              value={csvText}
-              onChange={(event) => onCsvTextChange(event.target.value)}
-              aria-label={t("left.csvEditor")}
-            />
-            <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyCsv}>
-              <FileText size={16} /> {t("left.applyCsv")}
-            </button>
-          </section>
-
-          <section className="panel-section grow-section">
-            <div className="section-heading">
-              <Code2 size={16} />
-              <h2>{t("left.htmlLayout")}</h2>
-            </div>
-            <textarea
-              className="layout-textarea"
-              spellCheck={false}
-              value={htmlText}
-              onChange={(event) => onHtmlTextChange(event.target.value)}
-              aria-label={t("left.htmlEditor")}
-            />
-            <button type="button" className="secondary-button icon-text wide-button" onClick={onApplyHtml}>
-              <Code2 size={16} /> {t("left.applyHtml")}
-            </button>
-          </section>
         </>
       ) : null}
 
@@ -345,61 +199,6 @@ export function LeftPanel({
                   <em>{template.settings.width}x{template.settings.height}</em>
                 </button>
               ))}
-            </div>
-          </section>
-
-          <section className="panel-section brand-kit-section">
-            <div className="section-heading">
-              <Paintbrush size={16} />
-              <h2>{t("left.brandKit")}</h2>
-            </div>
-            <label className="field">
-              <span>{t("left.channelName")}</span>
-              <input
-                type="text"
-                value={brandKit.channelName}
-                onChange={(event) => onBrandKitChange({ ...brandKit, channelName: event.currentTarget.value })}
-              />
-            </label>
-            <label className="field">
-              <span>{t("left.brandFont")}</span>
-              <select
-                value={brandKit.fontFamily}
-                onChange={(event) => onBrandKitChange({ ...brandKit, fontFamily: event.currentTarget.value })}
-              >
-                {fontOptions.map((option) => (
-                  <option key={option.value} value={option.value}>
-                    {option.label}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="brand-color-grid">
-              <ColorField label={t("left.primaryColor")} value={brandKit.primaryColor} onChange={(value) => onBrandKitChange({ ...brandKit, primaryColor: value })} />
-              <ColorField label={t("left.accentColor")} value={brandKit.accentColor} onChange={(value) => onBrandKitChange({ ...brandKit, accentColor: value })} />
-              <ColorField label={t("left.shadowColor")} value={brandKit.shadowColor} onChange={(value) => onBrandKitChange({ ...brandKit, shadowColor: value })} />
-            </div>
-            <label className="field">
-              <span>{t("left.logoAsset")}</span>
-              <select
-                value={brandKit.logoAssetKey ?? ""}
-                onChange={(event) => onBrandKitChange({ ...brandKit, logoAssetKey: event.currentTarget.value || undefined })}
-              >
-                <option value="">{t("left.noLogoAsset")}</option>
-                {assets.map((asset) => (
-                  <option key={asset.key} value={asset.key}>
-                    {asset.name}
-                  </option>
-                ))}
-              </select>
-            </label>
-            <div className="button-grid">
-              <button type="button" className="secondary-button icon-text" onClick={onCaptureBrandKit}>
-                <Save size={16} /> {t("left.captureBrand")}
-              </button>
-              <button type="button" className="primary-button icon-text" onClick={onApplyBrandKit}>
-                <Paintbrush size={16} /> {t("left.applyBrand")}
-              </button>
             </div>
           </section>
 
@@ -447,15 +246,6 @@ export function LeftPanel({
         </>
       ) : null}
     </aside>
-  );
-}
-
-function ColorField({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
-  return (
-    <label className="field color-field">
-      <span>{label}</span>
-      <input type="color" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
-    </label>
   );
 }
 

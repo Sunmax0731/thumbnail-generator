@@ -18,18 +18,18 @@ npm run preview
 ## Editor Layout
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add image/text/shape/line starter layers, open Image Lab for the selected asset, and restore the sample template.
-- Layouts: edit generated CSV/HTML layout text and apply CSV or HTML imports.
-- Templates: load bundled default templates, edit the brand kit, and save/load/delete browser-local templates.
+- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab for the selected asset.
+- Templates: load bundled default templates and save/load/delete browser-local templates.
+- Preview pane Layout I/O: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
-- Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
+- Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
-- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, register colors into Brand kit primary/accent/shadow slots, and resize the color list area with the handle below the list.
+- Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, register colors into Brand kit primary/accent/shadow slots, and resize the color list area with the handle below the list.
 - Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
 
 ## Import Layouts
 
-Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or Apply HTML. CSV and HTML import replace the current layer list when valid layers are found. Image references should match imported asset names/keys or the bundled `sample-bg` asset.
+Open Layout I/O in the preview pane to paste CSV or HTML definitions, then select Apply CSV or Apply HTML. CSV and HTML import replace the current layer list when valid layers are found. Image references should match imported asset names/keys or the bundled `sample-bg` asset.
 
 ## Edit The Canvas
 
@@ -43,23 +43,25 @@ Use the Layouts tab to paste CSV or HTML definitions, then select Apply CSV or A
 - Use Ctrl, Meta, or Shift while selecting to build a multi-selection.
 - With multiple layers selected, open Adjust and use Relative edit to move all selected layers by the same X/Y delta or rotate each selected layer by the same degree delta. Changes apply live as you edit the values; there is no Apply button.
 - With multiple layers selected, use Match angle to first selected to set every selected editable layer to the first selected editable layer's rotation.
+- With three or more layers selected, use Distribute H or Distribute V in Layers to space layer centers evenly.
 - Use Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y for copy, paste, cut, duplicate, undo, and redo when focus is outside text fields and modals.
 - Press Delete or Backspace while a layer is selected to open the layer delete confirmation dialog.
 - Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row or one grouped preview object selects the editable members of that group.
 - For a grouped row, use the small pointer button to select only that layer. Adjust then edits that one grouped object while the group metadata remains intact.
-- Use Fit to canvas in Layers to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
+- Use Fit to canvas in Adjust to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
+- Use the Pan button, Space-drag, or Alt-drag to move around a zoomed or tall preview. Preset and output-size changes keep the current zoom until you select Fit canvas.
 - Layers can extend outside the document while editing; the preview expands its edit-only padding so overhanging content and handles remain visible. Exported images still include only the configured canvas size.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees and Reset opacity to return it to `100%`.
 - Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
 
 ## Quick Add And Assets
 
-Use Assets to add common starter layers quickly:
+Use Quick Add at the top of Layers to add common starter layers quickly:
 
 - Text and Shape add basic editable layers.
 - Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
-- Select an imported asset row, then use its add button to place that image as a layer.
+- Select an imported asset row in Assets, then use its add button or the selected-image button in Layers Quick Add to place that image as a layer.
 - Paste a YouTube URL or 11-character video id into YouTube URL and select Import thumbnail to add that video thumbnail as an editable image layer.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
 
@@ -69,26 +71,9 @@ Open Templates and choose a bundled default template to replace the current canv
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
-Use the always-visible Guided start strip for a short beginner flow:
-
-1. Template opens the template list.
-2. Image jumps to Assets.
-3. Title inserts a headline layer.
-4. Brand applies the current brand kit.
-5. Layout regenerates CSV and HTML from the current canvas.
-
 ## Brand Kit
 
-Open Templates and edit Brand kit to store a reusable channel style:
-
-- Channel name.
-- Brand font.
-- Primary, accent, and shadow/outline colors.
-- Optional logo asset from the imported asset list.
-
-Capture style reads the current canvas text/shape style into the brand kit. Apply kit updates selected editable text and shape layers. If no compatible layer is selected, it applies to all editable text and shape layers. If a logo asset is set, applying the kit inserts it as an image layer.
-
-Open Colors to send the current palette preview color, a saved-palette color, or a registered single-color row into the Brand kit Primary, Accent, or Shadow slot. This keeps color exploration and reusable brand setup connected without leaving Colors.
+Brand kit setup controls are hidden from Templates. Existing browser-local brand kit data remains compatible with saved state. Open Colors to send the current palette preview color, a saved-palette color, or a registered single-color row into the Brand kit Primary, Accent, or Shadow slot.
 
 ## Save Current Edit State
 
@@ -136,7 +121,7 @@ Select a layer and open Adjust. Edge blur accepts signed values: `0` disables it
 
 ## Presets And Export
 
-Select an output preset from the top toolbar. Tall presets such as Shorts automatically reduce the preview zoom so the whole canvas fits the visible stage. Use PNG, JPG, or WebP to download the rendered thumbnail directly in that format.
+Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use PNG, JPG, or WebP to download the rendered thumbnail directly in that format.
 
 The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important layers, edge-safe-area risk, many layers, large image assets, 4K output, or large browser-storage estimates.
 
@@ -159,7 +144,7 @@ Open Image Lab from Assets or from an asset row. The modal supports chroma key, 
 
 Open Colors to select an existing single-color swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied when that color is used. Each registered swatch row has Fill and Stroke buttons, so the same saved single color can be applied directly to either style of the selected text or shape layer.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars, or Set selected as base. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. Pattern chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space.
 
 ## Browser Storage
 

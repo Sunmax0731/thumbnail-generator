@@ -166,6 +166,7 @@ Alignment controls support left, center, right, top, middle, and bottom:
 
 - With one selected layer, alignment targets the full canvas/output area.
 - With multiple selected layers, alignment targets the selected group bounds.
+- With three or more selected editable layers, Distribute H and Distribute V space layer centers evenly between the first and last selected-layer centers on that axis.
 
 ## Layer Ordering
 
@@ -181,20 +182,21 @@ Layer rows also include:
 
 The Layers tab also includes:
 
-- Fit selected image/shape layers to the canvas.
 - Group selected layers, rename the selected group, and ungroup it.
+- Alignment and distribution controls. Fit selected image/shape layers to the canvas is exposed from Adjust near position and size editing.
 
 ## Editor Information Architecture
 
 The left sidebar is grouped by task:
 
-- Assets: local image import, Image Lab launch for the selected asset, imported asset list, selected asset image-layer insertion, expanded quick text/shape/line creation, and sample restoration.
-- Layouts: generated CSV/HTML text, CSV import, and HTML import.
-- Templates: bundled default templates, brand kit controls, and browser-local template naming, saving, loading, and deletion.
+- Assets: local image import, Image Lab launch for the selected asset, imported asset list, and selected asset image-layer insertion.
+- Templates: bundled default templates plus browser-local template naming, saving, loading, and deletion.
+- The previous left-panel Layouts tab is hidden from the GUI. Generated CSV/HTML text, CSV import, and HTML import are available from the preview-pane Layout I/O section.
+- The previous guided creation strip is removed from the left panel.
 
 The right inspector is grouped by task:
 
-- Layers: layer ordering, visibility, selectable/editable lock, and alignment.
+- Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
 - Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
 - Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
@@ -207,7 +209,7 @@ The Adjust tab exposes reset buttons for selected-layer rotation and opacity. Re
 
 ## Quick Add
 
-Assets includes quick-add controls for:
+Layers includes collapsible quick-add controls for:
 
 - Basic text layer.
 - Basic shape layer.
@@ -237,7 +239,7 @@ Each bundled template also carries browser-rendered catalog metadata:
 - Preview colors: three representative swatches used by the compact template preview.
 - Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
 
-The left panel keeps a guided start strip visible above the active task tab for Template, Image, Title, Brand, and Layout actions. These controls route to existing browser-only editor actions and do not create server state.
+The left panel no longer shows a guided start strip. Template filters remain the primary way to narrow bundled starts by `All`, `YouTube`, `Shorts`, `Stream`, `Cutout`, `Schedule`, and `Motion`.
 
 ## OBS Preview
 
@@ -254,7 +256,7 @@ The brand kit is stored in browser `localStorage` under `thumbnail-generator.bra
 - Shadow/outline color.
 - Optional logo asset key.
 
-Capture style reads the current canvas text/shape styles into the kit. Apply kit updates selected editable text and shape layers with the kit font/colors; when no compatible layer is selected it targets all editable text/shape layers. If a logo asset is selected in the kit, applying the kit inserts that asset as an editable image layer.
+Brand kit setup controls are hidden from Templates in the current GUI. The storage model and application helpers remain available for existing saved data and internal compatibility.
 
 Colors can register the current palette draft, saved palette colors, or registered single-color rows into the Brand kit primary, accent, or shadow/outline color slots without leaving the Colors tab.
 
@@ -309,9 +311,9 @@ Assets accepts a YouTube URL or 11-character video id. The browser extracts ids 
 
 The first successful image response is converted to a data URL image asset and inserted as an editable image layer. This keeps export compatible with the browser-only canvas path and does not require a backend proxy.
 
-## Preview Fit
+## Preview Zoom And Pan
 
-The canvas preview keeps a user-controlled zoom value, but preset or output size changes recompute a fit zoom from the visible canvas stage and the document aspect ratio. Tall presets such as Shorts shrink the preview so the complete document and preview padding fit inside the desktop stage instead of forcing the editor shell to grow vertically.
+The canvas preview keeps a user-controlled zoom value. Preset or output size changes do not automatically recompute zoom. Users can select Fit canvas to calculate a one-time fit zoom from the visible canvas stage and the document aspect ratio, or pan the scrollable preview manually with the Pan button, Space-drag, or Alt-drag.
 
 The edit preview includes dynamic padding around the document. Padding expands to include visible off-canvas layer bounds and selection handles. Export rendering does not use this edit padding, so downloaded PNG/JPEG/WebP files remain clipped to the configured output width and height.
 
@@ -366,7 +368,7 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 
 The palette maker can save the currently displayed pattern as one multi-color palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
 
-The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars with HEX labels, an embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha editor, and recent-color swatches derived from the current draft, registered colors, and saved palettes. Selecting a wheel point only selects that point and does not change the base color. Dragging a point treats that point as the intended color, derives the matching base color for the active palette pattern, and regenerates the other points in the same scheme. The base color can also change through explicit base controls such as the wheel background, palette bars, Sketch-style controls, recent colors, or Set selected as base.
+The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars below the wheel with HEX labels, an embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha editor, and recent-color swatches derived from the current draft, registered colors, and saved palettes. The old wheel-side color strip is not rendered; the canonical color list appears below the palette maker. Selecting a wheel point only selects that point and does not change the base color. Dragging a point treats that point as the intended color, derives the matching base color for the active palette pattern, and regenerates the other points in the same scheme. The base color can also change through explicit base controls such as the wheel background, palette bars, Sketch-style controls, recent colors, or Set selected as base. Saved multi-color palettes and registered single-color rows can each be collapsed or expanded.
 
 ## Edit State Storage
 

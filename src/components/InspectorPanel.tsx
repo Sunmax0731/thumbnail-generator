@@ -5,6 +5,8 @@ import {
   AlignHorizontalJustifyCenter,
   AlignHorizontalJustifyEnd,
   AlignHorizontalJustifyStart,
+  ChevronDown,
+  ChevronRight,
   AlignVerticalJustifyCenter,
   AlignVerticalJustifyEnd,
   AlignVerticalJustifyStart,
@@ -16,6 +18,7 @@ import {
   Folder,
   GripHorizontal,
   GripVertical,
+  ImagePlus,
   Layers,
   Lock,
   MousePointer2,
@@ -24,6 +27,7 @@ import {
   Play,
   RotateCcw,
   RotateCw,
+  Shapes,
   SlidersHorizontal,
   Trash2,
   Type,
@@ -107,6 +111,13 @@ interface InspectorPanelProps {
   onReorderLayer: (draggedId: string, targetId: string) => void;
   onToggleVisible: (id: string) => void;
   onToggleSelectable: (id: string) => void;
+  selectedAssetKey: string;
+  onAddText: () => void;
+  onAddShape: () => void;
+  onAddLineLayer: () => void;
+  onAddQuickLayer: (kind: "headline" | "subtitle" | "badge" | "divider") => void;
+  onAddImageAssetLayer: (key: string) => void;
+  onResetTemplate: () => void;
   onAlignSelection: (mode: AlignmentMode) => void;
   onTransformSelection: (transform: RelativeLayerTransform) => void;
   onMatchSelectionRotation: () => void;
@@ -153,6 +164,13 @@ export function InspectorPanel({
   onReorderLayer,
   onToggleVisible,
   onToggleSelectable,
+  selectedAssetKey,
+  onAddText,
+  onAddShape,
+  onAddLineLayer,
+  onAddQuickLayer,
+  onAddImageAssetLayer,
+  onResetTemplate,
   onAlignSelection,
   onTransformSelection,
   onMatchSelectionRotation,
@@ -173,6 +191,8 @@ export function InspectorPanel({
   const [relativeTransform, setRelativeTransform] = useState(emptyLiveRelativeTransformState);
   const [layerListHeight, setLayerListHeight] = useState(360);
   const [colorListHeight, setColorListHeight] = useState(320);
+  const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(true);
+  const [isLayerListExpanded, setIsLayerListExpanded] = useState(true);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
   const selectedIdsKey = selectedIds.join("|");
   const selectedGroupIds = Array.from(new Set(selectedLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
@@ -250,14 +270,66 @@ export function InspectorPanel({
 
       {activeSection === "layers" ? (
         <>
+          <section className="panel-section quick-add-section">
+            <button
+              type="button"
+              className="collapsible-heading"
+              aria-expanded={isQuickAddExpanded}
+              onClick={() => setIsQuickAddExpanded((current) => !current)}
+            >
+              {isQuickAddExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <span>{t("left.quickLayers")}</span>
+            </button>
+            {isQuickAddExpanded ? (
+              <>
+                <div className="button-grid">
+                  <button type="button" className="secondary-button icon-text" onClick={onAddText}>
+                    <Type size={16} /> {t("left.text")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={onAddShape}>
+                    <Shapes size={16} /> {t("left.shape")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={onAddLineLayer}>
+                    <GripHorizontal size={16} /> {t("left.line")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={() => onAddImageAssetLayer(selectedAssetKey)} disabled={!selectedAssetKey}>
+                    <ImagePlus size={16} /> {t("left.addAssetLayer")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("headline")}>
+                    <Type size={16} /> {t("left.headline")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("subtitle")}>
+                    <Type size={16} /> {t("left.subtitle")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("badge")}>
+                    <Shapes size={16} /> {t("left.badge")}
+                  </button>
+                  <button type="button" className="secondary-button icon-text" onClick={() => onAddQuickLayer("divider")}>
+                    <Shapes size={16} /> {t("left.divider")}
+                  </button>
+                </div>
+                <button type="button" className="ghost-button wide-button" onClick={onResetTemplate}>
+                  {t("left.restoreSample")}
+                </button>
+              </>
+            ) : null}
+          </section>
+
           <section className="panel-section layer-section">
-            <div className="section-heading">
-              <Layers size={16} />
-              <h2>{t("inspector.layers")}</h2>
+            <button
+              type="button"
+              className="collapsible-heading"
+              aria-expanded={isLayerListExpanded}
+              onClick={() => setIsLayerListExpanded((current) => !current)}
+            >
+              {isLayerListExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <span>{t("inspector.layers")}</span>
               <span className="section-count">{layers.length}</span>
-            </div>
-            <div className="layer-list" aria-label={t("inspector.layerList")} style={{ height: layerListHeight }}>
-              {[...layers].reverse().map((layer) => (
+            </button>
+            {isLayerListExpanded ? (
+              <>
+                <div className="layer-list" aria-label={t("inspector.layerList")} style={{ height: layerListHeight }}>
+                  {[...layers].reverse().map((layer) => (
                 <div
                   key={layer.id}
                   draggable
@@ -363,22 +435,14 @@ export function InspectorPanel({
                     <Trash2 size={14} />
                   </button>
                 </div>
-              ))}
-            </div>
-            <ResizeHandle
-              label={t("inspector.resizeLayerList")}
-              onResize={(delta) => setLayerListHeight((height) => clampPanelHeight(height + delta))}
-            />
-            <div className="button-grid">
-              <button
-                type="button"
-                className="secondary-button icon-text"
-                disabled={canvasFitEligibleCount === 0}
-                onClick={onFitSelectedToCanvas}
-              >
-                <Move size={16} /> {t("inspector.fitToCanvas")}
-              </button>
-            </div>
+                  ))}
+                </div>
+                <ResizeHandle
+                  label={t("inspector.resizeLayerList")}
+                  onResize={(delta) => setLayerListHeight((height) => clampPanelHeight(height + delta))}
+                />
+              </>
+            ) : null}
           </section>
 
           <LayerGroupControls
@@ -421,6 +485,22 @@ export function InspectorPanel({
               </AlignButton>
               <AlignButton label={t("inspector.bottom")} mode="bottom" onAlignSelection={onAlignSelection} disabled={selectedLayers.length === 0}>
                 <AlignVerticalJustifyEnd size={16} />
+              </AlignButton>
+              <AlignButton
+                label={t("inspector.distributeHorizontal")}
+                mode="distribute-horizontal"
+                onAlignSelection={onAlignSelection}
+                disabled={selectedLayers.length < 3}
+              >
+                <GripHorizontal size={16} />
+              </AlignButton>
+              <AlignButton
+                label={t("inspector.distributeVertical")}
+                mode="distribute-vertical"
+                onAlignSelection={onAlignSelection}
+                disabled={selectedLayers.length < 3}
+              >
+                <GripVertical size={16} />
               </AlignButton>
             </div>
           </section>
@@ -536,6 +616,11 @@ export function InspectorPanel({
                   onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
                 />
               </div>
+              {selected.type === "image" || selected.type === "shape" ? (
+                <button type="button" className="secondary-button icon-text wide-button" onClick={onFitSelectedToCanvas}>
+                  <Move size={16} /> {t("inspector.fitToCanvas")}
+                </button>
+              ) : null}
               <div className="field-with-action">
                 <SliderNumberInput
                   label={t("inspector.rotation")}
@@ -635,6 +720,7 @@ export function InspectorPanel({
         ) : selectedLayers.length > 1 ? (
           <GroupTransformControls
             selectedCount={selectedLayers.length}
+            canvasFitEligibleCount={canvasFitEligibleCount}
             moveX={relativeTransform.moveX}
             moveY={relativeTransform.moveY}
             rotation={relativeTransform.rotation}
@@ -642,6 +728,7 @@ export function InspectorPanel({
             onMoveYChange={(value) => updateLiveRelativeTransform("moveY", value)}
             onRotationChange={(value) => updateLiveRelativeTransform("rotation", value)}
             onMatchRotation={onMatchSelectionRotation}
+            onFitSelectedToCanvas={onFitSelectedToCanvas}
             t={t}
           />
         ) : (
@@ -835,6 +922,8 @@ function PaletteControls({
 }) {
   const [activePointIndex, setActivePointIndex] = useState(0);
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
+  const [savedPalettesExpanded, setSavedPalettesExpanded] = useState(true);
+  const [registeredColorsExpanded, setRegisteredColorsExpanded] = useState(true);
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
   const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
   const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
@@ -925,17 +1014,6 @@ function PaletteControls({
               />
             ))}
           </div>
-          <div className="palette-preview-strip" aria-label={t("inspector.palettePreview")}>
-            {previewColors.map((color, index) => (
-              <button
-                key={`${color}-${index}`}
-                type="button"
-                title={color}
-                style={{ background: color, opacity: alphaDraft }}
-                onClick={() => setActivePointIndex(index)}
-              />
-            ))}
-          </div>
         </div>
         <div className="palette-spectrum-bars" aria-label={t("inspector.paletteScheme")}>
           {previewColors.map((color, index) => (
@@ -951,19 +1029,6 @@ function PaletteControls({
           ))}
         </div>
         <div className="palette-register">
-          <label className="field palette-name-field">
-            <span>{t("inspector.paletteName")}</span>
-            <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
-          </label>
-          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
-            <Sketch
-              color={sketchColor}
-              onChange={(color) => {
-                setBaseDraft(color.hex);
-                onAlphaDraftChange(color.hsva.a);
-              }}
-            />
-          </div>
           <label className="field palette-target-field">
             <span>{t("inspector.palettePattern")}</span>
             <select
@@ -980,6 +1045,19 @@ function PaletteControls({
               ))}
             </select>
           </label>
+          <label className="field palette-name-field">
+            <span>{t("inspector.paletteName")}</span>
+            <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
+          </label>
+          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
+            <Sketch
+              color={sketchColor}
+              onChange={(color) => {
+                setBaseDraft(color.hex);
+                onAlphaDraftChange(color.hsva.a);
+              }}
+            />
+          </div>
           <div className="palette-actions">
             <button type="button" className="secondary-button" onClick={() => setBaseDraft(activePointColor)}>
               {t("inspector.paletteUseSelectedBase")}
@@ -1014,10 +1092,16 @@ function PaletteControls({
       ) : null}
       {savedPalettes.length > 0 ? (
         <div className="saved-palette-list" aria-label={t("inspector.savedPalettes")}>
-          <div className="palette-subheading">
+          <button
+            type="button"
+            className="palette-subheading collapsible-subheading"
+            aria-expanded={savedPalettesExpanded}
+            onClick={() => setSavedPalettesExpanded((current) => !current)}
+          >
+            {savedPalettesExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
             <span>{t("inspector.savedPalettes")}</span>
-          </div>
-          {savedPalettes.map((palette) => (
+          </button>
+          {savedPalettesExpanded ? savedPalettes.map((palette) => (
             <div className="saved-palette-row" key={palette.id}>
               <div className="saved-palette-header">
                 <span>{palette.name}</span>
@@ -1048,14 +1132,22 @@ function PaletteControls({
                 ))}
               </div>
             </div>
-          ))}
+          )) : null}
         </div>
       ) : null}
-      <div className="palette-subheading">
+      <button
+        type="button"
+        className="palette-subheading collapsible-subheading"
+        aria-expanded={registeredColorsExpanded}
+        onClick={() => setRegisteredColorsExpanded((current) => !current)}
+      >
+        {registeredColorsExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
         <span>{t("inspector.registeredColors")}</span>
-      </div>
-      <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
-        {colors.map((color) => (
+      </button>
+      {registeredColorsExpanded ? (
+        <>
+          <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
+            {colors.map((color) => (
           <div className={`swatch-row ${selectedColorId === color.id ? "selected" : ""}`} key={color.id}>
             <button
               type="button"
@@ -1094,9 +1186,11 @@ function PaletteControls({
               <Trash2 size={13} />
             </button>
           </div>
-        ))}
-      </div>
-      <ResizeHandle label={t("inspector.resizeColorList")} onResize={onResizeList} />
+            ))}
+          </div>
+          <ResizeHandle label={t("inspector.resizeColorList")} onResize={onResizeList} />
+        </>
+      ) : null}
     </section>
   );
 }
@@ -1134,6 +1228,7 @@ function BrandKitColorActions({
 
 function GroupTransformControls({
   selectedCount,
+  canvasFitEligibleCount,
   moveX,
   moveY,
   rotation,
@@ -1141,9 +1236,11 @@ function GroupTransformControls({
   onMoveYChange,
   onRotationChange,
   onMatchRotation,
+  onFitSelectedToCanvas,
   t,
 }: {
   selectedCount: number;
+  canvasFitEligibleCount: number;
   moveX: number;
   moveY: number;
   rotation: number;
@@ -1151,6 +1248,7 @@ function GroupTransformControls({
   onMoveYChange: (value: number) => void;
   onRotationChange: (value: number) => void;
   onMatchRotation: () => void;
+  onFitSelectedToCanvas: () => void;
   t: Translator;
 }) {
   return (
@@ -1197,6 +1295,14 @@ function GroupTransformControls({
           onClick={onMatchRotation}
         >
           <RotateCw size={16} /> {t("inspector.matchRotation")}
+        </button>
+        <button
+          type="button"
+          className="secondary-button icon-text wide-button"
+          disabled={canvasFitEligibleCount === 0}
+          onClick={onFitSelectedToCanvas}
+        >
+          <Move size={16} /> {t("inspector.fitToCanvas")}
         </button>
       </div>
     </section>

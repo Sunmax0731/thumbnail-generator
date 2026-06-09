@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Schedule templates, expanded Motion/easing controls, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, Schedule filtering with eight yearly/monthly/weekly/daily templates, Motion filtering with ten animated eyecatch/waiting templates, Sunday-start weekly template order, template metadata, 12 Motion animation types, 31 easings.net-style easing choices, selected-object Motion preview, easing graph, direction none default with disabled distance, OBS preview window rendering, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, expanded Google Fonts dropdown choices, vertical text Adjust width/height editing, vertical text preview-handle resizing without unexpected movement, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
+    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, preview-pane Layout I/O, preview pan, user-controlled zoom on preset changes, Colors layout cleanup, Schedule templates, expanded Motion/easing controls, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,7 +15,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested easing expansion, Motion selected-object preview, easing graph, additional animation types, direction None behavior, animated eyecatch/waiting templates, weekly Schedule templates, Motion/OBS preview, expanded font selection, and vertical text display-bound resizing passed validation: 38 practical bundled templates including eight Schedule starts and ten Motion starts, Sunday-start Weekly Schedule Landscape and Weekly Schedule Portrait, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, Templates service-section removal, 26 text-layer font dropdown options, and vertical text width/height edits from both Adjust and preview handles. CSV/HTML import/export persistence works, Motion preview/graph works, OBS preview window rendering works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
+    "rationale": "Requested UI cleanup and layout changes passed validation: left Layouts is hidden, guided start is removed, Templates Brand kit setup is hidden, Quick Add is moved to Layers with collapse controls, the layer list collapses, even distribution is added, preview zoom stays user-controlled with pan available, and Colors no longer renders the wheel-side color strip while saved palettes and registered colors collapse. CSV/HTML import/export persistence works from the preview pane, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -54,21 +54,30 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4196/thumbnail-generator/",
+    "url": "http://127.0.0.1:4197/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
-    "desktopViewport": "1440x1000",
+    "desktopViewport": "1440x1100",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260609-motion-easing-desktop.png",
-      "docs/assets/runtime-20260609-motion-easing-mobile.png"
+      "docs/assets/runtime-20260609-ui-pan-colors-desktop.png",
+      "docs/assets/runtime-20260609-ui-pan-colors-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
       "English language switch",
-      "left Assets Layouts Templates tabs",
+      "left Assets and Templates tabs without the hidden Layouts tab",
       "right Layers Adjust Colors tabs",
+      "hidden guided start",
+      "hidden Templates Brand kit setup",
+      "hidden Assets Quick Add",
+      "Layers Quick Add collapse and expand",
+      "Layer list collapse and expand",
+      "Quick Add text shape line insertion",
+      "horizontal and vertical even distribution",
+      "preset change keeps preview zoom",
+      "preview pan drag",
       "38 bundled default templates",
       "8 Schedule templates",
       "10 Motion templates",
@@ -83,12 +92,13 @@
       "26 text-layer font dropdown options",
       "expanded hosted Google Fonts choices",
       "5 templates per core category plus 8 Schedule templates plus 10 Motion templates",
-      "always-visible guided start",
+      "preview-pane Layout I/O",
       "preview-pane edit state",
       "Colors-to-Brand-kit registration",
       "Templates service section removed",
       "template filter",
-      "brand kit capture and apply",
+      "hidden Templates Brand kit setup",
+      "Colors-to-Brand-kit registration",
       "GitHub Issues URL",
       "privacy notice",
       "CSV import",

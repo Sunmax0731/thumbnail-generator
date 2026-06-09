@@ -16,22 +16,23 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Select imported assets to add them as image layers or open them directly in Image Lab.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
 - Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
-- Select multiple layers, move or rotate them together, align them, or match angles to the first selected layer.
+- Select multiple layers, move or rotate them together, align or evenly distribute them, or match angles to the first selected layer.
 - Group selected layers, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped row individually from Layers, and fit selected image/shape layers to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
-- Paste CSV rows or HTML-like markup with `data-layer` attributes to replace the layout.
+- Paste CSV rows or HTML-like markup with `data-layer` attributes from the preview-pane Layout I/O section to replace the layout.
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases, eight schedule starts, and ten animated eyecatch/waiting starts.
-- Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case and start from a compact guided creation flow.
+- Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case.
 - Add layer animation presets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a separate OBS preview window that loops the current canvas without editor selection handles.
-- Save a browser-local brand kit with channel name, brand font, brand colors, shadow color, and optional logo asset, register Brand kit colors from Colors, then apply it to selected layers.
+- Keep browser-local brand color slots available from Colors so palette exploration can register primary, accent, and shadow colors without showing Brand kit setup in Templates.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
-- Export, import, or delete the browser-local edit state JSON for backup and recovery.
-- Register, edit, preview, delete, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
+- Export, import, or delete the browser-local edit state JSON for backup and recovery from the preview pane.
+- Register, edit, preview, delete, collapse, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, collapsible saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Export to common video presets or custom output sizes.
+- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
 
 See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide.md](docs/user-guide.md) for step-by-step usage, and [docs/screenshot-guide.md](docs/screenshot-guide.md) for screenshot-based feature walkthroughs.
 
