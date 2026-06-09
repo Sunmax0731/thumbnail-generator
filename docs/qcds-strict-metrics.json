@@ -11,7 +11,7 @@
   },
   "delivery": {
     "rating": "A+",
-    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README, user guide, and screenshot guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, docs packaging remains available through the existing workflow, and the GitHub Pages workflow is configured to deploy on pushes to codex/thumbnail-generator-static-app. A fresh remote Pages run after this commit remains pending until pushed."
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README, user guide, and screenshot guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, docs packaging remains available through the existing workflow, and the GitHub Pages workflow passed for the pushed codex/thumbnail-generator-static-app branch."
   },
   "satisfaction": {
     "rating": "A+",
@@ -56,7 +56,7 @@
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
     "url": "http://127.0.0.1:4212/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
-    "pagesWorkflow": "configured for pushes to codex/thumbnail-generator-static-app",
+    "pagesWorkflow": "passed for pushed codex/thumbnail-generator-static-app branch",
     "desktopViewport": "1440x1000",
     "mobileViewport": "390x844",
     "screenshots": [

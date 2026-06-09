@@ -138,7 +138,7 @@ Completed on 2026-06-10 for the requested bottom-pane layout, Colors reorder, th
   - `docs/assets/runtime-20260610-theme-reorder-desktop.png`
   - `docs/assets/runtime-20260610-theme-reorder-mobile.png`
 - Export evidence: `output/runtime-downloads-20260610-theme-reorder-pages/thumbnail-1280x720-2026-06-09T15-53-50-093Z.webp`.
-- GitHub Pages: `.github/workflows/pages.yml` deploys on pushes to `codex/thumbnail-generator-static-app`, so pushing this validated branch triggers the Pages build/deploy workflow.
+- GitHub Pages: `.github/workflows/pages.yml` deploys on pushes to `codex/thumbnail-generator-static-app`; the pushed branch's `Deploy GitHub Pages` workflow passed after this follow-up.
 
 ### Export, Colors, And Adjust Layout Follow-Up
 

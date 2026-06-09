@@ -15,7 +15,7 @@ Quality is A+ because the app covers image/text/shape/line layers, expanded shap
 
 Cost is A+ because the app remains static, browser-only, GitHub Pages compatible, and has no backend or paid service dependency. The added `@uiw/react-color` dependency is a client-side OSS React UI dependency, YouTube thumbnail import is client-side, Google Fonts are loaded as static browser resources, and edit state, templates, colors, saved palettes, and custom fonts are stored browser-locally without hosted storage infrastructure.
 
-Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, and docs can be packaged with the repo workflow. It is not S tier until a fresh remote Pages workflow run is observed after this commit.
+Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, docs can be packaged with the repo workflow, and the pushed branch's GitHub Pages workflow passed.
 
 Satisfaction is A+ because this pass closes the requested UI cleanup and follow-up fixes: Export and Edit state now sit side by side while each section stacks its buttons vertically, saved palettes and registered single colors can be reordered by drag-and-drop, language moved to the upper-right window controls, and the adjacent theme selector supports System, Light, and Dark. Prior cleanup remains in place: registered single-color Fill buttons show the word `Fill`, legacy registered color names hide the `Fill`/`Stroke` prefix before HEX values, saved palette rows omit `Color 1`-style labels, Adjust groups common layer controls above Text, Shape, or Image-specific controls, Adjust Fill/Stroke opens a draggable popup alpha-capable single-color picker without a color wheel, redundant opacity controls are gone, the preview frame no longer stretches around off-canvas content, clicking outside the output frame clears selection, Image Lab is opened from imported asset rows without duplicated import controls, OBS preview opens a popup-style canvas-only document, and template lists are resizable. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
 
@@ -70,7 +70,7 @@ Completed on 2026-06-10.
 - Scope: placed Export and Edit state side by side while stacking each section's buttons vertically, added drag-and-drop reordering for saved multi-color palettes and registered single colors, moved Language to the upper-right toolbar area, added a neighboring System/Light/Dark theme selector, and prepared the branch for GitHub Pages deployment through the existing Pages workflow.
 - Quality: A+. Runtime coverage verifies upper-right window controls, dark theme DOM state and persistence, desktop Export/Edit state placement, vertical section actions, saved-palette reorder persistence, single-color reorder persistence, canvas nonblank state, layer numeric editing, export, mobile no-overflow, and console health.
 - Cost: A+. The change stays in existing static React components, CSS theme variables, localStorage helpers, and docs; no backend, service, account, or new paid dependency was added.
-- Delivery: A+. `npm test` passed with 27 test files and 102 tests; `npm run build` passed; runtime evidence is recorded in `docs/test-plan.md`; `.github/workflows/pages.yml` deploys GitHub Pages on pushes to `codex/thumbnail-generator-static-app`.
+- Delivery: A+. `npm test` passed with 27 test files and 102 tests; `npm run build` passed; runtime evidence is recorded in `docs/test-plan.md`; `.github/workflows/pages.yml` deploys GitHub Pages on pushes to `codex/thumbnail-generator-static-app`, and the pushed branch's Pages workflow passed.
 - Satisfaction: A+. The four requested updates are implemented while preserving the browser-only data model, existing export path, and existing color palette storage keys.
 - Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4212/thumbnail-generator/`.
 - Runtime checks: nonblank render, primary UI visibility, upper-right Language and Theme controls, Dark theme application and `thumbnail-generator.theme.v1` persistence, Export and Edit state side-by-side desktop placement, Export action vertical stack, Edit state action vertical stack, saved-palette drag reorder and localStorage persistence, registered single-color drag reorder and localStorage persistence, Adjust X edit, WebP export download, mobile nonblank canvas, mobile horizontal overflow `0`, and no page errors or app console errors.
@@ -237,7 +237,7 @@ Completed on 2026-06-09.
 
 ## GitHub Pages
 
-Previous workflow `Deploy GitHub Pages` passed on remote GitHub Actions.
+The `Deploy GitHub Pages` workflow passed on remote GitHub Actions for the pushed `codex/thumbnail-generator-static-app` branch after this follow-up.
 
 Published URL: `https://sunmax0731.github.io/thumbnail-generator/`
 
