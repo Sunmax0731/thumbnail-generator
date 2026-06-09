@@ -4,8 +4,10 @@ import {
   FileDown,
   FolderOpen,
   Hand,
+  ImagePlus,
   ImageDown,
   Maximize2,
+  Monitor,
   MonitorPlay,
   MousePointer2,
   Save,
@@ -15,12 +17,12 @@ import {
 } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
+import { outputPresets } from "../lib/presets";
 import type { ExportFormat, OutputSettings } from "../lib/types";
 
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   settings: OutputSettings;
-  layerCount: number;
   selectedLayerName: string;
   zoom: number;
   cursor: string;
@@ -33,6 +35,9 @@ interface CanvasStageProps {
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onExport: (format?: ExportFormat) => void;
+  onImageFiles: (files: FileList | null) => void;
+  onSettingsChange: (next: Partial<OutputSettings>) => void;
+  onPresetChange: (presetId: string) => void;
   onAutoSaveChange: (enabled: boolean) => void;
   onSaveEditState: () => void;
   onRestoreEditState: () => void;
@@ -47,7 +52,6 @@ interface CanvasStageProps {
 export function CanvasStage({
   canvasRef,
   settings,
-  layerCount,
   selectedLayerName,
   zoom,
   cursor,
@@ -60,6 +64,9 @@ export function CanvasStage({
   onPointerMove,
   onPointerUp,
   onExport,
+  onImageFiles,
+  onSettingsChange,
+  onPresetChange,
   onAutoSaveChange,
   onSaveEditState,
   onRestoreEditState,
@@ -152,11 +159,65 @@ export function CanvasStage({
           <MousePointer2 size={16} />
           <span>{selectedLayerName}</span>
         </div>
-        <div className="stage-meta">
-          <span>{layerCount === 1 ? t("stage.layerCount.one") : t("stage.layerCount", { count: layerCount })}</span>
-          <span>
-            {settings.width} x {settings.height}
-          </span>
+        <div className="stage-size-controls" aria-label={t("toolbar.outputSettings")}>
+          <label className="field compact-field">
+            <span>
+              <Monitor size={14} /> {t("toolbar.preset")}
+            </span>
+            <select value={settings.presetId} onChange={(event) => onPresetChange(event.target.value)}>
+              {outputPresets.map((preset) => (
+                <option key={preset.id} value={preset.id}>
+                  {preset.label}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field size-field">
+            <span>{t("toolbar.width")}</span>
+            <input
+              type="number"
+              min={320}
+              max={4096}
+              step={16}
+              value={settings.width}
+              onChange={(event) =>
+                onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
+              }
+            />
+            <input
+              type="range"
+              min={320}
+              max={4096}
+              step={16}
+              value={settings.width}
+              onChange={(event) =>
+                onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
+              }
+            />
+          </label>
+          <label className="field size-field">
+            <span>{t("toolbar.height")}</span>
+            <input
+              type="number"
+              min={320}
+              max={4096}
+              step={16}
+              value={settings.height}
+              onChange={(event) =>
+                onSettingsChange({ presetId: "custom", height: Number.parseInt(event.target.value, 10) || 720 })
+              }
+            />
+            <input
+              type="range"
+              min={320}
+              max={4096}
+              step={16}
+              value={settings.height}
+              onChange={(event) =>
+                onSettingsChange({ presetId: "custom", height: Number.parseInt(event.target.value, 10) || 720 })
+              }
+            />
+          </label>
         </div>
         <div className="zoom-controls" aria-label={t("stage.zoom")}>
           <button
@@ -262,6 +323,19 @@ export function CanvasStage({
               <h2>{t("toolbar.export")}</h2>
             </div>
           </div>
+          <label className="file-drop compact-drop stage-image-import">
+            <ImagePlus size={15} />
+            <span>{t("left.importImages")}</span>
+            <input
+              type="file"
+              accept="image/*"
+              multiple
+              onChange={(event) => {
+                onImageFiles(event.currentTarget.files);
+                event.currentTarget.value = "";
+              }}
+            />
+          </label>
           <div className="stage-export-actions">
             <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>
               <ImageDown size={16} /> PNG

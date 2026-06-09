@@ -123,6 +123,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Left Layers, Asset Deletion, And Preview Size Controls
+
+Completed on 2026-06-10 for the requested left-panel Layers relocation, asset deletion, preview-header size controls, and template confirmation flow.
+
+- `npm test`: pass. 27 test files, 102 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4213/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: primary UI visible, initial canvas nonblank, left tabs ordered Templates/Layers/Assets, right inspector reduced to three tabs, top toolbar output controls removed, preview header exposed Preset/Width/Height controls, preview title metadata for layer count and canvas size removed, YouTube URL import UI hidden, preview Output section image import visible, left Layers tab rendered the layer list and no Restore sample button, deleting every layer through the Layers tab left zero layer rows, applying `Shorts Quote` showed a confirmation dialog and changed the canvas size to `1080x1920`, importing `runtime-import.png` from Output added an asset and image layer, deleting that asset removed the asset row and related image layer, selecting a remaining layer and editing Adjust X kept the canvas nonblank, WebP export downloaded, mobile canvas nonblank, mobile horizontal overflow `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-left-layer-assets-desktop.png`
+  - `docs/assets/runtime-20260610-left-layer-assets-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-left-layer-assets/thumbnail-1080x1920-2026-06-09T20-18-55-009Z.webp`.
+- Note: CSV/HTML parser/model coverage remains in `npm test`; the current GUI keeps CSV/HTML layout text hidden for edit-state and template compatibility.
+
 ### Theme, Palette Reorder, And Pages Follow-Up
 
 Completed on 2026-06-10 for the requested bottom-pane layout, Colors reorder, theme controls, and GitHub Pages reflection.

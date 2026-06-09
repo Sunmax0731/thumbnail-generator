@@ -650,6 +650,7 @@ function App() {
     (templateId: string) => {
       const template = defaultTemplates.find((candidate) => candidate.id === templateId);
       if (!template) return;
+      if (typeof window !== "undefined" && !window.confirm(t("left.confirmApplyTemplate", { name: template.name }))) return;
       const nextLayers = template.createLayers();
       setSettings(template.settings);
       setAssets(initialAssets(import.meta.env.BASE_URL));
@@ -661,7 +662,7 @@ function App() {
       setTemplateName(template.name);
       setStatus(`Loaded default template "${template.name}".`);
     },
-    [],
+    [t],
   );
 
   const saveEditState = useCallback(
@@ -808,10 +809,6 @@ function App() {
 
   const deleteLayer = useCallback((id: string) => {
     setLayers((current) => {
-      if (current.length <= 1) {
-        setStatus("At least one layer is required.");
-        return current;
-      }
       const target = current.find((layer) => layer.id === id);
       if (!target) return current;
       const next = current.filter((layer) => layer.id !== id);
@@ -820,6 +817,27 @@ function App() {
       return next;
     });
   }, []);
+
+  const deleteAsset = useCallback((key: string) => {
+    const target = assets.find((asset) => asset.key === key);
+    setAssets((current) => {
+      const next = current.filter((asset) => asset.key !== key);
+      setSelectedAssetKey((selected) => (selected === key ? next[0]?.key ?? "" : selected));
+      return next;
+    });
+    setLayers((current) => {
+      const removedLayerIds = new Set(
+        current
+          .filter((layer) => layer.type === "image" && layer.imageKey === key)
+          .map((layer) => layer.id),
+      );
+      if (removedLayerIds.size === 0) return current;
+      const next = current.filter((layer) => !removedLayerIds.has(layer.id));
+      setSelectedIds((selected) => selected.filter((id) => !removedLayerIds.has(id) && next.some((layer) => layer.id === id)));
+      return next;
+    });
+    setStatus(target ? `Deleted image asset "${target.name}" and related image layers.` : "Image asset deleted.");
+  }, [assets]);
 
   const copySelectedLayers = useCallback(() => {
     const copies = selectedIds
@@ -1345,6 +1363,7 @@ function App() {
     (templateId: string) => {
       const template = templates.find((candidate) => candidate.id === templateId);
       if (!template) return;
+      if (typeof window !== "undefined" && !window.confirm(t("left.confirmApplyTemplate", { name: template.name }))) return;
       setSettings(template.settings);
       setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
       const nextLayers = template.layers.map((layer) => ({ ...layer, selectable: layer.selectable !== false }));
@@ -1355,7 +1374,7 @@ function App() {
       setTemplateName(template.name);
       setStatus(`Loaded template "${template.name}".`);
     },
-    [templates],
+    [templates, t],
   );
 
   const deleteTemplate = useCallback(
@@ -1524,22 +1543,38 @@ function App() {
   return (
     <div className="app-shell" data-theme={effectiveTheme}>
       <TopToolbar
-        settings={settings}
         language={language}
         themeMode={themeMode}
-        onSettingsChange={updateSettings}
-        onPresetChange={handlePresetChange}
         onLanguageChange={setLanguage}
         onThemeChange={setThemeMode}
         t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
         <LeftPanel
-          onImageFiles={handleImageFiles}
-          onImportYouTubeThumbnail={importYouTubeThumbnail}
           selectedAssetKey={selectedAssetKey}
+          layerPanelProps={{
+            layers,
+            selectedIds,
+            selectedAssetKey,
+            onSelect: selectLayer,
+            onSelectIndividual: selectIndividualLayer,
+            onDelete: deleteLayer,
+            onReorderLayer: reorderLayer,
+            onToggleVisible: toggleLayerVisible,
+            onToggleSelectable: toggleLayerSelectable,
+            onAddText: addTextLayer,
+            onAddShape: addShapeLayer,
+            onAddLineLayer: addLineLayer,
+            onAddQuickLayer: addQuickLayer,
+            onAddImageAssetLayer: addImageLayerFromAsset,
+            onAlignSelection: alignSelection,
+            onCreateGroup: createLayerGroup,
+            onRenameGroup: renameLayerGroup,
+            onUngroup: ungroupLayerGroup,
+          }}
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
+          onDeleteAsset={deleteAsset}
           defaultTemplates={defaultTemplates}
           onLoadDefaultTemplate={loadDefaultTemplate}
           templateName={templateName}
@@ -1558,7 +1593,6 @@ function App() {
         <CanvasStage
           canvasRef={canvasRef}
           settings={settings}
-          layerCount={layers.length}
           selectedLayerName={selectionLabel}
           zoom={zoom}
           cursor={canvasCursor}
@@ -1571,6 +1605,9 @@ function App() {
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
           onExport={handleExport}
+          onImageFiles={handleImageFiles}
+          onSettingsChange={updateSettings}
+          onPresetChange={handlePresetChange}
           onAutoSaveChange={setAutoSaveEnabled}
           onSaveEditState={() => saveEditState("manual")}
           onRestoreEditState={restoreEditState}

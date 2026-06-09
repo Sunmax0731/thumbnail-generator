@@ -198,7 +198,7 @@ export function InspectorPanel({
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const paletteCompatibleCount = selectedLayers.filter((layer) => layer.type === "text" || layer.type === "shape").length;
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<InspectorSection>("layers");
+  const [activeSection, setActiveSection] = useState<InspectorSection>("edit");
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
   const [relativeTransform, setRelativeTransform] = useState(emptyLiveRelativeTransformState);
   const [layerListHeight, setLayerListHeight] = useState(360);
@@ -260,15 +260,6 @@ export function InspectorPanel({
   return (
     <aside className="side-panel inspector-panel" aria-label={t("inspector.aria")}>
       <div className="panel-tabs inspector-tabs" role="tablist" aria-label={t("inspector.tabs")}>
-        <button
-          type="button"
-          role="tab"
-          aria-selected={activeSection === "layers"}
-          className={activeSection === "layers" ? "selected" : ""}
-          onClick={() => setActiveSection("layers")}
-        >
-          <Layers size={15} /> {t("inspector.layers")}
-        </button>
         <button
           type="button"
           role="tab"

@@ -4,7 +4,7 @@ This page is the quick feature index for users and reviewers.
 
 ## Canvas Editing
 
-- Select layers from the preview or Layers tab.
+- Select layers from the preview or the left-panel Layers tab.
 - Drag selected layers on the canvas to move them.
 - Drag movement records undo/redo history only at the confirmed start and end positions.
 - Drag corner handles to resize one selected layer.
@@ -18,6 +18,7 @@ This page is the quick feature index for users and reviewers.
 - Move selected editable layers together by dragging on the canvas.
 - Use Layers alignment controls to align one layer to the canvas or multiple layers to the selection bounds.
 - Use Layers distribution controls to space three or more selected layers evenly horizontally or vertically.
+- Delete the final remaining layer when you need a fully empty canvas.
 - Use Adjust relative edit controls to apply live Move X, Move Y, and Rotation delta changes.
 - Use Match angle to first selected to copy the first selected editable layer's rotation to the other selected editable layers.
 - Group selected layers from Layers, rename the group, ungroup it, and select grouped rows or grouped preview objects as a multi-selection.
@@ -52,8 +53,9 @@ This page is the quick feature index for users and reviewers.
 
 ## Image And Text Tools
 
-- Import local image files from Assets.
-- Import a YouTube video thumbnail from Assets with a YouTube URL or video id.
+- Import local image files from the preview-pane Output section.
+- Use the Assets tab as the imported-image list, with per-image add, Image Lab, and delete actions.
+- YouTube thumbnail import helpers remain browser-only, while the current GUI hides the YouTube URL controls.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.

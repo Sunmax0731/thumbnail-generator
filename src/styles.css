@@ -104,6 +104,7 @@ button:disabled {
 .window-controls,
 .export-actions,
 .stage-toolbar,
+.stage-size-controls,
 .status-bar,
 .section-heading,
 .stage-title,
@@ -162,6 +163,14 @@ button:disabled {
 .toolbar-controls {
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.stage-size-controls {
+  flex: 1 1 420px;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px;
+  min-width: 280px;
 }
 
 .window-controls {
@@ -550,13 +559,13 @@ button:disabled {
 .asset-list {
   display: grid;
   gap: 6px;
-  max-height: 118px;
+  max-height: 520px;
   overflow: auto;
 }
 
 .asset-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 26px 26px;
+  grid-template-columns: minmax(0, 1fr) 26px 26px 26px;
   min-height: 38px;
   gap: 8px;
   padding: 5px;
@@ -951,6 +960,12 @@ button:disabled {
 
 .stage-export-actions .icon-text {
   justify-content: center;
+}
+
+.stage-image-import {
+  min-height: 38px;
+  justify-content: center;
+  padding: 0 10px;
 }
 
 .stage-edit-state {
@@ -2251,6 +2266,7 @@ button:disabled {
   }
 
   .toolbar-controls,
+  .stage-size-controls,
   .window-controls,
   .export-actions {
     display: grid;
@@ -2300,12 +2316,13 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .source-tabs {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+  .source-tabs,
+  .inspector-tabs {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
   }
 
-  .inspector-tabs {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .stage-size-controls .compact-field {
+    grid-column: 1 / -1;
   }
 
   .source-tabs button,

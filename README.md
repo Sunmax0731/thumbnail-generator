@@ -10,10 +10,10 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 
 - Compose thumbnails with image, text, and shape layers, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
 - Add line layers from Quick Add with solid, dotted, dashed, or wave strokes.
-- Import local images and edit their position, size, rotation, opacity, and simple effects.
-- Import a YouTube video thumbnail from a YouTube URL or video id and edit it as an image layer.
+- Import local images from the preview Output section and edit their position, size, rotation, opacity, and simple effects.
+- Keep browser-only YouTube thumbnail import support in code while the current Assets UI hides the YouTube URL controls.
 - Adjust layer blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, fill/stroke color alpha, and text kerning.
-- Select imported assets to add them as image layers or open them directly in Image Lab from each asset row.
+- Select imported assets to add them as image layers, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image layers that reference it.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
 - Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
 - Select multiple layers, move or rotate them together, align or evenly distribute them, or match angles to the first selected layer.
@@ -32,7 +32,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
-- Export to common video presets or custom output sizes from the preview pane at maximum quality.
+- Export to common video presets or custom output sizes from the preview header at maximum quality.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
 

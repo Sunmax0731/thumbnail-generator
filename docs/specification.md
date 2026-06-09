@@ -186,19 +186,21 @@ The Layers tab also includes:
 
 - Group selected layers, rename the selected group, and ungroup it.
 - Alignment and distribution controls. Fit selected image/shape layers to the canvas is exposed from Adjust near position and size editing.
+- Deleting the final remaining layer is allowed; the editor may intentionally show a zero-layer canvas.
 
 ## Editor Information Architecture
 
-The left sidebar is grouped by task:
+The left sidebar is grouped by task in this order:
 
-- Assets: local image import, imported asset list, selected asset image-layer insertion, and Image Lab launch from imported asset rows.
-- Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing.
+- Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing. Applying a template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
+- Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
+- Assets: imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, and asset deletion. Deleting an asset also removes image layers that reference it.
+- The local image import control lives in the preview-pane Output section, left of the PNG/JPG/WebP output buttons.
 - The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
 - The previous guided creation strip is removed from the left panel.
 
 The right inspector is grouped by task:
 
-- Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Common layer controls are grouped at the top, and Text, Shape, or Image-only controls are grouped below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
 - Motion: ordered motion sets for the selected layer, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
@@ -226,7 +228,7 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
+Bundled default templates are static browser assets, not localStorage records. Loading one first shows a confirmation dialog, then replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
 
 - YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
 - Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
@@ -303,7 +305,7 @@ Export waits for `document.fonts.ready` before drawing so custom fonts are refle
 
 ## YouTube Thumbnail Import
 
-Assets accepts a YouTube URL or 11-character video id. The browser extracts ids from `youtube.com/watch?v=...`, `youtu.be/...`, `/shorts/...`, `/embed/...`, and `/live/...` forms. It tries thumbnail candidates from highest to lowest quality:
+The YouTube thumbnail import helper accepts a YouTube URL or 11-character video id, but the current Assets GUI hides the YouTube URL controls. The browser extracts ids from `youtube.com/watch?v=...`, `youtu.be/...`, `/shorts/...`, `/embed/...`, and `/live/...` forms. It tries thumbnail candidates from highest to lowest quality:
 
 - `maxresdefault.jpg`
 - `sddefault.jpg`
@@ -396,7 +398,7 @@ The canvas preview pane contains the edit-state section. It supports edit-state 
 
 ## Image Lab
 
-The Image Lab modal workspace opens from an imported asset row in the Assets tab. It processes the selected image in the browser and creates a processed image asset plus a new image layer. Supported operations:
+The Image Lab modal workspace opens from an imported asset row in the Assets tab. Local image import is handled from the preview Output section, and Assets stays focused on the imported image list. Image Lab processes the selected image in the browser and creates a processed image asset plus a new image layer. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
 - Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.
@@ -407,7 +409,7 @@ The Image Lab modal workspace opens from an imported asset row in the Assets tab
 
 Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.
 
-The modal workspace provides a larger preview canvas than the sidebar, plus a header-level processed-layer creation button, close button, backdrop dismissal, and Escape-key dismissal. Image import and asset switching stay in the Assets tab, so the modal does not duplicate those controls. Chroma-key settings sit beside the position and size controls, while the processed-layer creation action stays separated in the modal header. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
+The modal workspace provides a larger preview canvas than the sidebar, plus a header-level processed-layer creation button, close button, backdrop dismissal, and Escape-key dismissal. Source changes stay outside the modal so Image Lab does not duplicate import controls. Chroma-key settings sit beside the position and size controls, while the processed-layer creation action stays separated in the modal header. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 
 ## Slider Controls
 

@@ -6,8 +6,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 
 ## Functional Requirements
 
-- Import local image files and use them as editable thumbnail layers.
-- Import YouTube video thumbnails by URL or video id and use them as editable image layers.
+- Import local image files from the preview-pane Output section and use them as editable thumbnail layers.
+- Keep browser-only YouTube video thumbnail import helpers available, while the current GUI hides the YouTube URL import controls.
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab from its asset row.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
@@ -17,7 +17,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Adjust text layer kerning/letter spacing.
 - Fit text layer font size to the configured layer bounds from the GUI.
 - Import browser-local custom font files for text layers.
-- Add common text, shape, line, headline, subtitle, badge, divider, and selected-asset image layers through expanded quick-add controls in the Layers inspector.
+- Add common text, shape, line, headline, subtitle, badge, divider, and selected-asset image layers through expanded quick-add controls in the left-panel Layers tab.
 - Add simple shapes with fill color, stroke color, size, position, rotation, and shape kinds for rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
 - Adjust layer blur, edge blur, and corner radius where applicable, including rounded polygon corners for non-rect shape kinds.
@@ -33,7 +33,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Load 38 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, eight schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting templates, without depending on localStorage.
 - Filter bundled templates by use case, show compact template previews before loading, and resize the Default templates and Browser templates list areas.
 - Configure one or more per-layer animation sets with easings.net-style easing choices, selected-object Motion preview, easing graph, disabled direction controls when an animation type does not use movement, and a popup-style OBS preview window without editor controls or selection handles.
-- Keep the left panel focused on Assets and Templates by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
+- Keep the left panel focused on Templates, Layers, and Assets by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
 - Show advisory quality warnings for text length, low contrast, hidden important layers, safe-area edges, heavy assets, large storage, many layers, and 4K export.
 - Export, import, and delete browser-local edit-state JSON for backup and recovery.
@@ -45,9 +45,12 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Switch major UI labels between Japanese and English, auto-selecting from browser/OS language when supported and falling back clearly when unsupported.
 - Preserve CSV and HTML-like layout text in saved edit states and templates.
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
-- Provide common presets and custom output dimensions.
+- Provide common presets and custom output dimensions from the preview header.
+- Confirm before applying a template that replaces the current layer state, and apply the template's canvas aspect ratio automatically.
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
 - Resize the Layers, Colors, Default templates, and Browser templates list areas while preserving core editor controls.
+- Delete the final remaining layer when requested, leaving the canvas with zero layer objects.
+- Delete registered/imported image assets from Assets, and remove any image layers that reference the deleted asset.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees from the Adjust tab.
 - Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.

@@ -3,30 +3,32 @@ import {
   FolderOpen,
   GripHorizontal,
   ImagePlus,
+  Layers,
   LayoutTemplate,
   Save,
   Scissors,
   Trash2,
 } from "lucide-react";
+import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
 import type { Translator } from "../lib/i18n";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
-type LeftPanelSection = "assets" | "templates";
+type LeftPanelSection = "templates" | "layers" | "assets";
 type TemplateFilter = "all" | DefaultTemplateDefinition["category"];
 export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
   assets: ImageAsset[];
   selectedAssetKey: string;
+  layerPanelProps: Omit<LayerPanelProps, "t">;
   templateName: string;
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
-  onImageFiles: (files: FileList | null) => void;
-  onImportYouTubeThumbnail: (url: string) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
+  onDeleteAsset: (key: string) => void;
   onLoadDefaultTemplate: (id: string) => void;
   onTemplateNameChange: (value: string) => void;
   onSaveTemplate: () => void;
@@ -39,13 +41,13 @@ interface LeftPanelProps {
 export function LeftPanel({
   assets,
   selectedAssetKey,
+  layerPanelProps,
   templateName,
   templates,
   defaultTemplates,
-  onImageFiles,
-  onImportYouTubeThumbnail,
   onSelectAsset,
   onAddImageAssetLayer,
+  onDeleteAsset,
   onLoadDefaultTemplate,
   onTemplateNameChange,
   onSaveTemplate,
@@ -54,8 +56,7 @@ export function LeftPanel({
   onOpenImageLab,
   t,
 }: LeftPanelProps) {
-  const [activeSection, setActiveSection] = useState<LeftPanelSection>("assets");
-  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [activeSection, setActiveSection] = useState<LeftPanelSection>("templates");
   const [templateFilter, setTemplateFilter] = useState<TemplateFilter>("all");
   const [defaultTemplateListHeight, setDefaultTemplateListHeight] = useState(260);
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
@@ -73,20 +74,29 @@ export function LeftPanel({
         <button
           type="button"
           role="tab"
-          aria-selected={activeSection === "assets"}
-          className={activeSection === "assets" ? "selected" : ""}
-          onClick={() => setActiveSection("assets")}
-        >
-          <ImagePlus size={15} /> {t("left.assets")}
-        </button>
-        <button
-          type="button"
-          role="tab"
           aria-selected={activeSection === "templates"}
           className={activeSection === "templates" ? "selected" : ""}
           onClick={() => setActiveSection("templates")}
         >
           <Save size={15} /> {t("left.templates")}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "layers"}
+          className={activeSection === "layers" ? "selected" : ""}
+          onClick={() => setActiveSection("layers")}
+        >
+          <Layers size={15} /> {t("inspector.layers")}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "assets"}
+          className={activeSection === "assets" ? "selected" : ""}
+          onClick={() => setActiveSection("assets")}
+        >
+          <ImagePlus size={15} /> {t("left.assets")}
         </button>
       </div>
 
@@ -97,34 +107,6 @@ export function LeftPanel({
               <ImagePlus size={16} />
               <h2>{t("left.images")}</h2>
               <span className="section-count">{assets.length}</span>
-            </div>
-            <label className="file-drop">
-              <ImagePlus size={19} />
-              <span>{t("left.importImages")}</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(event) => onImageFiles(event.currentTarget.files)}
-              />
-            </label>
-            <div className="youtube-import">
-              <label className="field">
-                <span>{t("left.youtubeUrl")}</span>
-                <input
-                  type="url"
-                  value={youtubeUrl}
-                  placeholder={t("left.youtubePlaceholder")}
-                  onChange={(event) => setYoutubeUrl(event.currentTarget.value)}
-                />
-              </label>
-              <button
-                type="button"
-                className="secondary-button icon-text"
-                onClick={() => onImportYouTubeThumbnail(youtubeUrl)}
-              >
-                <ImagePlus size={16} /> {t("left.importYoutube")}
-              </button>
             </div>
             <div className="asset-list" aria-label={t("left.assetsList")}>
               {assets.map((asset) => (
@@ -152,12 +134,22 @@ export function LeftPanel({
                   >
                     <Scissors size={14} />
                   </button>
+                  <button
+                    type="button"
+                    className="mini-icon-button danger"
+                    title={t("left.deleteAsset", { name: asset.name })}
+                    onClick={() => onDeleteAsset(asset.key)}
+                  >
+                    <Trash2 size={14} />
+                  </button>
                 </div>
               ))}
             </div>
           </section>
         </>
       ) : null}
+
+      {activeSection === "layers" ? <LayerPanel {...layerPanelProps} t={t} /> : null}
 
       {activeSection === "templates" ? (
         <>

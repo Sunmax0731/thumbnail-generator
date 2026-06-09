@@ -18,11 +18,12 @@ npm run preview
 ## Editor Layout
 
 - Window settings: use the upper-right Language selector to switch between Japanese and English, and use the adjacent Theme selector to choose System, Light, or Dark. System follows the browser or OS color-scheme preference. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
-- Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab from an imported asset row.
 - Templates: load bundled default templates, resize the Default templates and Browser templates lists, and save/load/delete browser-local templates.
+- Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
+- Assets: review imported assets, add a selected asset as an image layer, open Image Lab from an imported asset row, or delete an imported asset.
 - Preview pane export: download PNG, JPG, or WebP beside the current canvas. On desktop, Export and Edit state sit side by side, and each section stacks its action buttons vertically.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
-- Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
+- The preview header contains the output preset, width, and height controls. The preview Output section contains local image import plus PNG/JPG/WebP export buttons.
 - Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - Motion: assign multiple ordered motion sets, preview the selected object, and inspect the easing graph for OBS preview playback.
@@ -62,12 +63,13 @@ Use Quick Add at the top of Layers to add common starter layers quickly:
 - Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
 - Select an imported asset row in Assets, then use its add button or the selected-image button in Layers Quick Add to place that image as a layer.
-- Paste a YouTube URL or 11-character video id into YouTube URL and select Import thumbnail to add that video thumbnail as an editable image layer.
+- Delete an imported asset from Assets when it is no longer needed. Any image layer that uses that asset is removed at the same time.
+- YouTube thumbnail import remains browser-only internally, but the current GUI hides the YouTube URL controls.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 38 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting entries. Browser templates remain separate named snapshots saved in localStorage. Drag the resize handles under Default templates or Browser templates to change how much vertical space each list uses.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. Confirm the dialog before the current layers and canvas size are replaced; the template's aspect ratio is applied automatically. The shipped templates cover 38 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting entries. Browser templates remain separate named snapshots saved in localStorage. Drag the resize handles under Default templates or Browser templates to change how much vertical space each list uses.
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
@@ -139,7 +141,7 @@ The OBS preview opens a popup-style browser window that contains only the animat
 
 ## Image Lab
 
-Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Importing and switching source images stay in Assets; Image Lab focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Import images from the preview Output section before opening Image Lab; the modal focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
 
 ## Color Palette
 
