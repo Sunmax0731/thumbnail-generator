@@ -582,14 +582,14 @@ button:disabled {
 .template-list {
   display: grid;
   gap: 6px;
-  max-height: 164px;
+  min-height: 120px;
   overflow: auto;
 }
 
 .default-template-list {
   display: grid;
   gap: 6px;
-  max-height: 220px;
+  min-height: 120px;
   overflow: auto;
 }
 
@@ -1509,8 +1509,38 @@ button:disabled {
   min-width: 0;
 }
 
-.layer-color-dialog {
-  width: min(430px, calc(100vw - 24px));
+.layer-color-popup {
+  position: fixed;
+  z-index: 80;
+  display: grid;
+  width: min(360px, calc(100vw - 24px));
+  gap: 12px;
+  padding: 12px;
+  border: 1px solid rgba(216, 224, 231, 0.9);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 24px 64px rgba(15, 23, 42, 0.28);
+}
+
+.layer-color-popup-header {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 10px;
+  padding-bottom: 8px;
+  cursor: move;
+  user-select: none;
+  border-bottom: 1px solid var(--line);
+}
+
+.layer-color-popup-header .modal-title-block {
+  min-width: 0;
+}
+
+.layer-color-popup-header h2 {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
 }
 
 .layer-color-picker {

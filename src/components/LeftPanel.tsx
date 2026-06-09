@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react";
 import {
   FolderOpen,
+  GripHorizontal,
   ImagePlus,
   LayoutTemplate,
   Save,
@@ -56,6 +57,8 @@ export function LeftPanel({
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("assets");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [templateFilter, setTemplateFilter] = useState<TemplateFilter>("all");
+  const [defaultTemplateListHeight, setDefaultTemplateListHeight] = useState(260);
+  const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
   const filteredDefaultTemplates = useMemo(
     () =>
       templateFilter === "all"
@@ -176,7 +179,7 @@ export function LeftPanel({
                 </button>
               ))}
             </div>
-            <div className="default-template-list" aria-label={t("left.defaultTemplates")}>
+            <div className="default-template-list" aria-label={t("left.defaultTemplates")} style={{ height: defaultTemplateListHeight }}>
               {filteredDefaultTemplates.map((template) => (
                 <button
                   type="button"
@@ -197,6 +200,10 @@ export function LeftPanel({
                 </button>
               ))}
             </div>
+            <TemplateResizeHandle
+              label={t("left.resizeDefaultTemplates")}
+              onResize={(delta) => setDefaultTemplateListHeight((height) => clampTemplateListHeight(height + delta))}
+            />
           </section>
 
           <section className="panel-section template-section">
@@ -216,7 +223,7 @@ export function LeftPanel({
             <button type="button" className="primary-button icon-text wide-button" onClick={onSaveTemplate}>
               <Save size={16} /> {t("left.saveTemplate")}
             </button>
-            <div className="template-list" aria-label={t("left.savedTemplates")}>
+            <div className="template-list" aria-label={t("left.savedTemplates")} style={{ height: browserTemplateListHeight }}>
               {templates.length === 0 ? (
                 <p className="empty-note">{t("left.noTemplates")}</p>
               ) : (
@@ -238,6 +245,10 @@ export function LeftPanel({
                 ))
               )}
             </div>
+            <TemplateResizeHandle
+              label={t("left.resizeBrowserTemplates")}
+              onResize={(delta) => setBrowserTemplateListHeight((height) => clampTemplateListHeight(height + delta))}
+            />
           </section>
 
         </>
@@ -255,3 +266,45 @@ const templateFilterOptions: { id: TemplateFilter; labelKey: Parameters<Translat
   { id: "schedule", labelKey: "left.filter.schedule" },
   { id: "motion", labelKey: "left.filter.motion" },
 ];
+
+function TemplateResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: number) => void }) {
+  return (
+    <div
+      className="panel-resize-handle"
+      role="separator"
+      aria-label={label}
+      aria-orientation="horizontal"
+      tabIndex={0}
+      onPointerDown={(event) => {
+        event.preventDefault();
+        let lastY = event.clientY;
+        const handlePointerMove = (moveEvent: PointerEvent) => {
+          onResize(moveEvent.clientY - lastY);
+          lastY = moveEvent.clientY;
+        };
+        const handlePointerUp = () => {
+          window.removeEventListener("pointermove", handlePointerMove);
+          window.removeEventListener("pointerup", handlePointerUp);
+        };
+        window.addEventListener("pointermove", handlePointerMove);
+        window.addEventListener("pointerup", handlePointerUp);
+      }}
+      onKeyDown={(event) => {
+        if (event.key === "ArrowDown") {
+          event.preventDefault();
+          onResize(24);
+        }
+        if (event.key === "ArrowUp") {
+          event.preventDefault();
+          onResize(-24);
+        }
+      }}
+    >
+      <GripHorizontal size={16} />
+    </div>
+  );
+}
+
+function clampTemplateListHeight(value: number): number {
+  return Math.min(720, Math.max(120, Math.round(value)));
+}

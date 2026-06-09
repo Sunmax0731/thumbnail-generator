@@ -49,11 +49,13 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Japanese and English UI labels can be switched from the top toolbar.
 - Initial language detection chooses a supported language, and unsupported language tags fall back to English in unit coverage.
 - Clicking blank preview space clears selection and updates the stage/inspector state.
+- Clicking the preview area outside the output frame clears selection when pan mode is not active.
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
 - Preview-pane Layout I/O exposes generated CSV/HTML text plus CSV and HTML import.
 - Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
+- Default templates and Browser templates expose resizable list areas with no overlap or horizontal overflow.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Preview selection respects layer stacking order when layers overlap.
@@ -104,7 +106,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
-- Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open a compact single-color picker with alpha.
+- Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open a draggable popup compact single-color picker with alpha.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
@@ -120,6 +122,28 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### Popup Color Picker And Template List Resizing
+
+Completed on 2026-06-09.
+
+- Scope: changed Adjust Fill/Stroke color selection from an in-tab panel to a draggable popup, added selection clearing from the preview area outside the output frame, and added independent resize handles for Default templates and Browser templates.
+- `npm test`: pass. 26 test files, 98 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4200/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x1100`.
+- Mobile viewport: `390x844`.
+- Primary UI: pass. Header, Assets/Templates tabs, preview, inspector tabs, and export controls were visible.
+- Adjust color popup: pass. Fill/Stroke color display opened a fixed-position popup with Sketch picker count `1`, palette wheel count `0`, five color inputs, no confirm-backdrop wrapper, and drag movement from `1050,128` to `940,205`.
+- Preview outside-frame deselection: pass. A selected shape produced selected row count `1`; clicking the preview area outside the output frame changed selected row count to `0` and the stage label to `未選択`.
+- Template list resizing: pass. Default templates height changed `260 -> 332`; Browser templates height changed `220 -> 166`.
+- Canvas render: pass. Runtime canvas dimensions were `1280x720` and nonblank.
+- Mobile: pass. `390x844` viewport had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-popup-template-resize-desktop.png`
+  - `docs/assets/runtime-20260609-popup-template-resize-mobile.png`
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported.
 
 ### Image Lab, Single-Color Picker, And OBS Preview Follow-Up
 

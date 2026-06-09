@@ -144,7 +144,7 @@ The selected layer can be edited directly on the canvas:
 - The Adjust tab also exposes Match angle to first selected when multiple editable layers are selected. The first selected editable layer is the reference; every other selected editable layer receives that exact rotation value. Locked layers remain unchanged.
 - Inspector numeric fields remain the source of precise values.
 - When multiple visible editable layers overlap under the pointer, body clicks select the frontmost layer in the current render order.
-- Clicking preview space that is not a selectable layer or active handle clears the current selection.
+- Clicking preview space that is not a selectable layer or active handle, including the preview area outside the output frame, clears the current selection when pan mode is not active.
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Dragging an object outside the document does not change the user-selected zoom scale or expand the output frame.
@@ -191,18 +191,18 @@ The Layers tab also includes:
 The left sidebar is grouped by task:
 
 - Assets: local image import, imported asset list, selected asset image-layer insertion, and Image Lab launch from imported asset rows.
-- Templates: bundled default templates plus browser-local template naming, saving, loading, and deletion.
+- Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing.
 - The previous left-panel Layouts tab is hidden from the GUI. Generated CSV/HTML text, CSV import, and HTML import are available from the preview-pane Layout I/O section.
 - The previous guided creation strip is removed from the left panel.
 
 The right inspector is grouped by task:
 
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a compact Sketch-style single-color picker with alpha, so separate fill/stroke opacity sliders are not duplicated in Adjust.
+- Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
 - Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
+The Layers, Colors, Default templates, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
 Controls that cannot affect the current edit target are disabled instead of accepting inert input. Examples include single-line text line height, outline or stroke colors when stroke width is `0`, image asset switching when there is only one asset, and palette application when no selected text or shape layer can receive the color.
 

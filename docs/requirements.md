@@ -21,8 +21,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Add simple shapes with fill color, stroke color, size, position, rotation, and shape kinds for rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
 - Adjust layer blur, edge blur, and corner radius where applicable, including rounded polygon corners for non-rect shape kinds.
-- Adjust text/shape fill and stroke alpha through a compact single-color picker opened from Fill and Stroke color displays.
-- Clear the current selection by clicking non-layer blank space in the preview.
+- Adjust text/shape fill and stroke alpha through a draggable popup single-color picker opened from Fill and Stroke color displays.
+- Clear the current selection by clicking non-layer blank space in the preview or the preview area outside the output frame.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
 - Group selected layers, rename groups, ungroup them, and select a group as a multi-selection.
 - Select one grouped layer individually from the Layers panel for single-layer adjustment without ungrouping.
@@ -31,7 +31,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Load 38 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, eight schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting templates, without depending on localStorage.
-- Filter bundled templates by use case and show compact template previews before loading.
+- Filter bundled templates by use case, show compact template previews before loading, and resize the Default templates and Browser templates list areas.
 - Configure per-layer animation presets with easings.net-style easing choices, selected-object Motion preview, easing graph, a default `none` movement direction, disabled distance controls when movement direction is `none`, and a popup-style OBS preview window without editor controls or selection handles.
 - Keep the left panel focused on Assets and Templates by hiding the Layouts tab, removing the guided creation strip, and keeping CSV/HTML layout import/export in the preview pane.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
@@ -48,7 +48,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
 - Provide common presets and custom output dimensions.
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
-- Resize the Layers and Colors list areas in the inspector while preserving core editor controls.
+- Resize the Layers, Colors, Default templates, and Browser templates list areas while preserving core editor controls.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees from the Adjust tab.
 - Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.

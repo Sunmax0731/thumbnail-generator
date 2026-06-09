@@ -10,7 +10,7 @@ This page is the quick feature index for users and reviewers.
 - Drag corner handles to resize one selected layer.
 - Drag the top rotation handle to rotate one selected layer.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag without changing zoom.
-- Click blank preview space to clear selection.
+- Click blank preview space or the preview area outside the output frame to clear selection.
 - Ctrl, Meta, or Shift click adds or removes layers from a multi-selection.
 
 ## Multi-Selection
@@ -36,6 +36,7 @@ This page is the quick feature index for users and reviewers.
 
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule starts, and ten animated eyecatch/waiting starts.
 - Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion, with mini preview swatches and output-size badges.
+- Resize the Default templates and Browser templates list areas from the Templates tab.
 - Use Templates to save named browser-local templates.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
 - Export, import, or delete edit-state JSON for backup and recovery.
@@ -61,7 +62,7 @@ This page is the quick feature index for users and reviewers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
 - Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
-- Click Fill or Stroke color displays in Adjust to open a compact Sketch-style single-color picker with alpha.
+- Click Fill or Stroke color displays in Adjust to open a draggable popup Sketch-style single-color picker with alpha.
 - Select expanded hosted Google Fonts options from the font dropdown and switch text between horizontal and vertical writing.
 - Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.

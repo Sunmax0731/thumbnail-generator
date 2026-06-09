@@ -1532,6 +1532,12 @@ function App() {
           onImportEditState={importEditState}
           onDeleteEditState={deleteEditState}
           onOpenObsPreview={openObsPreview}
+          onClearSelection={() => {
+            setSelectedIds([]);
+            setHoverInteractionMode(null);
+            setCanvasCursor("default");
+            setStatus("Selection cleared.");
+          }}
           t={t}
         />
         <InspectorPanel

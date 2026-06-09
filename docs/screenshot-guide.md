@@ -27,7 +27,7 @@
 3. 必要に応じて **編集状態** の自動保存を有効にします。
 4. 再利用したい状態は **ブラウザテンプレート** に名前を付けて保存します。
 
-標準テンプレートは、Creator Live、Product Review、Tutorial Steps、Shorts Quote、Breaking News、Versus Comparison、Gaming Highlight、Podcast Guest、Event Countdown、Minimal Launch の 10 種類です。
+標準テンプレートは 38 種類です。YouTube、Shorts、Stream、Cutout、Schedule、Motion のフィルタで絞り込み、標準テンプレート一覧とブラウザテンプレート一覧の下にあるハンドルで表示領域の高さを変えられます。
 
 ![出力設定](assets/screenshot-guide-output-settings.png)
 
@@ -80,7 +80,7 @@ Image Lab は画像処理用のモーダルです。素材行から選んだ画�
 
 ![図形調整](assets/screenshot-guide-adjust-shape.png)
 
-図形レイヤーでは、線幅、図形種別、角丸、塗り、線を編集できます。塗りと線の色表示をクリックすると、単色ピッカーで色と透明度をまとめて設定できます。バッジや区切り線は、サムネイル内の注目箇所や構造を作るために使います。
+図形レイヤーでは、線幅、図形種別、角丸、塗り、線を編集できます。塗りと線の色表示をクリックすると、ドラッグ移動できるポップアップ単色ピッカーで色と透明度をまとめて設定できます。バッジや区切り線は、サムネイル内の注目箇所や構造を作るために使います。
 
 ## 基本ユースケース: CSV/HTML でレイアウトを再利用する
 

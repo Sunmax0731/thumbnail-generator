@@ -19,11 +19,11 @@ npm run preview
 
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab from an imported asset row.
-- Templates: load bundled default templates and save/load/delete browser-local templates.
+- Templates: load bundled default templates, resize the Default templates and Browser templates lists, and save/load/delete browser-local templates.
 - Preview pane Layout I/O: edit generated CSV/HTML layout text and apply CSV or HTML imports.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
-- Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a compact single-color picker, shape, and image effects.
+- Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
 
@@ -34,7 +34,7 @@ Open Layout I/O in the preview pane to paste CSV or HTML definitions, then selec
 ## Edit The Canvas
 
 - Click a visible editable layer in the preview to select it.
-- Click blank preview space to clear the current selection.
+- Click blank preview space or the preview area outside the output frame to clear the current selection.
 - If layers overlap, the frontmost visible editable layer is selected.
 - Drag inside the selected layer to move it.
 - Drag movement uses one undo/redo step for the confirmed start and end positions.
@@ -67,7 +67,7 @@ Use Quick Add at the top of Layers to add common starter layers quickly:
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 38 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting entries. Browser templates remain separate named snapshots saved in localStorage.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 38 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting entries. Browser templates remain separate named snapshots saved in localStorage. Drag the resize handles under Default templates or Browser templates to change how much vertical space each list uses.
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
@@ -146,7 +146,7 @@ Open Colors to select an existing single-color swatch row for editing. Update ch
 
 Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. The Pattern dropdown beside the wheel chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space.
 
-When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the compact Sketch-style single-color picker. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
+When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the draggable popup Sketch-style single-color picker. Drag the popup header to move it while comparing colors on the canvas. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
 
 Shape layers support Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, and Line. Corner radius rounds Rect and polygon shape corners; Line remains controlled by stroke width and line style.
 

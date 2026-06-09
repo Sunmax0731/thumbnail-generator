@@ -1,6 +1,6 @@
 # QCDS Code Starter Summary
 
-Completed on 2026-06-07. Refreshed on 2026-06-09 after Image Lab, single-color picker, OBS preview, Colors, Adjust, Shape, and preview follow-up work.
+Completed on 2026-06-07. Refreshed on 2026-06-09 after popup color picker, template resizing, Image Lab, single-color picker, OBS preview, Colors, Adjust, Shape, and preview follow-up work.
 
 ## Code Starter Result
 
@@ -21,12 +21,12 @@ This work item closes that gap by adding a Code Starter-specific summary with ex
 
 | Axis | Rating | State | Evidence |
 | --- | --- | --- | --- |
-| Quality | A+ | pass | Automated tests, production build, 38 default templates including eight Schedule starts and ten animated Motion starts, Sunday-start weekly layouts, expanded Motion easing controls, selected-object preview, easing graph, popup-style OBS preview, expanded hosted font choices, vertical text display-bound resizing, hidden left Layouts tab, Layers Quick Add, even distribution, preview pan, preview-pane Layout I/O and Edit state, hidden Colors-side Brand kit registration buttons, compact Adjust single-color picker, expanded shape kinds, fixed output-frame preview, Image Lab asset-row entry, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
+| Quality | A+ | pass | Automated tests, production build, 38 default templates including eight Schedule starts and ten animated Motion starts, Sunday-start weekly layouts, expanded Motion easing controls, selected-object preview, easing graph, popup-style OBS preview, expanded hosted font choices, vertical text display-bound resizing, hidden left Layouts tab, Layers Quick Add, even distribution, preview pan, preview-pane Layout I/O and Edit state, hidden Colors-side Brand kit registration buttons, draggable popup Adjust single-color picker, expanded shape kinds, fixed output-frame preview, outside-frame deselection, resizable Default and Browser template lists, Image Lab asset-row entry, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
 | Cost | A+ | pass | The app remains static, browser-only, GitHub Pages compatible, and has no backend or paid-service dependency. |
 | Delivery | A+ | pass | Docs, QCDS evidence, tests, build, and runtime gate are synchronized for the current release state. |
-| Satisfaction | A+ | pass | CSV/HTML import, layer editing, Motion selected-object preview, easing graph, 12 animation types, 31 easing choices, direction None distance disabling, popup-style OBS preview rendering, vertical text width/height resizing, export, mobile layout, 38 bundled templates, weekly Sunday-start layouts, ten animated eyecatch/waiting templates, expanded font selection, hidden left clutter, Layers Quick Add, even distribution, preview pan, hidden Colors-side Brand kit registration buttons, compact Adjust single-color picker, expanded shape kinds, Image Lab asset-row entry and modal cleanup, issue reporting, and user-facing docs are validated and visible in the release evidence. |
+| Satisfaction | A+ | pass | CSV/HTML import, layer editing, Motion selected-object preview, easing graph, 12 animation types, 31 easing choices, direction None distance disabling, popup-style OBS preview rendering, vertical text width/height resizing, export, mobile layout, 38 bundled templates, weekly Sunday-start layouts, ten animated eyecatch/waiting templates, expanded font selection, hidden left clutter, Layers Quick Add, even distribution, preview pan, hidden Colors-side Brand kit registration buttons, draggable popup Adjust single-color picker, expanded shape kinds, outside-frame deselection, resizable Default and Browser template lists, Image Lab asset-row entry and modal cleanup, issue reporting, and user-facing docs are validated and visible in the release evidence. |
 
-Latest runtime gate: Playwright headless Chromium passed at `http://127.0.0.1:4199/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260609-imagelab-color-obs-*.png`.
+Latest runtime gate: Playwright headless Chromium passed at `http://127.0.0.1:4200/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260609-popup-template-resize-*.png`.
 
 ## Code Starter Visibility Contract
 

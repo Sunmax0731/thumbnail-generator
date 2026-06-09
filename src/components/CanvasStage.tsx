@@ -48,6 +48,7 @@ interface CanvasStageProps {
   onImportEditState: (file: File | null) => void;
   onDeleteEditState: () => void;
   onOpenObsPreview: () => void;
+  onClearSelection: () => void;
   t: Translator;
 }
 
@@ -79,6 +80,7 @@ export function CanvasStage({
   onImportEditState,
   onDeleteEditState,
   onOpenObsPreview,
+  onClearSelection,
   t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -214,7 +216,13 @@ export function CanvasStage({
         className={`canvas-scroll ${isPanMode || isSpacePanning ? "pan-ready" : ""} ${isPanning ? "panning" : ""}`}
         ref={scrollRef}
         onPointerDown={(event) => {
-          if (event.target === event.currentTarget) beginPan(event);
+          if (event.target !== event.currentTarget) return;
+          if (shouldPan(event)) {
+            beginPan(event);
+            return;
+          }
+          event.preventDefault();
+          onClearSelection();
         }}
         onPointerMove={(event) => {
           continuePan(event);

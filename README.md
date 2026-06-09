@@ -23,13 +23,13 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Generate CSV and HTML layout text from the current thumbnail.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases, eight schedule starts, and ten animated eyecatch/waiting starts.
-- Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case.
+- Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case, and resize the Default templates and Browser templates list areas.
 - Add layer animation presets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the preview pane.
 - Register, edit, preview, delete, collapse, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, a palette-pattern dropdown beside the wheel, palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, collapsible saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
-- Open a compact single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
+- Open a draggable popup single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Export to common video presets or custom output sizes.

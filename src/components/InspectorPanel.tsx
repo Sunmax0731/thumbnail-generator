@@ -33,6 +33,7 @@ import {
   Type,
   Unlock,
   Upload,
+  X,
 } from "lucide-react";
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
@@ -218,7 +219,7 @@ export function InspectorPanel({
       if (event.key !== "Delete" && event.key !== "Backspace") return;
       if (event.ctrlKey || event.metaKey || event.altKey) return;
       if (isKeyboardInputTarget(event.target)) return;
-      if (document.querySelector(".confirm-backdrop, .image-lab-backdrop")) return;
+      if (document.querySelector(".confirm-backdrop, .image-lab-backdrop, .layer-color-popup")) return;
       const candidate = selectedLayers[0];
       if (!candidate) return;
       event.preventDefault();
@@ -2223,46 +2224,91 @@ function LayerColorPickerDialog({
 }) {
   const [draft, setDraft] = useState(normalizeColor(state.color) ?? "#000000");
   const [alpha, setAlpha] = useState(clampUnit(state.alpha));
+  const [position, setPosition] = useState(() => getInitialColorPopupPosition());
+  const dragStartRef = useRef<{ pointerX: number; pointerY: number; x: number; y: number } | null>(null);
   const sketchColor = { ...hexToHsva(normalizeColor(draft) ?? "#000000"), a: alpha };
 
   useEffect(() => {
     setDraft(normalizeColor(state.color) ?? "#000000");
     setAlpha(clampUnit(state.alpha));
+    setPosition(getInitialColorPopupPosition());
   }, [state]);
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === "Escape") onClose();
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [onClose]);
 
   const setBaseDraft = (value: string) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     setDraft(normalized ?? value);
   };
 
+  const beginDrag = (event: ReactPointerEvent<HTMLElement>) => {
+    event.preventDefault();
+    dragStartRef.current = {
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      x: position.x,
+      y: position.y,
+    };
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      const active = dragStartRef.current;
+      if (!active) return;
+      setPosition({
+        x: clampPopupPosition(active.x + moveEvent.clientX - active.pointerX, window.innerWidth, 360),
+        y: clampPopupPosition(active.y + moveEvent.clientY - active.pointerY, window.innerHeight, 392),
+      });
+    };
+    const handlePointerUp = () => {
+      dragStartRef.current = null;
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   return (
-    <div className="confirm-backdrop" role="presentation">
-      <section className="confirm-dialog layer-color-dialog" role="dialog" aria-modal="true" aria-labelledby="layer-color-picker-title">
+    <section
+      className="layer-color-popup"
+      role="dialog"
+      aria-modal="false"
+      aria-labelledby="layer-color-picker-title"
+      style={{ left: position.x, top: position.y }}
+    >
+      <div className="layer-color-popup-header" onPointerDown={beginDrag}>
         <div className="modal-title-block">
           <h2 id="layer-color-picker-title">{state.label}</h2>
           <p>{t("inspector.paletteColor")}</p>
         </div>
-        <div className="layer-color-picker">
-          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
-            <Sketch
-              color={sketchColor}
-              onChange={(color) => {
-                setBaseDraft(color.hex);
-                setAlpha(color.hsva.a);
-              }}
-            />
-          </div>
+        <button type="button" className="icon-button modal-close" aria-label={t("inspector.cancel")} onPointerDown={(event) => event.stopPropagation()} onClick={onClose}>
+          <X size={16} />
+        </button>
+      </div>
+      <div className="layer-color-picker">
+        <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
+          <Sketch
+            color={sketchColor}
+            onChange={(color) => {
+              setBaseDraft(color.hex);
+              setAlpha(color.hsva.a);
+            }}
+          />
         </div>
-        <div className="confirm-actions">
-          <button type="button" className="secondary-button" onClick={onClose}>
-            {t("inspector.cancel")}
-          </button>
-          <button type="button" className="primary-button" onClick={() => onApply(normalizeColor(draft) ?? "#000000", alpha)}>
-            {t("inspector.applyColorChoice")}
-          </button>
-        </div>
-      </section>
-    </div>
+      </div>
+      <div className="confirm-actions">
+        <button type="button" className="secondary-button" onClick={onClose}>
+          {t("inspector.cancel")}
+        </button>
+        <button type="button" className="primary-button" onClick={() => onApply(normalizeColor(draft) ?? "#000000", alpha)}>
+          {t("inspector.applyColorChoice")}
+        </button>
+      </div>
+    </section>
   );
 }
 
@@ -2286,4 +2332,16 @@ function hasMultipleLines(value: string): boolean {
 
 function clampPanelHeight(value: number): number {
   return Math.min(720, Math.max(220, Math.round(value)));
+}
+
+function clampPopupPosition(value: number, viewportSize: number, popupSize: number): number {
+  return Math.min(Math.max(12, Math.round(value)), Math.max(12, viewportSize - popupSize - 12));
+}
+
+function getInitialColorPopupPosition(): { x: number; y: number } {
+  if (typeof window === "undefined") return { x: 24, y: 96 };
+  return {
+    x: Math.max(16, window.innerWidth - 390),
+    y: Math.max(78, Math.min(window.innerHeight - 420, 128)),
+  };
 }
