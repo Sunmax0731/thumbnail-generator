@@ -1,6 +1,7 @@
 import type {
   ImageEffects,
   ImageLayer,
+  BaseLayer,
   LayerAnimation,
   LayerAnimationDirection,
   LayerAnimationEasing,
@@ -40,6 +41,7 @@ export function makeLayerId(prefix = "layer"): string {
 }
 
 export function makeImageLayer(partial: Partial<ImageLayer> = {}): ImageLayer {
+  const animationFields = normalizeLayerAnimationFields(partial);
   return {
     id: partial.id ?? makeLayerId("image"),
     type: "image",
@@ -58,13 +60,14 @@ export function makeImageLayer(partial: Partial<ImageLayer> = {}): ImageLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 0,
-    animation: normalizeAnimation(partial.animation),
+    ...animationFields,
     imageKey: partial.imageKey ?? "sample-bg",
     effects: { ...defaultEffects, ...partial.effects },
   };
 }
 
 export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
+  const animationFields = normalizeLayerAnimationFields(partial);
   return {
     id: partial.id ?? makeLayerId("text"),
     type: "text",
@@ -83,7 +86,7 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 0,
-    animation: normalizeAnimation(partial.animation),
+    ...animationFields,
     text: partial.text ?? "NEW THUMBNAIL",
     fontSize: partial.fontSize ?? 88,
     fontFamily: partial.fontFamily ?? "Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif",
@@ -101,6 +104,7 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
 }
 
 export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
+  const animationFields = normalizeLayerAnimationFields(partial);
   return {
     id: partial.id ?? makeLayerId("shape"),
     type: "shape",
@@ -119,7 +123,7 @@ export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 12,
-    animation: normalizeAnimation(partial.animation),
+    ...animationFields,
     shape: (partial.shape as ShapeKind) ?? "rect",
     fill: partial.fill ?? "#10b6d7",
     fillOpacity: partial.fillOpacity ?? 1,
@@ -158,6 +162,25 @@ export function normalizeAnimation(animation: Partial<Record<keyof LayerAnimatio
     loop: Boolean(animation.loop),
     direction: parseAnimationDirection(animation.direction),
     distance: clampNumber(animation.distance, 0, 4000, defaultAnimation.distance),
+  };
+}
+
+export function normalizeAnimations(
+  animations: Array<Partial<Record<keyof LayerAnimation, unknown>>> | undefined,
+  fallback?: Partial<Record<keyof LayerAnimation, unknown>>,
+): LayerAnimation[] {
+  const source = Array.isArray(animations) ? animations : fallback ? [fallback] : [];
+  return source
+    .map((animation) => normalizeAnimation(animation))
+    .filter((animation): animation is LayerAnimation => Boolean(animation))
+    .slice(0, 12);
+}
+
+function normalizeLayerAnimationFields(partial: Partial<BaseLayer>): Pick<BaseLayer, "animation" | "animations"> {
+  const animations = normalizeAnimations(partial.animations, partial.animation);
+  return {
+    animation: animations[0],
+    animations: animations.length > 0 ? animations : undefined,
   };
 }
 

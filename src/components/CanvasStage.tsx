@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  ChevronDown,
-  ChevronRight,
-  Code2,
   Download,
-  FileText,
+  FileDown,
   FolderOpen,
   Hand,
+  ImageDown,
   Maximize2,
   MonitorPlay,
   MousePointer2,
-  RefreshCw,
   Save,
   Trash2,
   ZoomIn,
@@ -18,7 +15,7 @@ import {
 } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
-import type { OutputSettings } from "../lib/types";
+import type { ExportFormat, OutputSettings } from "../lib/types";
 
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -28,19 +25,14 @@ interface CanvasStageProps {
   zoom: number;
   cursor: string;
   previewPadding: number;
-  csvText: string;
-  htmlText: string;
+  isExporting: boolean;
   autoSaveEnabled: boolean;
   savedEditStateUpdatedAt: string | null;
   onZoomChange: (zoom: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
-  onCsvTextChange: (value: string) => void;
-  onHtmlTextChange: (value: string) => void;
-  onApplyCsv: () => void;
-  onApplyHtml: () => void;
-  onSyncLayoutText: () => void;
+  onExport: (format?: ExportFormat) => void;
   onAutoSaveChange: (enabled: boolean) => void;
   onSaveEditState: () => void;
   onRestoreEditState: () => void;
@@ -60,19 +52,14 @@ export function CanvasStage({
   zoom,
   cursor,
   previewPadding,
-  csvText,
-  htmlText,
+  isExporting,
   autoSaveEnabled,
   savedEditStateUpdatedAt,
   onZoomChange,
   onPointerDown,
   onPointerMove,
   onPointerUp,
-  onCsvTextChange,
-  onHtmlTextChange,
-  onApplyCsv,
-  onApplyHtml,
-  onSyncLayoutText,
+  onExport,
   onAutoSaveChange,
   onSaveEditState,
   onRestoreEditState,
@@ -88,7 +75,6 @@ export function CanvasStage({
   const [isPanMode, setIsPanMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [isSpacePanning, setIsSpacePanning] = useState(false);
-  const [isLayoutIoExpanded, setIsLayoutIoExpanded] = useState(false);
   const fitCanvas = useCallback(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -268,92 +254,65 @@ export function CanvasStage({
           />
         </div>
       </div>
-      <section className="stage-layout-io" aria-label={t("left.generatedLayout")}>
-        <button
-          type="button"
-          className="collapsible-heading"
-          aria-expanded={isLayoutIoExpanded}
-          onClick={() => setIsLayoutIoExpanded((current) => !current)}
-        >
-          {isLayoutIoExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          <span>{t("left.generatedLayout")}</span>
-        </button>
-        {isLayoutIoExpanded ? (
-          <div className="stage-layout-grid">
-            <div className="stage-layout-actions">
-              <button type="button" className="secondary-button icon-text" onClick={onSyncLayoutText}>
-                <RefreshCw size={16} /> {t("left.generateLayout")}
-              </button>
-            </div>
-            <label className="field stage-layout-field">
-              <span>{t("left.csvLayout")}</span>
-              <textarea
-                className="layout-textarea"
-                spellCheck={false}
-                value={csvText}
-                onChange={(event) => onCsvTextChange(event.target.value)}
-                aria-label={t("left.csvEditor")}
-              />
-            </label>
-            <button type="button" className="secondary-button icon-text" onClick={onApplyCsv}>
-              <FileText size={16} /> {t("left.applyCsv")}
-            </button>
-            <label className="field stage-layout-field">
-              <span>{t("left.htmlLayout")}</span>
-              <textarea
-                className="layout-textarea"
-                spellCheck={false}
-                value={htmlText}
-                onChange={(event) => onHtmlTextChange(event.target.value)}
-                aria-label={t("left.htmlEditor")}
-              />
-            </label>
-            <button type="button" className="secondary-button icon-text" onClick={onApplyHtml}>
-              <Code2 size={16} /> {t("left.applyHtml")}
-            </button>
-          </div>
-        ) : null}
-      </section>
-      <section className="stage-edit-state" aria-label={t("left.editState")}>
-        <div className="stage-edit-state-header">
+      <div className="stage-bottom-row">
+        <section className="stage-export-panel" aria-label={t("toolbar.exportActions")}>
           <div className="section-heading">
-            <Save size={16} />
-            <h2>{t("left.editState")}</h2>
+            <ImageDown size={16} />
+            <h2>{t("toolbar.export")}</h2>
           </div>
-          <p className="edit-state-meta">
-            {savedEditStateUpdatedAt
-              ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
-              : t("left.noSavedEditState")}
-          </p>
-        </div>
-        <label className="checkbox-row autosave-row">
-          <input
-            type="checkbox"
-            checked={autoSaveEnabled}
-            onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
-          />
-          <span>{t("left.autoSaveEditState")}</span>
-        </label>
-        <div className="stage-edit-actions">
-          <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
-            <Save size={16} /> {t("left.saveEditState")}
-          </button>
-          <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
-            <FolderOpen size={16} /> {t("left.restoreEditState")}
-          </button>
-          <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
-            <Download size={16} /> {t("left.exportState")}
-          </button>
-          <label className="secondary-button icon-text file-action">
-            <FolderOpen size={16} /> {t("left.importState")}
-            <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
+          <div className="stage-export-actions">
+            <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>
+              <ImageDown size={16} /> PNG
+            </button>
+            <button className="secondary-button icon-text" type="button" onClick={() => onExport("jpeg")} disabled={isExporting}>
+              <FileDown size={16} /> JPG
+            </button>
+            <button className="secondary-button icon-text" type="button" onClick={() => onExport("webp")} disabled={isExporting}>
+              <FileDown size={16} /> WebP
+            </button>
+          </div>
+        </section>
+        <section className="stage-edit-state" aria-label={t("left.editState")}>
+          <div className="stage-edit-state-header">
+            <div className="section-heading">
+              <Save size={16} />
+              <h2>{t("left.editState")}</h2>
+            </div>
+            <p className="edit-state-meta">
+              {savedEditStateUpdatedAt
+                ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
+                : t("left.noSavedEditState")}
+            </p>
+          </div>
+          <label className="checkbox-row autosave-row">
+            <input
+              type="checkbox"
+              checked={autoSaveEnabled}
+              onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
+            />
+            <span>{t("left.autoSaveEditState")}</span>
           </label>
-          <button type="button" className="ghost-button danger-text icon-text" onClick={onDeleteEditState}>
-            <Trash2 size={15} /> {t("left.deleteEditState")}
-          </button>
-        </div>
-        <p className="privacy-note">{t("left.privacyNotice")}</p>
-      </section>
+          <div className="stage-edit-actions">
+            <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
+              <Save size={16} /> {t("left.saveEditState")}
+            </button>
+            <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
+              <FolderOpen size={16} /> {t("left.restoreEditState")}
+            </button>
+            <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
+              <Download size={16} /> {t("left.exportState")}
+            </button>
+            <label className="secondary-button icon-text file-action">
+              <FolderOpen size={16} /> {t("left.importState")}
+              <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
+            </label>
+            <button type="button" className="ghost-button danger-text icon-text" onClick={onDeleteEditState}>
+              <Trash2 size={15} /> {t("left.deleteEditState")}
+            </button>
+          </div>
+          <p className="privacy-note">{t("left.privacyNotice")}</p>
+        </section>
+      </div>
     </section>
   );
 }

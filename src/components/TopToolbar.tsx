@@ -1,27 +1,23 @@
-import { ExternalLink, FileDown, ImageDown, Monitor, SquareStack } from "lucide-react";
+import { ExternalLink, Monitor, SquareStack } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
-import type { ExportFormat, OutputSettings } from "../lib/types";
+import type { OutputSettings } from "../lib/types";
 
 interface TopToolbarProps {
   settings: OutputSettings;
   language: Language;
-  isExporting: boolean;
   onSettingsChange: (next: Partial<OutputSettings>) => void;
   onPresetChange: (presetId: string) => void;
   onLanguageChange: (language: Language) => void;
-  onExport: (format?: ExportFormat) => void;
   t: Translator;
 }
 
 export function TopToolbar({
   settings,
   language,
-  isExporting,
   onSettingsChange,
   onPresetChange,
   onLanguageChange,
-  onExport,
   t,
 }: TopToolbarProps) {
   return (
@@ -32,7 +28,6 @@ export function TopToolbar({
         </div>
         <div>
           <h1>{t("app.title")}</h1>
-          <p>{t("app.subtitle")}</p>
           <a className="brand-issue-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
             <ExternalLink size={12} /> {t("app.reportIssue")}
           </a>
@@ -108,29 +103,6 @@ export function TopToolbar({
             }
           />
         </label>
-        <label className="field quality-field">
-          <span>{t("toolbar.quality")}</span>
-          <input
-            type="range"
-            min={0.5}
-            max={1}
-            step={0.01}
-            value={settings.quality}
-            onChange={(event) => onSettingsChange({ quality: Number.parseFloat(event.target.value) })}
-          />
-        </label>
-      </div>
-
-      <div className="export-actions" aria-label={t("toolbar.exportActions")}>
-        <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>
-          <ImageDown size={16} /> PNG
-        </button>
-        <button className="secondary-button icon-text" type="button" onClick={() => onExport("jpeg")} disabled={isExporting}>
-          <FileDown size={16} /> JPG
-        </button>
-        <button className="secondary-button icon-text" type="button" onClick={() => onExport("webp")} disabled={isExporting}>
-          <FileDown size={16} /> WebP
-        </button>
       </div>
     </header>
   );

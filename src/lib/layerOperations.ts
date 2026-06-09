@@ -46,6 +46,5 @@ export function selectLayerIdsAfterDelete(
   deletedId: string,
 ): string[] {
   const selectableIds = new Set(layers.filter((layer) => layer.selectable).map((layer) => layer.id));
-  const retained = selectedIds.filter((id) => id !== deletedId && selectableIds.has(id));
-  return retained.length > 0 ? retained : selectTopSelectableLayerIds(layers);
+  return selectedIds.filter((id) => id !== deletedId && selectableIds.has(id));
 }

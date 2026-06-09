@@ -130,4 +130,38 @@ describe("animation", () => {
     expect(zoom.height).toBeCloseTo(95);
     expect(spin.rotation).toBeCloseTo(2);
   });
+
+  it("applies multiple animations in sequence on one layer", () => {
+    const layer = makeTextLayer({
+      x: 100,
+      y: 200,
+      opacity: 0.8,
+      animations: [
+        {
+          type: "fade",
+          startMs: 0,
+          durationMs: 1000,
+          easing: "linear",
+          loop: false,
+          direction: "none",
+          distance: 0,
+        },
+        {
+          type: "slide",
+          startMs: 0,
+          durationMs: 1000,
+          easing: "linear",
+          loop: false,
+          direction: "left",
+          distance: 100,
+        },
+      ],
+    });
+
+    const animated = applyLayerAnimation(layer, 500);
+
+    expect(animated.opacity).toBeCloseTo(0.4);
+    expect(animated.x).toBe(50);
+    expect(animated.y).toBe(200);
+  });
 });

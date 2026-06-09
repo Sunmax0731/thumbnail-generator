@@ -67,7 +67,7 @@ button:disabled {
 
 .top-toolbar {
   display: grid;
-  grid-template-columns: minmax(230px, 320px) 1fr auto;
+  grid-template-columns: minmax(250px, 360px) 1fr;
   align-items: center;
   gap: 14px;
   min-height: 74px;
@@ -367,14 +367,6 @@ button:disabled {
 
 .size-field {
   width: 128px;
-}
-
-.quality-field {
-  width: 118px;
-}
-
-.quality-field input {
-  padding: 0;
 }
 
 .size-field input[type="range"] {
@@ -886,11 +878,41 @@ button:disabled {
   user-select: none;
 }
 
+.stage-bottom-row {
+  display: grid;
+  grid-template-columns: minmax(170px, 220px) minmax(0, 1fr);
+  gap: 0;
+  border-top: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.stage-export-panel {
+  display: grid;
+  align-content: start;
+  gap: 8px;
+  padding: 10px 12px;
+  border-right: 1px solid var(--line);
+  background: #ffffff;
+}
+
+.stage-export-panel .section-heading h2 {
+  margin: 0;
+  font-size: 13px;
+}
+
+.stage-export-actions {
+  display: grid;
+  gap: 6px;
+}
+
+.stage-export-actions .icon-text {
+  justify-content: center;
+}
+
 .stage-edit-state {
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-  border-top: 1px solid var(--line);
   background: #ffffff;
 }
 
@@ -1153,6 +1175,57 @@ button:disabled {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
   gap: 10px;
+}
+
+.motion-sequence-list {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.motion-sequence-list button {
+  display: grid;
+  grid-template-columns: 22px minmax(0, 1fr);
+  align-items: center;
+  gap: 6px;
+  min-height: 32px;
+  padding: 4px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
+  color: var(--text);
+  text-align: left;
+}
+
+.motion-sequence-list button.selected {
+  border-color: var(--accent);
+  background: rgba(16, 182, 215, 0.1);
+}
+
+.motion-sequence-list span {
+  display: grid;
+  width: 22px;
+  height: 22px;
+  border-radius: 999px;
+  background: var(--panel-soft);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 900;
+  place-items: center;
+}
+
+.motion-sequence-list strong {
+  min-width: 0;
+  overflow: hidden;
+  font-size: 11px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.motion-sequence-actions {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 6px;
 }
 
 .motion-object-preview,
@@ -1657,9 +1730,14 @@ button:disabled {
 
 .saved-palette-color {
   display: grid;
-  grid-template-columns: 28px 1fr 1fr auto;
+  grid-template-columns: 34px 48px 48px minmax(0, 1fr);
   align-items: center;
   gap: 6px;
+  min-height: 38px;
+  padding: 5px 7px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: #ffffff;
 }
 
 .saved-palette-color .ghost-button {
@@ -1669,8 +1747,8 @@ button:disabled {
 }
 
 .saved-palette-swatch {
-  width: 28px;
-  height: 26px;
+  width: 34px;
+  height: 30px;
   border: 1px solid rgba(17, 24, 39, 0.2);
   border-radius: 5px;
 }
@@ -1695,7 +1773,7 @@ button:disabled {
 
 .swatch-row {
   display: grid;
-  grid-template-columns: 34px 48px 48px minmax(0, 1fr) auto 26px;
+  grid-template-columns: 34px 48px 48px minmax(0, 1fr) 26px;
   gap: 6px;
   align-items: center;
   min-height: 38px;
@@ -1722,6 +1800,16 @@ button:disabled {
   min-height: 30px;
   padding: 0 7px;
   font-size: 11px;
+}
+
+.swatch-apply-dot {
+  display: block;
+  width: 18px;
+  height: 18px;
+  margin: 0 auto;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  border-radius: 999px;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.32);
 }
 
 .swatch-meta {
@@ -1895,7 +1983,7 @@ button:disabled {
 }
 
 .image-cutout-section .segmented-control {
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .image-lab-adjust-grid {
@@ -2048,6 +2136,19 @@ button:disabled {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
+  .stage-bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-export-panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
+  }
+
+  .stage-export-actions {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
   .image-lab,
   .image-lab-adjust-grid {
     grid-template-columns: minmax(0, 1fr);
@@ -2073,8 +2174,7 @@ button:disabled {
 
   .compact-field,
   .language-field,
-  .size-field,
-  .quality-field {
+  .size-field {
     width: auto;
     min-width: 0;
   }
@@ -2097,9 +2197,11 @@ button:disabled {
 
   .field-with-action,
   .palette-actions,
-  .stage-layout-grid,
+  .stage-export-actions,
   .stage-edit-actions,
-  .stage-edit-state-header {
+  .stage-edit-state-header,
+  .motion-sequence-list,
+  .motion-sequence-actions {
     grid-template-columns: 1fr;
   }
 

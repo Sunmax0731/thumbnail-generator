@@ -8,7 +8,7 @@
 - Canvas fit calculation shrinks tall or wide presets by visible width/height and preserves preferred fit only when both axes allow it.
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
 - Hit testing supports intentional blank-click deselection.
-- Layer deletion selection helpers keep selection on valid selectable layers.
+- Layer deletion selection helpers retain other selected layers but leave no fallback selection after deleting the only selected layer.
 - Layer selection helpers select all editable grouped members from one grouped layer and toggle whole groups additively.
 - Relative layer transforms apply common movement and rotation deltas to selected editable layers.
 - Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
@@ -33,7 +33,7 @@
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
-- Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms without mutating source layer state.
+- Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms, including multiple ordered animation entries, without mutating source layer state.
 - Easing helpers expose linear plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce curves.
 - CSV/HTML import and layout export preserve optional layer animation metadata.
 - Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
@@ -51,7 +51,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Clicking blank preview space clears selection and updates the stage/inspector state.
 - Clicking the preview area outside the output frame clears selection when pan mode is not active.
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
-- Preview-pane Layout I/O exposes generated CSV/HTML text plus CSV and HTML import.
+- The preview-pane Generated layout section remains hidden from the GUI while edit-state and template compatibility keep CSV/HTML text internally.
 - Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
@@ -122,6 +122,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### ImageLab, Motion, Analytics, And Preview Export Follow-Up
+
+Completed on 2026-06-09 for `Issues/0084-ui-motion-analytics-followup.md`.
+
+- `npm test`: pass. 26 test files, 99 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4210/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Checks: title/header `サムネイル作成支援サービス`, no header subtitle, no Generated layout section, no Quality label, GA config `G-1LR6HRMGXE` and analytics scripts present, initial canvas nonblank, Image Lab default range `範囲なし` and range sliders disabled, delete flow changed selected layer rows from `1` to `0`, registered single-color row had no visible `Fill` or HEX code, saved palette rows showed `#10b6d7`, Motion disabled direction for Fade and enabled it for Slide, Add motion created two motion-set buttons, WebP export downloaded, mobile canvas nonblank, and mobile horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-ui-motion-analytics-desktop.png`
+  - `docs/assets/runtime-20260609-ui-motion-analytics-mobile.png`
+- Export evidence: `output/runtime-downloads-20260609-ui-motion-analytics/thumbnail-1280x720-2026-06-09T14-51-40-218Z.webp`.
+- Console health: no page errors or app console errors were reported.
 
 ### Popup Color Picker And Template List Resizing
 
@@ -390,7 +407,7 @@ Passed checks:
 - Default template category filters: pass. YouTube, Shorts, Stream, and Cutout each exposed exactly 5 templates.
 - Default template load: pass for all 20 templates, with nonblank canvas and visible layer rows after each load.
 - Guided start visibility: pass. The guided start section remained visible on Assets, Layouts, and Templates.
-- Edit state placement: pass. Save, restore, export/import, delete, autosave, saved-state metadata, and privacy/storage guidance were visible in the preview pane.
+- Edit state and export placement: pass. PNG/JPG/WebP export, save, restore, export/import, delete, autosave, saved-state metadata, and privacy/storage guidance were visible in the preview pane.
 - Colors-to-Brand-kit registration: pass. The Colors tab registered a preview color as the Brand kit primary color and reported the status.
 - Templates service section removal: pass. No `.service-section` rendered in the Templates tab.
 - Layer list after template load: pass. Each loaded template exposed editable layer rows.

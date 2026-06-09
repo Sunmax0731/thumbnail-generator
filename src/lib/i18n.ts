@@ -1,6 +1,6 @@
 const en = {
-  "app.title": "Thumbnail Generator",
-  "app.subtitle": "CSV / HTML layout canvas",
+  "app.title": "サムネイル作成支援サービス",
+  "app.subtitle": "",
   "app.reportIssue": "Report issue",
   "language.label": "Language",
   "language.en": "English",
@@ -143,6 +143,9 @@ const en = {
   "inspector.distributeHorizontal": "Distribute H",
   "inspector.distributeVertical": "Distribute V",
   "inspector.motionSettings": "Animation",
+  "inspector.motionSequence": "Motion sequence",
+  "inspector.addMotion": "Add motion",
+  "inspector.removeMotion": "Remove motion",
   "inspector.animationType": "Animation",
   "inspector.animationNone": "None",
   "inspector.animationFade": "Fade",
@@ -286,6 +289,7 @@ const en = {
   "imageLab.asset": "Asset",
   "imageLab.cutout": "Cutout",
   "imageLab.cutoutMode": "Cutout mode",
+  "imageLab.none": "No range",
   "imageLab.rect": "Rect",
   "imageLab.circle": "Circle",
   "imageLab.free": "Free",
@@ -578,6 +582,8 @@ const ja: Partial<Record<TranslationKey, string>> = {
 };
 
 const jaOverrides: Partial<Record<TranslationKey, string>> = {
+  "app.title": "サムネイル作成支援サービス",
+  "app.subtitle": "",
   "stage.openObsPreview": "OBSプレビューを開く",
   "left.filter.schedule": "予定",
   "inspector.distributeHorizontal": "横均等",
@@ -589,6 +595,9 @@ const jaOverrides: Partial<Record<TranslationKey, string>> = {
   "inspector.star": "星形",
   "inspector.motion": "Motion",
   "inspector.motionSettings": "アニメーション",
+  "inspector.motionSequence": "モーションセット",
+  "inspector.addMotion": "モーション追加",
+  "inspector.removeMotion": "モーション削除",
   "inspector.animationType": "アニメーション",
   "inspector.animationNone": "なし",
   "inspector.animationFade": "フェード",
@@ -619,6 +628,7 @@ const jaOverrides: Partial<Record<TranslationKey, string>> = {
   "inspector.motionPreview": "モーションプレビュー",
   "inspector.easingGraph": "イージンググラフ",
   "inspector.directionNone": "無し",
+  "imageLab.none": "範囲なし",
   "left.filter.motion": "Motion",
 };
 

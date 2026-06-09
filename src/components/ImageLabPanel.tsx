@@ -9,7 +9,7 @@ import {
 import type { Translator } from "../lib/i18n";
 import type { ImageAsset } from "../lib/types";
 
-type LabMode = Exclude<CropMode, "none">;
+type LabMode = CropMode;
 type RectDragMode = "new" | "move" | "nw" | "ne" | "sw" | "se";
 
 interface ImageLabPanelProps {
@@ -40,8 +40,8 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
   const polygonDragIndex = useRef<number | null>(null);
   const [assetKey, setAssetKey] = useState(assets[0]?.key ?? "");
   const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
-  const [mode, setMode] = useState<LabMode>("rect");
-  const [cropRect, setCropRect] = useState<RectSelection>({ x: 0, y: 0, width: 320, height: 180 });
+  const [mode, setMode] = useState<LabMode>("none");
+  const [cropRect, setCropRect] = useState<RectSelection>({ x: 0, y: 0, width: 0, height: 0 });
   const [polygonPoints, setPolygonPoints] = useState<ImagePoint[]>([]);
   const [chromaEnabled, setChromaEnabled] = useState(false);
   const [chromaColor, setChromaColor] = useState("#00ff00");
@@ -70,7 +70,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
       if (cancelled) return;
       const nextSize = { width: image.naturalWidth || image.width, height: image.naturalHeight || image.height };
       setImageSize(nextSize);
-      setCropRect((current) => fitRect(current, nextSize.width, nextSize.height));
+      setCropRect((current) => (mode === "none" ? current : fitRect(current, nextSize.width, nextSize.height)));
       drawPreview(image, cropRect, polygonPoints, mode, previewRect, canvasRef.current);
     };
     image.src = selectedAsset.src;
@@ -107,6 +107,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      if (mode === "none") return;
       const point = pointerToImage(event);
       if (mode === "polygon") {
         const hitIndex = hitPolygonPoint(point, polygonPoints, previewRect.current.scale);
@@ -130,6 +131,17 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
     },
     [cropRect, imageSize.height, imageSize.width, mode, pointerToImage, polygonPoints],
   );
+
+  const selectMode = (nextMode: LabMode) => {
+    setMode(nextMode);
+    if (nextMode === "none") {
+      setPolygonPoints([]);
+      return;
+    }
+    if (nextMode !== "polygon" && cropRect.width === 0 && cropRect.height === 0) {
+      setCropRect(defaultSelection(imageSize.width, imageSize.height));
+    }
+  };
 
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -228,6 +240,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
         </div>
         <div className="segmented-control" aria-label={t("imageLab.cutoutMode")}>
           {[
+            ["none", t("imageLab.none")],
             ["rect", t("imageLab.rect")],
             ["ellipse", t("imageLab.circle")],
             ["polygon", t("imageLab.free")],
@@ -236,7 +249,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
               key={value}
               type="button"
               className={mode === value ? "selected" : ""}
-              onClick={() => setMode(value as LabMode)}
+              onClick={() => selectMode(value as LabMode)}
             >
               {label}
             </button>
@@ -269,13 +282,14 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
         ) : null}
         <div className="image-lab-adjust-grid">
           <div className="field-grid two image-lab-position-fields">
-            <LabSlider label="X" value={cropRect.x} min={0} max={imageSize.width} onChange={(x) => setCropRect((rect) => ({ ...rect, x }))} />
-            <LabSlider label="Y" value={cropRect.y} min={0} max={imageSize.height} onChange={(y) => setCropRect((rect) => ({ ...rect, y }))} />
+            <LabSlider label="X" value={cropRect.x} min={0} max={imageSize.width} disabled={mode === "none"} onChange={(x) => setCropRect((rect) => ({ ...rect, x }))} />
+            <LabSlider label="Y" value={cropRect.y} min={0} max={imageSize.height} disabled={mode === "none"} onChange={(y) => setCropRect((rect) => ({ ...rect, y }))} />
             <LabSlider
               label="W"
               value={Math.abs(cropRect.width)}
               min={1}
               max={imageSize.width}
+              disabled={mode === "none"}
               onChange={(width) => setCropRect((rect) => ({ ...rect, width }))}
             />
             <LabSlider
@@ -283,6 +297,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
               value={Math.abs(cropRect.height)}
               min={1}
               max={imageSize.height}
+              disabled={mode === "none"}
               onChange={(height) => setCropRect((rect) => ({ ...rect, height }))}
             />
           </div>
@@ -337,6 +352,8 @@ function drawPreview(
   context.strokeStyle = "#10b6d7";
   context.lineWidth = 3;
   context.setLineDash([8, 6]);
+
+  if (mode === "none") return;
 
   if (mode === "polygon" && polygonPoints.length > 0) {
     context.beginPath();
@@ -396,12 +413,14 @@ function LabSlider({
   value,
   min,
   max,
+  disabled = false,
   onChange,
 }: {
   label: string;
   value: number;
   min: number;
   max: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }) {
   const rounded = Math.round(value);
@@ -410,10 +429,21 @@ function LabSlider({
       <span>
         {label} {rounded}
       </span>
-      <input type="range" min={min} max={Math.max(min, max)} step={1} value={rounded} onChange={(event) => onChange(Number(event.currentTarget.value))} />
-      <input type="number" min={min} max={max} step={1} value={rounded} onChange={(event) => onChange(Number(event.currentTarget.value) || 0)} />
+      <input type="range" min={min} max={Math.max(min, max)} step={1} value={rounded} disabled={disabled} onChange={(event) => onChange(Number(event.currentTarget.value))} />
+      <input type="number" min={min} max={max} step={1} value={rounded} disabled={disabled} onChange={(event) => onChange(Number(event.currentTarget.value) || 0)} />
     </label>
   );
+}
+
+function defaultSelection(width: number, height: number): RectSelection {
+  const rectWidth = Math.max(1, Math.round(width * 0.5));
+  const rectHeight = Math.max(1, Math.round(height * 0.5));
+  return {
+    x: Math.max(0, Math.round((width - rectWidth) / 2)),
+    y: Math.max(0, Math.round((height - rectHeight) / 2)),
+    width: rectWidth,
+    height: rectHeight,
+  };
 }
 
 function fitRect(rect: RectSelection, width: number, height: number): RectSelection {

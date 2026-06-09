@@ -20,16 +20,16 @@ npm run preview
 - Language: use the top toolbar selector to switch between Japanese and English. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Assets: import image files, import a YouTube thumbnail by URL/video id, select imported assets, add a selected asset as an image layer, and open Image Lab from an imported asset row.
 - Templates: load bundled default templates, resize the Default templates and Browser templates lists, and save/load/delete browser-local templates.
-- Preview pane Layout I/O: edit generated CSV/HTML layout text and apply CSV or HTML imports.
+- Preview pane export: download PNG, JPG, or WebP beside the current canvas.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
-- Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
+- Motion: assign multiple ordered motion sets, preview the selected object, and inspect the easing graph for OBS preview playback.
 
-## Import Layouts
+## Layout Compatibility
 
-Open Layout I/O in the preview pane to paste CSV or HTML definitions, then select Apply CSV or Apply HTML. CSV and HTML import replace the current layer list when valid layers are found. Image references should match imported asset names/keys or the bundled `sample-bg` asset.
+CSV and HTML-like layout text remain in browser edit states and saved templates for compatibility. The GUI no longer shows a Generated layout editor in the preview pane.
 
 ## Edit The Canvas
 
@@ -121,7 +121,7 @@ Select a layer and open Adjust. Edge blur accepts signed values: `0` disables it
 
 ## Presets And Export
 
-Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use PNG, JPG, or WebP to download the rendered thumbnail directly in that format.
+Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use PNG, JPG, or WebP beside Edit state in the preview pane to download the rendered thumbnail directly in that format at maximum quality.
 
 The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important layers, edge-safe-area risk, many layers, large image assets, 4K output, or large browser-storage estimates.
 
@@ -129,16 +129,17 @@ The status bar can show quality warning chips while you work. Check these before
 
 1. Select a layer.
 2. Open Motion.
-3. Choose Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe.
-4. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior.
-5. Use the selected-object preview and easing graph to check motion timing. Direction defaults to None; distance is disabled until Left, Right, Up, or Down is selected.
-6. Select Open OBS preview in the canvas toolbar.
+3. Choose Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe for the active motion set.
+4. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
+5. Add additional motion sets when one object needs multiple animation behaviors.
+6. Use the selected-object preview and easing graph to check motion timing.
+7. Select Open OBS preview in the canvas toolbar.
 
 The OBS preview opens a popup-style browser window that contains only the animated canvas on a black background. It does not draw editor controls or selection handles, and the app requests fullscreen where the browser permits it. Capture that window in OBS with Window Capture. Browser and OBS settings still decide whether OS or browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 
 ## Image Lab
 
-Open Image Lab from the scissors button on an imported asset row. The modal supports chroma key, rectangle/circle drag cutouts, and polygon cutout points. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Importing and switching source images stay in Assets; Image Lab focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Importing and switching source images stay in Assets; Image Lab focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
 
 ## Color Palette
 

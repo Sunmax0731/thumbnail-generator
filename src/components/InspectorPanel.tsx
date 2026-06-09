@@ -38,8 +38,9 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { easingOptions, evaluateEasing } from "../lib/easings";
+import { animationTypeUsesDirection } from "../lib/animation";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
-import { defaultAnimation, normalizeAnimation } from "../lib/layerFactory";
+import { defaultAnimation, normalizeAnimations } from "../lib/layerFactory";
 import { renderThumbnailToCanvas } from "../lib/renderCanvas";
 import {
   derivePaletteBaseFromSchemeColor,
@@ -1128,14 +1129,30 @@ function PaletteControls({
               </div>
               <div className="saved-palette-colors">
                 {palette.colors.map((color, index) => (
-                  <div className="saved-palette-color" key={`${palette.id}-${color}-${index}`}>
+                  <div className="saved-palette-color palette-color-row" key={`${palette.id}-${color}-${index}`}>
                     <span className="saved-palette-swatch" style={{ background: color }} />
-                    <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "fill")}>
-                      {t("inspector.fill")}
+                    <button
+                      type="button"
+                      className="ghost-button swatch-apply-button"
+                      disabled={selectedCount === 0}
+                      aria-label={t("inspector.applyColor", { name: color, target: t("inspector.fill") })}
+                      title={t("inspector.applyColor", { name: color, target: t("inspector.fill") })}
+                      onClick={() => onApply(color, "fill")}
+                    >
+                      <span className="swatch-apply-dot" style={{ background: color }} />
                     </button>
-                    <button type="button" className="ghost-button" disabled={selectedCount === 0} onClick={() => onApply(color, "stroke")}>
+                    <button
+                      type="button"
+                      className="ghost-button swatch-apply-button"
+                      disabled={selectedCount === 0}
+                      onClick={() => onApply(color, "stroke")}
+                    >
                       {t("inspector.stroke")}
                     </button>
+                    <div className="swatch-meta">
+                      <span className="swatch-name">{t("inspector.paletteColor")} {index + 1}</span>
+                      <span className="swatch-value">{color}</span>
+                    </div>
                   </div>
                 ))}
               </div>
@@ -1169,9 +1186,11 @@ function PaletteControls({
               type="button"
               className="ghost-button swatch-apply-button"
               disabled={selectedCount === 0}
+              aria-label={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
+              title={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
               onClick={() => onApply(color.value, "fill", color.alpha)}
             >
-              {t("inspector.fill")}
+              <span className="swatch-apply-dot" style={{ background: color.value }} />
             </button>
             <button
               type="button"
@@ -1184,9 +1203,7 @@ function PaletteControls({
             <div className="swatch-meta">
               <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
                 <span className="swatch-name">{color.name}</span>
-                <span className="swatch-value">
-                  {color.value} / {Math.round(color.alpha * 100)}%
-                </span>
+                <span className="swatch-value">{Math.round(color.alpha * 100)}%</span>
               </button>
             </div>
             <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
@@ -1487,19 +1504,58 @@ function MotionControls({
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
   t: Translator;
 }) {
-  const animation = selected.animation ?? defaultAnimation;
+  const savedAnimations = useMemo(() => normalizeAnimations(selected.animations, selected.animation), [selected.animation, selected.animations]);
+  const editableAnimations = savedAnimations.length > 0 ? savedAnimations : [defaultAnimation];
+  const [activeMotionIndex, setActiveMotionIndex] = useState(0);
+  const activeAnimation = editableAnimations[Math.min(activeMotionIndex, editableAnimations.length - 1)] ?? defaultAnimation;
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [previewProgress, setPreviewProgress] = useState(0);
-  const updateAnimation = (partial: Partial<typeof defaultAnimation>) => {
+
+  useEffect(() => {
+    if (activeMotionIndex >= editableAnimations.length) setActiveMotionIndex(Math.max(0, editableAnimations.length - 1));
+  }, [activeMotionIndex, editableAnimations.length]);
+
+  const saveAnimations = (nextAnimations: Array<Partial<typeof defaultAnimation>>) => {
+    const normalized = normalizeAnimations(nextAnimations);
     onUpdateLayer(selected.id, (layer) => ({
       ...layer,
-      animation: normalizeAnimation({ ...(layer.animation ?? defaultAnimation), ...partial }),
+      animation: normalized[0],
+      animations: normalized.length > 0 ? normalized : undefined,
     }));
   };
-  const hasAnimation = animation.type !== "none";
-  const directionIsNone = animation.direction === "none";
-  const duration = Math.max(100, animation.durationMs);
-  const sceneDuration = Math.max(1000, animation.startMs + duration);
+
+  const updateAnimation = (partial: Partial<typeof defaultAnimation>) => {
+    const type = (partial.type ?? activeAnimation.type) as LayerAnimationType;
+    const nextAnimation = {
+      ...activeAnimation,
+      ...partial,
+      direction: animationTypeUsesDirection(type) ? (partial.direction ?? activeAnimation.direction) : "none",
+    };
+    saveAnimations(editableAnimations.map((animation, index) => (index === activeMotionIndex ? nextAnimation : animation)));
+  };
+
+  const addMotion = () => {
+    const nextAnimation = { ...defaultAnimation, type: "fade" as LayerAnimationType };
+    saveAnimations([...savedAnimations, nextAnimation]);
+    setActiveMotionIndex(savedAnimations.length);
+  };
+
+  const removeMotion = () => {
+    if (savedAnimations.length === 0) return;
+    saveAnimations(savedAnimations.filter((_, index) => index !== activeMotionIndex));
+    setActiveMotionIndex(Math.max(0, activeMotionIndex - 1));
+  };
+
+  const hasAnimation = activeAnimation.type !== "none";
+  const directionSupported = animationTypeUsesDirection(activeAnimation.type);
+  const directionDisabled = !hasAnimation || !directionSupported;
+  const directionIsNone = directionDisabled || activeAnimation.direction === "none";
+  const duration = Math.max(100, activeAnimation.durationMs);
+  const sceneDuration = Math.max(
+    1000,
+    ...savedAnimations.map((animation) => animation.startMs + Math.max(100, animation.durationMs)),
+    activeAnimation.startMs + duration,
+  );
   const previewSettings = useMemo<OutputSettings>(
     () => ({
       ...settings,
@@ -1510,9 +1566,17 @@ function MotionControls({
     }),
     [settings],
   );
+  const previewSource = useMemo(
+    () => ({
+      ...selected,
+      animation: savedAnimations[0],
+      animations: savedAnimations.length > 0 ? savedAnimations : undefined,
+    }),
+    [savedAnimations, selected],
+  );
   const previewLayer = useMemo(
-    () => scaleLayerForMotionPreview(selected, previewSettings.width, previewSettings.height),
-    [previewSettings.height, previewSettings.width, selected],
+    () => scaleLayerForMotionPreview(previewSource, previewSettings.width, previewSettings.height),
+    [previewSettings.height, previewSettings.width, previewSource],
   );
 
   useEffect(() => {
@@ -1522,7 +1586,7 @@ function MotionControls({
     const render = async () => {
       if (cancelled) return;
       const elapsed = (performance.now() - startTime) % sceneDuration;
-      setPreviewProgress(Math.min(1, Math.max(0, (elapsed - animation.startMs) / duration)));
+      setPreviewProgress(Math.min(1, Math.max(0, (elapsed - activeAnimation.startMs) / duration)));
       if (previewCanvasRef.current) {
         await renderThumbnailToCanvas(previewCanvasRef.current, [previewLayer], assets, previewSettings, {
           animationTimeMs: elapsed,
@@ -1536,7 +1600,20 @@ function MotionControls({
       cancelled = true;
       window.cancelAnimationFrame(frame);
     };
-  }, [assets, animation.durationMs, animation.easing, animation.loop, animation.startMs, animation.type, animation.direction, animation.distance, sceneDuration, selected, previewLayer, previewSettings]);
+  }, [
+    activeAnimation.direction,
+    activeAnimation.distance,
+    activeAnimation.durationMs,
+    activeAnimation.easing,
+    activeAnimation.loop,
+    activeAnimation.startMs,
+    activeAnimation.type,
+    assets,
+    duration,
+    previewLayer,
+    previewSettings,
+    sceneDuration,
+  ]);
 
   return (
     <section className="panel-section motion-section">
@@ -1548,12 +1625,33 @@ function MotionControls({
         <div className="motion-object-preview">
           <canvas ref={previewCanvasRef} width={320} height={180} />
         </div>
-        <EasingGraph easing={animation.easing} progress={previewProgress} t={t} />
+        <EasingGraph easing={activeAnimation.easing} progress={previewProgress} t={t} />
+      </div>
+      <div className="motion-sequence-list" aria-label={t("inspector.motionSequence")}>
+        {editableAnimations.map((animation, index) => (
+          <button
+            key={`${animation.type}-${animation.startMs}-${index}`}
+            type="button"
+            className={index === activeMotionIndex ? "selected" : ""}
+            onClick={() => setActiveMotionIndex(index)}
+          >
+            <span>{index + 1}</span>
+            <strong>{t(animationTypeLabels[animation.type])}</strong>
+          </button>
+        ))}
+      </div>
+      <div className="motion-sequence-actions">
+        <button type="button" className="secondary-button icon-text" onClick={addMotion}>
+          <Copy size={15} /> {t("inspector.addMotion")}
+        </button>
+        <button type="button" className="ghost-button danger-text icon-text" disabled={savedAnimations.length === 0} onClick={removeMotion}>
+          <Trash2 size={15} /> {t("inspector.removeMotion")}
+        </button>
       </div>
       <label className="field">
         <span>{t("inspector.animationType")}</span>
         <select
-          value={animation.type}
+          value={activeAnimation.type}
           onChange={(event) => updateAnimation({ type: event.currentTarget.value as LayerAnimationType })}
         >
           {animationTypes.map((type) => (
@@ -1566,7 +1664,7 @@ function MotionControls({
       <div className="field-grid two">
         <SliderNumberInput
           label={t("inspector.animationStart")}
-          value={animation.startMs}
+          value={activeAnimation.startMs}
           min={0}
           max={10000}
           step={100}
@@ -1576,7 +1674,7 @@ function MotionControls({
         />
         <SliderNumberInput
           label={t("inspector.animationDuration")}
-          value={animation.durationMs}
+          value={activeAnimation.durationMs}
           min={100}
           max={10000}
           step={100}
@@ -1588,7 +1686,7 @@ function MotionControls({
       <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
         <span>{t("inspector.animationEasing")}</span>
         <select
-          value={animation.easing}
+          value={activeAnimation.easing}
           disabled={!hasAnimation}
           onChange={(event) => updateAnimation({ easing: event.currentTarget.value as LayerAnimationEasing })}
         >
@@ -1600,11 +1698,11 @@ function MotionControls({
         </select>
       </label>
       <div className="field-grid two">
-        <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
+        <label className={`field ${directionDisabled ? "field-disabled" : ""}`}>
           <span>{t("inspector.animationDirection")}</span>
           <select
-            value={animation.direction}
-            disabled={!hasAnimation}
+            value={directionSupported ? activeAnimation.direction : "none"}
+            disabled={directionDisabled}
             onChange={(event) => updateAnimation({ direction: event.currentTarget.value as LayerAnimationDirection })}
           >
             {animationDirections.map((direction) => (
@@ -1616,7 +1714,7 @@ function MotionControls({
         </label>
         <SliderNumberInput
           label={t("inspector.animationDistance")}
-          value={animation.distance}
+          value={activeAnimation.distance}
           min={0}
           max={800}
           step={10}
@@ -1627,7 +1725,7 @@ function MotionControls({
       <label className={`checkbox-row inline-checkbox ${!hasAnimation ? "field-disabled" : ""}`}>
         <input
           type="checkbox"
-          checked={animation.loop}
+          checked={activeAnimation.loop}
           disabled={!hasAnimation}
           onChange={(event) => updateAnimation({ loop: event.currentTarget.checked })}
         />
@@ -1687,12 +1785,10 @@ function graphPoint(
 
 function scaleLayerForMotionPreview(layer: ThumbnailLayer, canvasWidth: number, canvasHeight: number): ThumbnailLayer {
   const scale = Math.min(1.35, (canvasWidth * 0.68) / Math.max(1, layer.width), (canvasHeight * 0.62) / Math.max(1, layer.height));
-  const scaledAnimation = layer.animation
-    ? {
-        ...layer.animation,
-        distance: layer.animation.distance * scale,
-      }
-    : undefined;
+  const scaledAnimations = normalizeAnimations(layer.animations, layer.animation).map((animation) => ({
+    ...animation,
+    distance: animation.distance * scale,
+  }));
   const base = {
     ...layer,
     x: (canvasWidth - layer.width * scale) / 2,
@@ -1702,7 +1798,8 @@ function scaleLayerForMotionPreview(layer: ThumbnailLayer, canvasWidth: number, 
     layerBlur: layer.layerBlur * scale,
     edgeBlur: layer.edgeBlur * scale,
     cornerRadius: layer.cornerRadius * scale,
-    animation: scaledAnimation,
+    animation: scaledAnimations[0],
+    animations: scaledAnimations.length > 0 ? scaledAnimations : undefined,
   };
   if (layer.type === "text") {
     return {

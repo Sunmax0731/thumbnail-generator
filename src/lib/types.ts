@@ -88,6 +88,7 @@ export interface BaseLayer {
   edgeBlurStroke: boolean;
   cornerRadius: number;
   animation?: LayerAnimation;
+  animations?: LayerAnimation[];
 }
 
 export interface ImageLayer extends BaseLayer {

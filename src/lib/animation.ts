@@ -8,7 +8,16 @@ export function applyLayerAnimation(
   timeMs: number,
   sceneDurationMs = defaultSceneDurationMs,
 ): ThumbnailLayer {
-  const animation = layer.animation;
+  const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
+  return animations.reduce((currentLayer, animation) => applySingleLayerAnimation(currentLayer, animation, timeMs, sceneDurationMs), layer);
+}
+
+function applySingleLayerAnimation(
+  layer: ThumbnailLayer,
+  animation: LayerAnimation,
+  timeMs: number,
+  sceneDurationMs = defaultSceneDurationMs,
+): ThumbnailLayer {
   if (!animation || animation.type === "none") return layer;
 
   const progress = animationProgress(animation, timeMs, sceneDurationMs);
@@ -108,6 +117,10 @@ function offsetLayer(
 
 function isCycleAnimation(type: LayerAnimation["type"]): boolean {
   return type === "pulse" || type === "blink" || type === "drift" || type === "sway" || type === "shake" || type === "breathe";
+}
+
+export function animationTypeUsesDirection(type: LayerAnimation["type"]): boolean {
+  return type === "slide" || type === "drift" || type === "shake";
 }
 
 function scaleLayer<T extends ThumbnailLayer>(layer: T, scale: number): T {

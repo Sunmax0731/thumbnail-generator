@@ -27,10 +27,8 @@ This page is the quick feature index for users and reviewers.
 
 ## Layout Import And Export
 
-- Open the preview-pane Layout I/O section to generate CSV and HTML text from the current canvas.
-- Paste CSV rows and select Apply CSV to replace the current layer list.
-- Paste HTML-like markup with `data-layer` attributes and select Apply HTML to replace the current layer list.
-- Export the rendered thumbnail as PNG, JPEG, or WebP from the top toolbar.
+- CSV and HTML layout text remain part of browser edit-state and template compatibility.
+- Export the rendered thumbnail as PNG, JPEG, or WebP from the preview-pane export panel at maximum quality.
 
 ## Browser Storage
 
@@ -72,10 +70,11 @@ This page is the quick feature index for users and reviewers.
 
 ## Motion And OBS Preview
 
-- Open Motion to assign None, Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe animation to the selected layer.
+- Open Motion to assign one or more motion sets to the selected layer.
+- Each motion set can use None, Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
 - Review the selected-object Motion preview and easing graph before opening the OBS preview.
-- Choose direction None to keep movement disabled; distance is greyed out while None is active.
+- Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
 - Open OBS preview from the canvas toolbar to show the current animated canvas in a popup-style window without editor controls or selection handles.
 - Capture the OBS preview window in OBS with Window Capture for browser-only live display. Browser and OBS settings still decide whether OS/browser chrome is capturable.
 
@@ -87,6 +86,6 @@ This page is the quick feature index for users and reviewers.
 - Set palette opacity.
 - Apply each saved single color directly as Fill or Stroke to selected text and shape layers.
 - Preview graphical palette patterns from the draft color and opacity.
-- Save the currently displayed pattern as one multi-color palette set and apply each saved-palette color as Fill or Stroke.
+- Save the currently displayed pattern as one multi-color palette set and apply each saved-palette color as Fill or Stroke from rows that show the color code.
 - Collapse or expand saved multi-color palettes and registered single colors.
 - Resize the Colors list area when reviewing many saved swatches.

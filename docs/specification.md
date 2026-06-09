@@ -18,21 +18,22 @@ All layers share:
 - `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw a blurred layer copy behind the layer, and negative values draw the layer through a feathered alpha mask so inner edge softening is visible in preview and export.
 - `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
 - `cornerRadius`: rounded corner radius for image layers and supported shape paths. Rectangles use rounded rectangles; triangle, diamond, pentagon, hexagon, and star shapes use rounded polygon corners.
-- `animation`: optional per-layer animation settings used by Motion and OBS preview. Static PNG/JPEG/WebP export ignores animation time and renders the base layer state.
+- `animation`: optional first per-layer animation setting retained for backward compatibility.
+- `animations`: optional ordered list of per-layer animation settings used by Motion and OBS preview. Static PNG/JPEG/WebP export ignores animation time and renders the base layer state.
 
 ## Layer Animation
 
-Layer animation is optional metadata on existing image, text, and shape layers. It does not add a new layer type.
+Layer animation is optional metadata on existing image, text, and shape layers. It does not add a new layer type. A layer may store multiple entries in `animations`; the legacy `animation` field mirrors the first entry for older saved data and layout import/export paths.
 
 - `type`: `none`, `fade`, `slide`, `pop`, `pulse`, `blink`, `drift`, `zoom`, `spin`, `sway`, `shake`, or `breathe`.
 - `startMs`: start time in milliseconds.
 - `durationMs`: animation duration in milliseconds.
 - `easing`: `linear` plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce variants for `easeIn*`, `easeOut*`, and `easeInOut*`.
 - `loop`: whether the animation repeats.
-- `direction`: `none`, `left`, `right`, `up`, or `down` for motion presets that use movement. New animations default to `none`.
-- `distance`: movement distance in output pixels for movement presets. The Motion UI disables the distance control while direction is `none`.
+- `direction`: `none`, `left`, `right`, `up`, or `down` for motion presets that use movement. Direction is enabled for Slide, Drift, and Shake. New animations default to `none`.
+- `distance`: movement distance in output pixels for movement presets. The Motion UI disables the distance control while direction is unavailable or `none`.
 
-Rendering applies animation as a temporary draw-time transform. The stored layer position, size, rotation, and opacity are not mutated by playback.
+Rendering applies each animation entry in order as a temporary draw-time transform. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
 ## Image Layers
 
@@ -192,7 +193,7 @@ The left sidebar is grouped by task:
 
 - Assets: local image import, imported asset list, selected asset image-layer insertion, and Image Lab launch from imported asset rows.
 - Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing.
-- The previous left-panel Layouts tab is hidden from the GUI. Generated CSV/HTML text, CSV import, and HTML import are available from the preview-pane Layout I/O section.
+- The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
 - The previous guided creation strip is removed from the left panel.
 
 The right inspector is grouped by task:
@@ -200,7 +201,7 @@ The right inspector is grouped by task:
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
-- Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- Motion: ordered motion sets for the selected layer, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
 The Layers, Colors, Default templates, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 

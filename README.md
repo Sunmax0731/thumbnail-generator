@@ -19,12 +19,11 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Select multiple layers, move or rotate them together, align or evenly distribute them, or match angles to the first selected layer.
 - Group selected layers, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped row individually from Layers, and fit selected image/shape layers to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
-- Paste CSV rows or HTML-like markup with `data-layer` attributes from the preview-pane Layout I/O section to replace the layout.
-- Generate CSV and HTML layout text from the current thumbnail.
+- Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases, eight schedule starts, and ten animated eyecatch/waiting starts.
 - Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case, and resize the Default templates and Browser templates list areas.
-- Add layer animation presets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
+- Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the preview pane.
@@ -32,8 +31,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Open a draggable popup single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
-- Export to common video presets or custom output sizes.
+- Export to common video presets or custom output sizes from the preview pane at maximum quality.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
+- Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
 
 See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide.md](docs/user-guide.md) for step-by-step usage, and [docs/screenshot-guide.md](docs/screenshot-guide.md) for screenshot-based feature walkthroughs.
 

@@ -180,3 +180,4 @@ Waterfall task contract for the initial `thumbnail-generator` implementation.
 - [x] [P2] [Phase:04-implementation] Colors/Adjust/Shape/Previewフォローアップ修正 [Issue](Issues/0081-shape-color-preview-followup.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] Image Lab/単色ピッカー/OBSプレビュー整理 [Issue](Issues/0082-imagelab-color-obs-ui.md) [QCDS:Quality,Satisfaction] [Status:closed]
 - [x] [P2] [Phase:04-implementation] 色ピッカーのポップアップ化とテンプレート一覧リサイズ [Issue](Issues/0083-popup-template-resize.md) [QCDS:Quality,Satisfaction] [Status:closed]
+- [x] [P2] [Phase:04-implementation] ImageLab初期選択/削除後選択/GA/Motion/UI整理 [Issue](Issues/0084-ui-motion-analytics-followup.md) [QCDS:Quality,Satisfaction] [Status:closed]

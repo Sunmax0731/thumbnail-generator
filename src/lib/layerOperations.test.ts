@@ -3,14 +3,14 @@ import { makeShapeLayer } from "./layerFactory";
 import { selectIndividualLayerId, selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./layerOperations";
 
 describe("layerOperations", () => {
-  it("selects the top selectable layer when the deleted layer was the only selection", () => {
+  it("clears selection when the deleted layer was the only selection", () => {
     const layers = [
       makeShapeLayer({ id: "bottom", name: "Bottom" }),
       makeShapeLayer({ id: "locked-top", name: "Locked top", selectable: false }),
       makeShapeLayer({ id: "top", name: "Top" }),
     ];
 
-    expect(selectLayerIdsAfterDelete(layers, ["deleted"], "deleted")).toEqual(["top"]);
+    expect(selectLayerIdsAfterDelete(layers, ["deleted"], "deleted")).toEqual([]);
   });
 
   it("retains other valid selected layers after one selected layer is deleted", () => {

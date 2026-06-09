@@ -14,7 +14,7 @@ export const defaultOutputSettings: OutputSettings = {
   width: 1280,
   height: 720,
   format: "png",
-  quality: 0.92,
+  quality: 1,
   background: "#111827",
 };
 
@@ -45,4 +45,3 @@ export function mimeForFormat(format: ExportFormat): string {
 export function extensionForFormat(format: ExportFormat): string {
   return format === "jpeg" ? "jpg" : format;
 }
-

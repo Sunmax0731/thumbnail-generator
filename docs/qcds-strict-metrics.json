@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, preview-pane Layout I/O, preview pan, user-controlled zoom on preset changes, fixed output-frame preview during off-canvas drags, outside-frame deselection, Colors layout cleanup, draggable popup Adjust single-color picker, hidden Colors-side Brand kit registration buttons, expanded shape kinds, rounded polygon corners, Image Lab asset-row entry and modal cleanup, resizable Default and Browser template lists, popup-style OBS preview, Schedule templates, expanded Motion/easing controls, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
+    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, hidden Generated layout section, preview-pane Edit state/export controls, preview pan, user-controlled zoom on preset changes, fixed output-frame preview during off-canvas drags, outside-frame deselection, Colors layout cleanup, draggable popup Adjust single-color picker, hidden Colors-side Brand kit registration buttons, expanded shape kinds, rounded polygon corners, Image Lab asset-row entry with no-range default, deletion selection clearing, resizable Default and Browser template lists, popup-style OBS preview, Schedule templates, expanded Motion/easing controls with multiple motion sets and direction disabling, expanded hosted font options, Google Analytics tracking, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, maximum-quality WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -92,7 +92,7 @@
       "26 text-layer font dropdown options",
       "expanded hosted Google Fonts choices",
       "5 templates per core category plus 8 Schedule templates plus 10 Motion templates",
-      "preview-pane Layout I/O",
+      "preview-pane Edit state/export controls",
       "preview-pane edit state",
       "hidden Colors-side Brand kit registration buttons",
       "Colors pattern dropdown before color wheel",

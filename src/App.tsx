@@ -1417,7 +1417,7 @@ function App() {
 
   const handleExport = useCallback(
     async (format?: ExportFormat) => {
-      const exportSettings = format ? { ...settings, format } : settings;
+      const exportSettings = { ...settings, ...(format ? { format } : {}), quality: 1 };
       setSettings(exportSettings);
       setIsExporting(true);
       setStatus("Exporting thumbnail...");
@@ -1477,9 +1477,7 @@ function App() {
         language={language}
         onSettingsChange={updateSettings}
         onPresetChange={handlePresetChange}
-        onExport={handleExport}
         onLanguageChange={setLanguage}
-        isExporting={isExporting}
         t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
@@ -1512,19 +1510,14 @@ function App() {
           zoom={zoom}
           cursor={canvasCursor}
           previewPadding={previewPadding}
-          csvText={csvText}
-          htmlText={htmlText}
+          isExporting={isExporting}
           autoSaveEnabled={autoSaveEnabled}
           savedEditStateUpdatedAt={savedEditStateUpdatedAt}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
-          onCsvTextChange={setCsvText}
-          onHtmlTextChange={setHtmlText}
-          onApplyCsv={applyCsv}
-          onApplyHtml={applyHtml}
-          onSyncLayoutText={syncLayoutTextFromLayers}
+          onExport={handleExport}
           onAutoSaveChange={setAutoSaveEnabled}
           onSaveEditState={() => saveEditState("manual")}
           onRestoreEditState={restoreEditState}
