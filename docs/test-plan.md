@@ -121,7 +121,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 ## Current Results
 
-Latest completed on 2026-06-09.
+Latest completed on 2026-06-10.
+
+### Export, Colors, And Adjust Layout Follow-Up
+
+Completed on 2026-06-10 for the requested Export, Colors, and Adjust UI cleanup.
+
+- `npm test`: pass. 26 test files, 99 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4211/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: primary UI visible, initial canvas nonblank, Export and Edit state shared a one-column bottom layout with matching width and left edge, Export actions rendered as three columns, a text layer was selected and Adjust showed common `Layer` controls above `Text settings`, Adjust X editing kept the canvas nonblank, registered single-color Fill button text was `Fill`, legacy `Fill #10b6d7` displayed as `#10b6d7`, saved palette color rows showed only HEX values without `Color 1` labels, WebP export downloaded, mobile canvas nonblank, mobile horizontal overflow `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-export-colors-adjust-desktop.png`
+  - `docs/assets/runtime-20260610-export-colors-adjust-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-export-colors-adjust/thumbnail-1280x720-2026-06-09T15-29-06-954Z.webp`.
 
 ### ImageLab, Motion, Analytics, And Preview Export Follow-Up
 

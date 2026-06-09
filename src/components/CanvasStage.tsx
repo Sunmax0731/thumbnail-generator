@@ -256,9 +256,11 @@ export function CanvasStage({
       </div>
       <div className="stage-bottom-row">
         <section className="stage-export-panel" aria-label={t("toolbar.exportActions")}>
-          <div className="section-heading">
-            <ImageDown size={16} />
-            <h2>{t("toolbar.export")}</h2>
+          <div className="stage-export-header">
+            <div className="section-heading">
+              <ImageDown size={16} />
+              <h2>{t("toolbar.export")}</h2>
+            </div>
           </div>
           <div className="stage-export-actions">
             <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>

@@ -602,128 +602,136 @@ export function InspectorPanel({
             </div>
 
             <div className="field-stack">
-              <TextInput
-                label={t("inspector.name")}
-                value={selected.name}
-                onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, name: value }))}
-              />
-              <div className="field-grid two">
-                <SliderNumberInput
-                  label={t("inspector.x")}
-                  value={selected.x}
-                  min={-settings.width}
-                  max={settings.width * 2}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)}
+              <ControlGroup title={t("inspector.layerControls")}>
+                <TextInput
+                  label={t("inspector.name")}
+                  value={selected.name}
+                  onChange={(value) => onUpdateLayer(selected.id, (layer) => ({ ...layer, name: value }))}
                 />
-                <SliderNumberInput
-                  label={t("inspector.y")}
-                  value={selected.y}
-                  min={-settings.height}
-                  max={settings.height * 2}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)}
-                />
-                <SliderNumberInput
-                  label={t("inspector.width")}
-                  value={selected.width}
-                  min={16}
-                  max={settings.width * 2}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "width", value, onUpdateLayer)}
-                />
-                <SliderNumberInput
-                  label={t("inspector.height")}
-                  value={selected.height}
-                  min={16}
-                  max={settings.height * 2}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
-                />
-              </div>
-              {selected.type === "image" || selected.type === "shape" ? (
-                <button type="button" className="secondary-button icon-text wide-button" onClick={onFitSelectedToCanvas}>
-                  <Move size={16} /> {t("inspector.fitToCanvas")}
-                </button>
-              ) : null}
-              <div className="field-with-action">
-                <SliderNumberInput
-                  label={t("inspector.rotation")}
-                  value={selected.rotation}
-                  min={-180}
-                  max={180}
-                  step={1}
-                  icon={<RotateCw size={14} />}
-                  suffix="deg"
-                  onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
-                />
-                <button
-                  type="button"
-                  className="secondary-button icon-text reset-button"
-                  onClick={() => updateNumber(selected, "rotation", 0, onUpdateLayer)}
-                >
-                  <RotateCcw size={15} /> {t("inspector.resetRotation")}
-                </button>
-              </div>
-              <div className="field-grid two">
-                <SliderNumberInput
-                  label={t("inspector.layerBlur")}
-                  value={selected.layerBlur}
-                  min={0}
-                  max={36}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "layerBlur", value, onUpdateLayer)}
-                />
-                <SliderNumberInput
-                  label={t("inspector.edgeBlur")}
-                  value={selected.edgeBlur}
-                  min={-48}
-                  max={48}
-                  step={1}
-                  onChange={(value) => updateNumber(selected, "edgeBlur", value, onUpdateLayer)}
-                />
-                <label
-                  className={`checkbox-row inline-checkbox ${selected.type === "image" ? "field-disabled" : ""}`}
-                  title={t("inspector.edgeBlurStrokeHelp")}
-                >
-                  <input
-                    type="checkbox"
-                    checked={selected.edgeBlurStroke}
-                    disabled={selected.type === "image"}
-                    onChange={(event) => {
-                      const edgeBlurStroke = event.currentTarget.checked;
-                      onUpdateLayer(selected.id, (layer) => ({ ...layer, edgeBlurStroke }));
-                    }}
+                <div className="field-grid two">
+                  <SliderNumberInput
+                    label={t("inspector.x")}
+                    value={selected.x}
+                    min={-settings.width}
+                    max={settings.width * 2}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "x", value, onUpdateLayer)}
                   />
-                  <span>{t("inspector.edgeBlurStroke")}</span>
-                </label>
-                <SliderNumberInput
-                  label={t("inspector.cornerRadius")}
-                  value={selected.cornerRadius}
-                  min={0}
-                  max={Math.max(180, Math.min(selected.width, selected.height) / 2)}
-                  step={1}
-                  disabled={selected.type === "text"}
-                  onChange={(value) => updateNumber(selected, "cornerRadius", value, onUpdateLayer)}
-                />
-              </div>
+                  <SliderNumberInput
+                    label={t("inspector.y")}
+                    value={selected.y}
+                    min={-settings.height}
+                    max={settings.height * 2}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "y", value, onUpdateLayer)}
+                  />
+                  <SliderNumberInput
+                    label={t("inspector.width")}
+                    value={selected.width}
+                    min={16}
+                    max={settings.width * 2}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "width", value, onUpdateLayer)}
+                  />
+                  <SliderNumberInput
+                    label={t("inspector.height")}
+                    value={selected.height}
+                    min={16}
+                    max={settings.height * 2}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "height", value, onUpdateLayer)}
+                  />
+                </div>
+                {selected.type === "image" || selected.type === "shape" ? (
+                  <button type="button" className="secondary-button icon-text wide-button" onClick={onFitSelectedToCanvas}>
+                    <Move size={16} /> {t("inspector.fitToCanvas")}
+                  </button>
+                ) : null}
+                <div className="field-with-action">
+                  <SliderNumberInput
+                    label={t("inspector.rotation")}
+                    value={selected.rotation}
+                    min={-180}
+                    max={180}
+                    step={1}
+                    icon={<RotateCw size={14} />}
+                    suffix="deg"
+                    onChange={(value) => updateNumber(selected, "rotation", value, onUpdateLayer)}
+                  />
+                  <button
+                    type="button"
+                    className="secondary-button icon-text reset-button"
+                    onClick={() => updateNumber(selected, "rotation", 0, onUpdateLayer)}
+                  >
+                    <RotateCcw size={15} /> {t("inspector.resetRotation")}
+                  </button>
+                </div>
+                <div className="field-grid two compact-adjust-grid">
+                  <SliderNumberInput
+                    label={t("inspector.layerBlur")}
+                    value={selected.layerBlur}
+                    min={0}
+                    max={36}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "layerBlur", value, onUpdateLayer)}
+                  />
+                  <SliderNumberInput
+                    label={t("inspector.edgeBlur")}
+                    value={selected.edgeBlur}
+                    min={-48}
+                    max={48}
+                    step={1}
+                    onChange={(value) => updateNumber(selected, "edgeBlur", value, onUpdateLayer)}
+                  />
+                  <label
+                    className={`checkbox-row inline-checkbox ${selected.type === "image" ? "field-disabled" : ""}`}
+                    title={t("inspector.edgeBlurStrokeHelp")}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selected.edgeBlurStroke}
+                      disabled={selected.type === "image"}
+                      onChange={(event) => {
+                        const edgeBlurStroke = event.currentTarget.checked;
+                        onUpdateLayer(selected.id, (layer) => ({ ...layer, edgeBlurStroke }));
+                      }}
+                    />
+                    <span>{t("inspector.edgeBlurStroke")}</span>
+                  </label>
+                  <SliderNumberInput
+                    label={t("inspector.cornerRadius")}
+                    value={selected.cornerRadius}
+                    min={0}
+                    max={Math.max(180, Math.min(selected.width, selected.height) / 2)}
+                    step={1}
+                    disabled={selected.type === "text"}
+                    onChange={(value) => updateNumber(selected, "cornerRadius", value, onUpdateLayer)}
+                  />
+                </div>
+              </ControlGroup>
 
               {selected.type === "image" && (
-                <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
+                <ControlGroup title={t("inspector.imageControls")}>
+                  <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
+                </ControlGroup>
               )}
               {selected.type === "text" && (
-                <TextControls
-                  selected={selected}
-                  fontOptions={fontOptions}
-                  onUpdateLayer={onUpdateLayer}
-                  onCustomFontFiles={onCustomFontFiles}
-                  onFitTextToBounds={onFitTextToBounds}
-                  onOpenColorPicker={openLayerColorPicker}
-                  t={t}
-                />
+                <ControlGroup title={t("inspector.textControls")}>
+                  <TextControls
+                    selected={selected}
+                    fontOptions={fontOptions}
+                    onUpdateLayer={onUpdateLayer}
+                    onCustomFontFiles={onCustomFontFiles}
+                    onFitTextToBounds={onFitTextToBounds}
+                    onOpenColorPicker={openLayerColorPicker}
+                    t={t}
+                  />
+                </ControlGroup>
               )}
               {selected.type === "shape" && (
-                <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} onOpenColorPicker={openLayerColorPicker} t={t} />
+                <ControlGroup title={t("inspector.shapeControls")}>
+                  <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} onOpenColorPicker={openLayerColorPicker} t={t} />
+                </ControlGroup>
               )}
             </div>
           </section>
@@ -829,6 +837,15 @@ function ResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: n
       }}
     >
       <GripHorizontal size={16} />
+    </div>
+  );
+}
+
+function ControlGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <div className="control-group">
+      <h3>{title}</h3>
+      <div className="control-group-body">{children}</div>
     </div>
   );
 }
@@ -1139,7 +1156,7 @@ function PaletteControls({
                       title={t("inspector.applyColor", { name: color, target: t("inspector.fill") })}
                       onClick={() => onApply(color, "fill")}
                     >
-                      <span className="swatch-apply-dot" style={{ background: color }} />
+                      {t("inspector.fill")}
                     </button>
                     <button
                       type="button"
@@ -1150,7 +1167,6 @@ function PaletteControls({
                       {t("inspector.stroke")}
                     </button>
                     <div className="swatch-meta">
-                      <span className="swatch-name">{t("inspector.paletteColor")} {index + 1}</span>
                       <span className="swatch-value">{color}</span>
                     </div>
                   </div>
@@ -1190,7 +1206,7 @@ function PaletteControls({
               title={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
               onClick={() => onApply(color.value, "fill", color.alpha)}
             >
-              <span className="swatch-apply-dot" style={{ background: color.value }} />
+              {t("inspector.fill")}
             </button>
             <button
               type="button"
@@ -1202,7 +1218,7 @@ function PaletteControls({
             </button>
             <div className="swatch-meta">
               <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
-                <span className="swatch-name">{color.name}</span>
+                <span className="swatch-name">{paletteColorDisplayName(color)}</span>
                 <span className="swatch-value">{Math.round(color.alpha * 100)}%</span>
               </button>
             </div>
@@ -1345,6 +1361,11 @@ function uniqueColors(colors: string[]): string[] {
     unique.push(normalized);
   }
   return unique;
+}
+
+function paletteColorDisplayName(color: PaletteColor): string {
+  const cleaned = color.name.replace(/^(Fill|Stroke)\s+(#[0-9a-f]{3,8})$/i, "$2").trim();
+  return cleaned || color.value;
 }
 
 function wheelPointStyle(color: string): { left: string; top: string } {

@@ -1,6 +1,6 @@
 # QCDS Evaluation
 
-Completed on 2026-06-09.
+Completed on 2026-06-10.
 
 ## Scores
 
@@ -17,7 +17,7 @@ Cost is A+ because the app remains static, browser-only, GitHub Pages compatible
 
 Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, and docs can be packaged with the repo workflow. It is not S tier until a fresh remote Pages workflow run is observed after this commit.
 
-Satisfaction is A+ because this pass closes the requested UI cleanup and follow-up fixes: Adjust places Shape stroke width above the shape dropdown, Adjust Fill/Stroke opens a draggable popup alpha-capable single-color picker without a color wheel, redundant opacity controls are gone, the preview frame no longer stretches around off-canvas content, clicking outside the output frame clears selection, Assets opens Image Lab only from imported asset rows, Image Lab no longer duplicates import/source selection controls, chroma-key settings are separated from processed-layer creation and sit beside position/size controls, the processed-layer button is in the modal header, OBS preview opens a popup-style canvas-only document, and both Default templates and Browser templates lists are resizable. The shipped template set has 38 practical starts, including eight Schedule templates and ten Motion templates. The runtime gate verified the new UI placement, draggable color popup, outside-frame deselection, template-list resizing, shape controls, fixed output frame, Image Lab cleanup, OBS preview document, export, mobile layout, and QCDS/user-guide/test-plan documentation. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
+Satisfaction is A+ because this pass closes the requested UI cleanup and follow-up fixes: Export now uses the same full-width bottom-pane rhythm as Edit state, registered single-color Fill buttons show the word `Fill`, legacy registered color names hide the `Fill`/`Stroke` prefix before HEX values, saved palette rows omit `Color 1`-style labels, and Adjust groups common layer controls above Text, Shape, or Image-specific controls. Prior cleanup remains in place: Adjust Fill/Stroke opens a draggable popup alpha-capable single-color picker without a color wheel, redundant opacity controls are gone, the preview frame no longer stretches around off-canvas content, clicking outside the output frame clears selection, Image Lab is opened from imported asset rows without duplicated import controls, OBS preview opens a popup-style canvas-only document, and template lists are resizable. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
 
 ## Codex Work Dashboard Re-Evaluation
 
@@ -37,13 +37,17 @@ Browser automation path: Playwright headless Chromium.
 
 Evidence:
 
-- `docs/assets/runtime-20260609-popup-template-resize-desktop.png`
-- `docs/assets/runtime-20260609-popup-template-resize-mobile.png`
+- `docs/assets/runtime-20260610-export-colors-adjust-desktop.png`
+- `docs/assets/runtime-20260610-export-colors-adjust-mobile.png`
 
 Latest measured checks:
 
-- `npm test`: pass. 26 test files, 98 tests.
+- `npm test`: pass. 26 test files, 99 tests.
 - `npm run build`: pass.
+- Export/Edit state layout: pass. Export and Edit state shared one full-width bottom-pane layout with matching width and left edge, and Export actions rendered as three columns.
+- Adjust grouping: pass. A selected text layer showed common `Layer` controls above `Text settings`, and Adjust X editing kept the canvas nonblank.
+- Colors row cleanup: pass. Registered single-color Fill button text was `Fill`; legacy `Fill #10b6d7` displayed as `#10b6d7`; saved palette rows showed only HEX values and no `Color 1` labels.
+- Export and mobile: pass. WebP export downloaded, mobile canvas rendered nonblank, mobile horizontal overflow was `0`, and no page errors or app console errors were reported.
 - UI reposition: pass. Left Layouts, guided start, Templates Brand kit, and Assets Quick Add are hidden; Layers Quick Add and Layer list collapse and expand.
 - Layer distribution: pass. Distribute H and Distribute V work on a three-layer multi-selection.
 - Preview zoom/pan: pass. Preset changes kept zoom at `94%`; Pan drag moved the preview scroll area without changing zoom.
@@ -58,6 +62,20 @@ Latest measured checks:
 - Image Lab, single-color picker, and OBS follow-up: pass. Adjust Shape stroke width appears before the shape dropdown; Fill/Stroke color displays open a compact Sketch-style single-color picker with `0` color wheels and `0` palette bars; the preview output frame remains `1280x720`; Assets has no standalone Image Lab button; imported asset rows still expose Image Lab; Image Lab source/import/select controls are removed; chroma-key settings are inline beside position/size controls; processed-layer creation is in the modal header; OBS preview document contains one canvas and no toolbar/header/nav-like controls.
 - UI follow-up, preview-pane Edit state/export controls, hidden Generated layout UI, hidden Colors-side Brand kit registration buttons, hidden Templates Brand kit setup, Adjust numeric editing, WebP export, desktop screenshot, mobile screenshot, and mobile no-overflow checks: pass.
 - Console health: no page errors and no app HTTP 4xx/5xx responses; one test-induced `getImageData` warning may be produced by canvas sampling.
+
+## Export, Colors, And Adjust Layout Follow-Up Evidence
+
+Completed on 2026-06-10.
+
+- Scope: aligned the preview-pane Export section with the Edit state layout, changed registered single-color Fill application buttons to text-labeled `Fill`, removed target prefixes from legacy registered color names, removed saved-palette `Color 1`-style labels, and grouped Adjust controls into common Layer controls plus type-specific Text, Shape, or Image sections.
+- Quality: A+. Runtime coverage verifies bottom-pane layout alignment, Adjust grouping, registered color row text, saved palette row labels, layer numeric editing, canvas nonblank state, export, mobile no-overflow, and console health.
+- Cost: A+. The change stays in existing static React components, CSS, and docs; no backend, service, account, or new dependency was added.
+- Delivery: A+. `npm test` passed with 26 test files and 99 tests; `npm run build` passed; runtime evidence is recorded in `docs/test-plan.md`.
+- Satisfaction: A+. The three requested UI fixes are implemented without changing the browser-only data model or export workflow.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4211/thumbnail-generator/`.
+- Runtime checks: nonblank render, primary UI visibility, Export/Edit state matching width and left edge, Export actions in three columns, Adjust common `Layer` group above `Text settings`, Adjust X edit, registered Fill button text `Fill`, legacy `Fill #10b6d7` displayed as `#10b6d7`, saved palette HEX-only rows with no `Color 1` labels, WebP export download, mobile nonblank canvas, mobile horizontal overflow `0`, and no page errors or app console errors.
+- Evidence screenshots: `docs/assets/runtime-20260610-export-colors-adjust-desktop.png` and `docs/assets/runtime-20260610-export-colors-adjust-mobile.png`.
+- Export evidence: `output/runtime-downloads-20260610-export-colors-adjust/thumbnail-1280x720-2026-06-09T15-29-06-954Z.webp`.
 
 ## Popup Color Picker And Template List Resizing Evidence
 
