@@ -53,7 +53,7 @@ This page is the quick feature index for users and reviewers.
 
 ## Image And Text Tools
 
-- Import local image files from the preview-pane Output section.
+- Import local image files from the Assets tab.
 - Use the Assets tab as the imported-image list, with per-image add, Image Lab, and delete actions.
 - YouTube thumbnail import helpers remain browser-only, while the current GUI hides the YouTube URL controls.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.

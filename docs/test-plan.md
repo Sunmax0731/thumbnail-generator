@@ -123,6 +123,22 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Layout Readjust Follow-Up
+
+Completed on 2026-06-10 for the requested tab wrapping, right-pane tab width, Assets-tab image import, and template modal style adjustments.
+
+- `npm test`: pass. 27 test files, 102 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4214/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: left tabs stayed on one line with `white-space: nowrap` on desktop and mobile, right inspector tabs rendered as three equal-width columns without an unused right-side column, preview Output no longer contained the image import button, Assets tab contained exactly one image import input, YouTube URL UI remained hidden, importing `asset-tab-import.png` from Assets added an asset row, selecting `Shorts Quote` opened a `.confirm-backdrop .confirm-dialog` modal matching the layer-delete modal style, confirming applied the template and changed the canvas size to `1080x1920`, WebP export downloaded, mobile horizontal overflow `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-layout-readjust-desktop.png`
+  - `docs/assets/runtime-20260610-layout-readjust-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-layout-readjust/thumbnail-1080x1920-2026-06-09T21-54-33-738Z.webp`.
+
 ### Left Layers, Asset Deletion, And Preview Size Controls
 
 Completed on 2026-06-10 for the requested left-panel Layers relocation, asset deletion, preview-header size controls, and template confirmation flow.

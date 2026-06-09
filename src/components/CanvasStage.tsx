@@ -4,7 +4,6 @@ import {
   FileDown,
   FolderOpen,
   Hand,
-  ImagePlus,
   ImageDown,
   Maximize2,
   Monitor,
@@ -35,7 +34,6 @@ interface CanvasStageProps {
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onExport: (format?: ExportFormat) => void;
-  onImageFiles: (files: FileList | null) => void;
   onSettingsChange: (next: Partial<OutputSettings>) => void;
   onPresetChange: (presetId: string) => void;
   onAutoSaveChange: (enabled: boolean) => void;
@@ -64,7 +62,6 @@ export function CanvasStage({
   onPointerMove,
   onPointerUp,
   onExport,
-  onImageFiles,
   onSettingsChange,
   onPresetChange,
   onAutoSaveChange,
@@ -323,19 +320,6 @@ export function CanvasStage({
               <h2>{t("toolbar.export")}</h2>
             </div>
           </div>
-          <label className="file-drop compact-drop stage-image-import">
-            <ImagePlus size={15} />
-            <span>{t("left.importImages")}</span>
-            <input
-              type="file"
-              accept="image/*"
-              multiple
-              onChange={(event) => {
-                onImageFiles(event.currentTarget.files);
-                event.currentTarget.value = "";
-              }}
-            />
-          </label>
           <div className="stage-export-actions">
             <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>
               <ImageDown size={16} /> PNG

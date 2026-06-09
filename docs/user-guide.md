@@ -23,7 +23,7 @@ npm run preview
 - Assets: review imported assets, add a selected asset as an image layer, open Image Lab from an imported asset row, or delete an imported asset.
 - Preview pane export: download PNG, JPG, or WebP beside the current canvas. On desktop, Export and Edit state sit side by side, and each section stacks its action buttons vertically.
 - Preview pane Edit state: save or restore the current edit state, enable autosave, export/import JSON, and delete the saved work-in-progress slot while the canvas remains visible.
-- The preview header contains the output preset, width, and height controls. The preview Output section contains local image import plus PNG/JPG/WebP export buttons.
+- The preview header contains the output preset, width, and height controls. The preview Output section contains PNG/JPG/WebP export buttons.
 - Adjust: edit the selected layer's position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - Motion: assign multiple ordered motion sets, preview the selected object, and inspect the easing graph for OBS preview playback.
@@ -141,7 +141,7 @@ The OBS preview opens a popup-style browser window that contains only the animat
 
 ## Image Lab
 
-Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Import images from the preview Output section before opening Image Lab; the modal focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Rectangle and circle selections can be moved or resized by dragging the preview handles after selection. Polygon points can be dragged after placement, and Alt-clicking a point removes it. Import images from the Assets tab before opening Image Lab; the modal focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
 
 ## Color Palette
 

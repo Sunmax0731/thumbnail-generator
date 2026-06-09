@@ -650,7 +650,6 @@ function App() {
     (templateId: string) => {
       const template = defaultTemplates.find((candidate) => candidate.id === templateId);
       if (!template) return;
-      if (typeof window !== "undefined" && !window.confirm(t("left.confirmApplyTemplate", { name: template.name }))) return;
       const nextLayers = template.createLayers();
       setSettings(template.settings);
       setAssets(initialAssets(import.meta.env.BASE_URL));
@@ -662,7 +661,7 @@ function App() {
       setTemplateName(template.name);
       setStatus(`Loaded default template "${template.name}".`);
     },
-    [t],
+    [],
   );
 
   const saveEditState = useCallback(
@@ -1363,7 +1362,6 @@ function App() {
     (templateId: string) => {
       const template = templates.find((candidate) => candidate.id === templateId);
       if (!template) return;
-      if (typeof window !== "undefined" && !window.confirm(t("left.confirmApplyTemplate", { name: template.name }))) return;
       setSettings(template.settings);
       setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
       const nextLayers = template.layers.map((layer) => ({ ...layer, selectable: layer.selectable !== false }));
@@ -1374,7 +1372,7 @@ function App() {
       setTemplateName(template.name);
       setStatus(`Loaded template "${template.name}".`);
     },
-    [templates, t],
+    [templates],
   );
 
   const deleteTemplate = useCallback(
@@ -1572,6 +1570,7 @@ function App() {
             onRenameGroup: renameLayerGroup,
             onUngroup: ungroupLayerGroup,
           }}
+          onImageFiles={handleImageFiles}
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
           onDeleteAsset={deleteAsset}
@@ -1605,7 +1604,6 @@ function App() {
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
           onExport={handleExport}
-          onImageFiles={handleImageFiles}
           onSettingsChange={updateSettings}
           onPresetChange={handlePresetChange}
           onAutoSaveChange={setAutoSaveEnabled}

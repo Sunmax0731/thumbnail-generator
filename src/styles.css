@@ -285,11 +285,11 @@ button:disabled {
 }
 
 .source-tabs {
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .inspector-tabs {
-  grid-template-columns: repeat(4, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .panel-tabs button,
@@ -306,6 +306,7 @@ button:disabled {
   color: var(--muted);
   font-size: 12px;
   font-weight: 850;
+  white-space: nowrap;
 }
 
 .panel-tabs button.selected,
@@ -960,12 +961,6 @@ button:disabled {
 
 .stage-export-actions .icon-text {
   justify-content: center;
-}
-
-.stage-image-import {
-  min-height: 38px;
-  justify-content: center;
-  padding: 0 10px;
 }
 
 .stage-edit-state {

@@ -194,8 +194,7 @@ The left sidebar is grouped by task in this order:
 
 - Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing. Applying a template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Assets: imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, and asset deletion. Deleting an asset also removes image layers that reference it.
-- The local image import control lives in the preview-pane Output section, left of the PNG/JPG/WebP output buttons.
+- Assets: local image import, imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, and asset deletion. Deleting an asset also removes image layers that reference it.
 - The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
 - The previous guided creation strip is removed from the left panel.
 
@@ -398,7 +397,7 @@ The canvas preview pane contains the edit-state section. It supports edit-state 
 
 ## Image Lab
 
-The Image Lab modal workspace opens from an imported asset row in the Assets tab. Local image import is handled from the preview Output section, and Assets stays focused on the imported image list. Image Lab processes the selected image in the browser and creates a processed image asset plus a new image layer. Supported operations:
+The Image Lab modal workspace opens from an imported asset row in the Assets tab. Local image import is handled from the Assets tab, and the modal processes the selected image in the browser to create a processed image asset plus a new image layer. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
 - Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.

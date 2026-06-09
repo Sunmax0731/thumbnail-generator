@@ -6,7 +6,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 
 ## Functional Requirements
 
-- Import local image files from the preview-pane Output section and use them as editable thumbnail layers.
+- Import local image files from the Assets tab and use them as editable thumbnail layers.
 - Keep browser-only YouTube video thumbnail import helpers available, while the current GUI hides the YouTube URL import controls.
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab from its asset row.
 - Configure image size, position, rotation, opacity, and simple effects.

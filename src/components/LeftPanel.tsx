@@ -26,6 +26,7 @@ interface LeftPanelProps {
   templateName: string;
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
+  onImageFiles: (files: FileList | null) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
   onDeleteAsset: (key: string) => void;
@@ -45,6 +46,7 @@ export function LeftPanel({
   templateName,
   templates,
   defaultTemplates,
+  onImageFiles,
   onSelectAsset,
   onAddImageAssetLayer,
   onDeleteAsset,
@@ -60,6 +62,7 @@ export function LeftPanel({
   const [templateFilter, setTemplateFilter] = useState<TemplateFilter>("all");
   const [defaultTemplateListHeight, setDefaultTemplateListHeight] = useState(260);
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
+  const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string; kind: "default" | "browser" } | null>(null);
   const filteredDefaultTemplates = useMemo(
     () =>
       templateFilter === "all"
@@ -108,6 +111,19 @@ export function LeftPanel({
               <h2>{t("left.images")}</h2>
               <span className="section-count">{assets.length}</span>
             </div>
+            <label className="file-drop">
+              <ImagePlus size={19} />
+              <span>{t("left.importImages")}</span>
+              <input
+                type="file"
+                accept="image/*"
+                multiple
+                onChange={(event) => {
+                  onImageFiles(event.currentTarget.files);
+                  event.currentTarget.value = "";
+                }}
+              />
+            </label>
             <div className="asset-list" aria-label={t("left.assetsList")}>
               {assets.map((asset) => (
                 <div className={`asset-row ${asset.key === selectedAssetKey ? "selected" : ""}`} key={asset.key}>
@@ -177,7 +193,7 @@ export function LeftPanel({
                   type="button"
                   className="template-preset-row"
                   key={template.id}
-                  onClick={() => onLoadDefaultTemplate(template.id)}
+                  onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name, kind: "default" })}
                 >
                   <span className="template-mini-preview" aria-hidden="true">
                     {template.previewColors.map((color) => (
@@ -221,7 +237,11 @@ export function LeftPanel({
               ) : (
                 templates.map((template) => (
                   <div className="template-row" key={template.id}>
-                    <button type="button" className="template-load" onClick={() => onLoadTemplate(template.id)}>
+                    <button
+                      type="button"
+                      className="template-load"
+                      onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name, kind: "browser" })}
+                    >
                       <FolderOpen size={15} />
                       <span>{template.name}</span>
                     </button>
@@ -244,6 +264,19 @@ export function LeftPanel({
           </section>
 
         </>
+      ) : null}
+
+      {templateApplyCandidate ? (
+        <ApplyTemplateDialog
+          name={templateApplyCandidate.name}
+          onCancel={() => setTemplateApplyCandidate(null)}
+          onConfirm={() => {
+            if (templateApplyCandidate.kind === "default") onLoadDefaultTemplate(templateApplyCandidate.id);
+            else onLoadTemplate(templateApplyCandidate.id);
+            setTemplateApplyCandidate(null);
+          }}
+          t={t}
+        />
       ) : null}
     </aside>
   );
@@ -299,4 +332,35 @@ function TemplateResizeHandle({ label, onResize }: { label: string; onResize: (d
 
 function clampTemplateListHeight(value: number): number {
   return Math.min(720, Math.max(120, Math.round(value)));
+}
+
+function ApplyTemplateDialog({
+  name,
+  onCancel,
+  onConfirm,
+  t,
+}: {
+  name: string;
+  onCancel: () => void;
+  onConfirm: () => void;
+  t: Translator;
+}) {
+  return (
+    <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="apply-template-title">
+        <div className="modal-title-block">
+          <h2 id="apply-template-title">{t("left.applyTemplateQuestion")}</h2>
+        </div>
+        <p>{t("left.applyTemplateCopy", { name })}</p>
+        <div className="confirm-actions">
+          <button type="button" className="secondary-button" onClick={onCancel}>
+            {t("inspector.cancel")}
+          </button>
+          <button type="button" className="primary-button" onClick={onConfirm}>
+            {t("left.applyTemplate")}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
 }
