@@ -27,7 +27,7 @@
 - YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
-- Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
+- Color palette helpers convert HEX and RGB channel input for palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
@@ -103,7 +103,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
-- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, explicit base-color controls, large palette bars, synchronized HEX/RGB slider input with practical slider width, and recent-color reuse.
+- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
@@ -115,6 +115,25 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### UIW React Color Palette Input
+
+Completed on 2026-06-09.
+
+- Scope: replaced the custom single-color HEX/RGB/opacity controls in Colors with an embedded `@uiw/react-color` Sketch-style editor while leaving the linked color wheel, harmony generation, saved palettes, Fill/Stroke application, and Brand kit color actions unchanged.
+- `npm test`: pass. 26 test files, 93 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4173/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1100`.
+- Primary UI: pass. Top toolbar and thumbnail canvas were visible.
+- Nonblank canvas: pass.
+- CSV import: pass. Status reported `CSV applied: 6 layers.`
+- HTML import: pass. Status reported `HTML applied: 5 layers.`
+- Layer editing: pass. Selecting `Main title`, editing Adjust X to `100`, and generating layout text reflected the change in CSV.
+- Colors UI: pass. The embedded `@uiw/react-color` Sketch picker rendered in Colors with five editable input fields.
+- Color change path: pass. Editing the Sketch HEX input and saving the generated palette reported a saved multi-color palette.
+- Export: pass. WebP download was created as `thumbnail-1280x720-2026-06-09T08-34-00-150Z.webp`.
 
 ### Motion Easings And Animated Templates
 

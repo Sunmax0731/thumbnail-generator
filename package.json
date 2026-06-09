@@ -12,6 +12,7 @@
     "docs:zip": "powershell -NoProfile -ExecutionPolicy Bypass -File scripts/package-docs.ps1"
   },
   "dependencies": {
+    "@uiw/react-color": "^2.10.3",
     "lucide-react": "^0.468.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0"

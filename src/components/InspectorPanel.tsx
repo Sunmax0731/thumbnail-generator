@@ -1,5 +1,6 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import { Sketch, hexToHsva } from "@uiw/react-color";
 import {
   AlignHorizontalJustifyCenter,
   AlignHorizontalJustifyEnd,
@@ -835,10 +836,10 @@ function PaletteControls({
   const [activePointIndex, setActivePointIndex] = useState(0);
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
-  const previewRgb = hexToRgbChannels(previewBaseColor) ?? { r: 0, g: 0, b: 0 };
   const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
   const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
   const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
+  const sketchColor = { ...hexToHsva(previewBaseColor), a: alphaDraft };
 
   useEffect(() => {
     if (activePointIndex >= previewColors.length) setActivePointIndex(0);
@@ -856,17 +857,6 @@ function PaletteControls({
     setActivePointIndex(index);
   };
 
-  const handleAlphaDraftChange = (value: number) => {
-    onAlphaDraftChange(value);
-  };
-  const setRgbChannel = (channel: "r" | "g" | "b", value: number) => {
-    const next = rgbChannelsToHex(
-      channel === "r" ? value : previewRgb.r,
-      channel === "g" ? value : previewRgb.g,
-      channel === "b" ? value : previewRgb.b,
-    );
-    setBaseDraft(next);
-  };
   return (
     <section className="panel-section palette-section">
       <div className="section-heading">
@@ -965,37 +955,15 @@ function PaletteControls({
             <span>{t("inspector.paletteName")}</span>
             <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
           </label>
-          <label className="field color-field">
-            <span>{t("inspector.paletteHex")}</span>
-            <input type="color" value={previewBaseColor} onChange={(event) => setBaseDraft(event.currentTarget.value)} />
-            <input type="text" value={draft} onChange={(event) => setBaseDraft(event.currentTarget.value)} />
-          </label>
-          <div className="palette-rgb-fields" aria-label={t("inspector.paletteRgb")}>
-            <label className="palette-rgb-channel">
-              <span>R</span>
-              <input type="range" min={0} max={255} value={previewRgb.r} onChange={(event) => setRgbChannel("r", Number(event.currentTarget.value))} />
-              <input type="number" min={0} max={255} value={previewRgb.r} onChange={(event) => setRgbChannel("r", Number(event.currentTarget.value))} />
-            </label>
-            <label className="palette-rgb-channel">
-              <span>G</span>
-              <input type="range" min={0} max={255} value={previewRgb.g} onChange={(event) => setRgbChannel("g", Number(event.currentTarget.value))} />
-              <input type="number" min={0} max={255} value={previewRgb.g} onChange={(event) => setRgbChannel("g", Number(event.currentTarget.value))} />
-            </label>
-            <label className="palette-rgb-channel">
-              <span>B</span>
-              <input type="range" min={0} max={255} value={previewRgb.b} onChange={(event) => setRgbChannel("b", Number(event.currentTarget.value))} />
-              <input type="number" min={0} max={255} value={previewRgb.b} onChange={(event) => setRgbChannel("b", Number(event.currentTarget.value))} />
-            </label>
+          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
+            <Sketch
+              color={sketchColor}
+              onChange={(color) => {
+                setBaseDraft(color.hex);
+                onAlphaDraftChange(color.hsva.a);
+              }}
+            />
           </div>
-          <SliderNumberInput
-            label={t("inspector.paletteAlpha")}
-            value={alphaDraft}
-            min={0}
-            max={1}
-            step={0.05}
-            decimals={2}
-            onChange={handleAlphaDraftChange}
-          />
           <label className="field palette-target-field">
             <span>{t("inspector.palettePattern")}</span>
             <select

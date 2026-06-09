@@ -1393,34 +1393,25 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
-.palette-rgb-fields {
-  display: grid;
+.uiw-color-picker-panel {
   grid-column: 1 / -1;
-  grid-template-columns: minmax(0, 1fr);
-  gap: 6px;
-}
-
-.palette-rgb-fields label {
-  display: grid;
-  grid-template-columns: 18px minmax(120px, 1fr) 64px;
-  align-items: center;
-  gap: 8px;
-}
-
-.palette-rgb-fields span {
-  color: var(--muted);
-  font-size: 10px;
-  font-weight: 950;
-}
-
-.palette-rgb-fields input {
   min-width: 0;
-  height: 32px;
-  padding: 0 6px;
 }
 
-.palette-rgb-fields input[type="range"] {
-  padding: 0;
+.uiw-color-picker-panel .w-color-sketch {
+  width: 100% !important;
+  min-width: 0;
+  box-sizing: border-box;
+  border: 1px solid rgba(17, 24, 39, 0.14) !important;
+  box-shadow: none !important;
+}
+
+.uiw-color-picker-panel .w-color-saturation {
+  border-radius: 6px 6px 0 0;
+}
+
+.uiw-color-picker-panel .w-color-editable-input {
+  min-width: 0;
 }
 
 .palette-register .secondary-button {
