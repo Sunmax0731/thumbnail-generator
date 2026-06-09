@@ -1,4 +1,5 @@
 import type { LayerAnimation, LayerAnimationEasing, ThumbnailLayer } from "./types";
+import { evaluateEasing } from "./easings";
 
 export const defaultSceneDurationMs = 4000;
 
@@ -28,6 +29,14 @@ export function applyLayerAnimation(
     return scaleLayer(layer, 0.82 + ease(progress, animation.easing) * 0.18);
   }
 
+  if (animation.type === "zoom") {
+    return scaleLayer(layer, 0.9 + ease(progress, animation.easing) * 0.1);
+  }
+
+  if (animation.type === "spin") {
+    return { ...layer, rotation: layer.rotation - (1 - ease(progress, animation.easing)) * 16 };
+  }
+
   if (animation.type === "pulse") {
     const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
     return scaleLayer({ ...layer, opacity: layer.opacity * (0.72 + wave * 0.28) }, 0.96 + wave * 0.06);
@@ -42,6 +51,21 @@ export function applyLayerAnimation(
     const offset = Math.sin(progress * Math.PI * 2) * animation.distance;
     const { x, y } = offsetLayer(layer.x, layer.y, animation.direction, offset);
     return { ...layer, x, y };
+  }
+
+  if (animation.type === "sway") {
+    return { ...layer, rotation: layer.rotation + Math.sin(progress * Math.PI * 2) * 6 };
+  }
+
+  if (animation.type === "shake") {
+    const offset = Math.sin(progress * Math.PI * 8) * animation.distance;
+    const { x, y } = offsetLayer(layer.x, layer.y, animation.direction, offset);
+    return { ...layer, x, y };
+  }
+
+  if (animation.type === "breathe") {
+    const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
+    return scaleLayer(layer, 0.97 + wave * 0.08);
   }
 
   return layer;
@@ -60,16 +84,13 @@ function animationProgress(animation: LayerAnimation, timeMs: number, sceneDurat
   const timelineMs = animation.loop ? modulo(timeMs - animation.startMs, duration) : timeMs - animation.startMs;
   if (timelineMs < 0) return null;
   if (!animation.loop && timelineMs > duration) {
-    return animation.type === "pulse" || animation.type === "blink" || animation.type === "drift" ? null : 1;
+    return isCycleAnimation(animation.type) ? null : 1;
   }
   return clamp01(timelineMs / duration);
 }
 
 function ease(progress: number, easing: LayerAnimationEasing): number {
-  if (easing === "linear") return progress;
-  if (easing === "easeIn") return progress * progress;
-  if (easing === "easeOut") return 1 - (1 - progress) * (1 - progress);
-  return progress < 0.5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+  return evaluateEasing(progress, easing);
 }
 
 function offsetLayer(
@@ -78,10 +99,15 @@ function offsetLayer(
   direction: LayerAnimation["direction"],
   amount: number,
 ): { x: number; y: number } {
+  if (direction === "none") return { x, y };
   if (direction === "left") return { x: x - amount, y };
   if (direction === "right") return { x: x + amount, y };
   if (direction === "down") return { x, y: y + amount };
   return { x, y: y - amount };
+}
+
+function isCycleAnimation(type: LayerAnimation["type"]): boolean {
+  return type === "pulse" || type === "blink" || type === "drift" || type === "sway" || type === "shake" || type === "breathe";
 }
 
 function scaleLayer<T extends ThumbnailLayer>(layer: T, scale: number): T {

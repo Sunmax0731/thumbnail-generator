@@ -1,10 +1,11 @@
 import { defaultOutputSettings } from "./presets";
 import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
+import { motionTemplates } from "./motionTemplates";
 import { scheduleTemplates } from "./scheduleTemplates";
 import { createInitialLayers } from "./sampleData";
 import type { OutputSettings, ThumbnailLayer } from "./types";
 
-export type DefaultTemplateCategory = "youtube" | "shorts" | "stream" | "cutout" | "schedule";
+export type DefaultTemplateCategory = "youtube" | "shorts" | "stream" | "cutout" | "schedule" | "motion";
 
 export interface DefaultTemplateDefinition {
   id: string;
@@ -1586,5 +1587,6 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
       }),
     ],
   },
+  ...motionTemplates,
   ...scheduleTemplates,
 ];

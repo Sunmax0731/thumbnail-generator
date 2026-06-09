@@ -24,13 +24,13 @@ All layers share:
 
 Layer animation is optional metadata on existing image, text, and shape layers. It does not add a new layer type.
 
-- `type`: `none`, `fade`, `slide`, `pop`, `pulse`, `blink`, or `drift`.
+- `type`: `none`, `fade`, `slide`, `pop`, `pulse`, `blink`, `drift`, `zoom`, `spin`, `sway`, `shake`, or `breathe`.
 - `startMs`: start time in milliseconds.
 - `durationMs`: animation duration in milliseconds.
-- `easing`: `linear`, `easeIn`, `easeOut`, or `easeInOut`.
+- `easing`: `linear` plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce variants for `easeIn*`, `easeOut*`, and `easeInOut*`.
 - `loop`: whether the animation repeats.
-- `direction`: `left`, `right`, `up`, or `down` for slide and drift.
-- `distance`: movement distance in output pixels for slide and drift.
+- `direction`: `none`, `left`, `right`, `up`, or `down` for motion presets that use movement. New animations default to `none`.
+- `distance`: movement distance in output pixels for movement presets. The Motion UI disables the distance control while direction is `none`.
 
 Rendering applies animation as a temporary draw-time transform. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
@@ -108,7 +108,7 @@ Examples:
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
-<div data-layer="text" data-animation-type="fade" data-animation-duration-ms="900" data-animation-loop="true">MOTION</div>
+<div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true">MOTION</div>
 ```
 
 ## Export
@@ -197,7 +197,7 @@ The right inspector is grouped by task:
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
 - Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
-- Motion: selected-layer animation type, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- Motion: selected-layer animation type, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
 The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
@@ -222,17 +222,18 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 28 practical layouts built only from supported image, text, shape, and line layers:
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
 
 - YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
 - Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
 - Stream: Creator Live, Breaking News, Gaming Highlight, Event Countdown, Music Premiere.
 - Cutout: Minimal Launch, Profile Cutout, Product Cutout, Food Cutout, Fashion Cutout.
 - Schedule: Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Weekly Schedule Landscape, Weekly Schedule Portrait, Daily Schedule Landscape, Daily Schedule Portrait.
+- Motion: Animated Eyecatch Neon Pulse, Animated Eyecatch Pop Title, Animated Eyecatch News Flash, Animated Eyecatch Countdown, Animated Eyecatch Product Reveal, Animated Waiting Stream Start, Animated Waiting Chat Lobby, Animated Waiting Countdown, Animated Waiting Calm Screen, Animated Waiting Game Room.
 
 Each bundled template also carries browser-rendered catalog metadata:
 
-- Category: `youtube`, `shorts`, `stream`, `cutout`, or `schedule`.
+- Category: `youtube`, `shorts`, `stream`, `cutout`, `schedule`, or `motion`.
 - Preview colors: three representative swatches used by the compact template preview.
 - Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
 

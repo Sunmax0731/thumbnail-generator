@@ -32,7 +32,7 @@ describe("layoutExport", () => {
           type: "slide",
           startMs: 200,
           durationMs: 1200,
-          easing: "easeOut",
+          easing: "easeOutQuad",
           loop: true,
           direction: "up",
           distance: 90,

@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-09T09:34:47.979+09:00",
+  "generatedAt": "2026-06-09T11:15:42.059+09:00",
   "sourceWorkItem": {
     "kind": "issue",
     "title": "QCDS評価のCode Starter可視化",
@@ -26,7 +26,7 @@
       "label": "Quality",
       "rating": "A+",
       "state": "pass",
-      "summary": "Feature coverage, 28 default templates including eight Schedule starts with Sunday-start weekly layouts, Motion/OBS preview, expanded hosted font choices, vertical text display-bound resizing, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
+      "summary": "Feature coverage, 38 default templates including eight Schedule starts and ten animated Motion starts, Sunday-start weekly layouts, expanded Motion easing controls, selected-object preview, easing graph, Motion/OBS preview, expanded hosted font choices, vertical text display-bound resizing, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
       "evidence": [
         "docs/qcds-evaluation.md",
         "docs/qcds-strict-metrics.json",
@@ -59,7 +59,7 @@
       "label": "Satisfaction",
       "rating": "A+",
       "state": "pass",
-      "summary": "Primary editing/export workflows, Schedule templates, Motion/OBS preview, vertical text width/height resizing, mobile layout, 28 templates, weekly Sunday-start layouts, expanded font selection, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing documentation are validated.",
+      "summary": "Primary editing/export workflows, Schedule templates, expanded Motion easing controls, selected-object preview, easing graph, Motion/OBS preview, vertical text width/height resizing, mobile layout, 38 templates, weekly Sunday-start layouts, ten animated eyecatch/waiting templates, expanded font selection, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing documentation are validated.",
       "evidence": [
         "docs/user-guide.md",
         "docs/features.md",
@@ -84,7 +84,7 @@
   "validation": {
     "npmTest": "pass",
     "npmRunBuild": "pass",
-    "browserRuntimeGate": "pass; Playwright headless Chromium gate passed at http://127.0.0.1:4195/thumbnail-generator/",
+    "browserRuntimeGate": "pass; Playwright headless Chromium gate passed at http://127.0.0.1:4196/thumbnail-generator/",
     "manualCodeStarterCheck": "repo-side source files added; reload VS Code Code Starter if the view is cached"
   }
 }

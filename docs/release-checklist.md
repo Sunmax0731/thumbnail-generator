@@ -17,4 +17,4 @@
 - [x] Docs ZIP is generated.
 - [x] Git branch is pushed.
 
-Latest validation note: 2026-06-09 Weekly Schedule templates passed `npm test` (26 files, 89 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4195/thumbnail-generator/`. The gate confirmed 28 bundled templates, 8 Schedule templates, Sunday-start Weekly Landscape/Portrait output, CSV/HTML import, layer editing, WebP export, and mobile horizontal overflow `0`.
+Latest validation note: 2026-06-09 Motion easing controls and animated templates passed `npm test` (26 files, 93 tests), `npm run build`, and a Playwright headless Chromium runtime gate at `http://127.0.0.1:4196/thumbnail-generator/`. The gate confirmed 38 bundled templates, 10 Motion templates, selected-object Motion preview, easing graph, 12 animation types, 31 easing choices, direction `None` distance disabling, OBS preview, CSV/HTML import, layer editing, WebP export, and mobile horizontal overflow `0`.

@@ -1082,6 +1082,84 @@ button:disabled {
   font-weight: 750;
 }
 
+.motion-preview-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 10px;
+}
+
+.motion-object-preview,
+.motion-easing-graph {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+}
+
+.motion-object-preview canvas,
+.motion-easing-graph svg {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #111827;
+}
+
+.motion-object-preview canvas {
+  aspect-ratio: 16 / 9;
+  height: auto;
+}
+
+.motion-preview-heading {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+}
+
+.motion-preview-heading strong {
+  min-width: 0;
+  color: var(--text);
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.motion-easing-graph svg {
+  min-height: 132px;
+}
+
+.motion-easing-graph rect {
+  fill: #ffffff;
+}
+
+.motion-graph-grid {
+  fill: none;
+  stroke: #d8e0e7;
+  stroke-width: 2;
+}
+
+.motion-graph-linear {
+  fill: none;
+  stroke: #94a3b8;
+  stroke-dasharray: 6 6;
+  stroke-width: 2;
+}
+
+.motion-graph-curve {
+  fill: none;
+  stroke: var(--accent);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 4;
+}
+
+.motion-graph-dot {
+  fill: var(--export);
+  stroke: #ffffff;
+  stroke-width: 2;
+}
+
 .range-field {
   display: grid;
   gap: 6px;

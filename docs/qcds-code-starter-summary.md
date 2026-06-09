@@ -1,6 +1,6 @@
 # QCDS Code Starter Summary
 
-Completed on 2026-06-07. Refreshed on 2026-06-09 after adding weekly Schedule templates.
+Completed on 2026-06-07. Refreshed on 2026-06-09 after adding Motion easing controls and animated templates.
 
 ## Code Starter Result
 
@@ -21,12 +21,12 @@ This work item closes that gap by adding a Code Starter-specific summary with ex
 
 | Axis | Rating | State | Evidence |
 | --- | --- | --- | --- |
-| Quality | A+ | pass | Automated tests, production build, 28 default templates including eight Schedule starts with Sunday-start weekly layouts, Motion/OBS preview, expanded hosted font choices, vertical text display-bound resizing, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
+| Quality | A+ | pass | Automated tests, production build, 38 default templates including eight Schedule starts and ten animated Motion starts, Sunday-start weekly layouts, expanded Motion easing controls, selected-object preview, easing graph, OBS preview, expanded hosted font choices, vertical text display-bound resizing, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, headless Chromium runtime gate, and feature/docs coverage are recorded in `docs/test-plan.md` and `docs/qcds-evaluation.md`. |
 | Cost | A+ | pass | The app remains static, browser-only, GitHub Pages compatible, and has no backend or paid-service dependency. |
 | Delivery | A+ | pass | Docs, QCDS evidence, tests, build, and runtime gate are synchronized for the current release state. |
-| Satisfaction | A+ | pass | CSV/HTML import, layer editing, Motion fade assignment, OBS preview rendering, vertical text width/height resizing, export, mobile layout, 28 bundled templates, weekly Sunday-start layouts, expanded font selection, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing docs are validated and visible in the release evidence. |
+| Satisfaction | A+ | pass | CSV/HTML import, layer editing, Motion selected-object preview, easing graph, 12 animation types, 31 easing choices, direction None distance disabling, OBS preview rendering, vertical text width/height resizing, export, mobile layout, 38 bundled templates, weekly Sunday-start layouts, ten animated eyecatch/waiting templates, expanded font selection, brand reuse, Colors-to-Brand-kit registration, issue reporting, and user-facing docs are validated and visible in the release evidence. |
 
-Latest runtime gate: Playwright headless Chromium passed at `http://127.0.0.1:4195/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260609-weekly-schedule-*.png`.
+Latest runtime gate: Playwright headless Chromium passed at `http://127.0.0.1:4196/thumbnail-generator/` with desktop and mobile screenshots in `docs/assets/runtime-20260609-motion-easing-*.png`.
 
 ## Code Starter Visibility Contract
 

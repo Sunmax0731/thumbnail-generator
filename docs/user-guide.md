@@ -25,7 +25,7 @@ npm run preview
 - Layers: reorder, lock, hide/show, select, align, duplicate, delete layers, group layers, fit selected image/shape layers to the canvas, and resize the list area with the handle below the list.
 - Adjust: edit the selected layer's position, size, rotation, opacity, layer blur, signed edge blur, stroke/outline blur participation, corner radius, text, font, text writing mode, text kerning, text alignment, line style, fill/stroke opacity, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars, use synchronized HEX/RGB sliders and number inputs, reuse recent colors, preview and save multi-color palette patterns, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, register colors into Brand kit primary/accent/shadow slots, and resize the color list area with the handle below the list.
-- Motion: assign an animation preset to the selected layer for OBS preview playback.
+- Motion: assign an animation preset, preview the selected object, and inspect the easing graph for OBS preview playback.
 
 ## Import Layouts
 
@@ -65,9 +65,9 @@ Use Assets to add common starter layers quickly:
 
 ## Default Templates
 
-Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 28 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories plus eight Schedule entries for yearly, monthly, weekly, and daily layouts. Browser templates remain separate named snapshots saved in localStorage.
+Open Templates and choose a bundled default template to replace the current canvas with a complete starting layout. The shipped templates cover 38 practical starts with five entries each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting entries. Browser templates remain separate named snapshots saved in localStorage.
 
-Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, or Schedule. Each row shows a miniature color preview and output size so you can pick a start before loading it.
+Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
 Use the always-visible Guided start strip for a short beginner flow:
 
@@ -144,9 +144,10 @@ The status bar can show quality warning chips while you work. Check these before
 
 1. Select a layer.
 2. Open Motion.
-3. Choose Fade, Slide, Pop, Pulse, Blink, or Drift.
-4. Adjust start time, duration, easing, direction, distance, and loop behavior.
-5. Select Open OBS preview in the canvas toolbar.
+3. Choose Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe.
+4. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior.
+5. Use the selected-object preview and easing graph to check motion timing. Direction defaults to None; distance is disabled until Left, Right, Up, or Down is selected.
+6. Select Open OBS preview in the canvas toolbar.
 
 The OBS preview opens a separate browser window that contains only the animated canvas on a black background. It does not draw editor selection handles or preview padding. Capture that window in OBS with Window Capture. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 

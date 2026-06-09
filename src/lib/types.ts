@@ -4,9 +4,52 @@ export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
 export type TextWritingMode = "horizontal" | "vertical";
 export type ExportFormat = "png" | "jpeg" | "webp";
-export type LayerAnimationType = "none" | "fade" | "slide" | "pop" | "pulse" | "blink" | "drift";
-export type LayerAnimationEasing = "linear" | "easeIn" | "easeOut" | "easeInOut";
-export type LayerAnimationDirection = "left" | "right" | "up" | "down";
+export type LayerAnimationType =
+  | "none"
+  | "fade"
+  | "slide"
+  | "pop"
+  | "pulse"
+  | "blink"
+  | "drift"
+  | "zoom"
+  | "spin"
+  | "sway"
+  | "shake"
+  | "breathe";
+export type LayerAnimationEasing =
+  | "linear"
+  | "easeInSine"
+  | "easeOutSine"
+  | "easeInOutSine"
+  | "easeInQuad"
+  | "easeOutQuad"
+  | "easeInOutQuad"
+  | "easeInCubic"
+  | "easeOutCubic"
+  | "easeInOutCubic"
+  | "easeInQuart"
+  | "easeOutQuart"
+  | "easeInOutQuart"
+  | "easeInQuint"
+  | "easeOutQuint"
+  | "easeInOutQuint"
+  | "easeInExpo"
+  | "easeOutExpo"
+  | "easeInOutExpo"
+  | "easeInCirc"
+  | "easeOutCirc"
+  | "easeInOutCirc"
+  | "easeInBack"
+  | "easeOutBack"
+  | "easeInOutBack"
+  | "easeInElastic"
+  | "easeOutElastic"
+  | "easeInOutElastic"
+  | "easeInBounce"
+  | "easeOutBounce"
+  | "easeInOutBounce";
+export type LayerAnimationDirection = "none" | "left" | "right" | "up" | "down";
 
 export interface ImageEffects {
   grayscale: number;

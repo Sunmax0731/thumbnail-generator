@@ -4,10 +4,11 @@ import { layersToCsv, layersToHtml } from "./layoutExport";
 
 describe("defaultTemplates", () => {
   it("provides multiple use-case templates with renderable layers", () => {
-    expect(defaultTemplates).toHaveLength(28);
+    expect(defaultTemplates).toHaveLength(38);
     expect(new Set(defaultTemplates.map((template) => template.id)).size).toBe(defaultTemplates.length);
     expect(countByCategory()).toEqual({
       cutout: 5,
+      motion: 10,
       schedule: 8,
       shorts: 5,
       stream: 5,
@@ -18,7 +19,7 @@ describe("defaultTemplates", () => {
       const layers = template.createLayers();
       expect(template.name).not.toEqual("");
       expect(template.description).not.toEqual("");
-      expect(["youtube", "shorts", "stream", "cutout", "schedule"]).toContain(template.category);
+      expect(["youtube", "shorts", "stream", "cutout", "schedule", "motion"]).toContain(template.category);
       expect(template.previewColors).toHaveLength(3);
       expect(template.settings.width).toBeGreaterThan(0);
       expect(template.settings.height).toBeGreaterThan(0);
@@ -55,6 +56,16 @@ describe("defaultTemplates", () => {
       "product-cutout",
       "food-cutout",
       "fashion-cutout",
+      "motion-eyecatch-neon-pulse",
+      "motion-eyecatch-pop-title",
+      "motion-eyecatch-news-flash",
+      "motion-eyecatch-countdown",
+      "motion-eyecatch-product-reveal",
+      "motion-waiting-stream-start",
+      "motion-waiting-chat-lobby",
+      "motion-waiting-countdown",
+      "motion-waiting-calm-screen",
+      "motion-waiting-game-room",
       "schedule-year-landscape",
       "schedule-year-portrait",
       "schedule-month-landscape",
@@ -95,6 +106,25 @@ describe("defaultTemplates", () => {
         .filter((layer) => layer.type === "text" && layer.name.startsWith("Week day ") && layer.name.endsWith(" label"))
         .map((layer) => (layer.type === "text" ? layer.text : ""));
       expect(dayLabels).toEqual(expectedDays);
+    }
+  });
+
+  it("adds ten animated eyecatch and waiting templates", () => {
+    const motionTemplates = defaultTemplates.filter((template) => template.category === "motion");
+    expect(motionTemplates.map((template) => template.id)).toEqual([
+      "motion-eyecatch-neon-pulse",
+      "motion-eyecatch-pop-title",
+      "motion-eyecatch-news-flash",
+      "motion-eyecatch-countdown",
+      "motion-eyecatch-product-reveal",
+      "motion-waiting-stream-start",
+      "motion-waiting-chat-lobby",
+      "motion-waiting-countdown",
+      "motion-waiting-calm-screen",
+      "motion-waiting-game-room",
+    ]);
+    for (const template of motionTemplates) {
+      expect(template.createLayers().some((layer) => layer.animation && layer.animation.type !== "none")).toBe(true);
     }
   });
 });

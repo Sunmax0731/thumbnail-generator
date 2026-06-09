@@ -32,8 +32,8 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Load 28 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories plus eight Schedule starts for yearly, monthly, weekly, and daily layouts.
-- Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, or Schedule, with mini preview swatches and output-size badges.
+- Load 38 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule starts, and ten animated eyecatch/waiting starts.
+- Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion, with mini preview swatches and output-size badges.
 - Use the always-visible Guided start strip for the Template, Image, Title, Brand, and Layout creation path.
 - Use Templates to save named browser-local templates.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
@@ -70,8 +70,10 @@ This page is the quick feature index for users and reviewers.
 
 ## Motion And OBS Preview
 
-- Open Motion to assign None, Fade, Slide, Pop, Pulse, Blink, or Drift animation to the selected layer.
-- Set animation start time, duration, easing, direction, distance, and loop behavior.
+- Open Motion to assign None, Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe animation to the selected layer.
+- Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
+- Review the selected-object Motion preview and easing graph before opening the OBS preview.
+- Choose direction None to keep movement disabled; distance is greyed out while None is active.
 - Open OBS preview from the canvas toolbar to show the current animated canvas in a separate window without selection handles.
 - Capture the OBS preview window in OBS with Window Capture for browser-only live display.
 

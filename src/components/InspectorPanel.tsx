@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import {
   AlignHorizontalJustifyCenter,
@@ -31,8 +31,10 @@ import {
 } from "lucide-react";
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
+import { easingOptions, evaluateEasing } from "../lib/easings";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
 import { defaultAnimation, normalizeAnimation } from "../lib/layerFactory";
+import { renderThumbnailToCanvas } from "../lib/renderCanvas";
 import {
   derivePaletteBaseFromSchemeColor,
   generatePaletteSchemeColors,
@@ -454,7 +456,7 @@ export function InspectorPanel({
 
       {activeSection === "motion" ? (
         selected ? (
-          <MotionControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />
+          <MotionControls selected={selected} assets={assets} settings={settings} onUpdateLayer={onUpdateLayer} t={t} />
         ) : (
           <section className="panel-section">
             <div className="section-heading">
@@ -1392,9 +1394,21 @@ const brandKitColorRoleShortLabels = {
   shadowColor: "inspector.brandShadowShort",
 } as const;
 
-const animationTypes: LayerAnimationType[] = ["none", "fade", "slide", "pop", "pulse", "blink", "drift"];
-const animationEasings: LayerAnimationEasing[] = ["linear", "easeIn", "easeOut", "easeInOut"];
-const animationDirections: LayerAnimationDirection[] = ["left", "right", "up", "down"];
+const animationTypes: LayerAnimationType[] = [
+  "none",
+  "fade",
+  "slide",
+  "pop",
+  "pulse",
+  "blink",
+  "drift",
+  "zoom",
+  "spin",
+  "sway",
+  "shake",
+  "breathe",
+];
+const animationDirections: LayerAnimationDirection[] = ["none", "left", "right", "up", "down"];
 
 const animationTypeLabels: Record<LayerAnimationType, Parameters<Translator>[0]> = {
   none: "inspector.animationNone",
@@ -1404,16 +1418,15 @@ const animationTypeLabels: Record<LayerAnimationType, Parameters<Translator>[0]>
   pulse: "inspector.animationPulse",
   blink: "inspector.animationBlink",
   drift: "inspector.animationDrift",
-};
-
-const animationEasingLabels: Record<LayerAnimationEasing, Parameters<Translator>[0]> = {
-  linear: "inspector.animationLinear",
-  easeIn: "inspector.animationEaseIn",
-  easeOut: "inspector.animationEaseOut",
-  easeInOut: "inspector.animationEaseInOut",
+  zoom: "inspector.animationZoom",
+  spin: "inspector.animationSpin",
+  sway: "inspector.animationSway",
+  shake: "inspector.animationShake",
+  breathe: "inspector.animationBreathe",
 };
 
 const animationDirectionLabels: Record<LayerAnimationDirection, Parameters<Translator>[0]> = {
+  none: "inspector.directionNone",
   left: "inspector.directionLeft",
   right: "inspector.directionRight",
   up: "inspector.directionUp",
@@ -1427,14 +1440,20 @@ function isKeyboardInputTarget(target: EventTarget | null): boolean {
 
 function MotionControls({
   selected,
+  assets,
+  settings,
   onUpdateLayer,
   t,
 }: {
   selected: ThumbnailLayer;
+  assets: ImageAsset[];
+  settings: OutputSettings;
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
   t: Translator;
 }) {
   const animation = selected.animation ?? defaultAnimation;
+  const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
+  const [previewProgress, setPreviewProgress] = useState(0);
   const updateAnimation = (partial: Partial<typeof defaultAnimation>) => {
     onUpdateLayer(selected.id, (layer) => ({
       ...layer,
@@ -1442,12 +1461,58 @@ function MotionControls({
     }));
   };
   const hasAnimation = animation.type !== "none";
+  const directionIsNone = animation.direction === "none";
+  const duration = Math.max(100, animation.durationMs);
+  const sceneDuration = Math.max(1000, animation.startMs + duration);
+  const previewSettings = useMemo<OutputSettings>(
+    () => ({
+      ...settings,
+      presetId: "custom",
+      width: 320,
+      height: 180,
+      background: "#111827",
+    }),
+    [settings],
+  );
+  const previewLayer = useMemo(
+    () => scaleLayerForMotionPreview(selected, previewSettings.width, previewSettings.height),
+    [previewSettings.height, previewSettings.width, selected],
+  );
+
+  useEffect(() => {
+    let frame = 0;
+    let cancelled = false;
+    const startTime = performance.now();
+    const render = async () => {
+      if (cancelled) return;
+      const elapsed = (performance.now() - startTime) % sceneDuration;
+      setPreviewProgress(Math.min(1, Math.max(0, (elapsed - animation.startMs) / duration)));
+      if (previewCanvasRef.current) {
+        await renderThumbnailToCanvas(previewCanvasRef.current, [previewLayer], assets, previewSettings, {
+          animationTimeMs: elapsed,
+          sceneDurationMs: sceneDuration,
+        });
+      }
+      frame = window.requestAnimationFrame(render);
+    };
+    void render();
+    return () => {
+      cancelled = true;
+      window.cancelAnimationFrame(frame);
+    };
+  }, [assets, animation.durationMs, animation.easing, animation.loop, animation.startMs, animation.type, animation.direction, animation.distance, sceneDuration, selected, previewLayer, previewSettings]);
 
   return (
     <section className="panel-section motion-section">
       <div className="section-heading">
         <Play size={16} />
         <h2>{t("inspector.motionSettings")}</h2>
+      </div>
+      <div className="motion-preview-grid" aria-label={t("inspector.motionPreview")}>
+        <div className="motion-object-preview">
+          <canvas ref={previewCanvasRef} width={320} height={180} />
+        </div>
+        <EasingGraph easing={animation.easing} progress={previewProgress} t={t} />
       </div>
       <label className="field">
         <span>{t("inspector.animationType")}</span>
@@ -1491,9 +1556,9 @@ function MotionControls({
           disabled={!hasAnimation}
           onChange={(event) => updateAnimation({ easing: event.currentTarget.value as LayerAnimationEasing })}
         >
-          {animationEasings.map((easing) => (
+          {easingOptions.map((easing) => (
             <option key={easing} value={easing}>
-              {t(animationEasingLabels[easing])}
+              {easing}
             </option>
           ))}
         </select>
@@ -1519,7 +1584,7 @@ function MotionControls({
           min={0}
           max={800}
           step={10}
-          disabled={!hasAnimation}
+          disabled={!hasAnimation || directionIsNone}
           onChange={(value) => updateAnimation({ distance: value })}
         />
       </div>
@@ -1534,6 +1599,113 @@ function MotionControls({
       </label>
     </section>
   );
+}
+
+function EasingGraph({ easing, progress, t }: { easing: LayerAnimationEasing; progress: number; t: Translator }) {
+  const width = 260;
+  const height = 150;
+  const padding = 18;
+  const yMin = -0.25;
+  const yMax = 1.25;
+  const points = Array.from({ length: 61 }, (_, index) => {
+    const x = index / 60;
+    return graphPoint(x, evaluateEasing(x, easing), width, height, padding, yMin, yMax);
+  });
+  const path = points.map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`).join(" ");
+  const linearPath = [graphPoint(0, 0, width, height, padding, yMin, yMax), graphPoint(1, 1, width, height, padding, yMin, yMax)]
+    .map((point, index) => `${index === 0 ? "M" : "L"} ${point.x.toFixed(2)} ${point.y.toFixed(2)}`)
+    .join(" ");
+  const active = graphPoint(progress, evaluateEasing(progress, easing), width, height, padding, yMin, yMax);
+  return (
+    <div className="motion-easing-graph">
+      <div className="motion-preview-heading">
+        <span>{t("inspector.easingGraph")}</span>
+        <strong>{easing}</strong>
+      </div>
+      <svg viewBox={`0 0 ${width} ${height}`} role="img" aria-label={`${t("inspector.easingGraph")}: ${easing}`}>
+        <rect x="0" y="0" width={width} height={height} rx="8" />
+        <path className="motion-graph-grid" d={`M ${padding} ${height - padding} H ${width - padding} M ${padding} ${padding} V ${height - padding}`} />
+        <path className="motion-graph-linear" d={linearPath} />
+        <path className="motion-graph-curve" d={path} />
+        <circle className="motion-graph-dot" cx={active.x} cy={active.y} r="5" />
+      </svg>
+    </div>
+  );
+}
+
+function graphPoint(
+  progress: number,
+  value: number,
+  width: number,
+  height: number,
+  padding: number,
+  yMin: number,
+  yMax: number,
+): { x: number; y: number } {
+  const clampedValue = Math.min(yMax, Math.max(yMin, value));
+  return {
+    x: padding + progress * (width - padding * 2),
+    y: height - padding - ((clampedValue - yMin) / (yMax - yMin)) * (height - padding * 2),
+  };
+}
+
+function scaleLayerForMotionPreview(layer: ThumbnailLayer, canvasWidth: number, canvasHeight: number): ThumbnailLayer {
+  const scale = Math.min(1.35, (canvasWidth * 0.68) / Math.max(1, layer.width), (canvasHeight * 0.62) / Math.max(1, layer.height));
+  const scaledAnimation = layer.animation
+    ? {
+        ...layer.animation,
+        distance: layer.animation.distance * scale,
+      }
+    : undefined;
+  const base = {
+    ...layer,
+    x: (canvasWidth - layer.width * scale) / 2,
+    y: (canvasHeight - layer.height * scale) / 2,
+    width: layer.width * scale,
+    height: layer.height * scale,
+    layerBlur: layer.layerBlur * scale,
+    edgeBlur: layer.edgeBlur * scale,
+    cornerRadius: layer.cornerRadius * scale,
+    animation: scaledAnimation,
+  };
+  if (layer.type === "text") {
+    return {
+      ...base,
+      type: "text",
+      text: layer.text,
+      fontSize: layer.fontSize * scale,
+      fontFamily: layer.fontFamily,
+      fontWeight: layer.fontWeight,
+      color: layer.color,
+      strokeColor: layer.strokeColor,
+      strokeWidth: layer.strokeWidth * scale,
+      strokeOpacity: layer.strokeOpacity,
+      align: layer.align,
+      writingMode: layer.writingMode,
+      lineHeight: layer.lineHeight,
+      letterSpacing: layer.letterSpacing * scale,
+      fillOpacity: layer.fillOpacity,
+    };
+  }
+  if (layer.type === "shape") {
+    return {
+      ...base,
+      type: "shape",
+      shape: layer.shape,
+      fill: layer.fill,
+      fillOpacity: layer.fillOpacity,
+      strokeColor: layer.strokeColor,
+      strokeWidth: layer.strokeWidth * scale,
+      strokeOpacity: layer.strokeOpacity,
+      lineStyle: layer.lineStyle,
+    };
+  }
+  return {
+    ...base,
+    type: "image",
+    imageKey: layer.imageKey,
+    effects: { ...layer.effects, blur: layer.effects.blur * scale, mosaic: layer.effects.mosaic * scale },
+  };
 }
 
 function ImageControls({

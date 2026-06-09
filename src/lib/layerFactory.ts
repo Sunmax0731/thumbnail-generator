@@ -12,6 +12,7 @@ import type {
   TextWritingMode,
   ThumbnailLayer,
 } from "./types";
+import { normalizeEasingName } from "./easings";
 
 export const defaultEffects: ImageEffects = {
   grayscale: 0,
@@ -25,9 +26,9 @@ export const defaultAnimation: LayerAnimation = {
   type: "none",
   startMs: 0,
   durationMs: 900,
-  easing: "easeOut",
+  easing: "easeOutQuad",
   loop: false,
-  direction: "up",
+  direction: "none",
   distance: 80,
 };
 
@@ -161,19 +162,30 @@ export function normalizeAnimation(animation: Partial<Record<keyof LayerAnimatio
 }
 
 function parseAnimationType(value: unknown): LayerAnimationType {
-  if (value === "fade" || value === "slide" || value === "pop" || value === "pulse" || value === "blink" || value === "drift") {
+  if (
+    value === "fade" ||
+    value === "slide" ||
+    value === "pop" ||
+    value === "pulse" ||
+    value === "blink" ||
+    value === "drift" ||
+    value === "zoom" ||
+    value === "spin" ||
+    value === "sway" ||
+    value === "shake" ||
+    value === "breathe"
+  ) {
     return value;
   }
   return "none";
 }
 
 function parseAnimationEasing(value: unknown): LayerAnimationEasing {
-  if (value === "linear" || value === "easeIn" || value === "easeOut" || value === "easeInOut") return value;
-  return defaultAnimation.easing;
+  return normalizeEasingName(value, defaultAnimation.easing);
 }
 
 function parseAnimationDirection(value: unknown): LayerAnimationDirection {
-  if (value === "left" || value === "right" || value === "up" || value === "down") return value;
+  if (value === "none" || value === "left" || value === "right" || value === "up" || value === "down") return value;
   return defaultAnimation.direction;
 }
 

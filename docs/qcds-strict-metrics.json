@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Schedule templates, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 28 bundled default templates, Schedule filtering with eight yearly/monthly/weekly/daily templates, Sunday-start weekly template order, template metadata, Motion animation metadata, OBS preview window rendering, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, expanded Google Fonts dropdown choices, vertical text Adjust width/height editing, vertical text preview-handle resizing without unexpected movement, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
+    "rationale": "Schedule templates, expanded Motion/easing controls, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, Schedule filtering with eight yearly/monthly/weekly/daily templates, Motion filtering with ten animated eyecatch/waiting templates, Sunday-start weekly template order, template metadata, 12 Motion animation types, 31 easings.net-style easing choices, selected-object Motion preview, easing graph, direction none default with disabled distance, OBS preview window rendering, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, expanded Google Fonts dropdown choices, vertical text Adjust width/height editing, vertical text preview-handle resizing without unexpected movement, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,13 +15,13 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested weekly Schedule templates, Motion/OBS preview, expanded font selection, and vertical text display-bound resizing passed validation: 28 practical bundled templates including eight Schedule starts, Sunday-start Weekly Schedule Landscape and Weekly Schedule Portrait, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, Templates service-section removal, 26 text-layer font dropdown options, and vertical text width/height edits from both Adjust and preview handles. CSV/HTML import/export persistence works, Motion fade assignment works, OBS preview window rendering works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
+    "rationale": "Requested easing expansion, Motion selected-object preview, easing graph, additional animation types, direction None behavior, animated eyecatch/waiting templates, weekly Schedule templates, Motion/OBS preview, expanded font selection, and vertical text display-bound resizing passed validation: 38 practical bundled templates including eight Schedule starts and ten Motion starts, Sunday-start Weekly Schedule Landscape and Weekly Schedule Portrait, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, Templates service-section removal, 26 text-layer font dropdown options, and vertical text width/height edits from both Adjust and preview handles. CSV/HTML import/export persistence works, Motion preview/graph works, OBS preview window rendering works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
     "source": "docs/codex-work-dashboard-qcds.md",
     "openItemsBeforeReview": [
-      "Default templates 28 practical layouts with Schedule, weekly Sunday-start templates, and Motion/OBS preview"
+      "Default templates 38 practical layouts with Schedule, Motion, weekly Sunday-start templates, expanded easing, and Motion/OBS preview"
     ],
     "closedByReview": true,
     "ratingsAfterReview": {
@@ -54,14 +54,14 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4195/thumbnail-generator/",
+    "url": "http://127.0.0.1:4196/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
-    "desktopViewport": "1440x900",
+    "desktopViewport": "1440x1000",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260609-weekly-schedule-desktop.png",
-      "docs/assets/runtime-20260609-weekly-schedule-mobile.png"
+      "docs/assets/runtime-20260609-motion-easing-desktop.png",
+      "docs/assets/runtime-20260609-motion-easing-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -69,15 +69,20 @@
       "English language switch",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
-      "28 bundled default templates",
+      "38 bundled default templates",
       "8 Schedule templates",
+      "10 Motion templates",
       "Weekly Schedule Landscape and Portrait",
       "Sunday-start weekly day order",
-      "Motion animation assignment",
+      "12 Motion animation types",
+      "31 easing choices",
+      "selected-object Motion preview",
+      "easing graph",
+      "direction none disables distance",
       "OBS preview window nonblank render",
       "26 text-layer font dropdown options",
       "expanded hosted Google Fonts choices",
-      "5 templates per core category plus 8 Schedule templates",
+      "5 templates per core category plus 8 Schedule templates plus 10 Motion templates",
       "always-visible guided start",
       "preview-pane edit state",
       "Colors-to-Brand-kit registration",

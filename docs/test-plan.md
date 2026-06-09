@@ -29,10 +29,11 @@
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
-- Default template definitions provide exactly 28 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout plus eight Schedule templates, with exportable CSV/HTML and supported layer types.
+- Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
-- Layer animation helpers apply fade, slide, and pop transforms without mutating source layer state.
+- Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms without mutating source layer state.
+- Easing helpers expose linear plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce curves.
 - CSV/HTML import and layout export preserve optional layer animation metadata.
 - Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
 - Edit state helpers serialize, parse, and delete portable JSON recovery files.
@@ -86,10 +87,12 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
 - Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
-- All 28 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- All 38 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
-- Motion tab can assign a selected-layer animation preset.
+- Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
+- Motion tab can assign a selected-layer animation preset, preview the selected object, and show the easing graph.
+- Motion tab exposes 12 animation types, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
 - OBS preview opens in a separate window and renders a nonblank animated canvas without editor selection handles.
 - Guided start remains visible when Assets, Layouts, or Templates is active.
 - Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
@@ -112,6 +115,34 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-09.
+
+### Motion Easings And Animated Templates
+
+Completed on 2026-06-09.
+
+- Scope: added easings.net-style easing choices, selected-object Motion preview, easing graph, additional animation types, direction `None` default with disabled distance, and ten animated eyecatch/waiting templates in the Motion category.
+- `npm test`: pass. 26 test files, 93 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4196/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Default template count: pass. The Templates panel exposed exactly 38 bundled rows.
+- Motion filter: pass. The Templates panel exposed exactly 10 Motion rows: Animated Eyecatch Neon Pulse, Animated Eyecatch Pop Title, Animated Eyecatch News Flash, Animated Eyecatch Countdown, Animated Eyecatch Product Reveal, Animated Waiting Stream Start, Animated Waiting Chat Lobby, Animated Waiting Countdown, Animated Waiting Calm Screen, and Animated Waiting Game Room.
+- Motion template load: pass. Animated Waiting Stream Start and Animated Waiting Countdown rendered nonblank canvases.
+- Motion tab: pass. The selected-object preview canvas rendered nonblank and the easing graph SVG was visible.
+- Motion controls: pass. Animation type count was 12, easing count was 31, directions were `none`, `left`, `right`, `up`, and `down`.
+- Direction `None`: pass. Distance was disabled while direction was `none`, then re-enabled after changing direction to `right`.
+- OBS preview: pass. A separate preview window opened and rendered a nonblank canvas.
+- CSV import: pass. Status reported `CSV applied: 2 layers.`
+- HTML import: pass. Status reported `HTML applied: 2 layers.`
+- Layer editing: pass. Adjust numeric X edit accepted and the canvas stayed nonblank.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-motion-easing/thumbnail-1280x720-2026-06-09T02-15-42-059Z.webp`.
+- Mobile: pass. `390x844` viewport loaded Animated Waiting Countdown, rendered a nonblank canvas, and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-motion-easing-desktop.png`
+  - `docs/assets/runtime-20260609-motion-easing-mobile.png`
+- Console health: no page errors, relevant console warnings, or app HTTP 4xx/5xx responses were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
 
 ### Weekly Schedule Templates
 

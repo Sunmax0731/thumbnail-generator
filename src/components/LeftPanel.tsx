@@ -466,4 +466,5 @@ const templateFilterOptions: { id: TemplateFilter; labelKey: Parameters<Translat
   { id: "stream", labelKey: "left.filter.stream" },
   { id: "cutout", labelKey: "left.filter.cutout" },
   { id: "schedule", labelKey: "left.filter.schedule" },
+  { id: "motion", labelKey: "left.filter.motion" },
 ];
