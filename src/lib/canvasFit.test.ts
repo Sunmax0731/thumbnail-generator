@@ -12,7 +12,19 @@ describe("canvas fit zoom", () => {
     });
 
     expect(zoom).toBeLessThan(0.94);
-    expect(zoom).toBeGreaterThanOrEqual(0.25);
+    expect(zoom).toBeGreaterThanOrEqual(0.1);
+  });
+
+  it("allows narrow preview areas to fit portrait templates below 25 percent", () => {
+    expect(
+      calculateCanvasFitZoom({
+        containerWidth: 724,
+        containerHeight: 392,
+        documentWidth: 1080,
+        documentHeight: 1920,
+        previewPadding: 0,
+      }),
+    ).toBe(0.2);
   });
 
   it("shrinks landscape presets by the visible width when needed", () => {

@@ -123,6 +123,22 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Template Modal Localization, Autofit, And Browser Template Delete Confirmation
+
+Completed on 2026-06-10 for the requested template confirmation localization, preview auto-fit after template application, and browser-template delete confirmation.
+
+- `npm test`: pass. 27 test files, 103 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4215/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: primary UI visible in Japanese, initial canvas nonblank, selecting `Shorts Quote` opened the shared `.confirm-backdrop .confirm-dialog` modal with Japanese title/copy/confirm button text, the modal no longer contained fixed English `Apply template?` text, confirming applied `1080x1920`, preview zoom auto-fitted from `94%` to `18%`, the scaled canvas frame fit inside the visible preview scroll area, saving a browser template and clicking delete opened the same confirmation modal style with Japanese delete title/copy and danger confirm styling, confirming removed the browser-template row, WebP export downloaded, mobile canvas was nonblank, mobile horizontal overflow was `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-template-modal-autofit-desktop.png`
+  - `docs/assets/runtime-20260610-template-modal-autofit-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-template-modal-autofit/thumbnail-1080x1920-2026-06-09T22-14-43-248Z.webp`.
+
 ### Layout Readjust Follow-Up
 
 Completed on 2026-06-10 for the requested tab wrapping, right-pane tab width, Assets-tab image import, and template modal style adjustments.

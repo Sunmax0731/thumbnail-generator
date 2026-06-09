@@ -109,6 +109,8 @@ const en = {
   "left.applyTemplateQuestion": "Apply template?",
   "left.applyTemplateCopy": "Apply {name}. Current layers, assets, and canvas size will be replaced.",
   "left.applyTemplate": "Apply",
+  "left.deleteTemplateQuestion": "Delete template?",
+  "left.deleteTemplateCopy": "Delete {name} from browser templates.",
   "left.resizeDefaultTemplates": "Resize default templates",
   "left.resizeBrowserTemplates": "Resize browser templates",
   "inspector.aria": "Layer inspector",
@@ -609,6 +611,11 @@ const ja: Partial<Record<TranslationKey, string>> = {
 };
 
 const jaOverrides: Partial<Record<TranslationKey, string>> = {
+  "left.applyTemplateQuestion": "テンプレートを適用しますか?",
+  "left.applyTemplateCopy": "{name} を適用します。現在のレイヤー、素材、キャンバスサイズは置き換わります。",
+  "left.applyTemplate": "適用",
+  "left.deleteTemplateQuestion": "テンプレートを削除しますか?",
+  "left.deleteTemplateCopy": "{name} をブラウザテンプレートから削除します。",
   "app.title": "サムネイル作成支援サービス",
   "app.subtitle": "",
   "stage.openObsPreview": "OBSプレビューを開く",

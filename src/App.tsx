@@ -155,6 +155,7 @@ function App() {
   );
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
+  const [autoFitRevision, setAutoFitRevision] = useState(0);
   const [canvasCursor, setCanvasCursor] = useState("default");
   const [hoverInteractionMode, setHoverInteractionMode] = useState<CanvasInteractionMode | null>(null);
   const [activeInteractionMode, setActiveInteractionMode] = useState<CanvasInteractionMode | null>(null);
@@ -659,6 +660,7 @@ function App() {
       setCsvText(layersToCsv(nextLayers));
       setHtmlText(layersToHtml(nextLayers));
       setTemplateName(template.name);
+      setAutoFitRevision((current) => current + 1);
       setStatus(`Loaded default template "${template.name}".`);
     },
     [],
@@ -1370,6 +1372,7 @@ function App() {
       setCsvText(template.csv || layersToCsv(template.layers));
       setHtmlText(template.html || layersToHtml(template.layers));
       setTemplateName(template.name);
+      setAutoFitRevision((current) => current + 1);
       setStatus(`Loaded template "${template.name}".`);
     },
     [templates],
@@ -1594,6 +1597,7 @@ function App() {
           settings={settings}
           selectedLayerName={selectionLabel}
           zoom={zoom}
+          autoFitRevision={autoFitRevision}
           cursor={canvasCursor}
           previewPadding={previewPadding}
           isExporting={isExporting}

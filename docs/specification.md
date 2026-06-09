@@ -227,7 +227,7 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one first shows a confirmation dialog, then replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
+Bundled default templates are static browser assets, not localStorage records. Loading one first shows a localized confirmation dialog, then replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The template's output aspect ratio is applied automatically, and the preview zoom auto-fits so portrait or square starts are not clipped in the visible preview area. Browser-local templates use the same confirmation style when applied or deleted. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
 
 - YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
 - Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.

@@ -63,6 +63,7 @@ export function LeftPanel({
   const [defaultTemplateListHeight, setDefaultTemplateListHeight] = useState(260);
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
   const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string; kind: "default" | "browser" } | null>(null);
+  const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const filteredDefaultTemplates = useMemo(
     () =>
       templateFilter === "all"
@@ -249,7 +250,7 @@ export function LeftPanel({
                       type="button"
                       className="icon-button danger"
                       title={t("left.deleteTemplate", { name: template.name })}
-                      onClick={() => onDeleteTemplate(template.id)}
+                      onClick={() => setTemplateDeleteCandidate({ id: template.id, name: template.name })}
                     >
                       <Trash2 size={14} />
                     </button>
@@ -267,13 +268,30 @@ export function LeftPanel({
       ) : null}
 
       {templateApplyCandidate ? (
-        <ApplyTemplateDialog
-          name={templateApplyCandidate.name}
+        <ConfirmTemplateDialog
+          title={t("left.applyTemplateQuestion")}
+          copy={t("left.applyTemplateCopy", { name: templateApplyCandidate.name })}
+          confirmLabel={t("left.applyTemplate")}
+          confirmClassName="primary-button"
           onCancel={() => setTemplateApplyCandidate(null)}
           onConfirm={() => {
             if (templateApplyCandidate.kind === "default") onLoadDefaultTemplate(templateApplyCandidate.id);
             else onLoadTemplate(templateApplyCandidate.id);
             setTemplateApplyCandidate(null);
+          }}
+          t={t}
+        />
+      ) : null}
+      {templateDeleteCandidate ? (
+        <ConfirmTemplateDialog
+          title={t("left.deleteTemplateQuestion")}
+          copy={t("left.deleteTemplateCopy", { name: templateDeleteCandidate.name })}
+          confirmLabel={t("inspector.delete")}
+          confirmClassName="primary-button danger-button"
+          onCancel={() => setTemplateDeleteCandidate(null)}
+          onConfirm={() => {
+            onDeleteTemplate(templateDeleteCandidate.id);
+            setTemplateDeleteCandidate(null);
           }}
           t={t}
         />
@@ -334,30 +352,36 @@ function clampTemplateListHeight(value: number): number {
   return Math.min(720, Math.max(120, Math.round(value)));
 }
 
-function ApplyTemplateDialog({
-  name,
+function ConfirmTemplateDialog({
+  title,
+  copy,
+  confirmLabel,
+  confirmClassName,
   onCancel,
   onConfirm,
   t,
 }: {
-  name: string;
+  title: string;
+  copy: string;
+  confirmLabel: string;
+  confirmClassName: string;
   onCancel: () => void;
   onConfirm: () => void;
   t: Translator;
 }) {
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
-      <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="apply-template-title">
+      <section className="confirm-dialog" role="dialog" aria-modal="true" aria-labelledby="template-confirm-title">
         <div className="modal-title-block">
-          <h2 id="apply-template-title">{t("left.applyTemplateQuestion")}</h2>
+          <h2 id="template-confirm-title">{title}</h2>
         </div>
-        <p>{t("left.applyTemplateCopy", { name })}</p>
+        <p>{copy}</p>
         <div className="confirm-actions">
           <button type="button" className="secondary-button" onClick={onCancel}>
             {t("inspector.cancel")}
           </button>
-          <button type="button" className="primary-button" onClick={onConfirm}>
-            {t("left.applyTemplate")}
+          <button type="button" className={confirmClassName} onClick={onConfirm}>
+            {confirmLabel}
           </button>
         </div>
       </section>

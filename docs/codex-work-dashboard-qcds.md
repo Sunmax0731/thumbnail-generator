@@ -33,7 +33,7 @@ Earlier P2 items were already closed in `TODO.md` and their local Issue files. T
 - `npm run build`: pass.
 - Browser runtime gate: pass with Playwright headless Chromium after the in-app Browser returned `Browser is not available: iab`.
 - Runtime gate checks covered nonblank canvas render, primary UI visibility, CSV import, HTML import, layer X editing reflected in generated CSV, WebP export download, desktop screenshot, mobile screenshot, and mobile horizontal overflow `0`.
-- Latest follow-up validation on 2026-06-10: `npm test` passed with 27 test files and 102 tests, `npm run build` passed, and Playwright headless Chromium at `http://127.0.0.1:4212/thumbnail-generator/` verified upper-right Language/Theme controls, Dark theme persistence, side-by-side Export/Edit state sections with vertical action stacks, saved-palette and registered single-color drag reorder persistence, layer editing, WebP export, nonblank desktop/mobile canvas renders, and mobile horizontal overflow `0`.
+- Latest follow-up validation on 2026-06-10: `npm test` passed with 27 test files and 103 tests, `npm run build` passed, and Playwright headless Chromium at `http://127.0.0.1:4215/thumbnail-generator/` verified localized template apply confirmation, template-apply preview zoom auto-fit from `94%` to `18%`, browser-template delete confirmation, WebP export, nonblank desktop/mobile canvas renders, and mobile horizontal overflow `0`.
 - Evidence screenshots:
   - `docs/assets/runtime-dashboard-qcds-desktop.png`
   - `docs/assets/runtime-dashboard-qcds-mobile.png`

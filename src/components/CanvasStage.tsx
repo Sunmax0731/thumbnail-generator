@@ -24,6 +24,7 @@ interface CanvasStageProps {
   settings: OutputSettings;
   selectedLayerName: string;
   zoom: number;
+  autoFitRevision: number;
   cursor: string;
   previewPadding: number;
   isExporting: boolean;
@@ -52,6 +53,7 @@ export function CanvasStage({
   settings,
   selectedLayerName,
   zoom,
+  autoFitRevision,
   cursor,
   previewPadding,
   isExporting,
@@ -79,6 +81,7 @@ export function CanvasStage({
   const [isPanMode, setIsPanMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [isSpacePanning, setIsSpacePanning] = useState(false);
+  const lastAutoFitRevision = useRef(0);
   const fitCanvas = useCallback(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -95,6 +98,13 @@ export function CanvasStage({
       }),
     );
   }, [onZoomChange, previewPadding, settings.height, settings.width]);
+
+  useEffect(() => {
+    if (autoFitRevision <= 0 || lastAutoFitRevision.current === autoFitRevision) return;
+    lastAutoFitRevision.current = autoFitRevision;
+    const frame = window.requestAnimationFrame(() => fitCanvas());
+    return () => window.cancelAnimationFrame(frame);
+  }, [autoFitRevision, fitCanvas]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -238,7 +248,7 @@ export function CanvasStage({
             type="button"
             className="icon-button"
             title={t("stage.zoomOut")}
-            onClick={() => onZoomChange(Math.max(0.25, zoom - 0.08))}
+            onClick={() => onZoomChange(Math.max(0.1, zoom - 0.08))}
           >
             <ZoomOut size={16} />
           </button>

@@ -15,7 +15,7 @@ export function calculateCanvasFitZoom({
   documentHeight,
   previewPadding,
   maxZoom = 0.94,
-  minZoom = 0.25,
+  minZoom = 0.1,
 }: CanvasFitInput): number {
   const frameWidth = Math.max(1, documentWidth + previewPadding * 2);
   const frameHeight = Math.max(1, documentHeight + previewPadding * 2);
