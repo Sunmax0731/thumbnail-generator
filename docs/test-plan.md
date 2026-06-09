@@ -29,8 +29,10 @@
 - Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
 - Color palette helpers convert HEX and RGB channel input for synchronized numeric palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
-- Default template definitions provide exactly 20 distinct use-case layouts, five per category, with exportable CSV/HTML and supported layer types.
+- Default template definitions provide exactly 26 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout plus six Schedule templates, with exportable CSV/HTML and supported layer types.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
+- Layer animation helpers apply fade, slide, and pop transforms without mutating source layer state.
+- CSV/HTML import and layout export preserve optional layer animation metadata.
 - Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
 - Edit state helpers serialize, parse, and delete portable JSON recovery files.
 - Quality warning helpers flag long text, low contrast, safe-area edges, many layers, large exports, large assets, and large storage estimates.
@@ -83,7 +85,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab imports make the new image the active processing target.
 - Expanded quick add inserts text, shape, line, headline, subtitle, badge, and divider starters.
-- All 20 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- All 26 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- Schedule filter shows exactly six bundled templates and each schedule template renders nonblank.
+- Motion tab can assign a selected-layer animation preset.
+- OBS preview opens in a separate window and renders a nonblank animated canvas without editor selection handles.
 - Guided start remains visible when Assets, Layouts, or Templates is active.
 - Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
@@ -106,9 +111,34 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-09.
 
+### Schedule Templates, Motion, And OBS Preview
+
+Completed on 2026-06-09.
+
+- Scope: added Schedule default-template category, six yearly/monthly/daily schedule templates in landscape and portrait orientations, selected-layer Motion animation metadata, and a separate OBS preview window.
+- `npm test`: pass. 26 test files, 88 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed.
+- Runtime gate URL: `http://127.0.0.1:4194/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Schedule filter: pass. The Templates panel exposed exactly 6 Schedule rows.
+- Schedule template load: pass. Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Daily Schedule Landscape, and Daily Schedule Portrait each rendered a nonblank canvas.
+- CSV import: pass. Status reported `CSV applied: 2 layers.`
+- HTML import: pass. Status reported `HTML applied: 2 layers.`
+- Layer editing: pass. Adjust numeric edit accepted and the canvas stayed nonblank.
+- Motion setting: pass. The selected layer animation type changed to `fade`.
+- OBS preview: pass. A separate preview window opened and rendered a nonblank canvas.
+- Export: pass. WebP download created at `output/runtime-downloads-20260609-schedule-motion/thumbnail-1080x1920-2026-06-09T00-14-07-206Z.webp`.
+- Mobile: pass. `390x844` viewport rendered a nonblank canvas and had horizontal overflow `0`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260609-schedule-motion-desktop.png`
+  - `docs/assets/runtime-20260609-schedule-motion-mobile.png`
+- Console health: no page errors or relevant console warnings were reported. The gate used `getImageData` readbacks for canvas nonblank checks; Chromium may warn about frequent readbacks, but that is test-induced and not an app runtime error.
+
 ### Automated
 
-- `npm test`: pass. 25 test files, 84 tests.
+- `npm test`: pass. 26 test files, 88 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed.
 
 ### Vertical Text Bounds

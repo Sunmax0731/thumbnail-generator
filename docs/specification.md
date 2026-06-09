@@ -18,6 +18,21 @@ All layers share:
 - `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw a blurred layer copy behind the layer, and negative values draw the layer through a feathered alpha mask so inner edge softening is visible in preview and export.
 - `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
 - `cornerRadius`: rounded corner radius for image layers and rectangular shape layers.
+- `animation`: optional per-layer animation settings used by Motion and OBS preview. Static PNG/JPEG/WebP export ignores animation time and renders the base layer state.
+
+## Layer Animation
+
+Layer animation is optional metadata on existing image, text, and shape layers. It does not add a new layer type.
+
+- `type`: `none`, `fade`, `slide`, `pop`, `pulse`, `blink`, or `drift`.
+- `startMs`: start time in milliseconds.
+- `durationMs`: animation duration in milliseconds.
+- `easing`: `linear`, `easeIn`, `easeOut`, or `easeInOut`.
+- `loop`: whether the animation repeats.
+- `direction`: `left`, `right`, `up`, or `down` for slide and drift.
+- `distance`: movement distance in output pixels for slide and drift.
+
+Rendering applies animation as a temporary draw-time transform. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
 ## Image Layers
 
@@ -69,7 +84,7 @@ Shape layers include:
 CSV rows support the following columns:
 
 ```text
-type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
+type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
 ```
 
 Rules:
@@ -78,7 +93,7 @@ Rules:
 - Missing numbers fall back to safe defaults.
 - `effect` accepts semicolon-separated values such as `grayscale=1;blur=4;mosaic=12`.
 - `image` references an imported image name/key or a bundled sample key.
-- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, `groupId`, `groupName`, `writingMode`, and `lineStyle` are optional and fall back to safe defaults.
+- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, `groupId`, `groupName`, `writingMode`, `lineStyle`, and animation columns are optional and fall back to safe defaults.
 - Quoted CSV fields are supported.
 
 ## HTML Layout Schema
@@ -93,6 +108,7 @@ Examples:
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
+<div data-layer="text" data-animation-type="fade" data-animation-duration-ms="900" data-animation-loop="true">MOTION</div>
 ```
 
 ## Export
@@ -181,6 +197,7 @@ The right inspector is grouped by task:
 - Layers: layer ordering, visibility, selectable/editable lock, and alignment.
 - Adjust: selected layer properties such as position, size, rotation, opacity, text, shape, and image effects. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows.
+- Motion: selected-layer animation type, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
 The Layers list and Colors list use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
@@ -205,20 +222,25 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Default Templates
 
-Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 20 practical layouts built only from supported image, text, shape, and line layers, with five entries per category:
+Bundled default templates are static browser assets, not localStorage records. Loading one replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The current shipped set contains 26 practical layouts built only from supported image, text, shape, and line layers:
 
 - YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
 - Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
 - Stream: Creator Live, Breaking News, Gaming Highlight, Event Countdown, Music Premiere.
 - Cutout: Minimal Launch, Profile Cutout, Product Cutout, Food Cutout, Fashion Cutout.
+- Schedule: Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Daily Schedule Landscape, Daily Schedule Portrait.
 
 Each bundled template also carries browser-rendered catalog metadata:
 
-- Category: `youtube`, `shorts`, `stream`, or `cutout`.
+- Category: `youtube`, `shorts`, `stream`, `cutout`, or `schedule`.
 - Preview colors: three representative swatches used by the compact template preview.
 - Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
 
 The left panel keeps a guided start strip visible above the active task tab for Template, Image, Title, Brand, and Layout actions. These controls route to existing browser-only editor actions and do not create server state.
+
+## OBS Preview
+
+The canvas toolbar can open an OBS preview window. The child window displays only a canvas on a black background, draws without editor selection handles or preview padding, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. OBS users can capture this separate window with Window Capture. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
 
 ## Brand Kit
 

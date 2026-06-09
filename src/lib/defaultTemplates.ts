@@ -1,13 +1,16 @@
 import { defaultOutputSettings } from "./presets";
 import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
+import { scheduleTemplates } from "./scheduleTemplates";
 import { createInitialLayers } from "./sampleData";
 import type { OutputSettings, ThumbnailLayer } from "./types";
+
+export type DefaultTemplateCategory = "youtube" | "shorts" | "stream" | "cutout" | "schedule";
 
 export interface DefaultTemplateDefinition {
   id: string;
   name: string;
   description: string;
-  category: "youtube" | "shorts" | "stream" | "cutout";
+  category: DefaultTemplateCategory;
   previewColors: [string, string, string];
   settings: OutputSettings;
   createLayers: () => ThumbnailLayer[];
@@ -1583,4 +1586,5 @@ export const defaultTemplates: DefaultTemplateDefinition[] = [
       }),
     ],
   },
+  ...scheduleTemplates,
 ];

@@ -28,6 +28,15 @@ describe("layoutExport", () => {
         letterSpacing: 5,
         fillOpacity: 0.8,
         writingMode: "vertical",
+        animation: {
+          type: "slide",
+          startMs: 200,
+          durationMs: 1200,
+          easing: "easeOut",
+          loop: true,
+          direction: "up",
+          distance: 90,
+        },
       }),
       makeShapeLayer({ name: "Rule", shape: "line", lineStyle: "wave", strokeWidth: 12, cornerRadius: 4 }),
     ]);
@@ -39,6 +48,8 @@ describe("layoutExport", () => {
     expect(html).toContain('data-edge-blur-stroke="true"');
     expect(html).toContain('data-writing-mode="vertical"');
     expect(html).toContain('data-letter-spacing="5"');
+    expect(html).toContain('data-animation-type="slide"');
+    expect(html).toContain('data-animation-loop="true"');
     expect(html).toContain('data-line-style="wave"');
   });
 });

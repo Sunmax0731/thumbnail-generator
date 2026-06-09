@@ -233,9 +233,16 @@ button:disabled {
   position: sticky;
   z-index: 2;
   top: 0;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   padding-bottom: 6px;
   background: var(--panel);
+}
+
+.source-tabs {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.inspector-tabs {
+  grid-template-columns: repeat(4, minmax(0, 1fr));
 }
 
 .panel-tabs button,
@@ -557,7 +564,7 @@ button:disabled {
 
 .template-filter-tabs {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 5px;
 }
 
@@ -785,6 +792,7 @@ button:disabled {
 }
 
 .zoom-controls {
+  flex-wrap: wrap;
   gap: 6px;
 }
 
@@ -794,6 +802,12 @@ button:disabled {
   font-size: 11px;
   font-weight: 900;
   text-align: center;
+}
+
+.obs-preview-button {
+  min-height: 32px;
+  padding-inline: 10px;
+  white-space: nowrap;
 }
 
 .canvas-scroll {
@@ -1897,9 +1911,12 @@ button:disabled {
     grid-template-columns: 1fr;
   }
 
-  .source-tabs,
-  .inspector-tabs {
+  .source-tabs {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .inspector-tabs {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
   }
 
   .source-tabs button,

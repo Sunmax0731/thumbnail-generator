@@ -15,7 +15,7 @@ export interface CustomFont {
   createdAt: string;
 }
 
-const loadedFontIds = new Set<string>();
+const loadedFontIdsByDocument = new WeakMap<Document, Set<string>>();
 
 export function customFontToOption(font: CustomFont): FontOption {
   return {
@@ -79,11 +79,11 @@ export async function readCustomFontFile(file: File, now = new Date()): Promise<
   };
 }
 
-export async function loadCustomFonts(fonts: CustomFont[]): Promise<string[]> {
+export async function loadCustomFonts(fonts: CustomFont[], targetDocument: Document = document): Promise<string[]> {
   const errors: string[] = [];
   for (const font of fonts) {
     try {
-      await loadCustomFont(font);
+      await loadCustomFont(font, targetDocument);
     } catch (error) {
       errors.push(`${font.name}: ${error instanceof Error ? error.message : String(error)}`);
     }
@@ -91,14 +91,17 @@ export async function loadCustomFonts(fonts: CustomFont[]): Promise<string[]> {
   return errors;
 }
 
-export async function loadCustomFont(font: CustomFont): Promise<void> {
-  if (typeof document === "undefined" || typeof FontFace === "undefined" || !document.fonts) return;
+export async function loadCustomFont(font: CustomFont, targetDocument: Document = document): Promise<void> {
+  const FontFaceConstructor = targetDocument.defaultView?.FontFace ?? (typeof FontFace === "undefined" ? undefined : FontFace);
+  if (!FontFaceConstructor || !targetDocument.fonts) return;
+  const loadedFontIds = loadedFontIdsByDocument.get(targetDocument) ?? new Set<string>();
   if (loadedFontIds.has(font.id)) return;
 
-  const face = new FontFace(font.family, `url(${font.dataUrl}) format("${font.format}")`);
+  const face = new FontFaceConstructor(font.family, `url(${font.dataUrl}) format("${font.format}")`);
   const loaded = await face.load();
-  document.fonts.add(loaded);
+  targetDocument.fonts.add(loaded);
   loadedFontIds.add(font.id);
+  loadedFontIdsByDocument.set(targetDocument, loadedFontIds);
 }
 
 export function fontFormatForFile(name: string, type = ""): CustomFontFormat | undefined {

@@ -4,6 +4,9 @@ export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
 export type TextWritingMode = "horizontal" | "vertical";
 export type ExportFormat = "png" | "jpeg" | "webp";
+export type LayerAnimationType = "none" | "fade" | "slide" | "pop" | "pulse" | "blink" | "drift";
+export type LayerAnimationEasing = "linear" | "easeIn" | "easeOut" | "easeInOut";
+export type LayerAnimationDirection = "left" | "right" | "up" | "down";
 
 export interface ImageEffects {
   grayscale: number;
@@ -11,6 +14,16 @@ export interface ImageEffects {
   brightness: number;
   contrast: number;
   mosaic: number;
+}
+
+export interface LayerAnimation {
+  type: LayerAnimationType;
+  startMs: number;
+  durationMs: number;
+  easing: LayerAnimationEasing;
+  loop: boolean;
+  direction: LayerAnimationDirection;
+  distance: number;
 }
 
 export interface BaseLayer {
@@ -31,6 +44,7 @@ export interface BaseLayer {
   edgeBlur: number;
   edgeBlurStroke: boolean;
   cornerRadius: number;
+  animation?: LayerAnimation;
 }
 
 export interface ImageLayer extends BaseLayer {

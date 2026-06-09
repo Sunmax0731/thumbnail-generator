@@ -30,8 +30,9 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
-- Load 20 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, without depending on localStorage.
+- Load 26 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases plus six schedule entries for yearly, monthly, and daily layouts, without depending on localStorage.
 - Filter bundled templates by use case and show compact template previews before loading.
+- Configure simple per-layer animation presets and show the animated canvas in a separate OBS preview window without editor selection handles.
 - Keep a guided beginner creation path visible from the left panel for template selection, image replacement, title creation, brand application, and layout generation.
 - Save and apply a browser-local brand kit with channel name, font, colors, shadow/outline color, and optional logo asset.
 - Register the current Colors tab draft, saved palette colors, or registered single colors into Brand kit primary, accent, or shadow colors.

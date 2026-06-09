@@ -101,6 +101,10 @@ interface ActiveCanvasInteraction {
   latestLayers?: ThumbnailLayer[];
 }
 
+type ObsPreviewHostWindow = Window & {
+  __thumbnailObsPreviewRender?: (canvas: HTMLCanvasElement, timeMs: number) => Promise<void>;
+};
+
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
@@ -164,6 +168,8 @@ function App() {
   const [fontReadyRevision, setFontReadyRevision] = useState(0);
   const [isImageLabOpen, setIsImageLabOpen] = useState(false);
   const [selectedAssetKey, setSelectedAssetKey] = useState(() => assets[0]?.key ?? "");
+  const obsWindowRef = useRef<Window | null>(null);
+  const obsPreviewStateRef = useRef({ layers, assets, settings, customFonts });
 
   const selectedLayers = useMemo(
     () => layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable),
@@ -268,6 +274,16 @@ function App() {
       cancelled = true;
     };
   }, [customFonts]);
+
+  useEffect(() => {
+    obsPreviewStateRef.current = { layers, assets, settings, customFonts };
+  }, [assets, customFonts, layers, settings]);
+
+  useEffect(() => {
+    return () => {
+      delete (window as ObsPreviewHostWindow).__thumbnailObsPreviewRender;
+    };
+  }, []);
 
   useEffect(() => {
     try {
@@ -1323,6 +1339,88 @@ function App() {
     [templates],
   );
 
+  const openObsPreview = useCallback(() => {
+    if (obsWindowRef.current && !obsWindowRef.current.closed) {
+      obsWindowRef.current.focus();
+      setStatus("OBS preview window focused.");
+      return;
+    }
+
+    const previewWindow = window.open("", "thumbnail-generator-obs-preview", "width=1280,height=720,popup=yes");
+    if (!previewWindow) {
+      setStatus("OBS preview could not open. Allow popups for this site and try again.");
+      return;
+    }
+
+    obsWindowRef.current = previewWindow;
+    (window as ObsPreviewHostWindow).__thumbnailObsPreviewRender = async (canvas, timeMs) => {
+      const state = obsPreviewStateRef.current;
+      await loadCustomFonts(state.customFonts, canvas.ownerDocument);
+      await renderThumbnailToCanvas(canvas, state.layers, state.assets, state.settings, {
+        drawSelection: false,
+        previewPadding: 0,
+        animationTimeMs: timeMs,
+        sceneDurationMs: 4000,
+      });
+    };
+
+    previewWindow.document.open();
+    previewWindow.document.write(`<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>OBS Preview - Thumbnail Generator</title>
+    <style>
+      html, body {
+        width: 100%;
+        height: 100%;
+        margin: 0;
+        overflow: hidden;
+        background: #000000;
+      }
+      body {
+        display: grid;
+        place-items: center;
+      }
+      canvas {
+        display: block;
+        max-width: 100vw;
+        max-height: 100vh;
+        object-fit: contain;
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="obs-canvas" aria-label="OBS preview canvas"></canvas>
+    <script>
+      const canvas = document.getElementById("obs-canvas");
+      const start = performance.now();
+      let last = 0;
+      async function frame(now) {
+        if (now - last >= 33) {
+          last = now;
+          try {
+            if (!window.opener || window.opener.closed || !window.opener.__thumbnailObsPreviewRender) {
+              document.body.style.background = "#111827";
+            } else {
+              await window.opener.__thumbnailObsPreviewRender(canvas, now - start);
+            }
+          } catch (error) {
+            console.error(error);
+          }
+        }
+        requestAnimationFrame(frame);
+      }
+      requestAnimationFrame(frame);
+    </script>
+  </body>
+</html>`);
+    previewWindow.document.close();
+    previewWindow.focus();
+    setStatus("OBS preview window opened. Capture that window in OBS.");
+  }, []);
+
   const handleExport = useCallback(
     async (format?: ExportFormat) => {
       const exportSettings = format ? { ...settings, format } : settings;
@@ -1449,6 +1547,7 @@ function App() {
           onExportEditState={exportEditState}
           onImportEditState={importEditState}
           onDeleteEditState={deleteEditState}
+          onOpenObsPreview={openObsPreview}
           t={t}
         />
         <InspectorPanel

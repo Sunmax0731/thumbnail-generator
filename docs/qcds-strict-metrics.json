@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "Open P2 backlog, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 20 bundled default templates with five per category, template metadata, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, expanded Google Fonts dropdown choices, vertical text Adjust width/height editing, vertical text preview-handle resizing without unexpected movement, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser and real-device edge cases remain future work."
+    "rationale": "Schedule templates, Motion/OBS preview, expanded hosted font options, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 26 bundled default templates, Schedule filtering with six yearly/monthly/daily templates, template metadata, Motion animation metadata, OBS preview window rendering, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, service-section removal, expanded Google Fonts dropdown choices, vertical text Adjust width/height editing, vertical text preview-handle resizing without unexpected movement, brand kit helpers, quality warning helpers, edit-state JSON recovery helpers, CSV/HTML persistence, inspector editing, WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -15,13 +15,13 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested P2 backlog, expanded font selection, and vertical text display-bound resizing passed validation: 20 practical bundled templates with five per category, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, Templates service-section removal, 26 text-layer font dropdown options, and vertical text width/height edits from both Adjust and preview handles. Issue 0064 adds a screenshot-based guide, and Issues 0065-0068 add beginner guided creation, template filters/previews, creator brand reuse, quality warnings, state JSON recovery, and in-app issue/privacy display through the header and preview storage note. CSV/HTML import/export persistence works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, and non-Chromium browser coverage."
+    "rationale": "Requested Schedule templates, Motion/OBS preview, expanded font selection, and vertical text display-bound resizing passed validation: 26 practical bundled templates including six Schedule starts, always-visible guided start, preview-pane edit state, Colors-to-Brand-kit registration, Templates service-section removal, 26 text-layer font dropdown options, and vertical text width/height edits from both Adjust and preview handles. CSV/HTML import/export persistence works, Motion fade assignment works, OBS preview window rendering works, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
     "source": "docs/codex-work-dashboard-qcds.md",
     "openItemsBeforeReview": [
-      "Default templates 20 practical layouts"
+      "Default templates 26 practical layouts with Schedule and Motion/OBS preview"
     ],
     "closedByReview": true,
     "ratingsAfterReview": {
@@ -54,14 +54,14 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4193/thumbnail-generator/",
+    "url": "http://127.0.0.1:4194/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "previously passed",
     "desktopViewport": "1440x900",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260609-vertical-bounds-desktop.png",
-      "docs/assets/runtime-20260609-vertical-bounds-mobile.png"
+      "docs/assets/runtime-20260609-schedule-motion-desktop.png",
+      "docs/assets/runtime-20260609-schedule-motion-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
@@ -69,10 +69,13 @@
       "English language switch",
       "left Assets Layouts Templates tabs",
       "right Layers Adjust Colors tabs",
-      "20 bundled default templates",
+      "26 bundled default templates",
+      "6 Schedule templates",
+      "Motion animation assignment",
+      "OBS preview window nonblank render",
       "26 text-layer font dropdown options",
       "expanded hosted Google Fonts choices",
-      "5 templates per category",
+      "5 templates per core category plus 6 Schedule templates",
       "always-visible guided start",
       "preview-pane edit state",
       "Colors-to-Brand-kit registration",

@@ -32,8 +32,8 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Load 20 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories.
-- Filter bundled templates by All, YouTube, Shorts, Stream, or Cutout, with mini preview swatches and output-size badges.
+- Load 26 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories plus six Schedule starts for yearly, monthly, and daily layouts.
+- Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, or Schedule, with mini preview swatches and output-size badges.
 - Use the always-visible Guided start strip for the Template, Image, Title, Brand, and Layout creation path.
 - Use Templates to save named browser-local templates.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
@@ -67,6 +67,13 @@ This page is the quick feature index for users and reviewers.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
 - Use Adjust reset buttons to return selected-layer rotation to 0 degrees and opacity to 100%.
 - Controls that do not affect the current layer state are disabled, such as single-line text line height.
+
+## Motion And OBS Preview
+
+- Open Motion to assign None, Fade, Slide, Pop, Pulse, Blink, or Drift animation to the selected layer.
+- Set animation start time, duration, easing, direction, distance, and loop behavior.
+- Open OBS preview from the canvas toolbar to show the current animated canvas in a separate window without selection handles.
+- Capture the OBS preview window in OBS with Window Capture for browser-only live display.
 
 ## Color Palette
 

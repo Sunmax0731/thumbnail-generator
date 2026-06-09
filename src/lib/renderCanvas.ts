@@ -1,4 +1,5 @@
 import { rotateHandleOffset, selectionHandleRadius, type CanvasInteractionMode } from "./canvasInteraction";
+import { applyAnimationsToLayers, defaultSceneDurationMs } from "./animation";
 import { getLayerSelectionLocalBounds, getLayerSelectionLocalCenter, getLayerVisualLocalBounds } from "./layerVisualBounds";
 import type { ImageAsset, ImageEffects, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
@@ -9,6 +10,8 @@ export interface RenderOptions {
   selectedLayerIds?: string[];
   drawSelection?: boolean;
   previewPadding?: number;
+  animationTimeMs?: number;
+  sceneDurationMs?: number;
   hoverInteractionMode?: CanvasInteractionMode | null;
   activeInteractionMode?: CanvasInteractionMode | null;
 }
@@ -44,7 +47,11 @@ export async function renderThumbnailToCanvas(
   context.save();
   context.translate(previewPadding, previewPadding);
 
-  const sortedLayers = layers.filter((layer) => layer.visible);
+  const renderLayers =
+    options.animationTimeMs == null
+      ? layers
+      : applyAnimationsToLayers(layers, options.animationTimeMs, options.sceneDurationMs ?? defaultSceneDurationMs);
+  const sortedLayers = renderLayers.filter((layer) => layer.visible);
   for (const layer of sortedLayers) {
     await drawLayer(context, layer, assets);
   }

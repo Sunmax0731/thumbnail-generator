@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef } from "react";
-import { Download, FolderOpen, Maximize2, MousePointer2, Save, Trash2, ZoomIn, ZoomOut } from "lucide-react";
+import { Download, FolderOpen, Maximize2, MonitorPlay, MousePointer2, Save, Trash2, ZoomIn, ZoomOut } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
 import type { OutputSettings } from "../lib/types";
@@ -24,6 +24,7 @@ interface CanvasStageProps {
   onExportEditState: () => void;
   onImportEditState: (file: File | null) => void;
   onDeleteEditState: () => void;
+  onOpenObsPreview: () => void;
   t: Translator;
 }
 
@@ -47,6 +48,7 @@ export function CanvasStage({
   onExportEditState,
   onImportEditState,
   onDeleteEditState,
+  onOpenObsPreview,
   t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
@@ -90,6 +92,14 @@ export function CanvasStage({
           </span>
         </div>
         <div className="zoom-controls" aria-label={t("stage.zoom")}>
+          <button
+            type="button"
+            className="secondary-button icon-text obs-preview-button"
+            onClick={onOpenObsPreview}
+            title={t("stage.openObsPreview")}
+          >
+            <MonitorPlay size={16} /> {t("stage.openObsPreview")}
+          </button>
           <button
             type="button"
             className="icon-button"

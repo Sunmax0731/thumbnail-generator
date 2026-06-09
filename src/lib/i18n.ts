@@ -18,6 +18,7 @@ const en = {
   "stage.zoomOut": "Zoom out",
   "stage.zoomIn": "Zoom in",
   "stage.fitCanvas": "Fit canvas",
+  "stage.openObsPreview": "Open OBS preview",
   "stage.layerCount": "{count} layers",
   "stage.layerCount.one": "1 layer",
   "stage.canvasLabel": "Thumbnail preview canvas",
@@ -77,6 +78,7 @@ const en = {
   "left.filter.shorts": "Shorts",
   "left.filter.stream": "Stream",
   "left.filter.cutout": "Cutout",
+  "left.filter.schedule": "Schedule",
   "left.brandKit": "Brand kit",
   "left.channelName": "Channel name",
   "left.brandFont": "Brand font",
@@ -100,6 +102,7 @@ const en = {
   "inspector.layers": "Layers",
   "inspector.adjust": "Adjust",
   "inspector.colors": "Colors",
+  "inspector.motion": "Motion",
   "inspector.layerList": "Layer list",
   "inspector.resizeLayerList": "Resize layer list",
   "inspector.addLine": "Add line",
@@ -133,6 +136,29 @@ const en = {
   "inspector.top": "Top",
   "inspector.middle": "Middle",
   "inspector.bottom": "Bottom",
+  "inspector.motionSettings": "Animation",
+  "inspector.animationType": "Animation",
+  "inspector.animationNone": "None",
+  "inspector.animationFade": "Fade",
+  "inspector.animationSlide": "Slide",
+  "inspector.animationPop": "Pop",
+  "inspector.animationPulse": "Pulse",
+  "inspector.animationBlink": "Blink",
+  "inspector.animationDrift": "Drift",
+  "inspector.animationStart": "Start",
+  "inspector.animationDuration": "Duration",
+  "inspector.animationEasing": "Easing",
+  "inspector.animationLinear": "Linear",
+  "inspector.animationEaseIn": "Ease in",
+  "inspector.animationEaseOut": "Ease out",
+  "inspector.animationEaseInOut": "Ease in/out",
+  "inspector.animationLoop": "Loop animation",
+  "inspector.animationDirection": "Direction",
+  "inspector.animationDistance": "Distance",
+  "inspector.directionLeft": "Left",
+  "inspector.directionRight": "Right",
+  "inspector.directionUp": "Up",
+  "inspector.directionDown": "Down",
   "inspector.inspector": "Inspector",
   "inspector.moveUp": "Move layer up",
   "inspector.moveDown": "Move layer down",
@@ -266,7 +292,7 @@ export type TranslationKey = keyof typeof en;
 export type Translator = (key: TranslationKey, values?: Record<string, string | number>) => string;
 export type Language = "en" | "ja";
 
-const ja: Record<TranslationKey, string> = {
+const ja: Partial<Record<TranslationKey, string>> = {
   "app.title": "サムネイル生成",
   "app.subtitle": "CSV / HTML レイアウトキャンバス",
   "app.reportIssue": "Issue 報告",
@@ -530,7 +556,36 @@ const ja: Record<TranslationKey, string> = {
   "status.zoom": "{zoom}% 表示",
 };
 
-const dictionaries: Record<Language, Record<TranslationKey, string>> = { en, ja };
+const jaOverrides: Partial<Record<TranslationKey, string>> = {
+  "stage.openObsPreview": "OBSプレビューを開く",
+  "left.filter.schedule": "予定",
+  "inspector.motion": "Motion",
+  "inspector.motionSettings": "アニメーション",
+  "inspector.animationType": "アニメーション",
+  "inspector.animationNone": "なし",
+  "inspector.animationFade": "フェード",
+  "inspector.animationSlide": "スライド",
+  "inspector.animationPop": "ポップ",
+  "inspector.animationPulse": "パルス",
+  "inspector.animationBlink": "点滅",
+  "inspector.animationDrift": "ゆっくり移動",
+  "inspector.animationStart": "開始",
+  "inspector.animationDuration": "長さ",
+  "inspector.animationEasing": "イージング",
+  "inspector.animationLinear": "直線",
+  "inspector.animationEaseIn": "徐々に開始",
+  "inspector.animationEaseOut": "徐々に停止",
+  "inspector.animationEaseInOut": "開始/停止",
+  "inspector.animationLoop": "ループ再生",
+  "inspector.animationDirection": "方向",
+  "inspector.animationDistance": "距離",
+  "inspector.directionLeft": "左",
+  "inspector.directionRight": "右",
+  "inspector.directionUp": "上",
+  "inspector.directionDown": "下",
+};
+
+const dictionaries: Record<Language, Record<TranslationKey, string>> = { en, ja: { ...en, ...ja, ...jaOverrides } };
 
 export const languageOptions: Array<{ id: Language; labelKey: TranslationKey }> = [
   { id: "en", labelKey: "language.en" },

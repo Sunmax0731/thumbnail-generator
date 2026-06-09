@@ -1,4 +1,4 @@
-import { defaultEffects, makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
+import { defaultEffects, makeImageLayer, makeShapeLayer, makeTextLayer, normalizeAnimation } from "./layerFactory";
 import type {
   ImageEffects,
   LayoutParseOptions,
@@ -44,6 +44,15 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
       edgeBlur: numberOr(record.edgeBlur, 0),
       edgeBlurStroke: boolOr(record.edgeBlurStroke, false),
       cornerRadius: numberOr(record.cornerRadius, 0),
+      animation: normalizeAnimation({
+        type: record.animationType?.trim(),
+        startMs: numberOr(record.animationStartMs, 0),
+        durationMs: numberOr(record.animationDurationMs, 900),
+        easing: record.animationEasing?.trim(),
+        loop: boolOr(record.animationLoop, false),
+        direction: record.animationDirection?.trim(),
+        distance: numberOr(record.animationDistance, 80),
+      }),
     };
 
     if (type === "image") {

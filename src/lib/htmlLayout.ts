@@ -1,5 +1,5 @@
 import { parseEffects, numberOr } from "./csv";
-import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
+import { makeImageLayer, makeShapeLayer, makeTextLayer, normalizeAnimation } from "./layerFactory";
 import type {
   LayoutParseOptions,
   LayoutParseResult,
@@ -36,6 +36,15 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
       edgeBlur: numberOr(attr(node, "edge-blur"), 0),
       edgeBlurStroke: parseBoolean(attr(node, "edge-blur-stroke"), false),
       cornerRadius: numberOr(attr(node, "corner-radius"), 0),
+      animation: normalizeAnimation({
+        type: attr(node, "animation-type"),
+        startMs: numberOr(attr(node, "animation-start-ms"), 0),
+        durationMs: numberOr(attr(node, "animation-duration-ms"), 900),
+        easing: attr(node, "animation-easing"),
+        loop: parseBoolean(attr(node, "animation-loop"), false),
+        direction: attr(node, "animation-direction"),
+        distance: numberOr(attr(node, "animation-distance"), 80),
+      }),
     };
 
     if (type === "image") {

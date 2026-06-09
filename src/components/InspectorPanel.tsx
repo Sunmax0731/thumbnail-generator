@@ -20,6 +20,7 @@ import {
   MousePointer2,
   Move,
   Palette,
+  Play,
   RotateCcw,
   RotateCw,
   SlidersHorizontal,
@@ -31,6 +32,7 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import { acceptedFontFileTypes } from "../lib/customFonts";
 import { fontLabelFor, type FontOption } from "../lib/fonts";
+import { defaultAnimation, normalizeAnimation } from "../lib/layerFactory";
 import {
   derivePaletteBaseFromSchemeColor,
   generatePaletteSchemeColors,
@@ -54,6 +56,9 @@ import type { RelativeLayerTransform } from "../lib/layerTransform";
 import type {
   ImageAsset,
   ImageEffects,
+  LayerAnimationDirection,
+  LayerAnimationEasing,
+  LayerAnimationType,
   LineStyle,
   OutputSettings,
   BrandKitColorRole,
@@ -63,7 +68,7 @@ import type {
   ThumbnailLayer,
 } from "../lib/types";
 
-type InspectorSection = "layers" | "edit" | "colors";
+type InspectorSection = "layers" | "edit" | "colors" | "motion";
 
 interface InspectorPanelProps {
   assets: ImageAsset[];
@@ -228,6 +233,15 @@ export function InspectorPanel({
           onClick={() => setActiveSection("colors")}
         >
           <Palette size={15} /> {t("inspector.colors")}
+        </button>
+        <button
+          type="button"
+          role="tab"
+          aria-selected={activeSection === "motion"}
+          className={activeSection === "motion" ? "selected" : ""}
+          onClick={() => setActiveSection("motion")}
+        >
+          <Play size={15} /> {t("inspector.motion")}
         </button>
       </div>
 
@@ -436,6 +450,20 @@ export function InspectorPanel({
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
         />
+      ) : null}
+
+      {activeSection === "motion" ? (
+        selected ? (
+          <MotionControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />
+        ) : (
+          <section className="panel-section">
+            <div className="section-heading">
+              <Play size={16} />
+              <h2>{t("inspector.motionSettings")}</h2>
+            </div>
+            <p className="selection-note">{t("inspector.noEditableSelection")}</p>
+          </section>
+        )
       ) : null}
 
       {activeSection === "edit" ? (
@@ -1364,9 +1392,148 @@ const brandKitColorRoleShortLabels = {
   shadowColor: "inspector.brandShadowShort",
 } as const;
 
+const animationTypes: LayerAnimationType[] = ["none", "fade", "slide", "pop", "pulse", "blink", "drift"];
+const animationEasings: LayerAnimationEasing[] = ["linear", "easeIn", "easeOut", "easeInOut"];
+const animationDirections: LayerAnimationDirection[] = ["left", "right", "up", "down"];
+
+const animationTypeLabels: Record<LayerAnimationType, Parameters<Translator>[0]> = {
+  none: "inspector.animationNone",
+  fade: "inspector.animationFade",
+  slide: "inspector.animationSlide",
+  pop: "inspector.animationPop",
+  pulse: "inspector.animationPulse",
+  blink: "inspector.animationBlink",
+  drift: "inspector.animationDrift",
+};
+
+const animationEasingLabels: Record<LayerAnimationEasing, Parameters<Translator>[0]> = {
+  linear: "inspector.animationLinear",
+  easeIn: "inspector.animationEaseIn",
+  easeOut: "inspector.animationEaseOut",
+  easeInOut: "inspector.animationEaseInOut",
+};
+
+const animationDirectionLabels: Record<LayerAnimationDirection, Parameters<Translator>[0]> = {
+  left: "inspector.directionLeft",
+  right: "inspector.directionRight",
+  up: "inspector.directionUp",
+  down: "inspector.directionDown",
+};
+
 function isKeyboardInputTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
   return Boolean(target.closest("input, textarea, select")) || target.isContentEditable;
+}
+
+function MotionControls({
+  selected,
+  onUpdateLayer,
+  t,
+}: {
+  selected: ThumbnailLayer;
+  onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  t: Translator;
+}) {
+  const animation = selected.animation ?? defaultAnimation;
+  const updateAnimation = (partial: Partial<typeof defaultAnimation>) => {
+    onUpdateLayer(selected.id, (layer) => ({
+      ...layer,
+      animation: normalizeAnimation({ ...(layer.animation ?? defaultAnimation), ...partial }),
+    }));
+  };
+  const hasAnimation = animation.type !== "none";
+
+  return (
+    <section className="panel-section motion-section">
+      <div className="section-heading">
+        <Play size={16} />
+        <h2>{t("inspector.motionSettings")}</h2>
+      </div>
+      <label className="field">
+        <span>{t("inspector.animationType")}</span>
+        <select
+          value={animation.type}
+          onChange={(event) => updateAnimation({ type: event.currentTarget.value as LayerAnimationType })}
+        >
+          {animationTypes.map((type) => (
+            <option key={type} value={type}>
+              {t(animationTypeLabels[type])}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="field-grid two">
+        <SliderNumberInput
+          label={t("inspector.animationStart")}
+          value={animation.startMs}
+          min={0}
+          max={10000}
+          step={100}
+          suffix="ms"
+          disabled={!hasAnimation}
+          onChange={(value) => updateAnimation({ startMs: value })}
+        />
+        <SliderNumberInput
+          label={t("inspector.animationDuration")}
+          value={animation.durationMs}
+          min={100}
+          max={10000}
+          step={100}
+          suffix="ms"
+          disabled={!hasAnimation}
+          onChange={(value) => updateAnimation({ durationMs: value })}
+        />
+      </div>
+      <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
+        <span>{t("inspector.animationEasing")}</span>
+        <select
+          value={animation.easing}
+          disabled={!hasAnimation}
+          onChange={(event) => updateAnimation({ easing: event.currentTarget.value as LayerAnimationEasing })}
+        >
+          {animationEasings.map((easing) => (
+            <option key={easing} value={easing}>
+              {t(animationEasingLabels[easing])}
+            </option>
+          ))}
+        </select>
+      </label>
+      <div className="field-grid two">
+        <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
+          <span>{t("inspector.animationDirection")}</span>
+          <select
+            value={animation.direction}
+            disabled={!hasAnimation}
+            onChange={(event) => updateAnimation({ direction: event.currentTarget.value as LayerAnimationDirection })}
+          >
+            {animationDirections.map((direction) => (
+              <option key={direction} value={direction}>
+                {t(animationDirectionLabels[direction])}
+              </option>
+            ))}
+          </select>
+        </label>
+        <SliderNumberInput
+          label={t("inspector.animationDistance")}
+          value={animation.distance}
+          min={0}
+          max={800}
+          step={10}
+          disabled={!hasAnimation}
+          onChange={(value) => updateAnimation({ distance: value })}
+        />
+      </div>
+      <label className={`checkbox-row inline-checkbox ${!hasAnimation ? "field-disabled" : ""}`}>
+        <input
+          type="checkbox"
+          checked={animation.loop}
+          disabled={!hasAnimation}
+          onChange={(event) => updateAnimation({ loop: event.currentTarget.checked })}
+        />
+        <span>{t("inspector.animationLoop")}</span>
+      </label>
+    </section>
+  );
 }
 
 function ImageControls({

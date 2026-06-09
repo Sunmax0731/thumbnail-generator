@@ -17,6 +17,13 @@ const csvColumns = [
   "edgeBlur",
   "edgeBlurStroke",
   "cornerRadius",
+  "animationType",
+  "animationStartMs",
+  "animationDurationMs",
+  "animationEasing",
+  "animationLoop",
+  "animationDirection",
+  "animationDistance",
   "text",
   "fontSize",
   "fontFamily",
@@ -68,6 +75,13 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     edgeBlur: round(layer.edgeBlur ?? 0),
     edgeBlurStroke: layer.edgeBlurStroke ?? false,
     cornerRadius: round(layer.cornerRadius ?? 0),
+    animationType: layer.animation?.type ?? "",
+    animationStartMs: layer.animation ? round(layer.animation.startMs) : "",
+    animationDurationMs: layer.animation ? round(layer.animation.durationMs) : "",
+    animationEasing: layer.animation?.easing ?? "",
+    animationLoop: layer.animation?.loop ?? "",
+    animationDirection: layer.animation?.direction ?? "",
+    animationDistance: layer.animation ? round(layer.animation.distance) : "",
   };
   if (column in common) return common[column];
 
@@ -132,6 +146,13 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-edge-blur", round(layer.edgeBlur ?? 0)],
     ["data-edge-blur-stroke", String(layer.edgeBlurStroke ?? false)],
     ["data-corner-radius", round(layer.cornerRadius ?? 0)],
+    ["data-animation-type", layer.animation?.type ?? ""],
+    ["data-animation-start-ms", layer.animation ? round(layer.animation.startMs) : ""],
+    ["data-animation-duration-ms", layer.animation ? round(layer.animation.durationMs) : ""],
+    ["data-animation-easing", layer.animation?.easing ?? ""],
+    ["data-animation-loop", layer.animation ? String(layer.animation.loop) : ""],
+    ["data-animation-direction", layer.animation?.direction ?? ""],
+    ["data-animation-distance", layer.animation ? round(layer.animation.distance) : ""],
   ];
 
   if (layer.type === "image") {

@@ -39,11 +39,15 @@ shape,Plate,10,500,600,80,,0,rect,#ff0000,,`,
     expect(result.layers[2]).toMatchObject({ type: "shape", fill: "#ff0000" });
   });
 
-  it("reads layer effects, grouping, kerning, opacity, radius, and line styles", () => {
+  it("reads layer effects, grouping, kerning, opacity, radius, animation, and line styles", () => {
     const result = parseCsvLayout(
-      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,text,letterSpacing,fillOpacity,strokeOpacity,writingMode,shape,lineStyle,strokeWidth
-text,Title,0,0,400,120,g1,Brand,3,-4,true,0,HELLO,6,0.8,0.5,vertical,,,
-shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,,,,,,line,wave,12`,
+      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,text,letterSpacing,fillOpacity,strokeOpacity,writingMode,shape,lineStyle,strokeWidth
+text,Title,0,0,400,120,g1,Brand,3,-4,true,0,slide,200,1200,easeOut,true,up,90,HELLO,6,0.8,0.5,vertical,,,`,
+      { baseWidth: 1280, baseHeight: 720 },
+    );
+    const shapeResult = parseCsvLayout(
+      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shape,lineStyle,strokeWidth
+shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
       { baseWidth: 1280, baseHeight: 720 },
     );
 
@@ -58,8 +62,17 @@ shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,,,,,,line,wave,12`,
       fillOpacity: 0.8,
       strokeOpacity: 0.5,
       writingMode: "vertical",
+      animation: {
+        type: "slide",
+        startMs: 200,
+        durationMs: 1200,
+        easing: "easeOut",
+        loop: true,
+        direction: "up",
+        distance: 90,
+      },
     });
-    expect(result.layers[1]).toMatchObject({
+    expect(shapeResult.layers[0]).toMatchObject({
       type: "shape",
       shape: "line",
       lineStyle: "wave",
