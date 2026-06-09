@@ -3,7 +3,7 @@
   "ratingsAllowed": ["S+", "S-", "A+", "A-", "B+", "B-", "C+", "C-", "D+", "D-"],
   "quality": {
     "rating": "A+",
-    "rationale": "UI reposition, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, hidden Generated layout section, preview-pane Edit state/export controls, preview pan, user-controlled zoom on preset changes, fixed output-frame preview during off-canvas drags, outside-frame deselection, Colors layout cleanup, draggable popup Adjust single-color picker, hidden Colors-side Brand kit registration buttons, expanded shape kinds, rounded polygon corners, Image Lab asset-row entry with no-range default, deletion selection clearing, resizable Default and Browser template lists, popup-style OBS preview, Schedule templates, expanded Motion/easing controls with multiple motion sets and direction disabling, expanded hosted font options, Google Analytics tracking, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses, maximum-quality WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
+    "rationale": "UI reposition, upper-right Language and Theme controls, System/Light/Dark theme persistence, side-by-side preview-pane Export and Edit state sections with vertical button stacks, reorderable saved palettes and registered single colors, collapsible Layers Quick Add, collapsible layer list, horizontal and vertical even distribution, hidden Generated layout section, preview pan, user-controlled zoom on preset changes, fixed output-frame preview during off-canvas drags, outside-frame deselection, Colors layout cleanup, draggable popup Adjust single-color picker, hidden Colors-side Brand kit registration buttons, expanded shape kinds, rounded polygon corners, Image Lab asset-row entry with no-range default, deletion selection clearing, resizable Default and Browser template lists, popup-style OBS preview, Schedule templates, expanded Motion/easing controls with multiple motion sets and direction disabling, expanded hosted font options, Google Analytics tracking, and vertical text display-bound resizing are implemented and verified with automated tests, production build, and headless Chromium runtime gate. Coverage includes exactly 38 bundled default templates, hidden left Layouts tab, removed guided start, hidden Templates Brand kit setup, CSV/HTML persistence, inspector editing, Colors collapses and reorder persistence, maximum-quality WebP export, mobile no-overflow, user-facing docs, and QCDS evidence. Cross-browser, real-device, and real OBS setup edge cases remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -11,11 +11,11 @@
   },
   "delivery": {
     "rating": "A+",
-    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README, user guide, and screenshot guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, and docs packaging remains available through the existing workflow. A fresh remote Pages run after this commit remains pending until pushed."
+    "rationale": "TODO and local Issues are closed, implementation and docs are aligned, README, user guide, and screenshot guide are present, QCDS evidence is recorded, tests/build/runtime gate pass, docs packaging remains available through the existing workflow, and the GitHub Pages workflow is configured to deploy on pushes to codex/thumbnail-generator-static-app. A fresh remote Pages run after this commit remains pending until pushed."
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested UI cleanup and follow-up changes passed validation: left Layouts is hidden, guided start is removed, Templates Brand kit setup is hidden, Quick Add is moved to Layers with collapse controls, the layer list collapses, even distribution is added, preview zoom stays user-controlled with pan available, off-canvas dragging keeps zoom scale and output-frame size stable, clicking outside the output frame clears selection, Colors places the pattern dropdown beside the wheel and removes Brand kit registration buttons, Adjust opens a draggable popup alpha-capable single-color picker from Fill/Stroke displays, redundant opacity controls are removed, Shape supports Diamond/Pentagon/Hexagon/Star with rounded polygon corners, Image Lab opens only from imported asset rows and no longer duplicates source/import controls, chroma-key settings are separated from processed-layer creation, Default and Browser template lists are resizable, and OBS preview opens a popup-style canvas-only document. CSV/HTML import/export persistence works from the preview pane, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
+    "rationale": "Requested UI cleanup and follow-up changes passed validation: Export and Edit state sit side by side with vertical action stacks, saved palettes and registered single colors reorder by drag-and-drop with localStorage persistence, Language is in the upper-right toolbar area, Theme sits beside it with System/Light/Dark modes, left Layouts is hidden, guided start is removed, Templates Brand kit setup is hidden, Quick Add is moved to Layers with collapse controls, the layer list collapses, even distribution is added, preview zoom stays user-controlled with pan available, off-canvas dragging keeps zoom scale and output-frame size stable, clicking outside the output frame clears selection, Colors places the pattern dropdown beside the wheel and removes Brand kit registration buttons, Adjust opens a draggable popup alpha-capable single-color picker from Fill/Stroke displays, redundant opacity controls are removed, Shape supports Diamond/Pentagon/Hexagon/Star with rounded polygon corners, Image Lab opens only from imported asset rows and no longer duplicates source/import controls, chroma-key settings are separated from processed-layer creation, Default and Browser template lists are resizable, and OBS preview opens a popup-style canvas-only document. CSV/HTML import/export persistence works from the preview pane, WebP export works, and QCDS evidence is updated. Remaining satisfaction risk is broader real-user font files, real-device checks, non-Chromium browser coverage, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -54,19 +54,21 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4200/thumbnail-generator/",
+    "url": "http://127.0.0.1:4212/thumbnail-generator/",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
-    "pagesWorkflow": "previously passed",
-    "desktopViewport": "1440x1100",
+    "pagesWorkflow": "configured for pushes to codex/thumbnail-generator-static-app",
+    "desktopViewport": "1440x1000",
     "mobileViewport": "390x844",
     "screenshots": [
-      "docs/assets/runtime-20260609-popup-template-resize-desktop.png",
-      "docs/assets/runtime-20260609-popup-template-resize-mobile.png"
+      "docs/assets/runtime-20260610-theme-reorder-desktop.png",
+      "docs/assets/runtime-20260610-theme-reorder-mobile.png"
     ],
     "checks": [
       "nonblank canvas",
       "primary UI visible",
       "English language switch",
+      "upper-right Language and Theme controls",
+      "Dark theme DOM state and localStorage persistence",
       "left Assets and Templates tabs without the hidden Layouts tab",
       "right Layers Adjust Colors tabs",
       "hidden guided start",
@@ -93,9 +95,14 @@
       "expanded hosted Google Fonts choices",
       "5 templates per core category plus 8 Schedule templates plus 10 Motion templates",
       "preview-pane Edit state/export controls",
+      "side-by-side Export and Edit state sections",
+      "vertical Export action stack",
+      "vertical Edit state action stack",
       "preview-pane edit state",
       "hidden Colors-side Brand kit registration buttons",
       "Colors pattern dropdown before color wheel",
+      "saved-palette drag reorder persistence",
+      "registered single-color drag reorder persistence",
       "draggable popup Adjust Fill and Stroke single-color picker",
       "outside-frame preview click clears selection",
       "expanded shape kind options",

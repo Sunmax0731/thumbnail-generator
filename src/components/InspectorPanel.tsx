@@ -1,5 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from "react";
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { DragEvent as ReactDragEvent, PointerEvent as ReactPointerEvent, ReactNode } from "react";
 import { Sketch, hexToHsva } from "@uiw/react-color";
 import {
   AlignHorizontalJustifyCenter,
@@ -110,6 +110,8 @@ interface InspectorPanelProps {
   onDeletePaletteColor: (id: string) => void;
   onSaveCurrentColorPalette: (colors?: string[]) => void;
   onDeleteSavedColorPalette: (id: string) => void;
+  onReorderPaletteColor: (draggedId: string, targetId: string) => void;
+  onReorderSavedColorPalette: (draggedId: string, targetId: string) => void;
   onApplyPaletteColor: (color: string, target: PaletteTarget, alpha?: number) => void;
   onSelect: (id: string, additive?: boolean) => void;
   onSelectIndividual: (id: string) => void;
@@ -162,6 +164,8 @@ export function InspectorPanel({
   onDeletePaletteColor,
   onSaveCurrentColorPalette,
   onDeleteSavedColorPalette,
+  onReorderPaletteColor,
+  onReorderSavedColorPalette,
   onApplyPaletteColor,
   onSelect,
   onSelectIndividual,
@@ -553,6 +557,8 @@ export function InspectorPanel({
           onDelete={onDeletePaletteColor}
           onSavePalette={onSaveCurrentColorPalette}
           onDeleteSavedPalette={onDeleteSavedColorPalette}
+          onReorderColor={onReorderPaletteColor}
+          onReorderSavedPalette={onReorderSavedColorPalette}
           onApply={onApplyPaletteColor}
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
@@ -926,6 +932,8 @@ function PaletteControls({
   onDelete,
   onSavePalette,
   onDeleteSavedPalette,
+  onReorderColor,
+  onReorderSavedPalette,
   onApply,
   onResizeList,
   t,
@@ -949,6 +957,8 @@ function PaletteControls({
   onDelete: (id: string) => void;
   onSavePalette: (colors?: string[]) => void;
   onDeleteSavedPalette: (id: string) => void;
+  onReorderColor: (draggedId: string, targetId: string) => void;
+  onReorderSavedPalette: (draggedId: string, targetId: string) => void;
   onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
   onResizeList: (deltaY: number) => void;
   t: Translator;
@@ -977,6 +987,19 @@ function PaletteControls({
     const linkedBase = derivePaletteBaseFromSchemeColor(color, index, modeDraft);
     if (linkedBase) onDraftChange(linkedBase);
     setActivePointIndex(index);
+  };
+
+  const startPaletteDrag = (event: ReactDragEvent<HTMLElement>, kind: "saved" | "single", id: string) => {
+    event.dataTransfer.effectAllowed = "move";
+    event.dataTransfer.setData("text/plain", `${kind}:${id}`);
+  };
+
+  const dropPaletteDrag = (event: ReactDragEvent<HTMLElement>, kind: "saved" | "single", targetId: string) => {
+    event.preventDefault();
+    const [dragKind, draggedId] = event.dataTransfer.getData("text/plain").split(":");
+    if (dragKind !== kind || !draggedId) return;
+    if (kind === "saved") onReorderSavedPalette(draggedId, targetId);
+    else onReorderColor(draggedId, targetId);
   };
 
   return (
@@ -1129,8 +1152,18 @@ function PaletteControls({
             <span>{t("inspector.savedPalettes")}</span>
           </button>
           {savedPalettesExpanded ? savedPalettes.map((palette) => (
-            <div className="saved-palette-row" key={palette.id}>
+            <div
+              className="saved-palette-row reorderable-row"
+              key={palette.id}
+              draggable
+              onDragStart={(event) => startPaletteDrag(event, "saved", palette.id)}
+              onDragOver={(event) => event.preventDefault()}
+              onDrop={(event) => dropPaletteDrag(event, "saved", palette.id)}
+            >
               <div className="saved-palette-header">
+                <span className="reorder-handle" title={t("inspector.reorderPalette")}>
+                  <GripVertical size={14} />
+                </span>
                 <span>{palette.name}</span>
                 <small>
                   {t(harmonyLabelKey(palette.mode))} / {palette.colors.length}
@@ -1189,43 +1222,58 @@ function PaletteControls({
         <>
           <div className="swatch-grid" aria-label={t("inspector.registeredColors")} style={{ height: listHeight }}>
             {colors.map((color) => (
-          <div className={`swatch-row ${selectedColorId === color.id ? "selected" : ""}`} key={color.id}>
-            <button
-              type="button"
-              className="swatch"
-              aria-label={color.name}
-              title={color.name}
-              style={{ background: color.value }}
-              onClick={() => onSelectColor(color.id)}
-            />
-            <button
-              type="button"
-              className="ghost-button swatch-apply-button"
-              disabled={selectedCount === 0}
-              aria-label={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
-              title={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
-              onClick={() => onApply(color.value, "fill", color.alpha)}
-            >
-              {t("inspector.fill")}
-            </button>
-            <button
-              type="button"
-              className="ghost-button swatch-apply-button"
-              disabled={selectedCount === 0}
-              onClick={() => onApply(color.value, "stroke", color.alpha)}
-            >
-              {t("inspector.stroke")}
-            </button>
-            <div className="swatch-meta">
-              <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
-                <span className="swatch-name">{paletteColorDisplayName(color)}</span>
-                <span className="swatch-value">{Math.round(color.alpha * 100)}%</span>
-              </button>
-            </div>
-            <button type="button" className="mini-icon-button danger" title={t("inspector.deleteColor", { name: color.name })} onClick={() => onDelete(color.id)}>
-              <Trash2 size={13} />
-            </button>
-          </div>
+              <div
+                className={`swatch-row reorderable-row ${selectedColorId === color.id ? "selected" : ""}`}
+                key={color.id}
+                draggable
+                onDragStart={(event) => startPaletteDrag(event, "single", color.id)}
+                onDragOver={(event) => event.preventDefault()}
+                onDrop={(event) => dropPaletteDrag(event, "single", color.id)}
+              >
+                <span className="reorder-handle" title={t("inspector.reorderColor")}>
+                  <GripVertical size={14} />
+                </span>
+                <button
+                  type="button"
+                  className="swatch"
+                  aria-label={color.name}
+                  title={color.name}
+                  style={{ background: color.value }}
+                  onClick={() => onSelectColor(color.id)}
+                />
+                <button
+                  type="button"
+                  className="ghost-button swatch-apply-button"
+                  disabled={selectedCount === 0}
+                  aria-label={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
+                  title={t("inspector.applyColor", { name: color.name, target: t("inspector.fill") })}
+                  onClick={() => onApply(color.value, "fill", color.alpha)}
+                >
+                  {t("inspector.fill")}
+                </button>
+                <button
+                  type="button"
+                  className="ghost-button swatch-apply-button"
+                  disabled={selectedCount === 0}
+                  onClick={() => onApply(color.value, "stroke", color.alpha)}
+                >
+                  {t("inspector.stroke")}
+                </button>
+                <div className="swatch-meta">
+                  <button type="button" className="swatch-edit-button" onClick={() => onSelectColor(color.id)}>
+                    <span className="swatch-name">{paletteColorDisplayName(color)}</span>
+                    <span className="swatch-value">{Math.round(color.alpha * 100)}%</span>
+                  </button>
+                </div>
+                <button
+                  type="button"
+                  className="mini-icon-button danger"
+                  title={t("inspector.deleteColor", { name: color.name })}
+                  onClick={() => onDelete(color.id)}
+                >
+                  <Trash2 size={13} />
+                </button>
+              </div>
             ))}
           </div>
           <ResizeHandle label={t("inspector.resizeColorList")} onResize={onResizeList} />

@@ -123,6 +123,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Theme, Palette Reorder, And Pages Follow-Up
+
+Completed on 2026-06-10 for the requested bottom-pane layout, Colors reorder, theme controls, and GitHub Pages reflection.
+
+- `npm test`: pass. 27 test files, 102 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4212/thumbnail-generator/`.
+- Tool: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: primary UI visible, initial canvas nonblank, language and theme controls visible in the top-right toolbar, dark theme selected from the theme selector and persisted to `thumbnail-generator.theme.v1`, Export and Edit state rendered side by side on desktop, Export and Edit state action groups each used one vertical column, saved multi-color palettes reordered by drag/drop and persisted to `thumbnail-generator.savedColorPalettes.v1`, registered single colors reordered by drag/drop and persisted to `thumbnail-generator.colorPalette.v1`, Adjust layer X editing kept the canvas nonblank, WebP export downloaded, mobile canvas nonblank, mobile horizontal overflow `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-theme-reorder-desktop.png`
+  - `docs/assets/runtime-20260610-theme-reorder-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-theme-reorder-pages/thumbnail-1280x720-2026-06-09T15-53-50-093Z.webp`.
+- GitHub Pages: `.github/workflows/pages.yml` deploys on pushes to `codex/thumbnail-generator-static-app`, so pushing this validated branch triggers the Pages build/deploy workflow.
+
 ### Export, Colors, And Adjust Layout Follow-Up
 
 Completed on 2026-06-10 for the requested Export, Colors, and Adjust UI cleanup.

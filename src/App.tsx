@@ -85,6 +85,7 @@ import {
   upsertTemplate,
   writeSavedTemplates,
 } from "./lib/templates";
+import { readThemeMode, resolveThemeMode, writeThemeMode, type ThemeMode } from "./lib/theme";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
 import type { BrandKit, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
@@ -122,6 +123,15 @@ function App() {
   );
   const [language, setLanguage] = useState<Language>(initialLanguage);
   const t = useMemo(() => createTranslator(language), [language]);
+  const [themeMode, setThemeMode] = useState<ThemeMode>(() =>
+    typeof window === "undefined" ? "system" : readThemeMode(),
+  );
+  const [prefersDarkTheme, setPrefersDarkTheme] = useState(() =>
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-color-scheme: dark)").matches,
+  );
+  const effectiveTheme = useMemo(() => resolveThemeMode(themeMode, prefersDarkTheme), [prefersDarkTheme, themeMode]);
   const [settings, setSettings] = useState<OutputSettings>(initialSavedEditState?.settings ?? defaultOutputSettings);
   const [assets, setAssets] = useState<ImageAsset[]>(() =>
     initialSavedEditState?.assets.length ? initialSavedEditState.assets : initialAssets(import.meta.env.BASE_URL),
@@ -193,6 +203,25 @@ function App() {
     () => evaluateThumbnailWarnings({ layers, assets, settings, estimatedStorageBytes }),
     [assets, estimatedStorageBytes, layers, settings],
   );
+
+  useEffect(() => {
+    if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
+    const query = window.matchMedia("(prefers-color-scheme: dark)");
+    const handleChange = () => setPrefersDarkTheme(query.matches);
+    handleChange();
+    query.addEventListener("change", handleChange);
+    return () => query.removeEventListener("change", handleChange);
+  }, []);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    writeThemeMode(themeMode);
+  }, [themeMode]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.documentElement.dataset.theme = effectiveTheme;
+  }, [effectiveTheme]);
 
   useEffect(() => {
     setSelectedIds((current) => {
@@ -1074,6 +1103,17 @@ function App() {
     [savedColorPalettes],
   );
 
+  const reorderSavedColorPalette = useCallback(
+    (draggedId: string, targetId: string) => {
+      const next = reorderById(savedColorPalettes, draggedId, targetId);
+      if (next === savedColorPalettes) return;
+      writeSavedColorPalettes(next);
+      setSavedColorPalettes(next);
+      setStatus("Saved palette order updated.");
+    },
+    [savedColorPalettes],
+  );
+
   const deletePaletteColor = useCallback(
     (id: string) => {
       const next = removePaletteColor(paletteColors, id);
@@ -1081,6 +1121,17 @@ function App() {
       setPaletteColors(next);
       setSelectedPaletteColorId((current) => (current === id ? null : current));
       setStatus("Palette color removed.");
+    },
+    [paletteColors],
+  );
+
+  const reorderPaletteColor = useCallback(
+    (draggedId: string, targetId: string) => {
+      const next = reorderById(paletteColors, draggedId, targetId);
+      if (next === paletteColors) return;
+      writeColorPalette(next);
+      setPaletteColors(next);
+      setStatus("Registered color order updated.");
     },
     [paletteColors],
   );
@@ -1471,13 +1522,15 @@ function App() {
   }, [copySelectedLayers, cutSelectedLayers, duplicateSelectedLayers, pasteSelectedLayers, redoLayers, undoLayers]);
 
   return (
-    <div className="app-shell">
+    <div className="app-shell" data-theme={effectiveTheme}>
       <TopToolbar
         settings={settings}
         language={language}
+        themeMode={themeMode}
         onSettingsChange={updateSettings}
         onPresetChange={handlePresetChange}
         onLanguageChange={setLanguage}
+        onThemeChange={setThemeMode}
         t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
@@ -1556,6 +1609,8 @@ function App() {
           onDeletePaletteColor={deletePaletteColor}
           onSaveCurrentColorPalette={saveCurrentColorPalette}
           onDeleteSavedColorPalette={deleteSavedColorPalette}
+          onReorderPaletteColor={reorderPaletteColor}
+          onReorderSavedColorPalette={reorderSavedColorPalette}
           onApplyPaletteColor={applyPaletteColor}
           onSelect={selectLayer}
           onSelectIndividual={selectIndividualLayer}
@@ -1623,6 +1678,17 @@ function transformLayersFromPointer(active: ActiveCanvasInteraction, point: Canv
 
 function areLayerSnapshotsEqual(left: ThumbnailLayer[], right: ThumbnailLayer[]): boolean {
   return JSON.stringify(left) === JSON.stringify(right);
+}
+
+function reorderById<T extends { id: string }>(items: T[], draggedId: string, targetId: string): T[] {
+  if (draggedId === targetId) return items;
+  const draggedIndex = items.findIndex((item) => item.id === draggedId);
+  if (draggedIndex < 0 || !items.some((item) => item.id === targetId)) return items;
+  const next = [...items];
+  const [dragged] = next.splice(draggedIndex, 1);
+  const nextTargetIndex = next.findIndex((item) => item.id === targetId);
+  next.splice(nextTargetIndex, 0, dragged);
+  return next;
 }
 
 function cursorForMode(mode: CanvasInteractionMode, active = false): string {

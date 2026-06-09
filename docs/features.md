@@ -29,6 +29,7 @@ This page is the quick feature index for users and reviewers.
 
 - CSV and HTML layout text remain part of browser edit-state and template compatibility.
 - Export the rendered thumbnail as PNG, JPEG, or WebP from the preview-pane export panel at maximum quality.
+- Use the side-by-side preview-pane Export and Edit state sections on desktop; each section stacks its own action buttons vertically.
 
 ## Browser Storage
 
@@ -87,5 +88,11 @@ This page is the quick feature index for users and reviewers.
 - Apply each saved single color directly as Fill or Stroke to selected text and shape layers.
 - Preview graphical palette patterns from the draft color and opacity.
 - Save the currently displayed pattern as one multi-color palette set and apply each saved-palette color as Fill or Stroke from rows that show the color code.
+- Drag saved multi-color palettes or registered single-color rows to reorder browser-local color storage.
 - Collapse or expand saved multi-color palettes and registered single colors.
 - Resize the Colors list area when reviewing many saved swatches.
+
+## Window Settings
+
+- Switch display language from the upper-right toolbar controls.
+- Choose System, Light, or Dark theme beside the language selector. System follows the browser or OS color-scheme preference.

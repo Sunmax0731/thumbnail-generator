@@ -200,7 +200,7 @@ The right inspector is grouped by task:
 
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, text, shape, Fill/Stroke color, and image effects. Common layer controls are grouped at the top, and Text, Shape, or Image-only controls are grouped below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
-- Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels.
+- Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
 - Motion: ordered motion sets for the selected layer, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
 The Layers, Colors, Default templates, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
@@ -323,6 +323,10 @@ The edit preview includes dynamic padding around the document. Padding expands t
 
 The app supports English and Japanese UI labels. Initial language is detected from `navigator.languages`/`navigator.language`; tags beginning with `ja` use Japanese, tags beginning with `en` use English, and unsupported tags fall back to English. The top toolbar language selector can switch language during the session.
 
+## Theme
+
+The app supports `system`, `light`, and `dark` theme modes from the top-right toolbar. The selected mode is stored in browser `localStorage` under `thumbnail-generator.theme.v1`. `system` follows `prefers-color-scheme`; `light` and `dark` force the corresponding app theme. The resolved theme is applied to the document and app shell through `data-theme` so static GitHub Pages output remains browser-only.
+
 ## Browser Templates
 
 Templates are saved in browser `localStorage` under a repository-specific key. A template stores:
@@ -357,7 +361,7 @@ Registered colors can be applied to:
 - Shape fill color.
 - Shape stroke color.
 
-Palette entries can be selected back into the Colors editor and updated in place. Applying a registered color through its Fill or Stroke row button also applies that entry's opacity to supported text and shape layers. Legacy stored `groupName` values are ignored so old localStorage records load as plain single-color rows without rendering color group UI.
+Palette entries can be selected back into the Colors editor, updated in place, and reordered. Applying a registered color through its Fill or Stroke row button also applies that entry's opacity to supported text and shape layers. Legacy stored `groupName` values are ignored so old localStorage records load as plain single-color rows without rendering color group UI.
 
 Saved palette sets are stored separately under `thumbnail-generator.savedColorPalettes.v1`. A saved palette set stores:
 
@@ -368,7 +372,7 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 - Generated color list.
 - Created timestamp.
 
-The palette maker can save the currently displayed pattern as one multi-color palette set. Saved palette rows display all colors in the set, and each color has Fill and Stroke application buttons for the current text/shape selection.
+The palette maker can save the currently displayed pattern as one multi-color palette set. Saved palette rows display all colors in the set, each color has Fill and Stroke application buttons for the current text/shape selection, and saved palette rows can be reordered.
 
 The Colors tab also provides an Adobe-style color exploration surface: a drag-capable color wheel with generated-color points, large palette bars below the wheel with HEX labels, an embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha editor, and recent-color swatches derived from the current draft, registered colors, and saved palettes. The old wheel-side color strip is not rendered; the canonical color list appears below the palette maker. Selecting a wheel point only selects that point and does not change the base color. Dragging a point treats that point as the intended color, derives the matching base color for the active palette pattern, and regenerates the other points in the same scheme. The base color can also change through explicit base controls such as the wheel background, palette bars, Sketch-style controls, recent colors, or Set selected as base. Saved multi-color palettes and registered single-color rows can each be collapsed or expanded.
 

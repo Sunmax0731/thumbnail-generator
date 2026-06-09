@@ -10,6 +10,8 @@
   --bg: #edf2f6;
   --panel: #ffffff;
   --panel-soft: #f7fafc;
+  --panel-strong: #ffffff;
+  --workbench: #dfe7ee;
   --line: #d8e0e7;
   --line-strong: #aab7c4;
   --text: #152033;
@@ -20,6 +22,27 @@
   --warning: #f6b73c;
   --danger: #d92d20;
   --shadow: 0 18px 42px rgba(31, 41, 55, 0.12);
+}
+
+:root[data-theme="dark"] {
+  color-scheme: dark;
+  color: #e5edf6;
+  background: #0f172a;
+  --bg: #0f172a;
+  --panel: #111c2e;
+  --panel-soft: #172338;
+  --panel-strong: #1d2b42;
+  --workbench: #0b1220;
+  --line: #2f4059;
+  --line-strong: #536882;
+  --text: #e5edf6;
+  --muted: #9fb0c5;
+  --accent: #22c7e8;
+  --accent-strong: #7ddff1;
+  --coral: #ff6b78;
+  --warning: #ffd166;
+  --danger: #ff7a72;
+  --shadow: 0 20px 48px rgba(0, 0, 0, 0.34);
 }
 
 * {
@@ -67,17 +90,18 @@ button:disabled {
 
 .top-toolbar {
   display: grid;
-  grid-template-columns: minmax(250px, 360px) 1fr;
+  grid-template-columns: minmax(250px, 360px) minmax(0, 1fr) minmax(230px, auto);
   align-items: center;
   gap: 14px;
   min-height: 74px;
   padding: 10px 16px;
   border-bottom: 1px solid var(--line);
-  background: rgba(255, 255, 255, 0.95);
+  background: color-mix(in srgb, var(--panel) 94%, transparent);
 }
 
 .brand-block,
 .toolbar-controls,
+.window-controls,
 .export-actions,
 .stage-toolbar,
 .status-bar,
@@ -138,6 +162,15 @@ button:disabled {
 .toolbar-controls {
   flex-wrap: wrap;
   gap: 8px;
+}
+
+.window-controls {
+  justify-content: flex-end;
+  gap: 8px;
+}
+
+.window-controls .field {
+  min-width: 108px;
 }
 
 .export-actions {
@@ -216,7 +249,7 @@ button:disabled {
   padding: 0 7px;
   border: 1px solid var(--line);
   border-radius: 999px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--muted);
   font-size: 11px;
   font-weight: 900;
@@ -260,7 +293,7 @@ button:disabled {
   gap: 6px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--muted);
   font-size: 12px;
   font-weight: 850;
@@ -324,7 +357,7 @@ button:disabled {
   min-width: 0;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   font-size: 12px;
   font-weight: 650;
@@ -354,7 +387,7 @@ button:disabled {
 .field-disabled select,
 .field-disabled textarea {
   cursor: not-allowed;
-  background: #f4f7f9;
+  background: var(--panel-soft);
 }
 
 .compact-field {
@@ -363,6 +396,10 @@ button:disabled {
 
 .language-field {
   width: 118px;
+}
+
+.theme-field {
+  width: 126px;
 }
 
 .size-field {
@@ -415,7 +452,7 @@ button:disabled {
   min-height: 36px;
   padding: 0 11px;
   border-color: var(--line);
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
 }
 
@@ -433,7 +470,7 @@ button:disabled {
   height: 32px;
   padding: 0;
   border-color: var(--line);
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   place-items: center;
 }
@@ -466,7 +503,7 @@ button:disabled {
   gap: 6px;
   border: 1px dashed var(--line-strong);
   border-radius: 8px;
-  background: linear-gradient(180deg, #ffffff, #f8fbfd);
+  background: linear-gradient(180deg, var(--panel), var(--panel-soft));
   color: var(--muted);
   font-size: 12px;
   font-weight: 800;
@@ -597,7 +634,7 @@ button:disabled {
   min-height: 30px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--muted);
   font-size: 11px;
   font-weight: 850;
@@ -624,7 +661,7 @@ button:disabled {
   padding: 8px 9px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   text-align: left;
 }
@@ -753,7 +790,7 @@ button:disabled {
   padding: 0 9px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   font-size: 12px;
   font-weight: 800;
@@ -780,7 +817,7 @@ button:disabled {
   display: flex;
   overflow: hidden;
   flex-direction: column;
-  background: #dfe7ee;
+  background: var(--workbench);
 }
 
 .stage-toolbar {
@@ -790,7 +827,7 @@ button:disabled {
   min-height: 48px;
   padding: 10px 12px;
   border-bottom: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .stage-title {
@@ -845,7 +882,7 @@ button:disabled {
     linear-gradient(-45deg, rgba(255, 255, 255, 0.42) 25%, transparent 25%),
     linear-gradient(45deg, transparent 75%, rgba(255, 255, 255, 0.42) 75%),
     linear-gradient(-45deg, transparent 75%, rgba(255, 255, 255, 0.42) 75%),
-    #dce5ed;
+    var(--workbench);
   background-position:
     0 0,
     0 10px,
@@ -880,18 +917,19 @@ button:disabled {
 
 .stage-bottom-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr);
+  grid-template-columns: minmax(170px, 230px) minmax(0, 1fr);
   gap: 0;
   border-top: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .stage-export-panel {
   display: grid;
+  align-content: start;
   gap: 8px;
   padding: 10px 12px;
-  border-bottom: 1px solid var(--line);
-  background: #ffffff;
+  border-right: 1px solid var(--line);
+  background: var(--panel);
 }
 
 .stage-export-header {
@@ -908,7 +946,6 @@ button:disabled {
 
 .stage-export-actions {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 6px;
 }
 
@@ -920,7 +957,7 @@ button:disabled {
   display: grid;
   gap: 8px;
   padding: 10px 12px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .stage-layout-io {
@@ -928,7 +965,7 @@ button:disabled {
   gap: 8px;
   padding: 10px 12px;
   border-top: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .stage-layout-grid {
@@ -965,7 +1002,7 @@ button:disabled {
 
 .stage-edit-actions {
   display: grid;
-  grid-template-columns: repeat(5, minmax(0, 1fr));
+  grid-template-columns: minmax(0, 1fr);
   gap: 6px;
 }
 
@@ -996,7 +1033,7 @@ button:disabled {
   min-height: 38px;
   padding: 5px 7px;
   border-color: var(--line);
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   text-align: left;
 }
@@ -1008,13 +1045,13 @@ button:disabled {
 
 .layer-row.grouped {
   border-left: 3px solid var(--accent);
-  background: linear-gradient(90deg, rgba(16, 182, 215, 0.08), #ffffff 42%);
+  background: linear-gradient(90deg, rgba(16, 182, 215, 0.08), var(--panel) 42%);
   padding-left: 5px;
 }
 
 .layer-row.grouped.individual-selected {
   border-color: var(--coral);
-  background: linear-gradient(90deg, rgba(255, 79, 95, 0.1), #ffffff 42%);
+  background: linear-gradient(90deg, rgba(255, 79, 95, 0.1), var(--panel) 42%);
 }
 
 .layer-row.dragging {
@@ -1024,7 +1061,7 @@ button:disabled {
 
 .layer-row.locked {
   color: var(--muted);
-  background: #f4f7f9;
+  background: var(--panel-soft);
 }
 
 .drag-grip {
@@ -1107,7 +1144,7 @@ button:disabled {
   padding: 0;
   border: 1px solid var(--line);
   border-radius: 5px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--muted);
   place-items: center;
 }
@@ -1140,7 +1177,7 @@ button:disabled {
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #fbfdff;
+  background: var(--panel-soft);
 }
 
 .control-group h3 {
@@ -1224,7 +1261,7 @@ button:disabled {
   padding: 4px 7px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   text-align: left;
 }
@@ -1412,7 +1449,7 @@ button:disabled {
   padding: 4px 8px 4px 4px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--panel);
   color: var(--text);
   text-align: left;
 }
@@ -1440,8 +1477,8 @@ button:disabled {
   border: 1px solid var(--line);
   border-radius: 8px;
   background:
-    linear-gradient(180deg, rgba(16, 182, 215, 0.08), rgba(255, 255, 255, 0.78)),
-    #ffffff;
+    linear-gradient(180deg, rgba(16, 182, 215, 0.08), color-mix(in srgb, var(--panel) 78%, transparent)),
+    var(--panel);
 }
 
 .palette-maker-heading {
@@ -1731,12 +1768,12 @@ button:disabled {
   padding: 8px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .saved-palette-header {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto 26px;
+  grid-template-columns: 18px minmax(0, 1fr) auto 26px;
   align-items: center;
   gap: 8px;
 }
@@ -1769,7 +1806,7 @@ button:disabled {
   padding: 5px 7px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .saved-palette-color .ghost-button {
@@ -1805,14 +1842,30 @@ button:disabled {
 
 .swatch-row {
   display: grid;
-  grid-template-columns: 34px 54px 58px minmax(0, 1fr) 26px;
+  grid-template-columns: 18px 34px 54px 58px minmax(0, 1fr) 26px;
   gap: 6px;
   align-items: center;
   min-height: 38px;
   padding: 5px 7px;
   border: 1px solid var(--line);
   border-radius: 6px;
-  background: #ffffff;
+  background: var(--panel);
+}
+
+.reorderable-row {
+  cursor: grab;
+}
+
+.reorderable-row:active {
+  cursor: grabbing;
+}
+
+.reorder-handle {
+  display: grid;
+  width: 18px;
+  min-width: 18px;
+  color: var(--muted);
+  place-items: center;
 }
 
 .swatch-row.selected {
@@ -2032,7 +2085,7 @@ button:disabled {
   padding: 10px;
   border: 1px solid var(--line);
   border-radius: 8px;
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .compact-heading h2 {
@@ -2058,7 +2111,7 @@ button:disabled {
   min-height: 38px;
   padding: 7px 14px;
   border-top: 1px solid var(--line);
-  background: #ffffff;
+  background: var(--panel);
 }
 
 .status-message {
@@ -2110,6 +2163,10 @@ button:disabled {
 
   .top-toolbar {
     grid-template-columns: 1fr;
+  }
+
+  .window-controls {
+    justify-content: flex-start;
   }
 
   .export-actions {
@@ -2165,7 +2222,16 @@ button:disabled {
   }
 
   .stage-edit-actions {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+    grid-template-columns: 1fr;
+  }
+
+  .stage-bottom-row {
+    grid-template-columns: 1fr;
+  }
+
+  .stage-export-panel {
+    border-right: 0;
+    border-bottom: 1px solid var(--line);
   }
 
   .image-lab,
@@ -2185,6 +2251,7 @@ button:disabled {
   }
 
   .toolbar-controls,
+  .window-controls,
   .export-actions {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -2193,6 +2260,7 @@ button:disabled {
 
   .compact-field,
   .language-field,
+  .theme-field,
   .size-field {
     width: auto;
     min-width: 0;
