@@ -244,6 +244,15 @@ Each bundled template also carries browser-rendered catalog metadata:
 
 The left panel no longer shows a guided start strip. Template filters remain the primary way to narrow bundled starts by `All`, `YouTube`, `Shorts`, `Stream`, `Cutout`, `Schedule`, and `Motion`.
 
+The Templates tab also exposes a beta schedule generator. The generator opens in a modal and accepts:
+
+- Schedule type: monthly or weekly.
+- Canvas orientation: landscape `1280x720`, portrait `1080x1920`, or the current canvas size.
+- Date inputs: year, month, weekly start day, and Sunday/Monday week start for monthly grids.
+- Style inputs: title, font family, font weight, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
+
+Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, and refreshes the internally stored CSV and HTML layout text. The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+
 ## OBS Preview
 
 The canvas toolbar can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays only a canvas on a black background, draws without editor controls or selection handles, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It also requests fullscreen after opening; browser and OBS capture settings ultimately decide whether OS or browser chrome is captured. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.

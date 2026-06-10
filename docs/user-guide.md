@@ -73,6 +73,8 @@ Open Templates and choose a bundled default template to replace the current canv
 
 Use the template filters to narrow the list by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion. Each row shows a miniature color preview and output size so you can pick a start before loading it.
 
+Use **Generate schedule** in Templates to open the beta schedule generator. Choose monthly or weekly schedule, canvas orientation, year/month/start day, Sunday or Monday week start, title, font, grid style, corner radius, line width, and colors. Selecting **Generate layers** replaces the current layer list with editable schedule text and shape layers, updates the canvas size when a landscape or portrait orientation is chosen, and refreshes the internal CSV/HTML layout text used by edit state and templates. The modal labels this feature as beta because generated layout and copy may still need manual adjustment after placement.
+
 ## Brand Kit
 
 Brand kit setup controls are hidden from Templates. Existing browser-local brand kit data remains compatible with saved state. Open Colors to send the current palette preview color, a saved-palette color, or a registered single-color row into the Brand kit Primary, Accent, or Shadow slot.

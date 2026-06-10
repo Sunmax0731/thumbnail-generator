@@ -506,6 +506,18 @@ button:disabled {
   gap: 8px;
 }
 
+.checkbox-field {
+  display: grid;
+  grid-template-columns: 18px minmax(0, 1fr);
+  align-items: center;
+}
+
+.checkbox-field input {
+  width: 16px;
+  min-height: 16px;
+  padding: 0;
+}
+
 .file-drop {
   display: grid;
   min-height: 76px;
@@ -655,6 +667,23 @@ button:disabled {
   border-color: var(--accent);
   background: rgba(16, 182, 215, 0.1);
   color: var(--accent-strong);
+}
+
+.schedule-builder-entry {
+  display: grid;
+  gap: 6px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+}
+
+.schedule-builder-entry p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.35;
 }
 
 .guided-steps {
@@ -1251,6 +1280,10 @@ button:disabled {
 
 .field-grid.two {
   grid-template-columns: 1fr 1fr;
+}
+
+.field-grid.three {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .align-grid {
@@ -2068,6 +2101,68 @@ button:disabled {
   font-weight: 700;
 }
 
+.schedule-builder-dialog {
+  display: grid;
+  width: min(920px, calc(100vw - 32px));
+  max-height: calc(100vh - 32px);
+  overflow: auto;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(216, 224, 231, 0.82);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
+}
+
+.schedule-builder-dialog .modal-title-block {
+  display: grid;
+  gap: 5px;
+}
+
+.schedule-builder-dialog .modal-title-block p {
+  margin: 0;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.35;
+}
+
+.schedule-builder-grid {
+  display: grid;
+  align-items: start;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(220px, 0.8fr);
+  gap: 10px;
+}
+
+.schedule-builder-grid .panel-section {
+  min-width: 0;
+  height: 100%;
+}
+
+.schedule-color-section {
+  align-content: start;
+}
+
+.schedule-color-field {
+  grid-template-columns: 38px minmax(0, 1fr);
+  align-items: center;
+}
+
+.schedule-color-field span {
+  grid-column: 1 / -1;
+}
+
+.schedule-color-field input[type="color"] {
+  width: 38px;
+  height: 34px;
+  padding: 2px;
+}
+
+.schedule-builder-actions {
+  justify-self: end;
+  width: min(320px, 100%);
+}
+
 .confirm-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -2267,7 +2362,8 @@ button:disabled {
   }
 
   .image-lab,
-  .image-lab-adjust-grid {
+  .image-lab-adjust-grid,
+  .schedule-builder-grid {
     grid-template-columns: minmax(0, 1fr);
   }
 
@@ -2304,6 +2400,7 @@ button:disabled {
   }
 
   .field-grid.two,
+  .field-grid.three,
   .button-grid,
   .align-grid,
   .panel-tabs {
@@ -2360,6 +2457,12 @@ button:disabled {
   }
 
   .image-lab-modal {
+    width: calc(100vw - 16px);
+    max-height: none;
+    padding: 10px;
+  }
+
+  .schedule-builder-dialog {
     width: calc(100vw - 16px);
     max-height: none;
     padding: 10px;

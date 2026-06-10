@@ -23,6 +23,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases, eight schedule starts, and ten animated eyecatch/waiting starts.
 - Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case, and resize the Default templates and Browser templates list areas.
+- Use the beta schedule generator from Templates to create monthly or weekly schedule layers from a year/month/start date, with grid style, font, color, corner radius, line width, and Sunday/Monday-start options.
 - Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.

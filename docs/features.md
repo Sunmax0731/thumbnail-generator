@@ -36,6 +36,7 @@ This page is the quick feature index for users and reviewers.
 
 - Load 38 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule starts, and ten animated eyecatch/waiting starts.
 - Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion, with mini preview swatches and output-size badges.
+- Generate beta monthly or weekly schedule templates from the Templates tab with date, week-start, canvas orientation, grid style, font, color, corner radius, and line-width settings.
 - Resize the Default templates and Browser templates list areas from the Templates tab.
 - Use Templates to save named browser-local templates.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.

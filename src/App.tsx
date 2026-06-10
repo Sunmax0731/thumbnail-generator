@@ -77,6 +77,7 @@ import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
+import { buildScheduleTemplate, type ScheduleBuilderRequest } from "./lib/scheduleBuilder";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
 import {
   createTemplateSnapshot,
@@ -664,6 +665,21 @@ function App() {
       setStatus(`Loaded default template "${template.name}".`);
     },
     [],
+  );
+
+  const generateScheduleTemplate = useCallback(
+    (request: ScheduleBuilderRequest) => {
+      const schedule = buildScheduleTemplate(request, settings, language);
+      setSettings(schedule.settings);
+      setLayers(schedule.layers);
+      setSelectedIds(selectTopSelectableLayerIds(schedule.layers));
+      setCsvText(layersToCsv(schedule.layers));
+      setHtmlText(layersToHtml(schedule.layers));
+      setTemplateName(schedule.name);
+      setAutoFitRevision((current) => current + 1);
+      setStatus(`Generated beta schedule template "${schedule.name}" with ${schedule.layers.length} layers.`);
+    },
+    [language, settings],
   );
 
   const saveEditState = useCallback(
@@ -1579,6 +1595,7 @@ function App() {
           onDeleteAsset={deleteAsset}
           defaultTemplates={defaultTemplates}
           onLoadDefaultTemplate={loadDefaultTemplate}
+          onGenerateScheduleTemplate={generateScheduleTemplate}
           templateName={templateName}
           templates={templates}
           onTemplateNameChange={setTemplateName}

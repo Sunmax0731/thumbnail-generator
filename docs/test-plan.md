@@ -32,6 +32,7 @@
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
+- Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, and weekly date ranges before generating editable text/shape layers.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
 - Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms, including multiple ordered animation entries, without mutating source layer state.
 - Easing helpers expose linear plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce curves.
@@ -56,6 +57,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Default templates and Browser templates expose resizable list areas with no overlap or horizontal overflow.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts date/style/font/color settings, and generates editable monthly or weekly schedule layers.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Preview selection respects layer stacking order when layers overlap.
@@ -122,6 +124,23 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-10.
+
+### Beta Schedule Generator
+
+Completed on 2026-06-10 for the requested beta monthly/weekly schedule generator.
+
+- `npm test`: pass. 28 test files, 107 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4173/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1100`.
+- Mobile viewport: `390x900`.
+- Checks: primary UI visible, initial canvas nonblank, Templates showed **Generate schedule**, the schedule generator modal opened with a visible beta notice, weekly schedule generation accepted portrait canvas, `2026/6/10` start date, Monday week start, custom title, Montserrat 900, line grid, corner radius, line width, and accent color settings, generated 53 editable layers, the generated canvas rendered nonblank, an Adjust numeric edit persisted, WebP export downloaded, mobile modal showed the beta notice, mobile horizontal overflow was `0`, and no page errors or app console errors were reported.
+- CSV/HTML note: GUI layout text inputs remain hidden by design; schedule generation refreshed internal CSV/HTML text, and CSV/HTML parser/model compatibility passed through `npm test`.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-schedule-builder-desktop.png`
+  - `docs/assets/runtime-20260610-schedule-builder-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-schedule-builder/thumbnail-1080x1920-2026-06-10T00-49-31-824Z.webp`.
 
 ### Bottom Preview Actions Layout
 
