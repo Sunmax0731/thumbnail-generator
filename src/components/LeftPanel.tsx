@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react";
+﻿import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
   FolderOpen,
@@ -13,15 +13,16 @@ import {
 import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
 import type { FontOption } from "../lib/fonts";
-import type { Translator } from "../lib/i18n";
+import type { Language, Translator } from "../lib/i18n";
 import {
   addDays,
-  getDaysInMonth,
-  getWeekday,
+  buildScheduleTemplate,
   type ScheduleBuilderRequest,
 } from "../lib/scheduleBuilder";
+import { type PaletteColor, type SavedColorPalette } from "../lib/colorPalette";
 import type { SavedTemplate } from "../lib/templates";
-import type { ImageAsset } from "../lib/types";
+import type { ImageAsset, OutputSettings, TextLayer } from "../lib/types";
+import { renderThumbnailToCanvas } from "../lib/renderCanvas";
 
 type LeftPanelSection = "templates" | "layers" | "assets";
 type TemplateFilter = "all" | DefaultTemplateDefinition["category"];
@@ -35,6 +36,10 @@ interface LeftPanelProps {
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
   fontOptions: FontOption[];
+  settings: OutputSettings;
+  language: Language;
+  paletteColors: PaletteColor[];
+  savedColorPalettes: SavedColorPalette[];
   onImageFiles: (files: FileList | null) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
@@ -57,6 +62,10 @@ export function LeftPanel({
   templates,
   defaultTemplates,
   fontOptions,
+  settings,
+  language,
+  paletteColors,
+  savedColorPalettes,
   onImageFiles,
   onSelectAsset,
   onAddImageAssetLayer,
@@ -320,6 +329,10 @@ export function LeftPanel({
         <ScheduleBuilderDialog
           draft={scheduleDraft}
           fontOptions={fontOptions}
+          settings={settings}
+          language={language}
+          paletteColors={paletteColors}
+          savedColorPalettes={savedColorPalettes}
           onDraftChange={setScheduleDraft}
           onCancel={() => setIsScheduleBuilderOpen(false)}
           onConfirm={() => {
@@ -411,17 +424,23 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     textColor: "#152033",
     cornerRadius: 8,
     strokeWidth: 3,
-    actionCountMode: "uniform",
-    actionsPerDay: 3,
-    dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
-    showAdjacentDays: false,
-    groupLayers: true,
+  actionCountMode: "uniform",
+  actionsPerDay: 3,
+  dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
+  showAdjacentDays: false,
+  groupLayers: true,
+  weekendColorMode: "default",
+  showBadge: true,
   };
 }
 
 function ScheduleBuilderDialog({
   draft,
   fontOptions,
+  settings,
+  language,
+  paletteColors,
+  savedColorPalettes,
   onDraftChange,
   onCancel,
   onConfirm,
@@ -429,6 +448,10 @@ function ScheduleBuilderDialog({
 }: {
   draft: ScheduleBuilderRequest;
   fontOptions: FontOption[];
+  settings: OutputSettings;
+  language: Language;
+  paletteColors: PaletteColor[];
+  savedColorPalettes: SavedColorPalette[];
   onDraftChange: (draft: ScheduleBuilderRequest) => void;
   onCancel: () => void;
   onConfirm: () => void;
@@ -468,6 +491,23 @@ function ScheduleBuilderDialog({
     );
     onDraftChange({ ...draft, dailyActionCounts: nextCounts });
   };
+  const previewTemplate = useMemo(() => buildScheduleTemplate(draft, settings, language), [draft, language, settings]);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    const canvas = previewCanvasRef.current;
+    if (!canvas) return;
+    renderThumbnailToCanvas(canvas, previewTemplate.layers, [], previewTemplate.settings, { drawSelection: false }).catch(() => {});
+  }, [previewTemplate]);
+
+  const previewTitle = useMemo(() => {
+    const titleLayer = previewTemplate.layers.find(
+      (layer): layer is TextLayer =>
+        layer.type === "text" && layer.name === "Schedule title",
+    );
+    return titleLayer?.text ?? "";
+  }, [previewTemplate]);
+  const previewAspectRatio = `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`;
 
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
@@ -477,9 +517,6 @@ function ScheduleBuilderDialog({
             <h2 id="schedule-builder-title">{t("scheduleBuilder.title")}</h2>
             <p>{t("scheduleBuilder.betaNotice")}</p>
           </div>
-          <button type="button" className="secondary-button modal-close" onClick={onCancel}>
-            {t("inspector.cancel")}
-          </button>
         </div>
 
         <div className="schedule-builder-grid">
@@ -675,6 +712,26 @@ function ScheduleBuilderDialog({
                 ))}
               </div>
             ) : null}
+            <label className="field">
+              <span>{t("scheduleBuilder.weekendColorMode")}</span>
+              <select
+                value={draft.weekendColorMode}
+                onChange={(event) => setDraft("weekendColorMode", event.currentTarget.value as ScheduleBuilderRequest["weekendColorMode"])}
+              >
+                <option value="default">{t("scheduleBuilder.weekendColorMode.default")}</option>
+                <option value="grayscale">{t("scheduleBuilder.weekendColorMode.grayscale")}</option>
+                <option value="sundaySaturday">{t("scheduleBuilder.weekendColorMode.sundaySaturday")}</option>
+              </select>
+            </label>
+            <label className="field checkbox-field">
+              <input
+                type="checkbox"
+                checked={draft.kind === "week" ? false : draft.showBadge}
+                disabled={draft.kind === "week"}
+                onChange={(event) => setDraft("showBadge", event.currentTarget.checked)}
+              />
+              <span>{t("scheduleBuilder.showBadge")}</span>
+            </label>
           </section>
 
           <section className="panel-section schedule-color-section">
@@ -686,13 +743,55 @@ function ScheduleBuilderDialog({
             <ColorInput label={t("scheduleBuilder.surfaceColor")} value={draft.surfaceColor} onChange={(value) => setDraft("surfaceColor", value)} />
             <ColorInput label={t("scheduleBuilder.accentColor")} value={draft.accentColor} onChange={(value) => setDraft("accentColor", value)} />
             <ColorInput label={t("scheduleBuilder.textColor")} value={draft.textColor} onChange={(value) => setDraft("textColor", value)} />
+            <div className="schedule-color-list-group">
+              <p className="schedule-color-list-title">{t("inspector.registeredColors")}</p>
+              <div className="schedule-color-swatch-grid">
+                {paletteColors.length === 0 ? (
+                  <p className="schedule-empty-message">{t("scheduleBuilder.noRegisteredColors")}</p>
+                ) : (
+                  paletteColors.map((color) => (
+                    <div
+                      className="schedule-color-swatch"
+                      key={color.id}
+                      style={{ background: color.value }}
+                      title={`${color.name}: ${color.value}`}
+                      aria-label={`${color.name}: ${color.value}`}
+                    />
+                  ))
+                )}
+              </div>
+            </div>
+            <div className="schedule-color-list-group">
+              <p className="schedule-color-list-title">{t("inspector.savedPalettes")}</p>
+              <div className="schedule-saved-palette-list">
+                {savedColorPalettes.length === 0 ? (
+                  <p className="schedule-empty-message">{t("scheduleBuilder.noSavedPalettes")}</p>
+                ) : (
+                  savedColorPalettes.map((palette) => (
+                    <div className="schedule-saved-palette-row" key={palette.id}>
+                      <div className="schedule-saved-palette-header">
+                        <span>{palette.name}</span>
+                        <small>{palette.mode}</small>
+                      </div>
+                      <div className="schedule-saved-palette-swatches">
+                        {palette.colors.map((color) => (
+                          <span className="schedule-saved-palette-swatch" key={`${palette.id}-${color}`} style={{ background: color }} title={color} />
+                        ))}
+                      </div>
+                    </div>
+                  ))
+                )}
+              </div>
+            </div>
           </section>
           <section className="panel-section schedule-preview-section">
             <div className="section-heading">
               <CalendarDays size={16} />
               <h2>{t("scheduleBuilder.previewSection")}</h2>
             </div>
-            <SchedulePreview draft={draft} />
+            <div className="schedule-preview-canvas-shell" style={{ aspectRatio: previewAspectRatio }}>
+              <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={previewTitle} />
+            </div>
           </section>
         </div>
 
@@ -742,92 +841,6 @@ function ScheduleSlider({
   );
 }
 
-function SchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
-  const title = draft.title.trim() || (draft.kind === "week" ? "Weekly Schedule" : "Monthly Schedule");
-  return (
-    <div
-      className={`schedule-builder-preview ${draft.kind}`}
-      style={{
-        backgroundColor: draft.backgroundColor,
-        color: draft.textColor,
-        fontFamily: draft.fontFamily,
-        borderColor: draft.accentColor,
-      }}
-    >
-      <div className="schedule-preview-title" style={{ fontSize: `${Math.max(14, Math.round(draft.titleFontSize * 0.22))}px` }}>
-        {title}
-      </div>
-      {draft.kind === "week" ? <WeekSchedulePreview draft={draft} /> : <MonthSchedulePreview draft={draft} />}
-    </div>
-  );
-}
-
-function WeekSchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
-  return (
-    <div className="schedule-preview-week">
-      {getPreviewWeekDates(draft).map((date, index) => {
-        const count = draft.actionCountMode === "individual" ? normalizeDailyCounts(draft)[index] : clampPreviewCount(draft.actionsPerDay);
-        return (
-          <div className="schedule-preview-day" key={`${date.month}-${date.day}-${index}`} style={{ backgroundColor: draft.surfaceColor, borderColor: draft.accentColor, borderRadius: draft.cornerRadius }}>
-            <div className="schedule-preview-day-head" style={{ backgroundColor: draft.accentColor, color: "#ffffff" }}>
-              <span>{getWeekdayLabel(draft, date.weekday)}</span>
-              <strong>{formatPreviewDate(date, draft.dateFormat)}</strong>
-            </div>
-            <div className="schedule-preview-actions">
-              {Array.from({ length: count }).map((_, slot) => (
-                <span key={slot} style={{ backgroundColor: slot % 2 === 0 ? draft.backgroundColor : draft.accentColor }} />
-              ))}
-            </div>
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
-function MonthSchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
-  const labels = getOrderedWeekdayLabels(draft);
-  const firstWeekday = getWeekday(draft.year, draft.month, 1);
-  const weekStartIndex = draft.weekStartsOn === "monday" ? 1 : 0;
-  const leading = (firstWeekday - weekStartIndex + 7) % 7;
-  const daysInMonth = getDaysInMonth(draft.year, draft.month);
-  const totalCells = Math.ceil((leading + daysInMonth) / 7) * 7;
-  return (
-    <div className="schedule-preview-month">
-      {labels.map((label) => (
-        <div className="schedule-preview-month-head" key={label} style={{ backgroundColor: draft.accentColor, color: "#ffffff" }}>
-          {label}
-        </div>
-      ))}
-      {Array.from({ length: totalCells }).map((_, index) => {
-        const date = addDays(draft.year, draft.month, 1, index - leading);
-        const inMonth = date.month === draft.month;
-        return (
-          <div
-            className="schedule-preview-month-cell"
-            key={`${date.month}-${date.day}-${index}`}
-            style={{
-              backgroundColor: draft.gridStyle === "cards" ? draft.surfaceColor : draft.backgroundColor,
-              borderColor: draft.accentColor,
-              borderRadius: draft.cornerRadius,
-              opacity: inMonth || draft.showAdjacentDays ? 1 : 0.28,
-            }}
-          >
-            {(inMonth || draft.showAdjacentDays) ? <strong>{formatPreviewDate(date, draft.dateFormat)}</strong> : null}
-            {inMonth ? (
-              <div className="schedule-preview-actions">
-                {Array.from({ length: Math.min(3, clampPreviewCount(draft.actionsPerDay)) }).map((_, slot) => (
-                  <span key={slot} style={{ backgroundColor: slot === 0 ? draft.accentColor : draft.backgroundColor }} />
-                ))}
-              </div>
-            ) : null}
-          </div>
-        );
-      })}
-    </div>
-  );
-}
-
 function formatMonthInputValue(draft: ScheduleBuilderRequest): string {
   return `${draft.year}-${pad2(draft.month)}`;
 }
@@ -840,10 +853,6 @@ function getPreviewWeekDates(draft: ScheduleBuilderRequest) {
   return Array.from({ length: 7 }, (_, index) => addDays(draft.year, draft.month, draft.day, index));
 }
 
-function getOrderedWeekdayLabels(draft: ScheduleBuilderRequest): string[] {
-  const labels = draft.weekdayLanguage === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
-  return draft.weekStartsOn === "monday" ? [...labels.slice(1), labels[0]] : labels;
-}
 
 function getWeekdayLabel(draft: ScheduleBuilderRequest, weekday: number): string {
   return draft.weekdayLanguage === "ja"

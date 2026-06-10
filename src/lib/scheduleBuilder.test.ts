@@ -31,6 +31,8 @@ const baseRequest: ScheduleBuilderRequest = {
   dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
   showAdjacentDays: false,
   groupLayers: true,
+  weekendColorMode: "default",
+  showBadge: true,
 };
 
 describe("scheduleBuilder", () => {

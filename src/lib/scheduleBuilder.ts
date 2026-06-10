@@ -8,6 +8,7 @@ export type ScheduleGridStyle = "cards" | "lines";
 export type ScheduleWeekdayLanguage = "en" | "ja";
 export type ScheduleDateFormat = "day" | "month-day";
 export type ScheduleActionCountMode = "uniform" | "individual";
+export type ScheduleWeekendColorMode = "default" | "grayscale" | "sundaySaturday";
 
 export interface ScheduleBuilderRequest {
   kind: ScheduleBuilderKind;
@@ -38,6 +39,8 @@ export interface ScheduleBuilderRequest {
   dailyActionCounts: number[];
   showAdjacentDays: boolean;
   groupLayers: boolean;
+  weekendColorMode: ScheduleWeekendColorMode;
+  showBadge: boolean;
 }
 
 export interface BuiltScheduleTemplate {
@@ -128,7 +131,7 @@ function createMonthLayers(context: BuildContext): ThumbnailLayer[] {
   const layers: ThumbnailLayer[] = [
     shape(context, "Schedule background", 0, 0, width, height, request.backgroundColor, 0, request.backgroundColor, 0),
     text(context, "Schedule title", portrait ? 68 : 62, portrait ? 70 : 40, portrait ? width - 136 : width * 0.58, portrait ? 112 : 72, title, request.titleFontSize, request.textColor, "left", 0),
-    ...badge(context, getScheduleBadgeLabel(request), portrait ? width - 282 : width - 278, portrait ? 76 : 46, portrait ? 214 : 190, portrait ? 72 : 52),
+    ...(request.showBadge ? badge(context, getScheduleBadgeLabel(request), portrait ? width - 282 : width - 278, portrait ? 76 : 46, portrait ? 214 : 190, portrait ? 72 : 52) : []),
   ];
   const marginX = portrait ? 58 : 64;
   const gridTop = portrait ? 230 : 132;
@@ -140,9 +143,12 @@ function createMonthLayers(context: BuildContext): ThumbnailLayer[] {
   const cellHeight = (availableHeight - headerHeight - gap * rows) / rows;
 
   labels.forEach((label, index) => {
+    const weekday = request.weekStartsOn === "monday" ? (index + 1) % 7 : index;
+    const weekendColor = getWeekendColor(request, weekday);
+    const weekendTextColor = getWeekendTextColor(request, weekday);
     const x = marginX + index * (cellWidth + gap);
-    layers.push(shape(context, `Weekday ${label} header`, x, gridTop, cellWidth, headerHeight, request.accentColor, request.cornerRadius, request.accentColor, 0));
-    layers.push(text(context, `Weekday ${label} label`, x, gridTop + headerHeight * 0.24, cellWidth, headerHeight * 0.54, label, request.weekdayFontSize, "#ffffff", "center", 0));
+    layers.push(shape(context, `Weekday ${label} header`, x, gridTop, cellWidth, headerHeight, weekendColor, request.cornerRadius, weekendColor, 0));
+    layers.push(text(context, `Weekday ${label} label`, x, gridTop + headerHeight * 0.24, cellWidth, headerHeight * 0.54, label, request.weekdayFontSize, weekendTextColor, "center", 0));
   });
 
   for (let index = 0; index < totalCells; index += 1) {
@@ -154,12 +160,17 @@ function createMonthLayers(context: BuildContext): ThumbnailLayer[] {
     const inMonth = date.month === request.month;
     const displayDay = formatDateLabel(date, request.dateFormat);
     const showNumber = inMonth || request.showAdjacentDays;
+    const weekendColor = getWeekendColor(request, date.weekday);
+    const dateTextColor = getWeekendTextColor(request, date.weekday);
+    const cellWeekendColor = getWeekendCellColor(request, date.weekday, request.surfaceColor);
     const layerOpacity = inMonth ? 1 : 0.36;
-    const cellFill = request.gridStyle === "cards" ? request.surfaceColor : request.backgroundColor;
-    const stroke = request.gridStyle === "cards" ? request.accentColor : request.surfaceColor;
+    const cellFill = request.gridStyle === "cards" ? cellWeekendColor : request.backgroundColor;
+    const stroke = request.gridStyle === "cards" ? weekendColor : request.surfaceColor;
     layers.push(shape(context, `Day cell ${index + 1}`, x, y, cellWidth, cellHeight, cellFill, request.cornerRadius, stroke, request.strokeWidth, layerOpacity));
     if (showNumber) {
-      layers.push(text(context, `Day ${displayDay} number`, x + cellWidth * 0.08, y + cellHeight * 0.08, cellWidth * 0.46, cellHeight * 0.22, displayDay, request.dateFontSize, request.textColor, "left", 0, layerOpacity));
+      layers.push(
+        text(context, `Day ${displayDay} number`, x + cellWidth * 0.08, y + cellHeight * 0.08, cellWidth * 0.46, cellHeight * 0.22, displayDay, request.dateFontSize, dateTextColor, "left", 0, layerOpacity),
+      );
     }
     if (inMonth) {
       const slots = Math.min(3, request.actionsPerDay);
@@ -168,7 +179,21 @@ function createMonthLayers(context: BuildContext): ThumbnailLayer[] {
       const slotHeight = Math.max(4, (cellHeight * 0.36 - slotGap * Math.max(0, slots - 1)) / Math.max(1, slots));
       for (let slot = 0; slot < slots; slot += 1) {
         const slotY = slotTop + slot * (slotHeight + slotGap);
-        layers.push(shape(context, `Day ${displayDay} action ${slot + 1}`, x + cellWidth * 0.1, slotY, cellWidth * 0.8, slotHeight, slot === 0 ? request.accentColor : request.backgroundColor, Math.min(request.cornerRadius, 6), request.accentColor, slot === 0 ? 0 : Math.max(1, request.strokeWidth - 1), slot === 0 ? 0.72 : 0.52));
+        layers.push(
+          shape(
+            context,
+            `Day ${displayDay} action ${slot + 1}`,
+            x + cellWidth * 0.1,
+            slotY,
+            cellWidth * 0.8,
+            slotHeight,
+            slot === 0 ? weekendColor : request.backgroundColor,
+            Math.min(request.cornerRadius, 6),
+            weekendColor,
+            slot === 0 ? 0 : Math.max(1, request.strokeWidth - 1),
+            slot === 0 ? 0.72 : 0.52,
+          ),
+        );
         if (slot === 0 && (portrait || cellHeight > 70)) {
           layers.push(text(context, `Day ${displayDay} action ${slot + 1} text`, x + cellWidth * 0.13, slotY + slotHeight * 0.18, cellWidth * 0.74, slotHeight * 0.5, "Plan", request.eventFontSize, "#ffffff", "center", 0, 0.82));
         }
@@ -184,7 +209,6 @@ function createWeekLayers(context: BuildContext): ThumbnailLayer[] {
   const layers: ThumbnailLayer[] = [
     shape(context, "Schedule background", 0, 0, width, height, request.backgroundColor, 0, request.backgroundColor, 0),
     text(context, "Schedule title", portrait ? 68 : 62, portrait ? 70 : 42, portrait ? width - 136 : width * 0.6, portrait ? 112 : 72, title, request.titleFontSize, request.textColor, "left", 0),
-    ...badge(context, getScheduleBadgeLabel(request), portrait ? width - 252 : width - 250, portrait ? 78 : 48, portrait ? 184 : 176, portrait ? 70 : 50),
   ];
   const dates = Array.from({ length: 7 }, (_, index) => addDays(request.year, request.month, request.day, index));
 
@@ -197,21 +221,94 @@ function createWeekLayers(context: BuildContext): ThumbnailLayer[] {
     dates.forEach((date, index) => {
       const y = startY + index * (rowHeight + gap);
       const actionCount = getActionCount(request, index);
+      const dateColor = getWeekendTextColor(request, date.weekday);
+      const rowColor = getWeekendColor(request, date.weekday);
+      const rowFill = getWeekendCellColor(request, date.weekday, request.surfaceColor);
       const contentX = marginX + 212;
       const contentY = y + rowHeight * 0.18;
       const contentW = rowWidth - 252;
       const contentH = rowHeight * 0.64;
       const slotGap = Math.max(4, rowHeight * 0.035);
       const slotHeight = actionCount > 0 ? (contentH - slotGap * (actionCount - 1)) / actionCount : contentH;
-      layers.push(shape(context, `Week day ${index + 1} row`, marginX, y, rowWidth, rowHeight, request.surfaceColor, request.cornerRadius, request.accentColor, request.strokeWidth));
-      layers.push(shape(context, `Week day ${index + 1} date block`, marginX + 22, y + rowHeight * 0.16, 156, rowHeight * 0.68, request.accentColor, request.cornerRadius, request.accentColor, 0));
-      layers.push(text(context, `Week day ${index + 1} label`, marginX + 22, y + rowHeight * 0.22, 156, rowHeight * 0.22, weekdayLabels[request.weekdayLanguage][date.weekday], request.weekdayFontSize, "#ffffff", "center", 0));
-      layers.push(text(context, `Week day ${index + 1} date`, marginX + 22, y + rowHeight * 0.49, 156, rowHeight * 0.3, formatDateLabel(date, request.dateFormat), request.dateFontSize, "#ffffff", "center", 0));
+      layers.push(shape(context, `Week day ${index + 1} row`, marginX, y, rowWidth, rowHeight, rowFill, request.cornerRadius, rowColor, request.strokeWidth));
+      layers.push(shape(context, `Week day ${index + 1} date block`, marginX + 22, y + rowHeight * 0.16, 156, rowHeight * 0.68, rowColor, request.cornerRadius, rowColor, 0));
+      layers.push(
+        text(
+          context,
+          `Week day ${index + 1} label`,
+          marginX + 22,
+          y + rowHeight * 0.22,
+          156,
+          rowHeight * 0.22,
+          weekdayLabels[request.weekdayLanguage][date.weekday],
+          request.weekdayFontSize,
+          dateColor,
+          "center",
+          0,
+        ),
+      );
+      layers.push(
+        text(
+          context,
+          `Week day ${index + 1} date`,
+          marginX + 22,
+          y + rowHeight * 0.49,
+          156,
+          rowHeight * 0.3,
+          formatDateLabel(date, request.dateFormat),
+          request.dateFontSize,
+          dateColor,
+          "center",
+          0,
+        ),
+      );
       for (let slot = 0; slot < actionCount; slot += 1) {
         const slotY = contentY + slot * (slotHeight + slotGap);
-        layers.push(shape(context, `Week day ${index + 1} action ${slot + 1}`, contentX, slotY, contentW, slotHeight, slot === 0 ? request.backgroundColor : request.surfaceColor, Math.min(request.cornerRadius, 8), request.accentColor, Math.max(1, request.strokeWidth - 1), slot === 0 ? 0.78 : 1));
-        layers.push(text(context, `Week day ${index + 1} action ${slot + 1} time`, contentX + 18, slotY + slotHeight * 0.22, 132, slotHeight * 0.44, defaultActionTime(slot), request.eventFontSize, request.textColor, "left", 0));
-        layers.push(text(context, `Week day ${index + 1} action ${slot + 1} plan`, contentX + 166, slotY + slotHeight * 0.22, contentW - 188, slotHeight * 0.44, "Plan / event", request.eventFontSize, request.textColor, "left", 0));
+        layers.push(
+          shape(
+            context,
+            `Week day ${index + 1} action ${slot + 1}`,
+            contentX,
+            slotY,
+            contentW,
+            slotHeight,
+            slot === 0 ? request.backgroundColor : request.surfaceColor,
+            Math.min(request.cornerRadius, 8),
+            rowColor,
+            Math.max(1, request.strokeWidth - 1),
+            slot === 0 ? 0.78 : 1,
+          ),
+        );
+        layers.push(
+          text(
+            context,
+            `Week day ${index + 1} action ${slot + 1} time`,
+            contentX + 18,
+            slotY + slotHeight * 0.22,
+            132,
+            slotHeight * 0.44,
+            defaultActionTime(slot),
+            request.eventFontSize,
+            dateColor,
+            "left",
+            0,
+          ),
+        );
+        layers.push(
+          text(
+            context,
+            `Week day ${index + 1} action ${slot + 1} plan`,
+            contentX + 166,
+            slotY + slotHeight * 0.22,
+            contentW - 188,
+            slotHeight * 0.44,
+            "Plan / event",
+            request.eventFontSize,
+            dateColor,
+            "left",
+            0,
+          ),
+        );
       }
     });
     return layers;
@@ -225,10 +322,41 @@ function createWeekLayers(context: BuildContext): ThumbnailLayer[] {
   dates.forEach((date, index) => {
     const x = marginX + index * (cardWidth + gap);
     const actionCount = getActionCount(request, index);
-    layers.push(shape(context, `Week day ${index + 1} card`, x, startY, cardWidth, cardHeight, request.surfaceColor, request.cornerRadius, request.accentColor, request.strokeWidth));
-    layers.push(shape(context, `Week day ${index + 1} header`, x, startY, cardWidth, 64, request.accentColor, request.cornerRadius, request.accentColor, 0));
-    layers.push(text(context, `Week day ${index + 1} label`, x, startY + 14, cardWidth, 28, weekdayLabels[request.weekdayLanguage][date.weekday], request.weekdayFontSize, "#ffffff", "center", 0));
-    layers.push(text(context, `Week day ${index + 1} date`, x + cardWidth * 0.08, startY + 88, cardWidth * 0.84, 36, formatDateLabel(date, request.dateFormat), request.dateFontSize, request.textColor, "center", 0));
+    const cardColor = getWeekendCellColor(request, date.weekday, request.surfaceColor);
+    const cardAccent = getWeekendColor(request, date.weekday);
+    const cardDateColor = getWeekendTextColor(request, date.weekday);
+    layers.push(shape(context, `Week day ${index + 1} card`, x, startY, cardWidth, cardHeight, cardColor, request.cornerRadius, cardAccent, request.strokeWidth));
+    layers.push(shape(context, `Week day ${index + 1} header`, x, startY, cardWidth, 64, cardAccent, request.cornerRadius, cardAccent, 0));
+    layers.push(
+      text(
+        context,
+        `Week day ${index + 1} label`,
+        x,
+        startY + 14,
+        cardWidth,
+        28,
+        weekdayLabels[request.weekdayLanguage][date.weekday],
+        request.weekdayFontSize,
+        cardDateColor,
+        "center",
+        0,
+      ),
+    );
+    layers.push(
+      text(
+        context,
+        `Week day ${index + 1} date`,
+        x + cardWidth * 0.08,
+        startY + 88,
+        cardWidth * 0.84,
+        36,
+        formatDateLabel(date, request.dateFormat),
+        request.dateFontSize,
+        cardDateColor,
+        "center",
+        0,
+      ),
+    );
     const slotAreaY = startY + 150;
     const slotAreaH = cardHeight - 176;
     const slotGap = 10;
@@ -236,8 +364,39 @@ function createWeekLayers(context: BuildContext): ThumbnailLayer[] {
     for (let slot = 0; slot < actionCount; slot += 1) {
       const slotY = slotAreaY + slot * (slotHeight + slotGap);
       const active = slot % 2 === 1;
-      layers.push(shape(context, `Week day ${index + 1} slot ${slot + 1}`, x + cardWidth * 0.1, slotY, cardWidth * 0.8, slotHeight, active ? request.accentColor : request.backgroundColor, Math.min(request.cornerRadius, 8), request.surfaceColor, 0, active ? 1 : 0.68));
-      layers.push(text(context, `Week day ${index + 1} slot ${slot + 1} text`, x + cardWidth * 0.12, slotY + slotHeight * 0.28, cardWidth * 0.76, slotHeight * 0.32, defaultActionTime(slot), request.eventFontSize, active ? "#ffffff" : request.textColor, "center", 0, active ? 1 : 0.72));
+      const slotColor = active ? cardAccent : request.backgroundColor;
+      const slotTextColor = active ? "#ffffff" : cardDateColor;
+      layers.push(
+        shape(
+          context,
+          `Week day ${index + 1} slot ${slot + 1}`,
+          x + cardWidth * 0.1,
+          slotY,
+          cardWidth * 0.8,
+          slotHeight,
+          slotColor,
+          Math.min(request.cornerRadius, 8),
+          request.surfaceColor,
+          0,
+          active ? 1 : 0.68,
+        ),
+      );
+      layers.push(
+        text(
+          context,
+          `Week day ${index + 1} slot ${slot + 1} text`,
+          x + cardWidth * 0.12,
+          slotY + slotHeight * 0.28,
+          cardWidth * 0.76,
+          slotHeight * 0.32,
+          defaultActionTime(slot),
+          request.eventFontSize,
+          slotTextColor,
+          "center",
+          0,
+          active ? 1 : 0.72,
+        ),
+      );
     }
   });
   return layers;
@@ -264,7 +423,38 @@ function sanitizeScheduleRequest(request: ScheduleBuilderRequest): ScheduleBuild
     strokeWidth: Math.min(12, Math.max(0, Math.round(request.strokeWidth || 0))),
     actionsPerDay: clampActionCount(request.actionsPerDay),
     dailyActionCounts: Array.from({ length: 7 }, (_, index) => clampActionCount(request.dailyActionCounts?.[index] ?? request.actionsPerDay)),
+    weekendColorMode: sanitizeWeekendColorMode(request.weekendColorMode),
+    showBadge: request.kind === "week" ? false : request.showBadge !== false,
   };
+}
+
+function isWeekendDate(weekday: number): boolean {
+  return weekday === 0 || weekday === 6;
+}
+
+function sanitizeWeekendColorMode(value: ScheduleBuilderRequest["weekendColorMode"]): ScheduleWeekendColorMode {
+  if (value === "grayscale" || value === "sundaySaturday") return value;
+  return "default";
+}
+
+function getWeekendColor(request: ScheduleBuilderRequest, weekday: number): string {
+  if (!isWeekendDate(weekday)) return request.accentColor;
+  if (request.weekendColorMode === "sundaySaturday") return weekday === 0 ? "#dc2626" : "#2563eb";
+  if (request.weekendColorMode === "grayscale") return "#6b7280";
+  return request.accentColor;
+}
+
+function getWeekendCellColor(request: ScheduleBuilderRequest, weekday: number, fallback: string): string {
+  if (!isWeekendDate(weekday) || request.weekendColorMode === "default") return fallback;
+  if (request.weekendColorMode === "sundaySaturday") return weekday === 0 ? "#fee2e2" : "#dbeafe";
+  return "#d1d5db";
+}
+
+function getWeekendTextColor(request: ScheduleBuilderRequest, weekday: number): string {
+  if (!isWeekendDate(weekday)) return request.textColor;
+  if (request.weekendColorMode === "sundaySaturday") return "#ffffff";
+  if (request.weekendColorMode === "grayscale") return request.textColor;
+  return "#ffffff";
 }
 
 function getActionCount(request: ScheduleBuilderRequest, index: number): number {
