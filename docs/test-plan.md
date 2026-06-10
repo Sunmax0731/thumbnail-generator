@@ -637,3 +637,25 @@ Completed on 2026-06-08.
 - Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
 - Runtime gate URL: `http://127.0.0.1:4189/thumbnail-generator/`.
 - Runtime gate checks: pass. The `.format-field` count was `0`, the generic `出力` button count was `0`, PNG/JPG/WebP export buttons were each present once, WebP direct export downloaded a `.webp` file, and no page errors or relevant console warnings were reported.
+
+## Schedule Builder Color Picker Runtime Gate (2026-06-10)
+
+Completed on 2026-06-10.
+
+- Scope: registered single-color swatches and saved palette swatches are integrated into each Schedule Builder color field, making them directly selectable inside the modal before generation.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4225/thumbnail-generator/`.
+- Browser plugin attempt: no in-app browser plugin was used; Playwright fallback was used directly.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Runtime checks:
+  - Nonblank render: pass.
+  - Primary UI visible: pass (left panel and stage panel are both visible).
+  - Schedule Builder modal opened and registered color swatches rendered (`24` entries).
+  - Schedule color select applied at least one palette swatch in the modal.
+  - Layer edit: number field edit changed the selected value (`0` → `10` on desktop, `1057` → `1067` on mobile).
+  - Export path: WebP download succeeded.
+  - Mobile horizontal overflow: `0`.
+  - CSV/HTML compatibility note: CSV/HTML text controls are not visible in this build; parser compatibility is verified by unit coverage and saved-state layout metadata compatibility.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-schedule-color-picker-desktop.png`
+  - `docs/assets/runtime-20260610-schedule-color-picker-mobile.png`

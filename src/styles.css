@@ -2310,10 +2310,13 @@ button:disabled {
 .schedule-color-swatch {
   aspect-ratio: 1;
   min-height: 24px;
-  border: 1px solid rgba(17, 24, 39, 0.2);
+  padding: 0;
   border-radius: 5px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
   box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38);
   background: transparent;
+  cursor: pointer;
+  appearance: none;
 }
 
 .schedule-saved-palette-list {
@@ -2356,11 +2359,25 @@ button:disabled {
   grid-template-columns: repeat(8, minmax(0, 1fr));
 }
 
+.schedule-color-preview,
 .schedule-saved-palette-swatch {
+  margin: 0;
   aspect-ratio: 5 / 1;
+  padding: 0;
   border-radius: 5px;
   border: 1px solid rgba(17, 24, 39, 0.2);
+  appearance: none;
+  cursor: pointer;
+  box-shadow: inset 0 0 0 2px rgba(255, 255, 255, 0.38);
   min-height: 14px;
+}
+
+.schedule-color-preview {
+  width: 38px;
+  height: 34px;
+  min-height: 34px;
+  border-radius: 6px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
 }
 
 .schedule-empty-message {
@@ -2369,8 +2386,15 @@ button:disabled {
   font-size: 11px;
 }
 
-.schedule-color-field {
+.schedule-color-input-row {
+  display: grid;
   grid-template-columns: 38px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.schedule-color-field {
+  gap: 10px;
   align-items: center;
 }
 
@@ -2378,10 +2402,13 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
-.schedule-color-field input[type="color"] {
-  width: 38px;
-  height: 34px;
-  padding: 2px;
+.schedule-color-swatch.selected,
+.schedule-saved-palette-swatch.selected,
+.schedule-color-preview:focus-visible,
+.schedule-color-swatch:focus-visible,
+.schedule-saved-palette-swatch:focus-visible {
+  border-color: var(--accent);
+  box-shadow: inset 0 0 0 2px rgba(16, 182, 215, 0.3);
 }
 
 .schedule-builder-actions {

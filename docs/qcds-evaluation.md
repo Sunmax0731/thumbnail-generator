@@ -303,3 +303,16 @@ Completed on 2026-06-08.
 - Satisfaction: A+. The toolbar now matches the requested simpler mental model: choose the desired file button once and the download starts in that format.
 - Runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright fallback passed at `http://127.0.0.1:4189/thumbnail-generator/`.
 - Runtime checks: `.format-field` count `0`, generic `出力` button count `0`, one each of PNG/JPG/WebP, WebP direct export produced a `.webp` download, and no page errors or relevant console warnings were reported.
+## Schedule Builder Color Picker Follow-Up Evidence
+
+Completed on 2026-06-10.
+
+- Scope: integrated registered single-color swatches and saved palette entries directly in the Schedule Builder color section so users can pick palette values without leaving the modal.
+- Quality: A+. Runtime and previous parser coverage confirm no regression to schedule generation, color picker controls, layer editing, or export behavior.
+- Cost: A+. The change remains static React/Vite UI work with existing localStorage palette models and unchanged export/build paths.
+- Delivery: A+. `npm test` passed with 28 test files, 111 tests; `npm run build` passed in the latest verification cycle before this documentation update; runtime evidence is recorded in `docs/test-plan.md`.
+- Satisfaction: A+. Modal integration keeps the requested workflow in one place and removes the need to switch context to apply colors.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4225/thumbnail-generator/`.
+- Runtime checks: nonblank render, primary UI visibility, schedule builder open, modal swatch availability (`24` registered swatches), color select interaction, layer edit, WebP export download, mobile overflow `0`, and no page errors were reported.
+- CSV/HTML compatibility note: CSV/HTML controls are not visible in this build; parser/runtime-compatibility is covered by existing unit tests and runtime evidence of nonblank generation/edit behavior.
+- Evidence screenshots: `docs/assets/runtime-20260610-schedule-color-picker-desktop.png` and `docs/assets/runtime-20260610-schedule-color-picker-mobile.png`.

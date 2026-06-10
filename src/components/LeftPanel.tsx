@@ -19,7 +19,7 @@ import {
   buildScheduleTemplate,
   type ScheduleBuilderRequest,
 } from "../lib/scheduleBuilder";
-import { type PaletteColor, type SavedColorPalette } from "../lib/colorPalette";
+import { normalizeColor, type PaletteColor, type SavedColorPalette } from "../lib/colorPalette";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset, OutputSettings, TextLayer } from "../lib/types";
 import { renderThumbnailToCanvas } from "../lib/renderCanvas";
@@ -739,50 +739,38 @@ function ScheduleBuilderDialog({
               <LayoutTemplate size={16} />
               <h2>{t("scheduleBuilder.colorSection")}</h2>
             </div>
-            <ColorInput label={t("scheduleBuilder.backgroundColor")} value={draft.backgroundColor} onChange={(value) => setDraft("backgroundColor", value)} />
-            <ColorInput label={t("scheduleBuilder.surfaceColor")} value={draft.surfaceColor} onChange={(value) => setDraft("surfaceColor", value)} />
-            <ColorInput label={t("scheduleBuilder.accentColor")} value={draft.accentColor} onChange={(value) => setDraft("accentColor", value)} />
-            <ColorInput label={t("scheduleBuilder.textColor")} value={draft.textColor} onChange={(value) => setDraft("textColor", value)} />
-            <div className="schedule-color-list-group">
-              <p className="schedule-color-list-title">{t("inspector.registeredColors")}</p>
-              <div className="schedule-color-swatch-grid">
-                {paletteColors.length === 0 ? (
-                  <p className="schedule-empty-message">{t("scheduleBuilder.noRegisteredColors")}</p>
-                ) : (
-                  paletteColors.map((color) => (
-                    <div
-                      className="schedule-color-swatch"
-                      key={color.id}
-                      style={{ background: color.value }}
-                      title={`${color.name}: ${color.value}`}
-                      aria-label={`${color.name}: ${color.value}`}
-                    />
-                  ))
-                )}
-              </div>
-            </div>
-            <div className="schedule-color-list-group">
-              <p className="schedule-color-list-title">{t("inspector.savedPalettes")}</p>
-              <div className="schedule-saved-palette-list">
-                {savedColorPalettes.length === 0 ? (
-                  <p className="schedule-empty-message">{t("scheduleBuilder.noSavedPalettes")}</p>
-                ) : (
-                  savedColorPalettes.map((palette) => (
-                    <div className="schedule-saved-palette-row" key={palette.id}>
-                      <div className="schedule-saved-palette-header">
-                        <span>{palette.name}</span>
-                        <small>{palette.mode}</small>
-                      </div>
-                      <div className="schedule-saved-palette-swatches">
-                        {palette.colors.map((color) => (
-                          <span className="schedule-saved-palette-swatch" key={`${palette.id}-${color}`} style={{ background: color }} title={color} />
-                        ))}
-                      </div>
-                    </div>
-                  ))
-                )}
-              </div>
-            </div>
+            <ScheduleColorInput
+              label={t("scheduleBuilder.backgroundColor")}
+              value={draft.backgroundColor}
+              paletteColors={paletteColors}
+              savedColorPalettes={savedColorPalettes}
+              onChange={(value) => setDraft("backgroundColor", value)}
+              t={t}
+            />
+            <ScheduleColorInput
+              label={t("scheduleBuilder.surfaceColor")}
+              value={draft.surfaceColor}
+              paletteColors={paletteColors}
+              savedColorPalettes={savedColorPalettes}
+              onChange={(value) => setDraft("surfaceColor", value)}
+              t={t}
+            />
+            <ScheduleColorInput
+              label={t("scheduleBuilder.accentColor")}
+              value={draft.accentColor}
+              paletteColors={paletteColors}
+              savedColorPalettes={savedColorPalettes}
+              onChange={(value) => setDraft("accentColor", value)}
+              t={t}
+            />
+            <ScheduleColorInput
+              label={t("scheduleBuilder.textColor")}
+              value={draft.textColor}
+              paletteColors={paletteColors}
+              savedColorPalettes={savedColorPalettes}
+              onChange={(value) => setDraft("textColor", value)}
+              t={t}
+            />
           </section>
           <section className="panel-section schedule-preview-section">
             <div className="section-heading">
@@ -808,12 +796,112 @@ function ScheduleBuilderDialog({
   );
 }
 
-function ColorInput({ label, value, onChange }: { label: string; value: string; onChange: (value: string) => void }) {
+function ScheduleColorInput({
+  label,
+  value,
+  paletteColors,
+  savedColorPalettes,
+  onChange,
+  t,
+}: {
+  label: string;
+  value: string;
+  paletteColors: PaletteColor[];
+  savedColorPalettes: SavedColorPalette[];
+  onChange: (value: string) => void;
+  t: Translator;
+}) {
+  const [draftValue, setDraftValue] = useState(value);
+
+  useEffect(() => {
+    setDraftValue(value);
+  }, [value]);
+
+  const commitDraft = () => {
+    const normalized = normalizeColor(draftValue);
+    if (normalized) {
+      setDraftValue(normalized);
+      onChange(normalized);
+      return;
+    }
+    setDraftValue(value);
+  };
+
+  const applyColor = (nextValue: string) => {
+    setDraftValue(nextValue);
+    onChange(nextValue);
+  };
+
   return (
     <label className="field schedule-color-field">
       <span>{label}</span>
-      <input type="color" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
-      <input type="text" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
+      <div className="schedule-color-input-row">
+        <span className="schedule-color-preview" style={{ background: normalizeColor(value) ?? value }} aria-hidden="true" />
+        <input
+          type="text"
+          value={draftValue}
+          onChange={(event) => setDraftValue(event.currentTarget.value)}
+          onBlur={commitDraft}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              commitDraft();
+            }
+            if (event.key === "Escape") {
+              event.preventDefault();
+              setDraftValue(value);
+            }
+          }}
+        />
+      </div>
+      <div className="schedule-color-list-group">
+        <p className="schedule-color-list-title">{t("inspector.registeredColors")}</p>
+        {paletteColors.length === 0 ? (
+          <p className="schedule-empty-message">{t("scheduleBuilder.noRegisteredColors")}</p>
+        ) : (
+          <div className="schedule-color-swatch-grid">
+            {paletteColors.map((color) => (
+              <button
+                key={color.id}
+                type="button"
+                className={`schedule-color-swatch ${value === color.value ? "selected" : ""}`}
+                style={{ background: color.value }}
+                title={`${color.name}: ${color.value}`}
+                onClick={() => applyColor(color.value)}
+              />
+            ))}
+          </div>
+        )}
+      </div>
+      <div className="schedule-color-list-group">
+        <p className="schedule-color-list-title">{t("inspector.savedPalettes")}</p>
+        {savedColorPalettes.length === 0 ? (
+          <p className="schedule-empty-message">{t("scheduleBuilder.noSavedPalettes")}</p>
+        ) : (
+          <div className="schedule-saved-palette-list">
+            {savedColorPalettes.map((palette) => (
+              <div className="schedule-saved-palette-row" key={palette.id}>
+                <div className="schedule-saved-palette-header">
+                  <span>{palette.name}</span>
+                  <small>{palette.mode}</small>
+                </div>
+                <div className="schedule-saved-palette-swatches">
+                  {palette.colors.map((paletteColor) => (
+                    <button
+                      key={`${palette.id}-${paletteColor}`}
+                      type="button"
+                      className={`schedule-saved-palette-swatch ${value === paletteColor ? "selected" : ""}`}
+                      style={{ background: paletteColor }}
+                      title={paletteColor}
+                      onClick={() => applyColor(paletteColor)}
+                    />
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+      </div>
     </label>
   );
 }
