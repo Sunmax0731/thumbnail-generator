@@ -125,6 +125,43 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-10.
 
+### Color Palette Extraction Modal (Image-based, Production Gate)
+
+Completed on 2026-06-10 for the production rollout of image palette extraction interactions.
+
+- `npm test`: pass. 28 test files, 112 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4313/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render.
+  - Left panel, preview, layer rows, and export controls were all visible.
+  - Colors tab opened the image-palette modal successfully.
+  - Candidate count became `3` in the preview extraction result.
+- Lens interaction details:
+  - Lens became visible on hover.
+  - Candidate code observed: `#000008`.
+  - Lens code read on hover: `#021220`.
+- Exclusion flow:
+  - Excluded color count changed from `0` to `1`.
+- Adjust-flow stability:
+  - Adjust X edit changed from `371` to `372` on desktop and `371` to `372` on mobile.
+- Export:
+  - WebP export succeeded on both desktop and mobile.
+- Overflow:
+  - Desktop horizontal overflow: `0`.
+  - Mobile horizontal overflow: `0`.
+- Console health:
+  - No page errors and no app HTTP 4xx/5xx responses were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-image-palette-desktop.png`
+  - `docs/assets/runtime-20260610-image-palette-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260610-image-palette-production/desktop/thumbnail-1280x720-1781102767692.webp`
+  - `output/runtime-downloads/20260610-image-palette-production/mobile/thumbnail-1280x720-1781102774685.webp`
+
 ### Color Palette Extraction Modal (Image-based)
 
 Completed on 2026-06-10 for the latest beta image-palette extraction flow.

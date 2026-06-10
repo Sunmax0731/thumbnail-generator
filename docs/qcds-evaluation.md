@@ -49,10 +49,13 @@ Evidence:
 - `docs/assets/runtime-20260610-schedule-builder-v3-mobile.png`
 - `docs/assets/runtime-20260610-image-palette-5colors-exclude-desktop.png`
 - `docs/assets/runtime-20260610-image-palette-5colors-exclude-mobile.png`
+- `docs/assets/runtime-20260610-image-palette-desktop.png`
+- `docs/assets/runtime-20260610-image-palette-mobile.png`
 
 Latest measured checks:
 
 - Image palette extraction modal (beta): pass. Selected image opened the Colors image-color extractor modal in beta mode, extracted candidates from 3/4/5 target counts, captured an excluded color by clicking the preview image, registered the resulting palette via modal action, and closed successfully.
+- Image palette extraction modal (production): pass. Opened the image palette modal from Colors, displayed a hover lens code, added a previewed color to the exclusion list, changed Adjust X `371 -> 372`, exported WebP for desktop/mobile, and kept horizontal overflow at `0`.
 - `npm test`: pass. 28 test files, 111 tests.
 - `npm run build`: pass.
 - Beta schedule generator V3: pass. The modal opened from Templates, measured `1320px` wide with four desktop columns, exposed Adjust-shared fonts including Poppins 900, Noto Sans JP 900, and Impact, synchronized title/weekday/date/plan sliders to `72/24/34/20`, accepted `2026-06`, Japanese weekday language, and month/day date format, previewed `6/1`, generated a `6月 badge text` monthly label with grouping enabled, allowed an Adjust numeric edit after row switching, exported WebP, and kept mobile horizontal overflow at `0`.
@@ -336,3 +339,29 @@ Completed on 2026-06-10.
     - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/desktop-thumbnail-1280x720-2026-06-10T05-35-56-556Z.webp`
     - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/mobile-thumbnail-1280x720-2026-06-10T05-35-58-894Z.webp`
 - CSV/HTML note: controls are not dedicated visible panels in this build.
+
+### Image Palette Extraction Modal (Production Gate)
+
+- Scope: production runtime verification for hover lens color readout and excluded-color handling in the image palette modal.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4313/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Runtime checks:
+  - Colors tab opened the image-color extractor modal.
+  - Candidate count became `3`.
+  - Lens code read as `#021220`.
+  - Candidate code `#000008` appeared in the list.
+  - Exclusion flow changed count from `0` to `1`.
+  - Adjust X edit changed `371 -> 372`.
+  - Nonblank render and primary UI visibility.
+  - WebP export succeeded on desktop and mobile.
+  - Horizontal overflow was `0` on desktop and mobile.
+  - No page errors or app HTTP 4xx/5xx responses were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-image-palette-desktop.png`
+  - `docs/assets/runtime-20260610-image-palette-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260610-image-palette-production/desktop/thumbnail-1280x720-1781102767692.webp`
+  - `output/runtime-downloads/20260610-image-palette-production/mobile/thumbnail-1280x720-1781102774685.webp`
+- CSV/HTML note: visible panel controls remain unchanged from this build and parser compatibility is preserved.
