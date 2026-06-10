@@ -2143,6 +2143,120 @@ button:disabled {
   align-content: start;
 }
 
+.daily-action-grid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 6px;
+}
+
+.daily-action-grid .field span {
+  overflow: hidden;
+  font-size: 10px;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.daily-action-grid input {
+  min-height: 30px;
+  padding: 0 6px;
+}
+
+.schedule-preview-section {
+  grid-column: 1 / -1;
+}
+
+.schedule-builder-preview {
+  display: grid;
+  min-height: 240px;
+  gap: 10px;
+  padding: 12px;
+  overflow: hidden;
+  border: 2px solid;
+  border-radius: 8px;
+}
+
+.schedule-preview-title {
+  overflow: hidden;
+  font-weight: 900;
+  line-height: 1.05;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.schedule-preview-week {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.schedule-preview-day {
+  display: grid;
+  min-width: 0;
+  min-height: 160px;
+  overflow: hidden;
+  border: 1px solid;
+}
+
+.schedule-preview-day-head {
+  display: grid;
+  gap: 2px;
+  min-height: 48px;
+  padding: 7px 5px;
+  place-items: center;
+  text-align: center;
+}
+
+.schedule-preview-day-head span {
+  font-size: 10px;
+  font-weight: 900;
+}
+
+.schedule-preview-day-head strong {
+  font-size: 16px;
+  font-weight: 900;
+}
+
+.schedule-preview-actions {
+  display: grid;
+  align-content: start;
+  gap: 5px;
+  padding: 8px;
+}
+
+.schedule-preview-actions span {
+  display: block;
+  min-height: 10px;
+  border-radius: 4px;
+}
+
+.schedule-preview-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.schedule-preview-month-head {
+  min-height: 26px;
+  padding: 6px 4px;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 900;
+  text-align: center;
+}
+
+.schedule-preview-month-cell {
+  display: grid;
+  min-height: 42px;
+  align-content: start;
+  border: 1px solid;
+  padding: 5px;
+}
+
+.schedule-preview-month-cell strong {
+  font-size: 11px;
+  line-height: 1;
+}
+
 .schedule-color-field {
   grid-template-columns: 38px minmax(0, 1fr);
   align-items: center;
@@ -2367,6 +2481,14 @@ button:disabled {
     grid-template-columns: minmax(0, 1fr);
   }
 
+  .daily-action-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
+  .schedule-preview-week {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
+
   .image-lab-canvas {
     max-height: 54vh;
   }
@@ -2401,10 +2523,20 @@ button:disabled {
 
   .field-grid.two,
   .field-grid.three,
+  .daily-action-grid,
   .button-grid,
   .align-grid,
   .panel-tabs {
     grid-template-columns: 1fr;
+  }
+
+  .schedule-preview-week {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-preview-month-cell {
+    min-height: 36px;
+    padding: 4px;
   }
 
   .palette-maker-preview,

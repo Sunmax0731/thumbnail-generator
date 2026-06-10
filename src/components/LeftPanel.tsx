@@ -13,7 +13,12 @@ import {
 import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
 import type { Translator } from "../lib/i18n";
-import type { ScheduleBuilderRequest } from "../lib/scheduleBuilder";
+import {
+  addDays,
+  getDaysInMonth,
+  getWeekday,
+  type ScheduleBuilderRequest,
+} from "../lib/scheduleBuilder";
 import type { SavedTemplate } from "../lib/templates";
 import type { ImageAsset } from "../lib/types";
 
@@ -385,9 +390,12 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     month: now.getMonth() + 1,
     day: now.getDate(),
     weekStartsOn: "sunday",
+    weekdayLanguage: "en",
+    dateFormat: "month-day",
     title: "",
     fontFamily: "Noto Sans JP, Arial, sans-serif",
     fontWeight: "800",
+    fontSize: 56,
     gridStyle: "cards",
     backgroundColor: "#f7fafc",
     surfaceColor: "#ffffff",
@@ -395,7 +403,11 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     textColor: "#152033",
     cornerRadius: 8,
     strokeWidth: 3,
+    actionCountMode: "uniform",
+    actionsPerDay: 3,
+    dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
     showAdjacentDays: false,
+    groupLayers: true,
   };
 }
 
@@ -415,8 +427,22 @@ function ScheduleBuilderDialog({
   const setDraft = <Key extends keyof ScheduleBuilderRequest>(key: Key, value: ScheduleBuilderRequest[Key]) => {
     onDraftChange({ ...draft, [key]: value });
   };
-  const setNumber = (key: "year" | "month" | "day" | "cornerRadius" | "strokeWidth", value: string) => {
+  const setNumber = (key: "year" | "month" | "day" | "cornerRadius" | "strokeWidth" | "fontSize" | "actionsPerDay", value: string) => {
     setDraft(key, Number.parseInt(value, 10) || 0);
+  };
+  const updateMonthValue = (value: string) => {
+    const [year, month] = value.split("-").map((part) => Number.parseInt(part, 10));
+    if (Number.isFinite(year) && Number.isFinite(month)) onDraftChange({ ...draft, year, month });
+  };
+  const updateDateValue = (value: string) => {
+    const [year, month, day] = value.split("-").map((part) => Number.parseInt(part, 10));
+    if (Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)) onDraftChange({ ...draft, year, month, day });
+  };
+  const updateDailyActionCount = (index: number, value: string) => {
+    const nextCounts = normalizeDailyCounts(draft).map((count, countIndex) =>
+      countIndex === index ? Number.parseInt(value, 10) || 0 : count,
+    );
+    onDraftChange({ ...draft, dailyActionCounts: nextCounts });
   };
 
   return (
@@ -458,37 +484,49 @@ function ScheduleBuilderDialog({
                 </select>
               </label>
             </div>
-            <div className="field-grid three">
+            <div className="field-grid two">
               <label className="field">
-                <span>{t("scheduleBuilder.year")}</span>
-                <input type="number" min={1970} max={2100} value={draft.year} onChange={(event) => setNumber("year", event.currentTarget.value)} />
-              </label>
-              <label className="field">
-                <span>{t("scheduleBuilder.month")}</span>
-                <input type="number" min={1} max={12} value={draft.month} onChange={(event) => setNumber("month", event.currentTarget.value)} />
-              </label>
-              <label className={`field ${draft.kind === "month" ? "field-disabled" : ""}`}>
-                <span>{t("scheduleBuilder.day")}</span>
+                <span>{draft.kind === "month" ? t("scheduleBuilder.monthPicker") : t("scheduleBuilder.datePicker")}</span>
                 <input
-                  type="number"
-                  min={1}
-                  max={31}
-                  value={draft.day}
-                  disabled={draft.kind === "month"}
-                  onChange={(event) => setNumber("day", event.currentTarget.value)}
+                  type={draft.kind === "month" ? "month" : "date"}
+                  value={draft.kind === "month" ? formatMonthInputValue(draft) : formatDateInputValue(draft)}
+                  onChange={(event) => (draft.kind === "month" ? updateMonthValue(event.currentTarget.value) : updateDateValue(event.currentTarget.value))}
                 />
               </label>
+              <label className="field">
+                <span>{t("scheduleBuilder.weekdayLanguage")}</span>
+                <select
+                  value={draft.weekdayLanguage}
+                  onChange={(event) => setDraft("weekdayLanguage", event.currentTarget.value as ScheduleBuilderRequest["weekdayLanguage"])}
+                >
+                  <option value="en">{t("scheduleBuilder.weekdayLanguage.en")}</option>
+                  <option value="ja">{t("scheduleBuilder.weekdayLanguage.ja")}</option>
+                </select>
+              </label>
             </div>
-            <label className="field">
-              <span>{t("scheduleBuilder.weekStartsOn")}</span>
-              <select value={draft.weekStartsOn} onChange={(event) => setDraft("weekStartsOn", event.currentTarget.value as ScheduleBuilderRequest["weekStartsOn"])}>
-                <option value="sunday">{t("scheduleBuilder.weekStartsOn.sunday")}</option>
-                <option value="monday">{t("scheduleBuilder.weekStartsOn.monday")}</option>
-              </select>
-            </label>
+            <div className="field-grid two">
+              <label className="field">
+                <span>{t("scheduleBuilder.weekStartsOn")}</span>
+                <select value={draft.weekStartsOn} onChange={(event) => setDraft("weekStartsOn", event.currentTarget.value as ScheduleBuilderRequest["weekStartsOn"])}>
+                  <option value="sunday">{t("scheduleBuilder.weekStartsOn.sunday")}</option>
+                  <option value="monday">{t("scheduleBuilder.weekStartsOn.monday")}</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>{t("scheduleBuilder.dateFormat")}</span>
+                <select value={draft.dateFormat} onChange={(event) => setDraft("dateFormat", event.currentTarget.value as ScheduleBuilderRequest["dateFormat"])}>
+                  <option value="day">{t("scheduleBuilder.dateFormat.day")}</option>
+                  <option value="month-day">{t("scheduleBuilder.dateFormat.monthDay")}</option>
+                </select>
+              </label>
+            </div>
             <label className="field checkbox-field">
               <input type="checkbox" checked={draft.showAdjacentDays} onChange={(event) => setDraft("showAdjacentDays", event.currentTarget.checked)} />
               <span>{t("scheduleBuilder.showAdjacentDays")}</span>
+            </label>
+            <label className="field checkbox-field">
+              <input type="checkbox" checked={draft.groupLayers} onChange={(event) => setDraft("groupLayers", event.currentTarget.checked)} />
+              <span>{t("scheduleBuilder.groupLayers")}</span>
             </label>
           </section>
 
@@ -521,6 +559,10 @@ function ScheduleBuilderDialog({
                 </select>
               </label>
             </div>
+            <label className="field">
+              <span>{t("scheduleBuilder.fontSize")}</span>
+              <input type="number" min={24} max={140} value={draft.fontSize} onChange={(event) => setNumber("fontSize", event.currentTarget.value)} />
+            </label>
             <div className="field-grid two">
               <label className="field">
                 <span>{t("scheduleBuilder.gridStyle")}</span>
@@ -538,6 +580,38 @@ function ScheduleBuilderDialog({
               <span>{t("scheduleBuilder.strokeWidth")}</span>
               <input type="number" min={0} max={12} value={draft.strokeWidth} onChange={(event) => setNumber("strokeWidth", event.currentTarget.value)} />
             </label>
+            <div className="field-grid two">
+              <label className="field">
+                <span>{t("scheduleBuilder.actionCountMode")}</span>
+                <select
+                  value={draft.actionCountMode}
+                  onChange={(event) => setDraft("actionCountMode", event.currentTarget.value as ScheduleBuilderRequest["actionCountMode"])}
+                >
+                  <option value="uniform">{t("scheduleBuilder.actionCountMode.uniform")}</option>
+                  <option value="individual">{t("scheduleBuilder.actionCountMode.individual")}</option>
+                </select>
+              </label>
+              <label className="field">
+                <span>{t("scheduleBuilder.actionsPerDay")}</span>
+                <input type="number" min={0} max={6} value={draft.actionsPerDay} onChange={(event) => setNumber("actionsPerDay", event.currentTarget.value)} />
+              </label>
+            </div>
+            {draft.kind === "week" && draft.actionCountMode === "individual" ? (
+              <div className="daily-action-grid" aria-label={t("scheduleBuilder.dailyActionCounts")}>
+                {getPreviewWeekDates(draft).map((date, index) => (
+                  <label className="field" key={`${date.month}-${date.day}-${index}`}>
+                    <span>{`${getWeekdayLabel(draft, date.weekday)} ${formatPreviewDate(date, draft.dateFormat)}`}</span>
+                    <input
+                      type="number"
+                      min={0}
+                      max={6}
+                      value={normalizeDailyCounts(draft)[index]}
+                      onChange={(event) => updateDailyActionCount(index, event.currentTarget.value)}
+                    />
+                  </label>
+                ))}
+              </div>
+            ) : null}
           </section>
 
           <section className="panel-section schedule-color-section">
@@ -549,6 +623,13 @@ function ScheduleBuilderDialog({
             <ColorInput label={t("scheduleBuilder.surfaceColor")} value={draft.surfaceColor} onChange={(value) => setDraft("surfaceColor", value)} />
             <ColorInput label={t("scheduleBuilder.accentColor")} value={draft.accentColor} onChange={(value) => setDraft("accentColor", value)} />
             <ColorInput label={t("scheduleBuilder.textColor")} value={draft.textColor} onChange={(value) => setDraft("textColor", value)} />
+          </section>
+          <section className="panel-section schedule-preview-section">
+            <div className="section-heading">
+              <CalendarDays size={16} />
+              <h2>{t("scheduleBuilder.previewSection")}</h2>
+            </div>
+            <SchedulePreview draft={draft} />
           </section>
         </div>
 
@@ -573,6 +654,131 @@ function ColorInput({ label, value, onChange }: { label: string; value: string; 
       <input type="text" value={value} onChange={(event) => onChange(event.currentTarget.value)} />
     </label>
   );
+}
+
+function SchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
+  const title = draft.title.trim() || (draft.kind === "week" ? "Weekly Schedule" : "Monthly Schedule");
+  return (
+    <div
+      className={`schedule-builder-preview ${draft.kind}`}
+      style={{
+        backgroundColor: draft.backgroundColor,
+        color: draft.textColor,
+        fontFamily: draft.fontFamily,
+        borderColor: draft.accentColor,
+      }}
+    >
+      <div className="schedule-preview-title" style={{ fontSize: `${Math.max(14, Math.round(draft.fontSize * 0.22))}px` }}>
+        {title}
+      </div>
+      {draft.kind === "week" ? <WeekSchedulePreview draft={draft} /> : <MonthSchedulePreview draft={draft} />}
+    </div>
+  );
+}
+
+function WeekSchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
+  return (
+    <div className="schedule-preview-week">
+      {getPreviewWeekDates(draft).map((date, index) => {
+        const count = draft.actionCountMode === "individual" ? normalizeDailyCounts(draft)[index] : clampPreviewCount(draft.actionsPerDay);
+        return (
+          <div className="schedule-preview-day" key={`${date.month}-${date.day}-${index}`} style={{ backgroundColor: draft.surfaceColor, borderColor: draft.accentColor, borderRadius: draft.cornerRadius }}>
+            <div className="schedule-preview-day-head" style={{ backgroundColor: draft.accentColor, color: "#ffffff" }}>
+              <span>{getWeekdayLabel(draft, date.weekday)}</span>
+              <strong>{formatPreviewDate(date, draft.dateFormat)}</strong>
+            </div>
+            <div className="schedule-preview-actions">
+              {Array.from({ length: count }).map((_, slot) => (
+                <span key={slot} style={{ backgroundColor: slot % 2 === 0 ? draft.backgroundColor : draft.accentColor }} />
+              ))}
+            </div>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function MonthSchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
+  const labels = getOrderedWeekdayLabels(draft);
+  const firstWeekday = getWeekday(draft.year, draft.month, 1);
+  const weekStartIndex = draft.weekStartsOn === "monday" ? 1 : 0;
+  const leading = (firstWeekday - weekStartIndex + 7) % 7;
+  const daysInMonth = getDaysInMonth(draft.year, draft.month);
+  const totalCells = Math.ceil((leading + daysInMonth) / 7) * 7;
+  return (
+    <div className="schedule-preview-month">
+      {labels.map((label) => (
+        <div className="schedule-preview-month-head" key={label} style={{ backgroundColor: draft.accentColor, color: "#ffffff" }}>
+          {label}
+        </div>
+      ))}
+      {Array.from({ length: totalCells }).map((_, index) => {
+        const date = addDays(draft.year, draft.month, 1, index - leading);
+        const inMonth = date.month === draft.month;
+        return (
+          <div
+            className="schedule-preview-month-cell"
+            key={`${date.month}-${date.day}-${index}`}
+            style={{
+              backgroundColor: draft.gridStyle === "cards" ? draft.surfaceColor : draft.backgroundColor,
+              borderColor: draft.accentColor,
+              borderRadius: draft.cornerRadius,
+              opacity: inMonth || draft.showAdjacentDays ? 1 : 0.28,
+            }}
+          >
+            {(inMonth || draft.showAdjacentDays) ? <strong>{formatPreviewDate(date, draft.dateFormat)}</strong> : null}
+            {inMonth ? (
+              <div className="schedule-preview-actions">
+                {Array.from({ length: Math.min(3, clampPreviewCount(draft.actionsPerDay)) }).map((_, slot) => (
+                  <span key={slot} style={{ backgroundColor: slot === 0 ? draft.accentColor : draft.backgroundColor }} />
+                ))}
+              </div>
+            ) : null}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function formatMonthInputValue(draft: ScheduleBuilderRequest): string {
+  return `${draft.year}-${pad2(draft.month)}`;
+}
+
+function formatDateInputValue(draft: ScheduleBuilderRequest): string {
+  return `${draft.year}-${pad2(draft.month)}-${pad2(draft.day)}`;
+}
+
+function getPreviewWeekDates(draft: ScheduleBuilderRequest) {
+  return Array.from({ length: 7 }, (_, index) => addDays(draft.year, draft.month, draft.day, index));
+}
+
+function getOrderedWeekdayLabels(draft: ScheduleBuilderRequest): string[] {
+  const labels = draft.weekdayLanguage === "ja" ? ["日", "月", "火", "水", "木", "金", "土"] : ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"];
+  return draft.weekStartsOn === "monday" ? [...labels.slice(1), labels[0]] : labels;
+}
+
+function getWeekdayLabel(draft: ScheduleBuilderRequest, weekday: number): string {
+  return draft.weekdayLanguage === "ja"
+    ? ["日", "月", "火", "水", "木", "金", "土"][weekday]
+    : ["SUN", "MON", "TUE", "WED", "THU", "FRI", "SAT"][weekday];
+}
+
+function formatPreviewDate(date: { month: number; day: number }, format: ScheduleBuilderRequest["dateFormat"]): string {
+  return format === "month-day" ? `${date.month}/${date.day}` : String(date.day);
+}
+
+function normalizeDailyCounts(draft: ScheduleBuilderRequest): number[] {
+  return Array.from({ length: 7 }, (_, index) => clampPreviewCount(draft.dailyActionCounts?.[index] ?? draft.actionsPerDay));
+}
+
+function clampPreviewCount(value: number): number {
+  return Math.min(6, Math.max(0, Math.round(value || 0)));
+}
+
+function pad2(value: number): string {
+  return String(value).padStart(2, "0");
 }
 
 function ConfirmTemplateDialog({

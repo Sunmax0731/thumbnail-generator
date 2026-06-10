@@ -9,9 +9,12 @@ const baseRequest: ScheduleBuilderRequest = {
   month: 6,
   day: 10,
   weekStartsOn: "sunday",
+  weekdayLanguage: "en",
+  dateFormat: "month-day",
   title: "",
   fontFamily: "Noto Sans JP, Arial, sans-serif",
   fontWeight: "800",
+  fontSize: 56,
   gridStyle: "cards",
   backgroundColor: "#f7fafc",
   surfaceColor: "#ffffff",
@@ -19,7 +22,11 @@ const baseRequest: ScheduleBuilderRequest = {
   textColor: "#152033",
   cornerRadius: 8,
   strokeWidth: 3,
+  actionCountMode: "uniform",
+  actionsPerDay: 3,
+  dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
   showAdjacentDays: false,
+  groupLayers: true,
 };
 
 describe("scheduleBuilder", () => {
@@ -32,7 +39,7 @@ describe("scheduleBuilder", () => {
   it("builds a Sunday-start monthly schedule with leading blank cells", () => {
     const result = buildScheduleTemplate(baseRequest, defaultOutputSettings, "en");
     const numbers = result.layers.filter((layer) => layer.type === "text" && layer.name.includes("number"));
-    const firstNumber = numbers.find((layer) => layer.type === "text" && layer.text === "1");
+    const firstNumber = numbers.find((layer) => layer.type === "text" && layer.text === "6/1");
 
     expect(result.name).toBe("2026-06 Monthly Schedule");
     expect(result.settings.width).toBe(1280);
@@ -43,19 +50,49 @@ describe("scheduleBuilder", () => {
   it("moves June 2026 day one into the first column for Monday-start months", () => {
     const sunday = buildScheduleTemplate(baseRequest, defaultOutputSettings, "en");
     const monday = buildScheduleTemplate({ ...baseRequest, weekStartsOn: "monday" }, defaultOutputSettings, "en");
-    const sundayOne = sunday.layers.find((layer) => layer.type === "text" && layer.name === "Day 1 number");
-    const mondayOne = monday.layers.find((layer) => layer.type === "text" && layer.name === "Day 1 number");
+    const sundayOne = sunday.layers.find((layer) => layer.type === "text" && layer.name === "Day 6/1 number");
+    const mondayOne = monday.layers.find((layer) => layer.type === "text" && layer.name === "Day 6/1 number");
 
     expect(mondayOne?.x).toBeLessThan(sundayOne?.x ?? 0);
   });
 
   it("builds a one-week schedule from the requested start date", () => {
-    const result = buildScheduleTemplate({ ...baseRequest, kind: "week", day: 10 }, defaultOutputSettings, "ja");
+    const result = buildScheduleTemplate({ ...baseRequest, kind: "week", day: 10, weekdayLanguage: "ja" }, defaultOutputSettings, "ja");
     const labels = result.layers.filter((layer) => layer.type === "text").map((layer) => layer.text);
 
     expect(result.name).toBe("2026年6月10日週の予定");
     expect(labels).toContain("6/10");
     expect(labels).toContain("6/16");
     expect(labels).toContain("水");
+  });
+
+  it("uses per-day action counts for weekly schedules", () => {
+    const result = buildScheduleTemplate(
+      {
+        ...baseRequest,
+        kind: "week",
+        actionCountMode: "individual",
+        dailyActionCounts: [0, 1, 2, 3, 4, 5, 6],
+        orientation: "portrait",
+      },
+      defaultOutputSettings,
+      "en",
+    );
+
+    expect(result.layers.filter((layer) => layer.name.startsWith("Week day 1 action")).length).toBe(0);
+    expect(result.layers.filter((layer) => layer.name.startsWith("Week day 7 action") && layer.type === "shape")).toHaveLength(6);
+  });
+
+  it("can render day-only dates and ungrouped generated layers", () => {
+    const result = buildScheduleTemplate(
+      { ...baseRequest, kind: "week", dateFormat: "day", groupLayers: false },
+      defaultOutputSettings,
+      "en",
+    );
+    const labels = result.layers.filter((layer) => layer.type === "text").map((layer) => layer.text);
+
+    expect(labels).toContain("10");
+    expect(labels).not.toContain("6/10");
+    expect(result.layers.every((layer) => !layer.groupId && !layer.groupName)).toBe(true);
   });
 });
