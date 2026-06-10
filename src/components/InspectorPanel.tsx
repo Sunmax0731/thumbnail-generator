@@ -144,6 +144,8 @@ interface InspectorPanelProps {
   onFitSelectedToCanvas: () => void;
   onCustomFontFiles: (files: FileList | null) => void;
   onFitTextToBounds: (id: string) => void;
+  onOpenImageColorPalette: () => void;
+  isExtractingImagePalette: boolean;
   t: Translator;
 }
 
@@ -200,6 +202,8 @@ export function InspectorPanel({
   onFitSelectedToCanvas,
   onCustomFontFiles,
   onFitTextToBounds,
+  onOpenImageColorPalette,
+  isExtractingImagePalette,
   t,
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
@@ -564,6 +568,8 @@ export function InspectorPanel({
           listHeight={colorListHeight}
           onResizeList={(delta) => setColorListHeight((height) => clampPanelHeight(height + delta))}
           t={t}
+          onOpenImageColorPalette={onOpenImageColorPalette}
+          isExtractingImagePalette={isExtractingImagePalette}
         />
       ) : null}
 
@@ -939,6 +945,8 @@ function PaletteControls({
   onReorderSavedPalette,
   onApply,
   onResizeList,
+  onOpenImageColorPalette,
+  isExtractingImagePalette,
   t,
 }: {
   colors: PaletteColor[];
@@ -966,6 +974,8 @@ function PaletteControls({
   onReorderSavedPalette: (draggedId: string, targetId: string) => void;
   onApply: (color: string, target: PaletteTarget, alpha?: number) => void;
   onResizeList: (deltaY: number) => void;
+  onOpenImageColorPalette: () => void;
+  isExtractingImagePalette: boolean;
   t: Translator;
 }) {
   const [activePointIndex, setActivePointIndex] = useState(0);
@@ -982,7 +992,6 @@ function PaletteControls({
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
   const previewColors = generatePaletteSchemeColors(previewBaseColor, activeMode);
   const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
-  const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
   const sketchColor = { ...hexToHsva(previewBaseColor), a: alphaDraft };
 
   useEffect(() => {
@@ -1158,19 +1167,12 @@ function PaletteControls({
             <button type="button" className="secondary-button" onClick={() => onSavePalette(previewColors)}>
               {t("inspector.savePalette")}
             </button>
+            <button type="button" className="secondary-button" onClick={onOpenImageColorPalette} disabled={isExtractingImagePalette}>
+              {isExtractingImagePalette ? t("inspector.extractingPaletteFromImage") : t("inspector.extractPaletteFromImage")}
+            </button>
           </div>
         </div>
       </div>
-      {recentColors.length > 0 ? (
-        <div className="palette-recent">
-          <span>{t("inspector.paletteRecent")}</span>
-          <div>
-            {recentColors.map((color) => (
-              <button key={`recent-${color}`} type="button" title={color} style={{ background: color }} onClick={() => setBaseDraft(color)} />
-            ))}
-          </div>
-        </div>
-      ) : null}
       {savedPalettes.length > 0 ? (
         <div className="saved-palette-list" aria-label={t("inspector.savedPalettes")}>
           <button
@@ -1428,18 +1430,6 @@ function DeleteLayerDialog({
       </section>
     </div>
   );
-}
-
-function uniqueColors(colors: string[]): string[] {
-  const seen = new Set<string>();
-  const unique: string[] = [];
-  for (const color of colors) {
-    const normalized = normalizeColor(color);
-    if (!normalized || seen.has(normalized)) continue;
-    seen.add(normalized);
-    unique.push(normalized);
-  }
-  return unique;
 }
 
 function paletteColorDisplayName(color: PaletteColor): string {

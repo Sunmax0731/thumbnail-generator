@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CanvasStage } from "./components/CanvasStage";
 import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel } from "./components/InspectorPanel";
@@ -176,6 +176,11 @@ function App() {
   const [savedColorPalettes, setSavedColorPalettes] = useState<SavedColorPalette[]>(() =>
     typeof window === "undefined" ? [] : readSavedColorPalettes(),
   );
+  const [extractedImagePalette, setExtractedImagePalette] = useState<string[]>([]);
+  const [isImagePaletteModalOpen, setImagePaletteModalOpen] = useState(false);
+  const [isExtractingImagePalette, setIsExtractingImagePalette] = useState(false);
+  const [extractedPaletteName, setExtractedPaletteName] = useState("Image palette");
+  const [extractedPaletteSource, setExtractedPaletteSource] = useState("");
   const [customFonts, setCustomFonts] = useState<CustomFont[]>(() =>
     typeof window === "undefined" ? [] : readCustomFonts(),
   );
@@ -1132,6 +1137,70 @@ function App() {
     );
   }, [paletteDraft, paletteModeDraft, paletteNameDraft, savedColorPalettes]);
 
+  const openImagePaletteExtractor = useCallback(async () => {
+    const selectedImageLayer = selectedLayers.find((layer) => layer.type === "image");
+    if (!selectedImageLayer) {
+      setStatus("Select an image layer before extracting a palette.");
+      return;
+    }
+    const selectedAsset = assets.find((asset) => asset.key === selectedImageLayer.imageKey);
+    if (!selectedAsset) {
+      setStatus("Selected image source is not available.");
+      return;
+    }
+    setIsExtractingImagePalette(true);
+    setImagePaletteModalOpen(false);
+    setExtractedImagePalette([]);
+    setExtractedPaletteSource(selectedImageLayer.name || selectedAsset.name);
+    setExtractedPaletteName("Image palette");
+    try {
+      const palette = await extractPaletteFromImageSource(selectedAsset.src, 3);
+      if (palette.length === 0) {
+        setStatus("Could not extract colors from the selected image.");
+        setImagePaletteModalOpen(false);
+        return;
+      }
+      setExtractedImagePalette(palette);
+      const sourceName = selectedImageLayer.name || selectedAsset.name;
+      setExtractedPaletteSource(sourceName);
+      setExtractedPaletteName(`${sourceName} palette`);
+      setImagePaletteModalOpen(true);
+      setStatus(`Extracted ${palette.length} colors from ${sourceName}.`);
+    } catch (error) {
+      setStatus(`Palette extraction failed: ${error instanceof Error ? error.message : String(error)}`);
+    } finally {
+      setIsExtractingImagePalette(false);
+    }
+  }, [assets, selectedLayers]);
+
+  const registerExtractedPalette = useCallback(() => {
+    if (extractedImagePalette.length === 0) {
+      setStatus("No extracted palette is available.");
+      return;
+    }
+    const colors = extractedImagePalette.filter((color) => color);
+    const baseColor = colors[0];
+    const next = addSavedColorPalette(savedColorPalettes, {
+      name: extractedPaletteName.trim() || "Image palette",
+      baseColor,
+      mode: "tricolor",
+      colors,
+    });
+    if (next.length === savedColorPalettes.length) {
+      setStatus("Palette was not saved because the base color is invalid.");
+      return;
+    }
+    writeSavedColorPalettes(next);
+    setSavedColorPalettes(next);
+    setImagePaletteModalOpen(false);
+    setStatus(`Saved ${colors.length} color palette "${next[0].name}".`);
+  }, [extractedImagePalette, extractedPaletteName, savedColorPalettes]);
+
+  const closeImagePaletteModal = useCallback(() => {
+    setImagePaletteModalOpen(false);
+    setExtractedImagePalette([]);
+  }, []);
+
   const handlePalettePrincipleDraftChange = useCallback((principle: PalettePrinciple) => {
     const nextMode = paletteModesByPrinciple[principle]?.[0];
     if (nextMode === undefined) return;
@@ -1707,6 +1776,8 @@ function App() {
           onAddQuickLayer={addQuickLayer}
           onAddImageAssetLayer={addImageLayerFromAsset}
           onResetTemplate={resetTemplate}
+          onOpenImageColorPalette={openImagePaletteExtractor}
+          isExtractingImagePalette={isExtractingImagePalette}
           onAlignSelection={alignSelection}
           onTransformSelection={transformSelection}
           onMatchSelectionRotation={matchSelectionRotation}
@@ -1740,6 +1811,74 @@ function App() {
               onClose={() => setIsImageLabOpen(false)}
               t={t}
             />
+          </section>
+        </div>
+      ) : null}
+      {isImagePaletteModalOpen ? (
+        <div
+          className="modal-backdrop image-color-modal-backdrop"
+          onMouseDown={(event) => {
+            if (event.target === event.currentTarget) closeImagePaletteModal();
+          }}
+        >
+          <section
+            className="image-color-modal"
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="image-palette-title"
+            onMouseDown={(event) => event.stopPropagation()}
+          >
+            <div className="modal-header">
+              <div className="modal-title-block">
+                <h2 id="image-palette-title">{t("inspector.imagePaletteFromImage")}</h2>
+                <p>{t("inspector.imagePaletteSource", { source: extractedPaletteSource || "Selected image" })}</p>
+              </div>
+              <button type="button" className="icon-button modal-close" onClick={closeImagePaletteModal} aria-label={t("inspector.cancel")}>
+                ×
+              </button>
+            </div>
+            <div className="field">
+              <span>{t("inspector.paletteName")}</span>
+              <input value={extractedPaletteName} onChange={(event) => setExtractedPaletteName(event.currentTarget.value)} />
+            </div>
+            <div className="image-palette-candidate-list">
+              {extractedImagePalette.length > 0 ? (
+                extractedImagePalette.map((color, index) => (
+                  <div className="image-palette-candidate" key={color + index}>
+                    <span>
+                      {index === 0
+                        ? t("inspector.imagePaletteBase")
+                        : index === 1
+                          ? t("inspector.imagePaletteSecondary")
+                          : t("inspector.imagePaletteAccent")}
+                    </span>
+                    <button
+                      type="button"
+                      className="image-palette-swatch"
+                      style={{ background: color }}
+                      title={color}
+                    >
+                      {color}
+                    </button>
+                  </div>
+                ))
+              ) : (
+                <p>{t("inspector.imagePaletteNoColors")}</p>
+              )}
+            </div>
+            <div className="confirm-actions">
+              <button type="button" className="secondary-button" onClick={closeImagePaletteModal}>
+                {t("inspector.cancel")}
+              </button>
+              <button
+                type="button"
+                className="primary-button"
+                disabled={extractedImagePalette.length === 0}
+                onClick={registerExtractedPalette}
+              >
+                {t("inspector.imagePaletteRegister")}
+              </button>
+            </div>
           </section>
         </div>
       ) : null}
@@ -1789,6 +1928,90 @@ function safelySetPointerCapture(element: HTMLElement, pointerId: number): void 
   } catch {
     // Synthetic tests may dispatch pointer events without an active browser pointer.
   }
+}
+
+async function extractPaletteFromImageSource(src: string, targetCount: number): Promise<string[]> {
+  const image = await loadImageForPaletteExtraction(src);
+  const maxDimension = 220;
+  const baseWidth = image.naturalWidth || image.width;
+  const baseHeight = image.naturalHeight || image.height;
+  const scale = Math.min(1, maxDimension / Math.max(baseWidth, baseHeight));
+  const width = Math.max(1, Math.round(baseWidth * scale));
+  const height = Math.max(1, Math.round(baseHeight * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
+  const context = canvas.getContext("2d");
+  if (!context) return [];
+  context.drawImage(image, 0, 0, width, height);
+  const imageData = context.getImageData(0, 0, width, height).data;
+  const buckets = new Map<number, { count: number; r: number; g: number; b: number }>();
+
+  for (let index = 0; index < imageData.length; index += 4) {
+    const alpha = imageData[index + 3];
+    if (alpha < 18) continue;
+    const quantizedR = imageData[index] >> 3;
+    const quantizedG = imageData[index + 1] >> 3;
+    const quantizedB = imageData[index + 2] >> 3;
+    const key = (quantizedR << 10) | (quantizedG << 5) | quantizedB;
+    const bucket = buckets.get(key);
+    if (bucket) {
+      bucket.count += 1;
+      continue;
+    }
+    buckets.set(key, {
+      count: 1,
+      r: quantizedR << 3,
+      g: quantizedG << 3,
+      b: quantizedB << 3,
+    });
+  }
+
+  const sortedBuckets = [...buckets.values()].sort((a, b) => b.count - a.count);
+  const picked: Array<{ color: string; r: number; g: number; b: number }> = [];
+  const minDistance = 42;
+  const maxDistance = minDistance ** 2;
+
+  for (const bucket of sortedBuckets) {
+    const hex = rgbToHex(bucket.r, bucket.g, bucket.b);
+    if (picked.some((pickedColor) => squaredRgbDistance(pickedColor, bucket) < maxDistance)) continue;
+    picked.push({ color: hex, r: bucket.r, g: bucket.g, b: bucket.b });
+    if (picked.length >= targetCount) break;
+  }
+
+  while (picked.length < Math.min(targetCount, sortedBuckets.length)) {
+    const fallback = sortedBuckets[picked.length];
+    if (!fallback) break;
+    picked.push({ color: rgbToHex(fallback.r, fallback.g, fallback.b), r: fallback.r, g: fallback.g, b: fallback.b });
+  }
+
+  return picked.map((entry) => entry.color);
+}
+
+function squaredRgbDistance(left: { r: number; g: number; b: number }, right: { r: number; g: number; b: number }): number {
+  const deltaRed = left.r - right.r;
+  const deltaGreen = left.g - right.g;
+  const deltaBlue = left.b - right.b;
+  return deltaRed * deltaRed + deltaGreen * deltaGreen + deltaBlue * deltaBlue;
+}
+
+function rgbToHex(red: number, green: number, blue: number): string {
+  const normalizedRed = Math.min(255, Math.max(0, Math.round(red)));
+  const normalizedGreen = Math.min(255, Math.max(0, Math.round(green)));
+  const normalizedBlue = Math.min(255, Math.max(0, Math.round(blue)));
+  return `#${normalizedRed.toString(16).padStart(2, "0")}${normalizedGreen.toString(16).padStart(2, "0")}${normalizedBlue
+    .toString(16)
+    .padStart(2, "0")}`;
+}
+
+function loadImageForPaletteExtraction(src: string): Promise<HTMLImageElement> {
+  return new Promise((resolve, reject) => {
+    const image = new Image();
+    image.onload = () => resolve(image);
+    image.onerror = () => reject(new Error("Could not load image for palette extraction."));
+    image.src = src;
+  });
 }
 
 function downloadTextFile(text: string, filename: string, type: string): void {
