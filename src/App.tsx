@@ -1594,6 +1594,7 @@ function App() {
           onAddImageAssetLayer={addImageLayerFromAsset}
           onDeleteAsset={deleteAsset}
           defaultTemplates={defaultTemplates}
+          fontOptions={fontOptions}
           onLoadDefaultTemplate={loadDefaultTemplate}
           onGenerateScheduleTemplate={generateScheduleTemplate}
           templateName={templateName}

@@ -249,11 +249,11 @@ The Templates tab also exposes a beta schedule generator. The generator opens in
 - Schedule type: monthly or weekly.
 - Canvas orientation: landscape `1280x720`, portrait `1080x1920`, or the current canvas size.
 - Date inputs: browser calendar-style month/date inputs, weekly start day, Sunday/Monday week start for monthly grids, weekday language, and date format (`day` or `month/day`).
-- Style inputs: title, font family, font weight, font size, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
+- Style inputs: title, the same font family choices exposed by Adjust, font weight, separate title/weekday/date/plan font-size sliders, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
 - Schedule density inputs: one uniform action count for every day, or individual counts for all seven days in weekly schedules.
 - Output behavior inputs: whether the generated layers should share group metadata.
 
-The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, and refreshes the internally stored CSV and HTML layout text. The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
 
 ## OBS Preview
 

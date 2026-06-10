@@ -2103,7 +2103,7 @@ button:disabled {
 
 .schedule-builder-dialog {
   display: grid;
-  width: min(920px, calc(100vw - 32px));
+  width: min(1320px, calc(100vw - 32px));
   max-height: calc(100vh - 32px);
   overflow: auto;
   gap: 12px;
@@ -2130,7 +2130,7 @@ button:disabled {
 .schedule-builder-grid {
   display: grid;
   align-items: start;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.1fr) minmax(220px, 0.8fr);
+  grid-template-columns: minmax(245px, 0.95fr) minmax(320px, 1.25fr) minmax(220px, 0.8fr) minmax(310px, 1.15fr);
   gap: 10px;
 }
 
@@ -2161,10 +2161,6 @@ button:disabled {
   padding: 0 6px;
 }
 
-.schedule-preview-section {
-  grid-column: 1 / -1;
-}
-
 .schedule-builder-preview {
   display: grid;
   min-height: 240px;
@@ -2173,6 +2169,25 @@ button:disabled {
   overflow: hidden;
   border: 2px solid;
   border-radius: 8px;
+}
+
+.schedule-slider-field {
+  grid-template-columns: minmax(0, 1fr) 64px;
+  align-items: center;
+}
+
+.schedule-slider-field span {
+  grid-column: 1 / -1;
+}
+
+.schedule-slider-field input[type="range"] {
+  min-height: 16px;
+  padding: 0;
+}
+
+.schedule-slider-field input[type="number"] {
+  min-height: 30px;
+  padding: 0 7px;
 }
 
 .schedule-preview-title {

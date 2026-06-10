@@ -15,6 +15,10 @@ const baseRequest: ScheduleBuilderRequest = {
   fontFamily: "Noto Sans JP, Arial, sans-serif",
   fontWeight: "800",
   fontSize: 56,
+  titleFontSize: 56,
+  weekdayFontSize: 22,
+  dateFontSize: 30,
+  eventFontSize: 18,
   gridStyle: "cards",
   backgroundColor: "#f7fafc",
   surfaceColor: "#ffffff",
@@ -44,7 +48,14 @@ describe("scheduleBuilder", () => {
     expect(result.name).toBe("2026-06 Monthly Schedule");
     expect(result.settings.width).toBe(1280);
     expect(result.layers.some((layer) => layer.name === "Day cell 1")).toBe(true);
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "JUNE badge text" && layer.text === "JUNE")).toBe(true);
     expect(firstNumber?.x).toBeGreaterThan(64);
+  });
+
+  it("localizes the monthly badge from weekday language", () => {
+    const result = buildScheduleTemplate({ ...baseRequest, weekdayLanguage: "ja" }, defaultOutputSettings, "en");
+
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "6月 badge text" && layer.text === "6月")).toBe(true);
   });
 
   it("moves June 2026 day one into the first column for Monday-start months", () => {
@@ -95,4 +106,29 @@ describe("scheduleBuilder", () => {
     expect(labels).not.toContain("6/10");
     expect(result.layers.every((layer) => !layer.groupId && !layer.groupName)).toBe(true);
   });
+
+  it("applies separate font sizes to title, weekday, date, and event text", () => {
+    const result = buildScheduleTemplate(
+      {
+        ...baseRequest,
+        kind: "week",
+        titleFontSize: 80,
+        weekdayFontSize: 24,
+        dateFontSize: 36,
+        eventFontSize: 20,
+      },
+      defaultOutputSettings,
+      "en",
+    );
+
+    expect(findTextFontSize(result.layers, "Schedule title")).toBe(80);
+    expect(findTextFontSize(result.layers, "Week day 1 label")).toBe(24);
+    expect(findTextFontSize(result.layers, "Week day 1 date")).toBe(36);
+    expect(findTextFontSize(result.layers, "Week day 1 slot 1 text")).toBe(20);
+  });
 });
+
+function findTextFontSize(layers: ReturnType<typeof buildScheduleTemplate>["layers"], name: string): number | undefined {
+  const layer = layers.find((candidate) => candidate.name === name);
+  return layer?.type === "text" ? layer.fontSize : undefined;
+}

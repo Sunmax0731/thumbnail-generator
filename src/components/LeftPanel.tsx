@@ -12,6 +12,7 @@ import {
 } from "lucide-react";
 import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
 import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
+import type { FontOption } from "../lib/fonts";
 import type { Translator } from "../lib/i18n";
 import {
   addDays,
@@ -33,6 +34,7 @@ interface LeftPanelProps {
   templateName: string;
   templates: SavedTemplate[];
   defaultTemplates: DefaultTemplateDefinition[];
+  fontOptions: FontOption[];
   onImageFiles: (files: FileList | null) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
@@ -54,6 +56,7 @@ export function LeftPanel({
   templateName,
   templates,
   defaultTemplates,
+  fontOptions,
   onImageFiles,
   onSelectAsset,
   onAddImageAssetLayer,
@@ -316,6 +319,7 @@ export function LeftPanel({
       {isScheduleBuilderOpen ? (
         <ScheduleBuilderDialog
           draft={scheduleDraft}
+          fontOptions={fontOptions}
           onDraftChange={setScheduleDraft}
           onCancel={() => setIsScheduleBuilderOpen(false)}
           onConfirm={() => {
@@ -393,9 +397,13 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     weekdayLanguage: "en",
     dateFormat: "month-day",
     title: "",
-    fontFamily: "Noto Sans JP, Arial, sans-serif",
+    fontFamily: "'Noto Sans JP', 'Yu Gothic', 'Meiryo', Arial, sans-serif",
     fontWeight: "800",
     fontSize: 56,
+    titleFontSize: 56,
+    weekdayFontSize: 22,
+    dateFontSize: 30,
+    eventFontSize: 18,
     gridStyle: "cards",
     backgroundColor: "#f7fafc",
     surfaceColor: "#ffffff",
@@ -413,12 +421,14 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
 
 function ScheduleBuilderDialog({
   draft,
+  fontOptions,
   onDraftChange,
   onCancel,
   onConfirm,
   t,
 }: {
   draft: ScheduleBuilderRequest;
+  fontOptions: FontOption[];
   onDraftChange: (draft: ScheduleBuilderRequest) => void;
   onCancel: () => void;
   onConfirm: () => void;
@@ -427,7 +437,21 @@ function ScheduleBuilderDialog({
   const setDraft = <Key extends keyof ScheduleBuilderRequest>(key: Key, value: ScheduleBuilderRequest[Key]) => {
     onDraftChange({ ...draft, [key]: value });
   };
-  const setNumber = (key: "year" | "month" | "day" | "cornerRadius" | "strokeWidth" | "fontSize" | "actionsPerDay", value: string) => {
+  const setNumber = (
+    key:
+      | "year"
+      | "month"
+      | "day"
+      | "cornerRadius"
+      | "strokeWidth"
+      | "fontSize"
+      | "titleFontSize"
+      | "weekdayFontSize"
+      | "dateFontSize"
+      | "eventFontSize"
+      | "actionsPerDay",
+    value: string,
+  ) => {
     setDraft(key, Number.parseInt(value, 10) || 0);
   };
   const updateMonthValue = (value: string) => {
@@ -543,11 +567,14 @@ function ScheduleBuilderDialog({
               <label className="field">
                 <span>{t("scheduleBuilder.fontFamily")}</span>
                 <select value={draft.fontFamily} onChange={(event) => setDraft("fontFamily", event.currentTarget.value)}>
-                  <option value="Noto Sans JP, Arial, sans-serif">Noto Sans JP</option>
-                  <option value="Arial Black, Arial, sans-serif">Arial Black</option>
-                  <option value="Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif">Impact</option>
-                  <option value="Montserrat, Arial, sans-serif">Montserrat</option>
-                  <option value="M PLUS Rounded 1c, Arial, sans-serif">M PLUS Rounded</option>
+                  {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
+                    <option value={draft.fontFamily}>{draft.fontFamily}</option>
+                  ) : null}
+                  {fontOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
                 </select>
               </label>
               <label className="field">
@@ -559,10 +586,36 @@ function ScheduleBuilderDialog({
                 </select>
               </label>
             </div>
-            <label className="field">
-              <span>{t("scheduleBuilder.fontSize")}</span>
-              <input type="number" min={24} max={140} value={draft.fontSize} onChange={(event) => setNumber("fontSize", event.currentTarget.value)} />
-            </label>
+            <ScheduleSlider
+              label={t("scheduleBuilder.titleFontSize")}
+              value={draft.titleFontSize}
+              min={24}
+              max={140}
+              onChange={(value) => setDraft("titleFontSize", value)}
+            />
+            <div className="field-grid two">
+              <ScheduleSlider
+                label={t("scheduleBuilder.weekdayFontSize")}
+                value={draft.weekdayFontSize}
+                min={10}
+                max={72}
+                onChange={(value) => setDraft("weekdayFontSize", value)}
+              />
+              <ScheduleSlider
+                label={t("scheduleBuilder.dateFontSize")}
+                value={draft.dateFontSize}
+                min={10}
+                max={96}
+                onChange={(value) => setDraft("dateFontSize", value)}
+              />
+            </div>
+            <ScheduleSlider
+              label={t("scheduleBuilder.eventFontSize")}
+              value={draft.eventFontSize}
+              min={10}
+              max={72}
+              onChange={(value) => setDraft("eventFontSize", value)}
+            />
             <div className="field-grid two">
               <label className="field">
                 <span>{t("scheduleBuilder.gridStyle")}</span>
@@ -573,11 +626,13 @@ function ScheduleBuilderDialog({
               </label>
               <label className="field">
                 <span>{t("scheduleBuilder.cornerRadius")}</span>
+                <input type="range" min={0} max={32} value={draft.cornerRadius} onChange={(event) => setNumber("cornerRadius", event.currentTarget.value)} />
                 <input type="number" min={0} max={32} value={draft.cornerRadius} onChange={(event) => setNumber("cornerRadius", event.currentTarget.value)} />
               </label>
             </div>
             <label className="field">
               <span>{t("scheduleBuilder.strokeWidth")}</span>
+              <input type="range" min={0} max={12} value={draft.strokeWidth} onChange={(event) => setNumber("strokeWidth", event.currentTarget.value)} />
               <input type="number" min={0} max={12} value={draft.strokeWidth} onChange={(event) => setNumber("strokeWidth", event.currentTarget.value)} />
             </label>
             <div className="field-grid two">
@@ -593,6 +648,7 @@ function ScheduleBuilderDialog({
               </label>
               <label className="field">
                 <span>{t("scheduleBuilder.actionsPerDay")}</span>
+                <input type="range" min={0} max={6} value={draft.actionsPerDay} onChange={(event) => setNumber("actionsPerDay", event.currentTarget.value)} />
                 <input type="number" min={0} max={6} value={draft.actionsPerDay} onChange={(event) => setNumber("actionsPerDay", event.currentTarget.value)} />
               </label>
             </div>
@@ -601,6 +657,13 @@ function ScheduleBuilderDialog({
                 {getPreviewWeekDates(draft).map((date, index) => (
                   <label className="field" key={`${date.month}-${date.day}-${index}`}>
                     <span>{`${getWeekdayLabel(draft, date.weekday)} ${formatPreviewDate(date, draft.dateFormat)}`}</span>
+                    <input
+                      type="range"
+                      min={0}
+                      max={6}
+                      value={normalizeDailyCounts(draft)[index]}
+                      onChange={(event) => updateDailyActionCount(index, event.currentTarget.value)}
+                    />
                     <input
                       type="number"
                       min={0}
@@ -656,6 +719,29 @@ function ColorInput({ label, value, onChange }: { label: string; value: string; 
   );
 }
 
+function ScheduleSlider({
+  label,
+  value,
+  min,
+  max,
+  onChange,
+}: {
+  label: string;
+  value: number;
+  min: number;
+  max: number;
+  onChange: (value: number) => void;
+}) {
+  const handleChange = (raw: string) => onChange(Number.parseInt(raw, 10) || min);
+  return (
+    <label className="field schedule-slider-field">
+      <span>{label}</span>
+      <input type="range" min={min} max={max} value={value} onChange={(event) => handleChange(event.currentTarget.value)} />
+      <input type="number" min={min} max={max} value={value} onChange={(event) => handleChange(event.currentTarget.value)} />
+    </label>
+  );
+}
+
 function SchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
   const title = draft.title.trim() || (draft.kind === "week" ? "Weekly Schedule" : "Monthly Schedule");
   return (
@@ -668,7 +754,7 @@ function SchedulePreview({ draft }: { draft: ScheduleBuilderRequest }) {
         borderColor: draft.accentColor,
       }}
     >
-      <div className="schedule-preview-title" style={{ fontSize: `${Math.max(14, Math.round(draft.fontSize * 0.22))}px` }}>
+      <div className="schedule-preview-title" style={{ fontSize: `${Math.max(14, Math.round(draft.titleFontSize * 0.22))}px` }}>
         {title}
       </div>
       {draft.kind === "week" ? <WeekSchedulePreview draft={draft} /> : <MonthSchedulePreview draft={draft} />}

@@ -32,7 +32,7 @@
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
-- Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, weekly date ranges, weekday language, date format, action counts, font size, and grouped/ungrouped layer metadata before generating editable text/shape layers.
+- Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, weekly date ranges, weekday language, date format, action counts, month-aware badge labels, separate title/weekday/date/plan font sizes, and grouped/ungrouped layer metadata before generating editable text/shape layers.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
 - Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms, including multiple ordered animation entries, without mutating source layer state.
 - Easing helpers expose linear plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce curves.
@@ -57,7 +57,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Default templates and Browser templates expose resizable list areas with no overlap or horizontal overflow.
-- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, font, and color settings, and generates editable monthly or weekly schedule layers.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, and color settings, and generates editable monthly or weekly schedule layers with localized badge text.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Preview selection respects layer stacking order when layers overlap.
@@ -124,6 +124,22 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-10.
+
+### Beta Schedule Generator V3
+
+Completed on 2026-06-10 for the requested shared-font, typography-slider, monthly-badge, and wide-modal follow-up.
+
+- `npm test`: pass. 28 test files, 111 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4173/thumbnail-generator/`.
+- Browser plugin attempt: previously failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks: schedule generator modal opened from Templates, beta notice remained visible, desktop dialog measured `1320px` wide with four columns, font choices included the same Adjust-tab options such as Poppins 900, Noto Sans JP 900, and Impact, title/weekday/date/plan sliders synchronized to numeric values `72/24/34/20`, month input accepted `2026-06`, weekday language changed to Japanese, date format changed to month/day, pre-generation preview showed `6/1`, monthly generation created a Japanese month badge layer named `6月 badge text`, generated layers were grouped by default, an Adjust numeric edit persisted after switching rows, WebP export downloaded, mobile preview was visible, mobile horizontal overflow was `0`, and no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-schedule-builder-v3-desktop.png`
+  - `docs/assets/runtime-20260610-schedule-builder-v3-mobile.png`
+- Export evidence: `output/runtime-downloads-20260610-schedule-builder-v3/thumbnail-1280x720-2026-06-10T01-59-36-365Z.webp`.
 
 ### Beta Schedule Generator V2
 
