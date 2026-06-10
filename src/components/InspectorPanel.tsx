@@ -986,6 +986,7 @@ function PaletteControls({
   const [activePointIndex, setActivePointIndex] = useState(0);
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
   const [savedPalettesExpanded, setSavedPalettesExpanded] = useState(true);
+  const [paletteRegisterExpanded, setPaletteRegisterExpanded] = useState(true);
   const [registeredColorsExpanded, setRegisteredColorsExpanded] = useState(true);
   const resolvedModeDraft = resolveHarmonyMode(modeDraft);
   const patternModes = paletteModesByPrinciple[principleDraft] ?? paletteModesByPrinciple.order;
@@ -1143,40 +1144,51 @@ function PaletteControls({
             </button>
           ))}
         </div>
-        <div className="palette-register">
-          <label className="field palette-name-field">
-            <span>{t("inspector.paletteName")}</span>
-            <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
-          </label>
-          <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
-            <Sketch
-              color={sketchColor}
-              onChange={(color) => {
-                setBaseDraft(color.hex);
-                onAlphaDraftChange(color.hsva.a);
-              }}
-            />
+        <button
+          type="button"
+          className="palette-subheading collapsible-subheading"
+          aria-expanded={paletteRegisterExpanded}
+          onClick={() => setPaletteRegisterExpanded((current) => !current)}
+        >
+          {paletteRegisterExpanded ? <ChevronDown size={14} /> : <ChevronRight size={14} />}
+          <span>{t("inspector.paletteMaker")}</span>
+        </button>
+        {paletteRegisterExpanded ? (
+          <div className="palette-register">
+            <label className="field palette-name-field">
+              <span>{t("inspector.paletteName")}</span>
+              <input type="text" value={nameDraft} onChange={(event) => onNameDraftChange(event.currentTarget.value)} />
+            </label>
+            <div className="uiw-color-picker-panel" aria-label={`${t("inspector.paletteColor")} ${t("inspector.paletteHex")}`}>
+              <Sketch
+                color={sketchColor}
+                onChange={(color) => {
+                  setBaseDraft(color.hex);
+                  onAlphaDraftChange(color.hsva.a);
+                }}
+              />
+            </div>
+            <div className="palette-actions">
+              <button type="button" className="secondary-button" onClick={onAdd}>
+                {t("inspector.addColor")}
+              </button>
+              <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
+                {t("inspector.updateColor")}
+              </button>
+              <button type="button" className="secondary-button" onClick={() => onSavePalette(previewColors)}>
+                {t("inspector.savePalette")}
+              </button>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={onOpenImageColorPalette}
+                disabled={isExtractingImagePalette || !hasSelectedImageLayer}
+              >
+                {isExtractingImagePalette ? t("inspector.extractingPaletteFromImage") : t("inspector.extractPaletteFromImage")}
+              </button>
+            </div>
           </div>
-        <div className="palette-actions">
-            <button type="button" className="secondary-button" onClick={onAdd}>
-              {t("inspector.addColor")}
-            </button>
-            <button type="button" className="secondary-button" disabled={!selectedColorId} onClick={onUpdate}>
-              {t("inspector.updateColor")}
-            </button>
-            <button type="button" className="secondary-button" onClick={() => onSavePalette(previewColors)}>
-              {t("inspector.savePalette")}
-            </button>
-            <button
-              type="button"
-              className="secondary-button"
-              onClick={onOpenImageColorPalette}
-              disabled={isExtractingImagePalette || !hasSelectedImageLayer}
-            >
-              {isExtractingImagePalette ? t("inspector.extractingPaletteFromImage") : t("inspector.extractPaletteFromImage")}
-            </button>
-          </div>
-        </div>
+        ) : null}
       </div>
       {savedPalettes.length > 0 ? (
         <div className="saved-palette-list" aria-label={t("inspector.savedPalettes")}>

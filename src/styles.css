@@ -1645,8 +1645,8 @@ button:disabled {
 
 .palette-spectrum-bars {
   display: grid;
-  grid-template-columns: 1fr;
-  min-height: 76px;
+  grid-template-columns: repeat(6, minmax(0, 1fr));
+  min-height: 54px;
   overflow: hidden;
   border: 1px solid rgba(17, 24, 39, 0.16);
   border-radius: 8px;
@@ -1654,10 +1654,10 @@ button:disabled {
 
 .palette-spectrum-bars button {
   display: grid;
-  align-content: end;
+  align-content: center;
   min-width: 0;
-  min-height: 76px;
-  padding: 8px;
+  min-height: 54px;
+  padding: 0;
   border: 0;
   border-right: 1px solid rgba(255, 255, 255, 0.72);
   border-radius: 0;
@@ -2273,11 +2273,11 @@ button:disabled {
   display: grid;
   width: min(1320px, calc(100vw - 24px));
   max-width: 1320px;
-  max-height: min(900px, calc(100vh - 24px));
-  min-height: min(900px, calc(100vh - 24px));
-  height: min(900px, calc(100vh - 24px));
+  max-height: min(920px, calc(100vh - 24px));
+  min-height: min(640px, calc(100vh - 24px));
+  height: auto;
   overflow: auto;
-  gap: 12px;
+  gap: 10px;
   padding: 14px;
   border: 1px solid rgba(216, 224, 231, 0.82);
   border-radius: 8px;
@@ -2285,17 +2285,25 @@ button:disabled {
   box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
 }
 
+.schedule-builder-dialog .modal-header {
+  padding-bottom: 8px;
+}
+
 .schedule-builder-dialog .modal-title-block {
   display: grid;
-  gap: 5px;
+  gap: 3px;
+}
+
+.schedule-builder-dialog .modal-title-block h2 {
+  font-size: 16px;
 }
 
 .schedule-builder-dialog .modal-title-block p {
   margin: 0;
   color: var(--muted);
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 750;
-  line-height: 1.35;
+  line-height: 1.3;
 }
 
 .schedule-builder-grid {
@@ -2345,7 +2353,7 @@ button:disabled {
 .schedule-preview-canvas-shell {
   width: 100%;
   min-width: 0;
-  max-height: 420px;
+  max-height: min(74vh, 640px);
   overflow: hidden;
   border: 2px solid var(--line);
   border-radius: 8px;
@@ -2683,6 +2691,11 @@ button:disabled {
   width: min(320px, 100%);
 }
 
+.schedule-builder-actions button {
+  min-height: 32px;
+  padding: 0 12px;
+}
+
 .confirm-actions {
   display: grid;
   grid-template-columns: 1fr 1fr;
@@ -3017,9 +3030,16 @@ button:disabled {
   .schedule-builder-dialog {
     width: calc(100vw - 16px);
     max-height: calc(100vh - 16px);
-    height: calc(100vh - 16px);
     min-height: calc(100vh - 16px);
     padding: 10px;
+  }
+
+  .schedule-builder-dialog .modal-header {
+    padding-bottom: 6px;
+  }
+
+  .schedule-builder-actions button {
+    min-height: 34px;
   }
 
   .stage-toolbar,
