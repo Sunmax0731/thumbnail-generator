@@ -302,8 +302,9 @@ function paletteHueOffsets(mode: HarmonyMode): readonly number[] | undefined {
   const resolvedMode = resolveHarmonyMode(mode);
   if (resolvedMode === "identity") return [0];
   if (resolvedMode === "analogous") return [0, 330, 30];
-  if (resolvedMode === "intermediate") return [0, 15, 30];
-  if (resolvedMode === "diod" || resolvedMode === "opponent" || resolvedMode === "bicolor") return [0, 180];
+  if (resolvedMode === "intermediate") return [0, 90];
+  if (resolvedMode === "diod" || resolvedMode === "bicolor") return [0, 180];
+  if (resolvedMode === "opponent") return [0, 135];
   if (resolvedMode === "split-complementary") return [0, 150, 210];
   if (resolvedMode === "triad" || resolvedMode === "tricolor") return [0, 120, 240];
   if (resolvedMode === "tetrad" || resolvedMode === "rectangular") return [0, 90, 180, 270];

@@ -115,6 +115,8 @@ describe("colorPalette", () => {
     expect(getHarmonyPrinciple("tricolor")).toBe("clarity");
     expect(generatePaletteSchemeColors("#00ff00", "identity")).toHaveLength(1);
     expect(generatePaletteSchemeColors("#ff0000", "tricolor")).toHaveLength(3);
+    expect(generatePaletteSchemeColors("#ff0000", "intermediate")).toHaveLength(2);
+    expect(generatePaletteSchemeColors("#ff0000", "opponent")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "diod")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "rectangular")).toHaveLength(4);
     expect(generatePaletteSchemeColors("#ff0000", "hexad")).toHaveLength(6);
@@ -145,6 +147,16 @@ describe("colorPalette", () => {
     expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#00ff00", 1, "triad") ?? "", "triad")[1]).toBe(
       "#00ff00",
     );
+    expect(derivePaletteBaseFromSchemeColor(generatePaletteSchemeColors("#00ff00", "intermediate")[1], 1, "intermediate")).toBe(
+      "#00ff00",
+    );
+    expect(
+      generatePaletteSchemeColors(
+        derivePaletteBaseFromSchemeColor(generatePaletteSchemeColors("#00ff00", "intermediate")[1], 1, "intermediate") ?? "",
+        "intermediate",
+      )[1],
+    ).toBe(generatePaletteSchemeColors("#00ff00", "intermediate")[1]);
+    expect(derivePaletteBaseFromSchemeColor(generatePaletteSchemeColors("#00ff00", "opponent")[1], 1, "opponent")).toBe("#00ff00");
     expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#808080", 0, "square") ?? "", "square")[0]).toBe(
       "#808080",
     );
