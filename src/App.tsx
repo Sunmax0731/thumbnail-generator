@@ -211,6 +211,7 @@ function App() {
     [layers, selectedIds],
   );
   const selectedLayer = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
+  const hasSelectedImageLayer = selectedLayers.some((layer) => layer.type === "image");
   const fontOptions = useMemo(
     () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
     [customFonts],
@@ -1873,9 +1874,10 @@ function App() {
           paletteAlphaDraft={paletteAlphaDraft}
           paletteModeDraft={paletteModeDraft}
           palettePrincipleDraft={palettePrincipleDraft}
-           selectedPaletteColorId={selectedPaletteColorId}
+          selectedPaletteColorId={selectedPaletteColorId}
           savedColorPalettes={savedColorPalettes}
           fontOptions={fontOptions}
+          hasSelectedImageLayer={hasSelectedImageLayer}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteAlphaDraftChange={setPaletteAlphaDraft}

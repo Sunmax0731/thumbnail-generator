@@ -578,15 +578,6 @@ function ScheduleBuilderDialog({
                 </select>
               </label>
             </div>
-            <label className={`field checkbox-field ${isWeekSchedule ? "field-disabled" : ""}`}>
-              <input
-                type="checkbox"
-                checked={isWeekSchedule ? false : draft.showAdjacentDays}
-                disabled={isWeekSchedule}
-                onChange={(event) => setDraft("showAdjacentDays", event.currentTarget.checked)}
-              />
-              <span>{t("scheduleBuilder.showAdjacentDays")}</span>
-            </label>
             <label className="field">
               <span>{t("scheduleBuilder.weekendColorMode")}</span>
               <select
@@ -597,6 +588,15 @@ function ScheduleBuilderDialog({
                 <option value="grayscale">{t("scheduleBuilder.weekendColorMode.grayscale")}</option>
                 <option value="sundaySaturday">{t("scheduleBuilder.weekendColorMode.sundaySaturday")}</option>
               </select>
+            </label>
+            <label className={`field checkbox-field ${isWeekSchedule ? "field-disabled" : ""}`}>
+              <input
+                type="checkbox"
+                checked={isWeekSchedule ? false : draft.showAdjacentDays}
+                disabled={isWeekSchedule}
+                onChange={(event) => setDraft("showAdjacentDays", event.currentTarget.checked)}
+              />
+              <span>{t("scheduleBuilder.showAdjacentDays")}</span>
             </label>
             <label className={`field checkbox-field ${draft.kind === "week" ? "field-disabled" : ""}`}>
               <input

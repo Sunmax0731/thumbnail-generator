@@ -146,6 +146,7 @@ interface InspectorPanelProps {
   onFitTextToBounds: (id: string) => void;
   onOpenImageColorPalette: () => void;
   isExtractingImagePalette: boolean;
+  hasSelectedImageLayer: boolean;
   t: Translator;
 }
 
@@ -204,6 +205,7 @@ export function InspectorPanel({
   onFitTextToBounds,
   onOpenImageColorPalette,
   isExtractingImagePalette,
+  hasSelectedImageLayer,
   t,
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
@@ -570,6 +572,7 @@ export function InspectorPanel({
           t={t}
           onOpenImageColorPalette={onOpenImageColorPalette}
           isExtractingImagePalette={isExtractingImagePalette}
+          hasSelectedImageLayer={hasSelectedImageLayer}
         />
       ) : null}
 
@@ -947,6 +950,7 @@ function PaletteControls({
   onResizeList,
   onOpenImageColorPalette,
   isExtractingImagePalette,
+  hasSelectedImageLayer,
   t,
 }: {
   colors: PaletteColor[];
@@ -976,6 +980,7 @@ function PaletteControls({
   onResizeList: (deltaY: number) => void;
   onOpenImageColorPalette: () => void;
   isExtractingImagePalette: boolean;
+  hasSelectedImageLayer: boolean;
   t: Translator;
 }) {
   const [activePointIndex, setActivePointIndex] = useState(0);
@@ -991,7 +996,6 @@ function PaletteControls({
       : patternModes[0];
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
   const previewColors = generatePaletteSchemeColors(previewBaseColor, activeMode);
-  const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
   const sketchColor = { ...hexToHsva(previewBaseColor), a: alphaDraft };
 
   useEffect(() => {
@@ -1133,10 +1137,9 @@ function PaletteControls({
               key={`bar-${color}-${index}`}
               type="button"
               style={{ background: color, color: readableTextColor(color) }}
+              aria-label={color}
               onClick={() => setBaseDraft(color)}
             >
-              <span>{index === 0 ? t("inspector.paletteBase") : t("inspector.paletteColor")}</span>
-              <strong>{color}</strong>
             </button>
           ))}
         </div>
@@ -1154,10 +1157,7 @@ function PaletteControls({
               }}
             />
           </div>
-          <div className="palette-actions">
-            <button type="button" className="secondary-button" onClick={() => setBaseDraft(activePointColor)}>
-              {t("inspector.paletteUseSelectedBase")}
-            </button>
+        <div className="palette-actions">
             <button type="button" className="secondary-button" onClick={onAdd}>
               {t("inspector.addColor")}
             </button>
@@ -1167,7 +1167,12 @@ function PaletteControls({
             <button type="button" className="secondary-button" onClick={() => onSavePalette(previewColors)}>
               {t("inspector.savePalette")}
             </button>
-            <button type="button" className="secondary-button" onClick={onOpenImageColorPalette} disabled={isExtractingImagePalette}>
+            <button
+              type="button"
+              className="secondary-button"
+              onClick={onOpenImageColorPalette}
+              disabled={isExtractingImagePalette || !hasSelectedImageLayer}
+            >
               {isExtractingImagePalette ? t("inspector.extractingPaletteFromImage") : t("inspector.extractPaletteFromImage")}
             </button>
           </div>
