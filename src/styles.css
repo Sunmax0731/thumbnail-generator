@@ -2130,7 +2130,7 @@ button:disabled {
 .schedule-builder-grid {
   display: grid;
   align-items: start;
-  grid-template-columns: minmax(240px, 1.05fr) minmax(320px, 1.2fr) minmax(176px, 0.55fr) minmax(360px, 1.55fr);
+  grid-template-columns: minmax(240px, 1.02fr) minmax(324px, 1.14fr) minmax(148px, 0.42fr) minmax(400px, 1.72fr);
   gap: 10px;
 }
 
