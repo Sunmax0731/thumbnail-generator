@@ -2130,7 +2130,7 @@ button:disabled {
 .schedule-builder-grid {
   display: grid;
   align-items: start;
-  grid-template-columns: minmax(245px, 0.95fr) minmax(320px, 1.25fr) minmax(220px, 0.8fr) minmax(310px, 1.15fr);
+  grid-template-columns: minmax(240px, 1.05fr) minmax(320px, 1.2fr) minmax(176px, 0.55fr) minmax(360px, 1.55fr);
   gap: 10px;
 }
 
@@ -2191,6 +2191,15 @@ button:disabled {
   align-items: center;
 }
 
+.schedule-font-row {
+  grid-template-columns: 1fr 64px;
+  align-items: end;
+}
+
+.schedule-font-family-field {
+  min-width: 0;
+}
+
 .schedule-slider-field span {
   grid-column: 1 / -1;
 }
@@ -2209,7 +2218,20 @@ button:disabled {
 }
 
 .schedule-font-weight-field select {
-  width: 98px;
+  width: 64px;
+  min-width: 0;
+}
+
+.schedule-grid-style-field {
+  display: grid;
+}
+
+.schedule-action-count-row {
+  grid-template-columns: 1fr minmax(0, 1fr);
+  align-items: end;
+}
+
+.schedule-action-mode-field {
   min-width: 0;
 }
 
@@ -2304,7 +2326,7 @@ button:disabled {
 .schedule-color-target-grid {
   display: grid;
   gap: 8px;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-template-columns: 1fr;
 }
 
 .schedule-color-target-button {
@@ -2335,17 +2357,9 @@ button:disabled {
 
 .schedule-color-target-button-row {
   display: grid;
-  grid-template-columns: 38px minmax(0, 1fr);
+  grid-template-columns: 1fr;
   gap: 8px;
   align-items: center;
-}
-
-.schedule-color-target-button small {
-  overflow: hidden;
-  white-space: nowrap;
-  color: var(--muted);
-  font-size: 11px;
-  text-overflow: ellipsis;
 }
 
 .schedule-color-target-button span:first-child {

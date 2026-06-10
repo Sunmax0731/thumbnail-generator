@@ -587,6 +587,26 @@ function ScheduleBuilderDialog({
               />
               <span>{t("scheduleBuilder.showAdjacentDays")}</span>
             </label>
+            <label className="field">
+              <span>{t("scheduleBuilder.weekendColorMode")}</span>
+              <select
+                value={draft.weekendColorMode}
+                onChange={(event) => setDraft("weekendColorMode", event.currentTarget.value as ScheduleBuilderRequest["weekendColorMode"])}
+              >
+                <option value="default">{t("scheduleBuilder.weekendColorMode.default")}</option>
+                <option value="grayscale">{t("scheduleBuilder.weekendColorMode.grayscale")}</option>
+                <option value="sundaySaturday">{t("scheduleBuilder.weekendColorMode.sundaySaturday")}</option>
+              </select>
+            </label>
+            <label className={`field checkbox-field ${draft.kind === "week" ? "field-disabled" : ""}`}>
+              <input
+                type="checkbox"
+                checked={draft.kind === "week" ? false : draft.showBadge}
+                disabled={draft.kind === "week"}
+                onChange={(event) => setDraft("showBadge", event.currentTarget.checked)}
+              />
+              <span>{t("scheduleBuilder.showBadge")}</span>
+            </label>
             <label className="field checkbox-field">
               <input type="checkbox" checked={draft.groupLayers} onChange={(event) => setDraft("groupLayers", event.currentTarget.checked)} />
               <span>{t("scheduleBuilder.groupLayers")}</span>
@@ -602,8 +622,8 @@ function ScheduleBuilderDialog({
               <span>{t("scheduleBuilder.titleLabel")}</span>
               <input type="text" value={draft.title} placeholder={t("scheduleBuilder.titlePlaceholder")} onChange={(event) => setDraft("title", event.currentTarget.value)} />
             </label>
-            <div className="field-grid two">
-              <label className="field">
+            <div className="field-grid schedule-font-row">
+              <label className="field schedule-font-family-field">
                 <span>{t("scheduleBuilder.fontFamily")}</span>
                 <select value={draft.fontFamily} onChange={(event) => setDraft("fontFamily", event.currentTarget.value)}>
                   {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
@@ -657,14 +677,14 @@ function ScheduleBuilderDialog({
                 onChange={(value) => setDraft("eventFontSize", value)}
               />
             </div>
+            <label className="field schedule-grid-style-field">
+              <span>{t("scheduleBuilder.gridStyle")}</span>
+              <select value={draft.gridStyle} onChange={(event) => setDraft("gridStyle", event.currentTarget.value as ScheduleBuilderRequest["gridStyle"])}>
+                <option value="cards">{t("scheduleBuilder.gridStyle.cards")}</option>
+                <option value="lines">{t("scheduleBuilder.gridStyle.lines")}</option>
+              </select>
+            </label>
             <div className="field-grid two">
-              <label className="field">
-                <span>{t("scheduleBuilder.gridStyle")}</span>
-                <select value={draft.gridStyle} onChange={(event) => setDraft("gridStyle", event.currentTarget.value as ScheduleBuilderRequest["gridStyle"])}>
-                  <option value="cards">{t("scheduleBuilder.gridStyle.cards")}</option>
-                  <option value="lines">{t("scheduleBuilder.gridStyle.lines")}</option>
-                </select>
-              </label>
               <ScheduleSlider
                 label={t("scheduleBuilder.cornerRadius")}
                 value={draft.cornerRadius}
@@ -672,8 +692,6 @@ function ScheduleBuilderDialog({
                 max={32}
                 onChange={(value) => setDraft("cornerRadius", value)}
               />
-            </div>
-            <div className="field-grid two">
               <ScheduleSlider
                 label={t("scheduleBuilder.strokeWidth")}
                 value={draft.strokeWidth}
@@ -681,7 +699,9 @@ function ScheduleBuilderDialog({
                 max={12}
                 onChange={(value) => setDraft("strokeWidth", value)}
               />
-              <label className={`field ${isMonthSchedule ? "field-disabled" : ""}`}>
+            </div>
+            <div className="field-grid schedule-action-count-row">
+              <label className={`field schedule-action-mode-field ${isMonthSchedule ? "field-disabled" : ""}`}>
                 <span>{t("scheduleBuilder.actionCountMode")}</span>
                 <select
                   value={draft.actionCountMode}
@@ -692,14 +712,14 @@ function ScheduleBuilderDialog({
                   <option value="individual">{t("scheduleBuilder.actionCountMode.individual")}</option>
                 </select>
               </label>
+              <ScheduleSlider
+                label={t("scheduleBuilder.actionsPerDay")}
+                value={draft.actionsPerDay}
+                min={0}
+                max={6}
+                onChange={(value) => setDraft("actionsPerDay", value)}
+              />
             </div>
-            <ScheduleSlider
-              label={t("scheduleBuilder.actionsPerDay")}
-              value={draft.actionsPerDay}
-              min={0}
-              max={6}
-              onChange={(value) => setDraft("actionsPerDay", value)}
-            />
             {draft.kind === "week" && draft.actionCountMode === "individual" ? (
               <div className="daily-action-grid" aria-label={t("scheduleBuilder.dailyActionCounts")}>
                 {getPreviewWeekDates(draft).map((date, index) => (
@@ -723,26 +743,6 @@ function ScheduleBuilderDialog({
                 ))}
               </div>
             ) : null}
-            <label className="field">
-              <span>{t("scheduleBuilder.weekendColorMode")}</span>
-              <select
-                value={draft.weekendColorMode}
-                onChange={(event) => setDraft("weekendColorMode", event.currentTarget.value as ScheduleBuilderRequest["weekendColorMode"])}
-              >
-                <option value="default">{t("scheduleBuilder.weekendColorMode.default")}</option>
-                <option value="grayscale">{t("scheduleBuilder.weekendColorMode.grayscale")}</option>
-                <option value="sundaySaturday">{t("scheduleBuilder.weekendColorMode.sundaySaturday")}</option>
-              </select>
-            </label>
-            <label className="field checkbox-field">
-              <input
-                type="checkbox"
-                checked={draft.kind === "week" ? false : draft.showBadge}
-                disabled={draft.kind === "week"}
-                onChange={(event) => setDraft("showBadge", event.currentTarget.checked)}
-              />
-              <span>{t("scheduleBuilder.showBadge")}</span>
-            </label>
           </section>
 
           <section className="panel-section schedule-color-section">
@@ -761,7 +761,6 @@ function ScheduleBuilderDialog({
                   <span>{target.label}</span>
                   <div className="schedule-color-target-button-row">
                     <span className="schedule-color-preview" style={{ background: normalizeColor(target.value) ?? target.value }} aria-hidden="true" />
-                    <small>{target.value}</small>
                   </div>
                 </button>
               ))}
