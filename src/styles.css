@@ -2293,6 +2293,82 @@ button:disabled {
   gap: 8px;
 }
 
+.schedule-color-target-grid {
+  display: grid;
+  gap: 8px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.schedule-color-target-button {
+  appearance: none;
+  display: grid;
+  gap: 6px;
+  min-height: 56px;
+  padding: 9px 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  cursor: pointer;
+  text-align: left;
+}
+
+.schedule-color-target-button:focus-visible {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(16, 182, 215, 0.16);
+}
+
+.schedule-color-target-button.selected {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 1px rgba(16, 182, 215, 0.25);
+  background: rgba(16, 182, 215, 0.09);
+}
+
+.schedule-color-target-button-row {
+  display: grid;
+  grid-template-columns: 38px minmax(0, 1fr);
+  gap: 8px;
+  align-items: center;
+}
+
+.schedule-color-target-button small {
+  overflow: hidden;
+  white-space: nowrap;
+  color: var(--muted);
+  font-size: 11px;
+  text-overflow: ellipsis;
+}
+
+.schedule-color-target-button span:first-child {
+  font-weight: 800;
+  font-size: 12px;
+}
+
+.schedule-color-picker-backdrop {
+  z-index: 90;
+}
+
+.schedule-color-picker-modal {
+  display: grid;
+  width: min(560px, calc(100vw - 32px));
+  max-height: calc(100vh - 90px);
+  overflow: auto;
+  gap: 12px;
+  padding: 14px;
+  border: 1px solid rgba(216, 224, 231, 0.82);
+  border-radius: 8px;
+  background: var(--panel);
+  box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
+}
+
+.schedule-color-picker-close {
+  min-height: 28px;
+  min-width: 32px;
+  padding: 2px;
+  border-radius: 8px;
+}
+
 .schedule-color-list-title {
   margin: 0;
   color: var(--muted);
@@ -2391,15 +2467,6 @@ button:disabled {
   grid-template-columns: 38px minmax(0, 1fr);
   gap: 8px;
   align-items: center;
-}
-
-.schedule-color-field {
-  gap: 10px;
-  align-items: center;
-}
-
-.schedule-color-field span {
-  grid-column: 1 / -1;
 }
 
 .schedule-color-swatch.selected,
@@ -2725,6 +2792,20 @@ button:disabled {
     align-items: start;
     overflow: auto;
     padding: 8px;
+  }
+
+  .schedule-color-target-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .schedule-color-picker-backdrop {
+    padding: 10px;
+  }
+
+  .schedule-color-picker-modal {
+    width: calc(100vw - 20px);
+    max-height: calc(100vh - 40px);
+    padding: 10px;
   }
 
   .image-lab-modal {
