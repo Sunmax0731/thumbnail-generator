@@ -801,7 +801,7 @@ function ScheduleBuilderDialog({
           <button type="button" className="primary-button" onClick={onConfirm}>
             {t("scheduleBuilder.generate")}
           </button>
-        </div>
+          </div>
       </section>
     </div>
   );
@@ -921,7 +921,6 @@ function ScheduleColorPickerModal({
             </div>
           )}
         </div>
-      </div>
     </section>
     </div>
   );

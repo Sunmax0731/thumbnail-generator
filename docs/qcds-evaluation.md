@@ -316,3 +316,20 @@ Completed on 2026-06-10.
 - Runtime checks: nonblank render, primary UI visibility, schedule builder open, modal swatch availability (`24` registered swatches), color select interaction, layer edit, WebP export download, mobile overflow `0`, and no page errors were reported.
 - CSV/HTML compatibility note: CSV/HTML controls are not visible in this build; parser/runtime-compatibility is covered by existing unit tests and runtime evidence of nonblank generation/edit behavior.
 - Evidence screenshots: `docs/assets/runtime-20260610-schedule-color-picker-desktop.png` and `docs/assets/runtime-20260610-schedule-color-picker-mobile.png`.
+
+### Latest Runtime Evidence (target-first color modal flow)
+
+- Runtime checks: `npm test` passed (28 test files, 111 tests), `npm run build` passed, Playwright headless Chromium passed at `http://127.0.0.1:4225/thumbnail-generator/`.
+- New workflow checks:
+  - Schedule color targets: `4`.
+  - Registered swatches available: `6`.
+  - Color picker modal appears on target click and closes after swatch select.
+  - Layer edit: first number input changed from `56` to `10`.
+  - WebP export downloaded successfully.
+  - Evidence screenshots:
+    - `docs/assets/runtime-20260610-schedule-color-picker-gate-2-desktop.png`
+    - `docs/assets/runtime-20260610-schedule-color-picker-gate-2-mobile.png`
+  - Export evidence:
+    - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/desktop-thumbnail-1280x720-2026-06-10T05-35-56-556Z.webp`
+    - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/mobile-thumbnail-1280x720-2026-06-10T05-35-58-894Z.webp`
+- CSV/HTML note: controls are not dedicated visible panels in this build.

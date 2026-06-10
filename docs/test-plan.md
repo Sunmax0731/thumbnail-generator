@@ -659,3 +659,29 @@ Completed on 2026-06-10.
 - Evidence screenshots:
   - `docs/assets/runtime-20260610-schedule-color-picker-desktop.png`
   - `docs/assets/runtime-20260610-schedule-color-picker-mobile.png`
+
+## Schedule Builder Color Picker Modal Flow Runtime Gate (2026-06-10)
+
+Completed on 2026-06-10.
+
+- Scope: separate color target selection from color-value selector so that clicking one of four targets opens one modal, then selecting a swatch auto-closes the modal and applies color to target.
+- Browser runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4225/thumbnail-generator/`.
+- Desktop viewport: `1440x900`.
+- Mobile viewport: `390x844`.
+- Runtime checks:
+  - Nonblank render: pass.
+  - Primary UI visible: pass.
+  - Schedule builder open: pass.
+  - Color target buttons available: `4`.
+  - Color picker modal opened after selecting a target: pass.
+  - Registered color swatches available: `6`.
+  - Color selection applied and modal closed automatically: pass.
+  - Layer edit: first number input changed from `56` to `10`.
+  - Export path: WebP download succeeded.
+  - CSV/HTML compatibility note: no dedicated visible CSV/HTML control panel in this build.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260610-schedule-color-picker-gate-2-desktop.png`
+  - `docs/assets/runtime-20260610-schedule-color-picker-gate-2-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/desktop-thumbnail-1280x720-2026-06-10T05-35-56-556Z.webp`
+  - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/mobile-thumbnail-1280x720-2026-06-10T05-35-58-894Z.webp`
