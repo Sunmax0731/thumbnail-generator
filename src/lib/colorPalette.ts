@@ -351,7 +351,8 @@ function paletteHueOffsets(mode: HarmonyMode): readonly number[] | undefined {
   if (resolvedMode === "opponent") return [0, 135];
   if (resolvedMode === "split-complementary") return [0, 150, 210];
   if (resolvedMode === "triad" || resolvedMode === "tricolor") return [0, 120, 240];
-  if (resolvedMode === "tetrad" || resolvedMode === "rectangular") return [0, 90, 180, 270];
+  if (resolvedMode === "tetrad") return [0, 90, 180, 270];
+  if (resolvedMode === "rectangular") return [0, 60, 180, 240];
   if (resolvedMode === "pentad") return generateHueIntervalOffsets(5);
   if (resolvedMode === "hexad") return generateHueIntervalOffsets(6);
   return undefined;

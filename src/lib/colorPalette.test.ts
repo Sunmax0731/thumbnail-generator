@@ -119,6 +119,8 @@ describe("colorPalette", () => {
     expect(generatePaletteSchemeColors("#ff0000", "opponent")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "diod")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "rectangular")).toHaveLength(4);
+    expect(generatePaletteSchemeColors("#ff0000", "rectangular")).toEqual(["#ff0000", "#ffff00", "#00ffff", "#0000ff"]);
+    expect(generatePaletteSchemeColors("#ff0000", "rectangular")).not.toEqual(generatePaletteSchemeColors("#ff0000", "tetrad"));
     expect(generatePaletteSchemeColors("#ff0000", "hexad")).toHaveLength(6);
 
     expect(generatePaletteSchemeColors("#ff0000", "complementary")).toHaveLength(2);
