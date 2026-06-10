@@ -27,7 +27,7 @@
 - Vertical text preview resizing changes the configured display bounds without translating the anchored corner unexpectedly.
 - YouTube thumbnail helpers extract video ids from common URL shapes and order thumbnail candidates by quality.
 - Custom font helpers validate supported formats, sanitize display names, create dropdown options, read localStorage records, and deduplicate stored fonts.
-- Color palette helpers generate saved palette sets for analogous, complementary, split, triad, square, compound, shades, and monochromatic modes.
+- Color palette helpers generate saved palette sets across order, proximity, similarity, and clarity principles: identity, analogous, intermediate, diod, opponent, split-complementary, triad, tetrad, pentad, hexad, rectangular, complex-harmony, natural-harmony, dominant-color, tone-on-tone, dominant-tone, tone-in-tone, tonal-color, camaieu, faux-camaieu, tricolor, and bicolor.
 - Color palette helpers convert HEX and RGB channel input for palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
@@ -112,7 +112,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
-- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, a palette-pattern dropdown to the left of the wheel, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
+- Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, palette-principle and palette-pattern dropdowns to the left of the wheel, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
 - Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.

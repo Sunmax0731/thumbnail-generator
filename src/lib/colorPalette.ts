@@ -7,15 +7,86 @@ export interface PaletteColor {
 }
 
 export type PaletteTarget = "fill" | "stroke";
+export const palettePrinciples = ["order", "proximity", "similarity", "clarity"] as const;
+export type PalettePrinciple = (typeof palettePrinciples)[number];
+type LegacyHarmonyMode = "analogous" | "complementary" | "split" | "triad" | "square" | "compound" | "shades" | "monochromatic";
 export type HarmonyMode =
-  | "analogous"
-  | "complementary"
-  | "split"
-  | "triad"
-  | "square"
-  | "compound"
-  | "shades"
-  | "monochromatic";
+  | LegacyHarmonyMode
+  | "identity"
+  | "intermediate"
+  | "diod"
+  | "opponent"
+  | "split-complementary"
+  | "tetrad"
+  | "pentad"
+  | "hexad"
+  | "rectangular"
+  | "complex-harmony"
+  | "natural-harmony"
+  | "dominant-color"
+  | "tone-on-tone"
+  | "dominant-tone"
+  | "tone-in-tone"
+  | "tonal-color"
+  | "camaieu"
+  | "faux-camaieu"
+  | "tricolor"
+  | "bicolor";
+
+export const paletteModesByPrinciple: Readonly<Record<PalettePrinciple, readonly HarmonyMode[]>> = {
+  order: [
+    "identity",
+    "analogous",
+    "intermediate",
+    "diod",
+    "opponent",
+    "split-complementary",
+    "triad",
+    "tetrad",
+    "pentad",
+    "hexad",
+    "rectangular",
+  ],
+  proximity: ["complex-harmony", "natural-harmony"],
+  similarity: [
+    "dominant-color",
+    "tone-on-tone",
+    "dominant-tone",
+    "tone-in-tone",
+    "tonal-color",
+    "camaieu",
+    "faux-camaieu",
+  ],
+  clarity: ["tricolor", "bicolor"],
+};
+
+export function resolveHarmonyMode(mode: HarmonyMode): HarmonyMode {
+  switch (mode) {
+    case "complementary":
+      return "opponent";
+    case "split":
+      return "split-complementary";
+    case "square":
+      return "tetrad";
+    case "compound":
+      return "complex-harmony";
+    case "shades":
+      return "natural-harmony";
+    case "monochromatic":
+      return "tonal-color";
+    default:
+      return mode;
+  }
+}
+
+export function getHarmonyPrinciple(mode: HarmonyMode): PalettePrinciple {
+  const resolved = resolveHarmonyMode(mode);
+  if (paletteModesByPrinciple.order.includes(resolved)) return "order";
+  if (paletteModesByPrinciple.proximity.includes(resolved)) return "proximity";
+  if (paletteModesByPrinciple.similarity.includes(resolved)) return "similarity";
+  if (paletteModesByPrinciple.clarity.includes(resolved)) return "clarity";
+  return "order";
+}
 
 export const colorPaletteStorageKey = "thumbnail-generator.colorPalette.v1";
 export const savedColorPaletteStorageKey = "thumbnail-generator.savedColorPalettes.v1";
@@ -139,15 +210,22 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
   const normalized = normalizeColor(baseColor);
   if (!normalized) return [];
   const hsl = hexToHsl(normalized);
-  const offsets: Partial<Record<HarmonyMode, number[]>> = {
-    analogous: [-30, 30],
-    complementary: [180],
-    split: [150, 210],
-    triad: [120, 240],
-    square: [90, 180, 270],
-    compound: [30, 180],
-  };
-  if (mode === "shades") {
+  const resolvedMode = resolveHarmonyMode(mode);
+  if (resolvedMode === "identity") return [normalized];
+  if (
+    resolvedMode === "dominant-color" ||
+    resolvedMode === "tone-on-tone" ||
+    resolvedMode === "dominant-tone" ||
+    resolvedMode === "tone-in-tone" ||
+    resolvedMode === "tonal-color"
+  ) {
+    return [
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.55), l: clampUnit(hsl.l * 0.82) }),
+      normalized,
+      hslToHex({ ...hsl, s: clampUnit(Math.min(1, hsl.s * 1.2)), l: clampUnit(hsl.l + (1 - hsl.l) * 0.28) }),
+    ];
+  }
+  if (resolvedMode === "natural-harmony" || resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
     return [
       hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.42) }),
       hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.68) }),
@@ -156,14 +234,9 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
       hslToHex({ ...hsl, l: clampUnit(hsl.l + (1 - hsl.l) * 0.58) }),
     ];
   }
-  if (mode === "monochromatic") {
-    return [
-      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.55), l: clampUnit(hsl.l * 0.82) }),
-      normalized,
-      hslToHex({ ...hsl, s: clampUnit(Math.min(1, hsl.s * 1.2)), l: clampUnit(hsl.l + (1 - hsl.l) * 0.28) }),
-    ];
-  }
-  return [normalized, ...(offsets[mode] ?? []).map((offset) => hslToHex({ ...hsl, h: normalizeHue(hsl.h + offset) }))];
+  const offsets = paletteHueOffsets(resolvedMode);
+  if (!offsets) return [normalized];
+  return offsets.map((offset) => hslToHex({ ...hsl, h: normalizeHue(hsl.h + offset) }));
 }
 
 export function derivePaletteBaseFromSchemeColor(
@@ -176,15 +249,39 @@ export function derivePaletteBaseFromSchemeColor(
   if (pointIndex <= 0) return normalized;
 
   const colorHsl = hexToHsl(normalized);
-  const hueOffsets: Partial<Record<HarmonyMode, number[]>> = {
-    analogous: [0, -30, 30],
-    complementary: [0, 180],
-    split: [0, 150, 210],
-    triad: [0, 120, 240],
-    square: [0, 90, 180, 270],
-    compound: [0, 30, 180],
-  };
-  const offsets = hueOffsets[mode];
+  const resolvedMode = resolveHarmonyMode(mode);
+  if (resolvedMode === "identity") return normalized;
+  if (
+    resolvedMode === "dominant-color" ||
+    resolvedMode === "tone-on-tone" ||
+    resolvedMode === "dominant-tone" ||
+    resolvedMode === "tone-in-tone" ||
+    resolvedMode === "tonal-color"
+  ) {
+    if (pointIndex === 0) {
+      return hslToHex({ h: colorHsl.h, s: clampUnit(colorHsl.s / 0.55), l: clampUnit(colorHsl.l / 0.82) });
+    }
+    if (pointIndex === 1) return normalized;
+    if (pointIndex === 2) {
+      return hslToHex({
+        h: colorHsl.h,
+        s: clampUnit(colorHsl.s / 1.2),
+        l: clampUnit((colorHsl.l - (1 - colorHsl.l) * 0.28) / 0.72),
+      });
+    }
+    return normalized;
+  }
+
+  if (resolvedMode === "natural-harmony" || resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
+    const lightnessByIndex = [colorHsl.l / 0.42, colorHsl.l / 0.68, colorHsl.l, (colorHsl.l - 0.34) / 0.66, (colorHsl.l - 0.58) / 0.42];
+    return hslToHex({
+      h: colorHsl.h,
+      s: colorHsl.s,
+      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
+    });
+  }
+
+  const offsets = paletteHueOffsets(resolvedMode);
   if (offsets?.[pointIndex] !== undefined) {
     return hslToHex({
       h: normalizeHue(colorHsl.h - offsets[pointIndex]),
@@ -193,32 +290,27 @@ export function derivePaletteBaseFromSchemeColor(
     });
   }
 
-  if (mode === "shades") {
-    const lightnessByIndex = [
-      colorHsl.l / 0.42,
-      colorHsl.l / 0.68,
-      colorHsl.l,
-      (colorHsl.l - 0.34) / 0.66,
-      (colorHsl.l - 0.58) / 0.42,
-    ];
-    return hslToHex({
-      h: colorHsl.h,
-      s: colorHsl.s,
-      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
-    });
-  }
-
-  if (mode === "monochromatic") {
-    const saturationByIndex = [colorHsl.s / 0.55, colorHsl.s, colorHsl.s / 1.2];
-    const lightnessByIndex = [colorHsl.l / 0.82, colorHsl.l, (colorHsl.l - 0.28) / 0.72];
-    return hslToHex({
-      h: colorHsl.h,
-      s: clampUnit(saturationByIndex[pointIndex] ?? colorHsl.s),
-      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
-    });
-  }
-
   return normalized;
+}
+
+function generateHueIntervalOffsets(count: number): readonly number[] {
+  if (count <= 0) return [];
+  return Array.from({ length: count }, (_, index) => (360 / count) * index);
+}
+
+function paletteHueOffsets(mode: HarmonyMode): readonly number[] | undefined {
+  const resolvedMode = resolveHarmonyMode(mode);
+  if (resolvedMode === "identity") return [0];
+  if (resolvedMode === "analogous") return [0, 330, 30];
+  if (resolvedMode === "intermediate") return [0, 15, 30];
+  if (resolvedMode === "diod" || resolvedMode === "opponent" || resolvedMode === "bicolor") return [0, 180];
+  if (resolvedMode === "split-complementary") return [0, 150, 210];
+  if (resolvedMode === "triad" || resolvedMode === "tricolor") return [0, 120, 240];
+  if (resolvedMode === "tetrad" || resolvedMode === "rectangular") return [0, 90, 180, 270];
+  if (resolvedMode === "pentad") return generateHueIntervalOffsets(5);
+  if (resolvedMode === "hexad") return generateHueIntervalOffsets(6);
+  if (resolvedMode === "complex-harmony") return [0, 150, 210];
+  return undefined;
 }
 
 export function addHarmonyColors(
@@ -411,11 +503,31 @@ function capitalize(value: string): string {
 
 function isHarmonyMode(value: unknown): value is HarmonyMode {
   return (
+    value === "identity" ||
     value === "analogous" ||
     value === "complementary" ||
+    value === "intermediate" ||
+    value === "diod" ||
+    value === "opponent" ||
     value === "split" ||
+    value === "split-complementary" ||
     value === "triad" ||
+    value === "tetrad" ||
+    value === "pentad" ||
+    value === "hexad" ||
+    value === "rectangular" ||
     value === "square" ||
+    value === "complex-harmony" ||
+    value === "natural-harmony" ||
+    value === "dominant-color" ||
+    value === "tone-on-tone" ||
+    value === "dominant-tone" ||
+    value === "tone-in-tone" ||
+    value === "tonal-color" ||
+    value === "camaieu" ||
+    value === "faux-camaieu" ||
+    value === "tricolor" ||
+    value === "bicolor" ||
     value === "compound" ||
     value === "shades" ||
     value === "monochromatic"

@@ -379,7 +379,12 @@ Saved palette sets are stored separately under `thumbnail-generator.savedColorPa
 
 - Palette id.
 - Display name.
-- Pattern mode: analogous, complementary, split, triad, square, compound, shades, or monochromatic.
+- Pattern mode is now grouped by principle and uses stored keys:
+  - Order principle: identity, analogous, intermediate, diod, opponent, split-complementary, triad, tetrad, pentad, hexad, rectangular.
+  - Proximity principle: complex-harmony, natural-harmony.
+  - Similarity principle: dominant-color, tone-on-tone, dominant-tone, tone-in-tone, tonal-color, camaieu, faux-camaieu.
+  - Clarity principle: tricolor, bicolor.
+- Legacy aliases are normalized for compatibility: complementary→opponent, split→split-complementary, square→tetrad, compound→complex-harmony, shades→natural-harmony, monochromatic→tonal-color.
 - Base color.
 - Generated color list.
 - Created timestamp.

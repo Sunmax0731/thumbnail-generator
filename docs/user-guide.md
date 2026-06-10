@@ -149,7 +149,16 @@ Open Image Lab from the scissors button on an imported asset row. The modal star
 
 Open Colors to select an existing single-color swatch row for editing. Update changes the selected palette entry in browser storage. Use Opacity to store the alpha value applied when that color is used. Each registered swatch row has Fill and Stroke buttons, so the same saved single color can be applied directly to either style of the selected text or shape layer.
 
-Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base. The Pattern dropdown beside the wheel chooses Analogous, Complement, Split, Triad, Square, Compound, Shades, or Monochrome. Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space. Drag a row handle in either saved palettes or registered single colors to reorder the browser-local list.
+Use the palette maker preview to check the current draft color, opacity, and companion colors before saving. Selecting a color-wheel point only selects that point; it does not change the base color. Dragging one point treats that point as the intended color and regenerates the other points in the same pattern. Change the base color explicitly with the wheel background, `@uiw/react-color` Sketch-style HEX/RGB/alpha controls, recent colors, palette bars below the wheel, or Set selected as base.
+
+The palette pattern selection uses two dropdowns. Select a principle first (Order, Proximity, Similarity, Clarity), then choose one pattern that belongs to that principle. The active pattern list includes:
+
+- Order: Identity, Analogous, Intermediate, Diod, Opponent, Split-complementary, Triad, Tetrad, Pentad, Hexad, Rectangular.
+- Proximity: Complex-harmony, Natural-harmony.
+- Similarity: Dominant-color, Tone-on-tone, Dominant-tone, Tone-in-tone, Tonal-color, Camaieu, Faux-camaieu.
+- Clarity: Tricolor, Bicolor.
+
+Save palette stores the currently displayed colors as one multi-color palette set. Each saved-palette color has Fill and Stroke buttons, and saved palettes plus registered single colors can collapse when you need more vertical space. Drag a row handle in either saved palettes or registered single colors to reorder the browser-local list.
 
 When a text or shape layer is selected in Adjust, click the Fill or Stroke color display to open the draggable popup Sketch-style single-color picker. Drag the popup header to move it while comparing colors on the canvas. Apply color writes both color and alpha to that style. The older separate Fill opacity and Stroke opacity sliders are intentionally removed.
 

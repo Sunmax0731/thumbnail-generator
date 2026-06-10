@@ -25,6 +25,7 @@ import {
   addPaletteColor as appendPaletteColor,
   addSavedColorPalette,
   generatePaletteSchemeColors,
+  getHarmonyPrinciple,
   normalizeColor,
   readColorPalette,
   readSavedColorPalettes,
@@ -34,9 +35,11 @@ import {
   type PaletteColor,
   type PaletteTarget,
   type HarmonyMode,
+  type PalettePrinciple,
   writeColorPalette,
   type SavedColorPalette,
   writeSavedColorPalettes,
+  paletteModesByPrinciple,
 } from "./lib/colorPalette";
 import {
   customFontToOption,
@@ -167,6 +170,7 @@ function App() {
   const [paletteNameDraft, setPaletteNameDraft] = useState("Accent");
   const [paletteAlphaDraft, setPaletteAlphaDraft] = useState(1);
   const [paletteModeDraft, setPaletteModeDraft] = useState<HarmonyMode>("triad");
+  const [palettePrincipleDraft, setPalettePrincipleDraft] = useState<PalettePrinciple>(() => getHarmonyPrinciple("triad"));
   const [brandKit, setBrandKit] = useState<BrandKit>(initialBrandKit);
   const [selectedPaletteColorId, setSelectedPaletteColorId] = useState<string | null>(null);
   const [savedColorPalettes, setSavedColorPalettes] = useState<SavedColorPalette[]>(() =>
@@ -1128,6 +1132,18 @@ function App() {
     );
   }, [paletteDraft, paletteModeDraft, paletteNameDraft, savedColorPalettes]);
 
+  const handlePalettePrincipleDraftChange = useCallback((principle: PalettePrinciple) => {
+    const nextMode = paletteModesByPrinciple[principle]?.[0];
+    if (nextMode === undefined) return;
+    setPalettePrincipleDraft(principle);
+    setPaletteModeDraft(nextMode);
+  }, []);
+
+  const handlePaletteModeDraftChange = useCallback((mode: HarmonyMode) => {
+    setPaletteModeDraft(mode);
+    setPalettePrincipleDraft(getHarmonyPrinciple(mode));
+  }, []);
+
   const deleteSavedColorPalette = useCallback(
     (id: string) => {
       const next = removeSavedColorPalette(savedColorPalettes, id);
@@ -1657,13 +1673,15 @@ function App() {
           paletteNameDraft={paletteNameDraft}
           paletteAlphaDraft={paletteAlphaDraft}
           paletteModeDraft={paletteModeDraft}
-          selectedPaletteColorId={selectedPaletteColorId}
+          palettePrincipleDraft={palettePrincipleDraft}
+           selectedPaletteColorId={selectedPaletteColorId}
           savedColorPalettes={savedColorPalettes}
           fontOptions={fontOptions}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteAlphaDraftChange={setPaletteAlphaDraft}
-          onPaletteModeDraftChange={setPaletteModeDraft}
+           onPaletteModeDraftChange={handlePaletteModeDraftChange}
+           onPalettePrincipleDraftChange={handlePalettePrincipleDraftChange}
           onSelectPaletteColor={selectPaletteColor}
           onAddPaletteColor={addPaletteColor}
           onUpdatePaletteColor={saveSelectedPaletteColor}

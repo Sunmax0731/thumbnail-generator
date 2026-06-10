@@ -3,10 +3,12 @@ import {
   addHarmonyColors,
   addPaletteColor,
   addSavedColorPalette,
+  getHarmonyPrinciple,
   derivePaletteBaseFromSchemeColor,
   generateHarmonyColors,
   generatePaletteSchemeColors,
   hexToRgbChannels,
+  paletteModesByPrinciple,
   normalizeColor,
   normalizePaletteName,
   parseRgbColorInput,
@@ -79,6 +81,44 @@ describe("colorPalette", () => {
   });
 
   it("creates and reads saved palette units with multiple harmony modes", () => {
+    expect(paletteModesByPrinciple.order).toEqual([
+      "identity",
+      "analogous",
+      "intermediate",
+      "diod",
+      "opponent",
+      "split-complementary",
+      "triad",
+      "tetrad",
+      "pentad",
+      "hexad",
+      "rectangular",
+    ]);
+    expect(paletteModesByPrinciple.proximity).toEqual(["complex-harmony", "natural-harmony"]);
+    expect(paletteModesByPrinciple.similarity).toEqual([
+      "dominant-color",
+      "tone-on-tone",
+      "dominant-tone",
+      "tone-in-tone",
+      "tonal-color",
+      "camaieu",
+      "faux-camaieu",
+    ]);
+    expect(paletteModesByPrinciple.clarity).toEqual(["tricolor", "bicolor"]);
+    expect(getHarmonyPrinciple("identity")).toBe("order");
+    expect(getHarmonyPrinciple("complementary")).toBe("order");
+    expect(getHarmonyPrinciple("split")).toBe("order");
+    expect(getHarmonyPrinciple("complex-harmony")).toBe("proximity");
+    expect(getHarmonyPrinciple("shades")).toBe("proximity");
+    expect(getHarmonyPrinciple("dominant-color")).toBe("similarity");
+    expect(getHarmonyPrinciple("camaieu")).toBe("similarity");
+    expect(getHarmonyPrinciple("tricolor")).toBe("clarity");
+    expect(generatePaletteSchemeColors("#00ff00", "identity")).toHaveLength(1);
+    expect(generatePaletteSchemeColors("#ff0000", "tricolor")).toHaveLength(3);
+    expect(generatePaletteSchemeColors("#ff0000", "diod")).toHaveLength(2);
+    expect(generatePaletteSchemeColors("#ff0000", "rectangular")).toHaveLength(4);
+    expect(generatePaletteSchemeColors("#ff0000", "hexad")).toHaveLength(6);
+
     expect(generatePaletteSchemeColors("#ff0000", "complementary")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "square")).toHaveLength(4);
     expect(generatePaletteSchemeColors("#ff0000", "shades")).toHaveLength(5);

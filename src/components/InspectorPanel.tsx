@@ -46,12 +46,16 @@ import {
   derivePaletteBaseFromSchemeColor,
   generatePaletteSchemeColors,
   hexToRgbChannels,
+  paletteModesByPrinciple,
+  palettePrinciples,
+  type PalettePrinciple,
   normalizeColor,
   parseRgbColorInput,
   rgbChannelsToHex,
   type HarmonyMode,
   type PaletteColor,
   type PaletteTarget,
+  resolveHarmonyMode,
   type SavedColorPalette,
 } from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
@@ -97,6 +101,7 @@ interface InspectorPanelProps {
   paletteNameDraft: string;
   paletteAlphaDraft: number;
   paletteModeDraft: HarmonyMode;
+  palettePrincipleDraft: PalettePrinciple;
   selectedPaletteColorId: string | null;
   savedColorPalettes: SavedColorPalette[];
   fontOptions: FontOption[];
@@ -104,6 +109,7 @@ interface InspectorPanelProps {
   onPaletteNameDraftChange: (value: string) => void;
   onPaletteAlphaDraftChange: (value: number) => void;
   onPaletteModeDraftChange: (value: HarmonyMode) => void;
+  onPalettePrincipleDraftChange: (value: PalettePrinciple) => void;
   onSelectPaletteColor: (id: string) => void;
   onAddPaletteColor: () => void;
   onUpdatePaletteColor: () => void;
@@ -151,6 +157,7 @@ export function InspectorPanel({
   paletteNameDraft,
   paletteAlphaDraft,
   paletteModeDraft,
+  palettePrincipleDraft,
   selectedPaletteColorId,
   savedColorPalettes,
   fontOptions,
@@ -158,6 +165,7 @@ export function InspectorPanel({
   onPaletteNameDraftChange,
   onPaletteAlphaDraftChange,
   onPaletteModeDraftChange,
+  onPalettePrincipleDraftChange,
   onSelectPaletteColor,
   onAddPaletteColor,
   onUpdatePaletteColor,
@@ -535,6 +543,7 @@ export function InspectorPanel({
           nameDraft={paletteNameDraft}
           alphaDraft={paletteAlphaDraft}
           modeDraft={paletteModeDraft}
+          principleDraft={palettePrincipleDraft}
           selectedColorId={selectedPaletteColorId}
           savedPalettes={savedColorPalettes}
           selectedCount={paletteCompatibleCount}
@@ -542,6 +551,7 @@ export function InspectorPanel({
           onNameDraftChange={onPaletteNameDraftChange}
           onAlphaDraftChange={onPaletteAlphaDraftChange}
           onModeDraftChange={onPaletteModeDraftChange}
+          onPrincipleDraftChange={onPalettePrincipleDraftChange}
           onSelectColor={onSelectPaletteColor}
           onAdd={onAddPaletteColor}
           onUpdate={onUpdatePaletteColor}
@@ -909,6 +919,7 @@ function PaletteControls({
   nameDraft,
   alphaDraft,
   modeDraft,
+  principleDraft,
   selectedColorId,
   savedPalettes,
   selectedCount,
@@ -917,6 +928,7 @@ function PaletteControls({
   onNameDraftChange,
   onAlphaDraftChange,
   onModeDraftChange,
+  onPrincipleDraftChange,
   onSelectColor,
   onAdd,
   onUpdate,
@@ -934,6 +946,7 @@ function PaletteControls({
   nameDraft: string;
   alphaDraft: number;
   modeDraft: HarmonyMode;
+  principleDraft: PalettePrinciple;
   selectedColorId: string | null;
   savedPalettes: SavedColorPalette[];
   selectedCount: number;
@@ -942,6 +955,7 @@ function PaletteControls({
   onNameDraftChange: (value: string) => void;
   onAlphaDraftChange: (value: number) => void;
   onModeDraftChange: (value: HarmonyMode) => void;
+  onPrincipleDraftChange: (value: PalettePrinciple) => void;
   onSelectColor: (id: string) => void;
   onAdd: () => void;
   onUpdate: () => void;
@@ -958,8 +972,15 @@ function PaletteControls({
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
   const [savedPalettesExpanded, setSavedPalettesExpanded] = useState(true);
   const [registeredColorsExpanded, setRegisteredColorsExpanded] = useState(true);
+  const resolvedModeDraft = resolveHarmonyMode(modeDraft);
+  const patternModes = paletteModesByPrinciple[principleDraft] ?? paletteModesByPrinciple.order;
+  const activeMode = patternModes.includes(modeDraft)
+    ? modeDraft
+    : patternModes.includes(resolvedModeDraft)
+      ? resolvedModeDraft
+      : patternModes[0];
   const previewBaseColor = normalizeColor(draft) ?? "#000000";
-  const previewColors = generatePaletteSchemeColors(previewBaseColor, modeDraft);
+  const previewColors = generatePaletteSchemeColors(previewBaseColor, activeMode);
   const activePointColor = previewColors[activePointIndex] ?? previewBaseColor;
   const recentColors = uniqueColors([previewBaseColor, ...colors.map((color) => color.value), ...savedPalettes.flatMap((palette) => palette.colors)]).slice(0, 12);
   const sketchColor = { ...hexToHsva(previewBaseColor), a: alphaDraft };
@@ -968,6 +989,10 @@ function PaletteControls({
     if (activePointIndex >= previewColors.length) setActivePointIndex(0);
   }, [activePointIndex, previewColors.length]);
 
+  useEffect(() => {
+    if (activeMode !== modeDraft) onModeDraftChange(activeMode);
+  }, [activeMode, modeDraft, onModeDraftChange]);
+
   const setBaseDraft = (value: string, options: { preserveActivePoint?: boolean } = {}) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
     onDraftChange(normalized ?? value);
@@ -975,7 +1000,7 @@ function PaletteControls({
   };
 
   const updateLinkedPreviewPoint = (index: number, color: string) => {
-    const linkedBase = derivePaletteBaseFromSchemeColor(color, index, modeDraft);
+    const linkedBase = derivePaletteBaseFromSchemeColor(color, index, activeMode);
     if (linkedBase) onDraftChange(linkedBase);
     setActivePointIndex(index);
   };
@@ -1006,15 +1031,30 @@ function PaletteControls({
         </div>
         <div className="palette-maker-preview">
           <label className="field palette-target-field palette-wheel-pattern-field">
+            <span>{t("inspector.palettePrinciple")}</span>
+            <select
+              value={principleDraft}
+              onChange={(event) => {
+                onPrincipleDraftChange(event.currentTarget.value as PalettePrinciple);
+              }}
+            >
+              {palettePrinciples.map((principle) => (
+                <option key={principle} value={principle}>
+                  {t(palettePrincipleLabelKey(principle))}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field palette-target-field palette-wheel-pattern-field">
             <span>{t("inspector.palettePattern")}</span>
             <select
-              value={modeDraft}
+              value={activeMode}
               onChange={(event) => {
                 setActivePointIndex(0);
                 onModeDraftChange(event.currentTarget.value as HarmonyMode);
               }}
             >
-              {palettePatternModes.map((mode) => (
+              {patternModes.map((mode) => (
                 <option key={mode} value={mode}>
                   {t(harmonyLabelKey(mode))}
                 </option>
@@ -1483,29 +1523,48 @@ function clampUnit(value: number): number {
 }
 
 function harmonyLabelKey(mode: HarmonyMode) {
-  const keys = {
+  const keys: Record<HarmonyMode, Parameters<Translator>[0]> = {
+    identity: "inspector.harmony.identity",
     analogous: "inspector.harmony.analogous",
-    complementary: "inspector.harmony.complementary",
-    split: "inspector.harmony.split",
+    intermediate: "inspector.harmony.intermediate",
+    diod: "inspector.harmony.diod",
+    opponent: "inspector.harmony.opponent",
+    "split-complementary": "inspector.harmony.split-complementary",
     triad: "inspector.harmony.triad",
-    square: "inspector.harmony.square",
-    compound: "inspector.harmony.compound",
-    shades: "inspector.harmony.shades",
-    monochromatic: "inspector.harmony.monochromatic",
-  } as const;
+    tetrad: "inspector.harmony.tetrad",
+    pentad: "inspector.harmony.pentad",
+    hexad: "inspector.harmony.hexad",
+    rectangular: "inspector.harmony.rectangular",
+    "complex-harmony": "inspector.harmony.complex-harmony",
+    "natural-harmony": "inspector.harmony.natural-harmony",
+    "dominant-color": "inspector.harmony.dominant-color",
+    "tone-on-tone": "inspector.harmony.tone-on-tone",
+    "dominant-tone": "inspector.harmony.dominant-tone",
+    "tone-in-tone": "inspector.harmony.tone-in-tone",
+    "tonal-color": "inspector.harmony.tonal-color",
+    camaieu: "inspector.harmony.camaieu",
+    "faux-camaieu": "inspector.harmony.faux-camaieu",
+    tricolor: "inspector.harmony.tricolor",
+    bicolor: "inspector.harmony.bicolor",
+    complementary: "inspector.harmony.opponent",
+    split: "inspector.harmony.split-complementary",
+    square: "inspector.harmony.rectangular",
+    compound: "inspector.harmony.complex-harmony",
+    shades: "inspector.harmony.natural-harmony",
+    monochromatic: "inspector.harmony.tonal-color",
+  };
   return keys[mode];
 }
 
-const palettePatternModes: HarmonyMode[] = [
-  "analogous",
-  "complementary",
-  "split",
-  "triad",
-  "square",
-  "compound",
-  "shades",
-  "monochromatic",
-];
+function palettePrincipleLabelKey(principle: PalettePrinciple): Parameters<Translator>[0] {
+  const keys: Record<PalettePrinciple, Parameters<Translator>[0]> = {
+    order: "inspector.palettePrinciple.order",
+    proximity: "inspector.palettePrinciple.proximity",
+    similarity: "inspector.palettePrinciple.similarity",
+    clarity: "inspector.palettePrinciple.clarity",
+  };
+  return keys[principle];
+}
 
 const animationTypes: LayerAnimationType[] = [
   "none",
