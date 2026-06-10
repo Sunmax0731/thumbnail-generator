@@ -1899,9 +1899,6 @@ function App() {
                 <p>{t("inspector.imagePaletteSource", { source: extractedPaletteSource || "Selected image" })}</p>
                 <p className="image-palette-beta-notice">{t("inspector.imagePaletteBetaNotice")}</p>
               </div>
-              <button type="button" className="icon-button modal-close" onClick={closeImagePaletteModal} aria-label={t("inspector.cancel")}>
-                ×
-              </button>
             </div>
             <div className="field">
               <span>{t("inspector.paletteName")}</span>
