@@ -124,7 +124,7 @@ describe("colorPalette", () => {
     expect(generatePaletteSchemeColors("#ff0000", "complementary")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "square")).toHaveLength(4);
     expect(generatePaletteSchemeColors("#ff0000", "shades")).toHaveLength(5);
-    expect(generatePaletteSchemeColors("#ff0000", "monochromatic")).toHaveLength(3);
+    expect(generatePaletteSchemeColors("#ff0000", "monochromatic")).toHaveLength(5);
     expect(generatePaletteSchemeColors("#ff0000", "complex-harmony")).toHaveLength(5);
 
     const now = new Date("2026-06-07T00:00:00.000Z");
