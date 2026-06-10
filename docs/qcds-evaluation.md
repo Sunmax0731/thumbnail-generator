@@ -47,12 +47,12 @@ Evidence:
 - `docs/assets/runtime-20260610-schedule-builder-v2-mobile.png`
 - `docs/assets/runtime-20260610-schedule-builder-v3-desktop.png`
 - `docs/assets/runtime-20260610-schedule-builder-v3-mobile.png`
-- `docs/assets/runtime-20260610-image-palette-desktop.png`
-- `docs/assets/runtime-20260610-image-palette-mobile.png`
+- `docs/assets/runtime-20260610-image-palette-5colors-exclude-desktop.png`
+- `docs/assets/runtime-20260610-image-palette-5colors-exclude-mobile.png`
 
 Latest measured checks:
 
-- Image palette extraction modal (beta): pass. Selected image opened the Colors image-color extractor modal, extracted base/secondary/accent swatches, registered a multi-color palette via modal candidate selection, left the dedicated recent-colors section out of this beta path, executed an Adjust edit (`X`), exported WebP, and kept mobile horizontal overflow at `0`.
+- Image palette extraction modal (beta): pass. Selected image opened the Colors image-color extractor modal in beta mode, extracted candidates from 3/4/5 target counts, captured an excluded color by clicking the preview image, registered the resulting palette via modal action, and closed successfully.
 - `npm test`: pass. 28 test files, 111 tests.
 - `npm run build`: pass.
 - Beta schedule generator V3: pass. The modal opened from Templates, measured `1320px` wide with four desktop columns, exposed Adjust-shared fonts including Poppins 900, Noto Sans JP 900, and Impact, synchronized title/weekday/date/plan sliders to `72/24/34/20`, accepted `2026-06`, Japanese weekday language, and month/day date format, previewed `6/1`, generated a `6月 badge text` monthly label with grouping enabled, allowed an Adjust numeric edit after row switching, exported WebP, and kept mobile horizontal overflow at `0`.

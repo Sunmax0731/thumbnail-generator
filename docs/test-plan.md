@@ -127,29 +127,26 @@ Latest completed on 2026-06-10.
 
 ### Color Palette Extraction Modal (Image-based)
 
-Completed on 2026-06-10 for image-based base/secondary/accent color extraction and palette registration flow.
+Completed on 2026-06-10 for the latest beta image-palette extraction flow.
 
-- `npm test`: pass. 28 test files, 111 tests.
+- `npm test`: pass. 28 test files, 112 tests.
 - `npm run build`: pass.
 - Runtime gate URL: `http://127.0.0.1:4173/thumbnail-generator/`.
 - Desktop viewport: `1440x1000`.
 - Mobile viewport: `390x844`.
 - Checks:
   - Nonblank app render.
-  - Primary UI visible (left tabs, preview pane, layer list, inspector, and export controls).
-  - An image asset was added and inserted into the canvas.
-  - Colors tab opened its dedicated image color extraction modal.
-  - Modal extracted three candidate swatches from the selected image (base/secondary/accent).
-  - Candidate palette was registered into saved multi-color palettes from the modal.
-  - The dedicated “recent colors” section from this tab was not shown for the beta flow.
-  - Layer edit path executed (`Adjust X` changed from `890` to `900`).
-  - WebP export download succeeded.
+  - Left panel assets import and image-layer insertion via asset row succeeded.
+  - Colorsタブ opened the image-palette modal with title containing `ベータ機能`.
+  - Extracted color count selector changed from `3` to `4`/`5`.
+  - Candidate count became 5 when selecting 5 colors and nonzero on 4-color mode.
+  - Preview image click was recorded as an excluded color.
+  - Excluded-color list rendered at least one entry.
+  - Clicking the register action closed the modal and saved the palette path.
   - Mobile horizontal overflow: `0`.
-  - No page errors were reported.
 - Evidence screenshots:
-  - `docs/assets/runtime-20260610-image-palette-desktop.png`
-  - `docs/assets/runtime-20260610-image-palette-mobile.png`
-- Export evidence: `output/runtime-downloads/20260610-image-palette-beta-2026-06-10T10-59-03-759Z/desktop-thumbnail-1280x720-2026-06-10T10-59-03-759Z.webp`.
+  - `docs/assets/runtime-20260610-image-palette-5colors-exclude-desktop.png`
+  - `docs/assets/runtime-20260610-image-palette-5colors-exclude-mobile.png`.
 
 ### Beta Schedule Generator V3
 
