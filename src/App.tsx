@@ -94,6 +94,16 @@ import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
 import type { BrandKit, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
+type ImagePalettePreviewHoverState = {
+  x: number;
+  y: number;
+  width: number;
+  height: number;
+};
+
+const IMAGE_PALETTE_PREVIEW_LENS_SIZE = 160;
+const IMAGE_PALETTE_PREVIEW_LENS_SCALE = 3;
+
 interface ActiveCanvasInteraction {
   mode: CanvasInteractionMode;
   layer?: ThumbnailLayer;
@@ -190,8 +200,11 @@ function App() {
   const [fontReadyRevision, setFontReadyRevision] = useState(0);
   const [isImageLabOpen, setIsImageLabOpen] = useState(false);
   const [selectedAssetKey, setSelectedAssetKey] = useState(() => assets[0]?.key ?? "");
+  const [imagePaletteHoverState, setImagePaletteHoverState] = useState<ImagePalettePreviewHoverState | null>(null);
+  const [imagePaletteHoverColor, setImagePaletteHoverColor] = useState("");
   const obsWindowRef = useRef<Window | null>(null);
   const obsPreviewStateRef = useRef({ layers, assets, settings, customFonts });
+  const imagePaletteHoverSampleVersion = useRef(0);
 
   const selectedLayers = useMemo(
     () => layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable),
@@ -1214,8 +1227,38 @@ function App() {
     setExtractedImagePalette([]);
     setImagePaletteTargetCount(3);
     setImagePaletteExcludedColors([]);
+    setImagePaletteHoverState(null);
+    setImagePaletteHoverColor("");
+    imagePaletteHoverSampleVersion.current += 1;
     setExtractedPaletteAsset(null);
   }, []);
+
+  const clearImagePalettePreviewHover = useCallback(() => {
+    setImagePaletteHoverState(null);
+    setImagePaletteHoverColor("");
+    imagePaletteHoverSampleVersion.current += 1;
+  }, []);
+
+  const handleImagePalettePreviewSample = useCallback(
+    async (event: { currentTarget: HTMLImageElement; clientX: number; clientY: number }) => {
+      if (!extractedPaletteAsset || isExtractingImagePalette) return;
+      const target = event.currentTarget;
+      const bounds = target.getBoundingClientRect();
+      if (!bounds.width || !bounds.height) return;
+
+      const x = event.clientX - bounds.left;
+      const y = event.clientY - bounds.top;
+      if (x < 0 || y < 0 || x > bounds.width || y > bounds.height) return;
+
+      const requestId = ++imagePaletteHoverSampleVersion.current;
+      const color = await sampleColorFromImageAsset(extractedPaletteAsset.src, x, y, bounds.width, bounds.height);
+      if (requestId !== imagePaletteHoverSampleVersion.current) return;
+
+      setImagePaletteHoverState({ x, y, width: bounds.width, height: bounds.height });
+      setImagePaletteHoverColor(color);
+    },
+    [extractedPaletteAsset, isExtractingImagePalette],
+  );
 
   const openImagePaletteExtractor = useCallback(async () => {
     const selectedImageLayer = selectedLayers.find((layer) => layer.type === "image");
@@ -1232,6 +1275,8 @@ function App() {
     setImagePaletteTargetCount(3);
     setImagePaletteExcludedColors([]);
     setExtractedImagePalette([]);
+    setImagePaletteHoverState(null);
+    setImagePaletteHoverColor("");
     setExtractedPaletteAsset(selectedAsset);
     setExtractedPaletteSource(sourceName);
     setExtractedPaletteName("Image palette");
@@ -1670,6 +1715,26 @@ function App() {
     [assets, layers, settings],
   );
 
+  const imagePalettePreviewLensStyle = useMemo(() => {
+    if (!imagePaletteHoverState || !extractedPaletteAsset) return null;
+    const x = Math.max(0, Math.min(imagePaletteHoverState.x, imagePaletteHoverState.width));
+    const y = Math.max(0, Math.min(imagePaletteHoverState.y, imagePaletteHoverState.height));
+    const lensLeft = Math.max(0, Math.min(x - IMAGE_PALETTE_PREVIEW_LENS_SIZE / 2, imagePaletteHoverState.width - IMAGE_PALETTE_PREVIEW_LENS_SIZE));
+    const lensTop = Math.max(0, Math.min(y - IMAGE_PALETTE_PREVIEW_LENS_SIZE / 2, imagePaletteHoverState.height - IMAGE_PALETTE_PREVIEW_LENS_SIZE));
+
+    return {
+      left: `${lensLeft}px`,
+      top: `${lensTop}px`,
+      backgroundImage: `url("${extractedPaletteAsset.src}")`,
+      backgroundSize: `${Math.max(1, imagePaletteHoverState.width) * IMAGE_PALETTE_PREVIEW_LENS_SCALE}px ${
+        Math.max(1, imagePaletteHoverState.height) * IMAGE_PALETTE_PREVIEW_LENS_SCALE
+      }px`,
+      backgroundPosition: `${-x * IMAGE_PALETTE_PREVIEW_LENS_SCALE + IMAGE_PALETTE_PREVIEW_LENS_SIZE / 2}px ${
+        -y * IMAGE_PALETTE_PREVIEW_LENS_SCALE + IMAGE_PALETTE_PREVIEW_LENS_SIZE / 2
+      }px`,
+    };
+  }, [extractedPaletteAsset, imagePaletteHoverState]);
+
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
       if (isShortcutSuppressed(event.target)) return;
@@ -1921,20 +1986,30 @@ function App() {
                 <label className="field image-palette-preview-field">
                   <span>{t("inspector.imagePaletteSourceImage")}</span>
                   <p className="image-palette-hint">{t("inspector.imagePaletteExcludeHint")}</p>
-                  <img
-                    src={extractedPaletteAsset.src}
-                    alt={extractedPaletteAsset.name}
-                    className="image-palette-preview"
-                    onClick={async (event) => {
-                      if (isExtractingImagePalette) return;
-                      const target = event.currentTarget;
-                      const bounds = target.getBoundingClientRect();
-                      const x = event.clientX - bounds.left;
-                      const y = event.clientY - bounds.top;
-                      const color = await sampleColorFromImageAsset(extractedPaletteAsset.src, x, y, bounds.width, bounds.height);
-                      await addImagePaletteExcludedColor(color);
-                    }}
-                  />
+                  <div className="image-palette-preview-wrapper">
+                    <img
+                      src={extractedPaletteAsset.src}
+                      alt={extractedPaletteAsset.name}
+                      className="image-palette-preview"
+                      onMouseEnter={handleImagePalettePreviewSample}
+                      onMouseMove={handleImagePalettePreviewSample}
+                      onMouseLeave={clearImagePalettePreviewHover}
+                      onClick={async (event) => {
+                        if (isExtractingImagePalette) return;
+                        const target = event.currentTarget;
+                        const bounds = target.getBoundingClientRect();
+                        const x = event.clientX - bounds.left;
+                        const y = event.clientY - bounds.top;
+                        const color = await sampleColorFromImageAsset(extractedPaletteAsset.src, x, y, bounds.width, bounds.height);
+                        await addImagePaletteExcludedColor(color);
+                      }}
+                    />
+                    {imagePalettePreviewLensStyle ? (
+                      <div className="image-palette-preview-lens" style={imagePalettePreviewLensStyle}>
+                        <span className="image-palette-preview-lens-code">{imagePaletteHoverColor || "--"}</span>
+                      </div>
+                    ) : null}
+                  </div>
                 </label>
                 <div className="field">
                   <span>{t("inspector.imagePaletteExcludedColors")}</span>
@@ -1963,13 +2038,15 @@ function App() {
                     <span>
                       {getImagePaletteRoleLabel(index, t)}
                     </span>
+                    <span className="image-palette-swatch" style={{ background: color }} title={color} />
+                    <span className="image-palette-color-code">{color}</span>
                     <button
                       type="button"
-                      className="image-palette-swatch"
-                      style={{ background: color }}
-                      title={color}
+                      className="image-palette-exclude-action"
+                      onClick={() => addImagePaletteExcludedColor(color)}
+                      disabled={imagePaletteExcludedColors.includes(color)}
                     >
-                      {color}
+                      {imagePaletteExcludedColors.includes(color) ? t("inspector.imagePaletteExcluded") : t("inspector.imagePaletteAddToExcluded")}
                     </button>
                   </div>
                 ))
