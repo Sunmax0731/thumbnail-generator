@@ -338,7 +338,7 @@ export function derivePaletteBaseFromSchemeColor(
   const offsets = paletteHueOffsets(resolvedMode);
   if (offsets?.[pointIndex] !== undefined) {
     return hslToHex({
-      h: normalizeHue(colorHsl.h - offsets[pointIndex]),
+      h: Math.round(normalizeHue(colorHsl.h - offsets[pointIndex])),
       s: colorHsl.s,
       l: colorHsl.l,
     });
