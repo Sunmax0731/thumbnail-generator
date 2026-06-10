@@ -1098,7 +1098,7 @@ function PaletteControls({
                 key={`${color}-${index}`}
                 type="button"
                 className={`palette-wheel-point ${index === 0 ? "base" : ""} ${activePointIndex === index ? "selected" : ""}`}
-                style={{ ...wheelPointStyle(color), background: color }}
+                style={{ ...wheelPointStyle(color, activeMode), background: color }}
                 title={color}
                 onPointerDown={(event) => {
                   event.preventDefault();
@@ -1447,12 +1447,21 @@ function paletteColorDisplayName(color: PaletteColor): string {
   return cleaned || color.value;
 }
 
-function wheelPointStyle(color: string): { left: string; top: string } {
+function wheelPointStyle(color: string, mode: HarmonyMode): { left: string; top: string } {
   const channels = hexToRgbChannels(color);
   if (!channels) return { left: "50%", top: "50%" };
   const hsl = rgbToHsl(channels.r, channels.g, channels.b);
   const angle = ((hsl.h - 90) * Math.PI) / 180;
-  const radius = 10 + hsl.s * 34;
+  const resolvedMode = resolveHarmonyMode(mode);
+  const isSimilarityMode = paletteModesByPrinciple.similarity.includes(resolvedMode);
+  const similarityLightnessGain =
+    resolvedMode === "tone-on-tone"
+      ? 38
+      : resolvedMode === "dominant-color" || resolvedMode === "camaieu" || resolvedMode === "faux-camaieu"
+        ? 18
+        : 24;
+  const lightnessRadiusBias = isSimilarityMode ? (hsl.l - 0.5) * similarityLightnessGain : 0;
+  const radius = Math.min(56, Math.max(8, 12 + hsl.s * 30 + lightnessRadiusBias));
   return {
     left: `calc(50% + ${Math.cos(angle) * radius}px)`,
     top: `calc(50% + ${Math.sin(angle) * radius}px)`,

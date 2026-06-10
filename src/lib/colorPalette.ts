@@ -211,24 +211,32 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
   if (!normalized) return [];
   const hsl = hexToHsl(normalized);
   const resolvedMode = resolveHarmonyMode(mode);
-  if (resolvedMode === "identity") {
-    return [
-      normalized,
-      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.65), l: clampUnit(hsl.l * 0.62) }),
-      hslToHex({ ...hsl, s: clampUnit(hsl.s * 1.25), l: clampUnit(hsl.l * 1.2) }),
-    ];
-  }
   if (
     resolvedMode === "dominant-color" ||
     resolvedMode === "tone-on-tone" ||
     resolvedMode === "dominant-tone" ||
     resolvedMode === "tone-in-tone" ||
-    resolvedMode === "tonal-color"
+    resolvedMode === "tonal-color" ||
+    resolvedMode === "camaieu" ||
+    resolvedMode === "faux-camaieu"
   ) {
+    const profile = getSimilarityPaletteProfile(hsl, resolvedMode);
     return [
-      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.55), l: clampUnit(hsl.l * 0.82) }),
       normalized,
-      hslToHex({ ...hsl, s: clampUnit(Math.min(1, hsl.s * 1.2)), l: clampUnit(hsl.l + (1 - hsl.l) * 0.28) }),
+      ...profile.slice(1).map((entry) =>
+        hslToHex({
+          h: normalizeHue(hsl.h + entry.hueOffset),
+          s: clampUnit(hsl.s * entry.saturationScale),
+          l: clampUnit(entry.lightnessScale * hsl.l + entry.lightnessAdd),
+        }),
+      ),
+    ];
+  }
+  if (resolvedMode === "identity") {
+    return [
+      normalized,
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.65), l: clampUnit(hsl.l * 0.62) }),
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 1.25), l: clampUnit(hsl.l * 1.2) }),
     ];
   }
   if (resolvedMode === "natural-harmony") {
@@ -248,15 +256,6 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
         l: clampUnit(hsl.l * entry.lightnessScale),
       }),
     );
-  }
-  if (resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
-    return [
-      hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.42) }),
-      hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.68) }),
-      normalized,
-      hslToHex({ ...hsl, l: clampUnit(hsl.l + (1 - hsl.l) * 0.34) }),
-      hslToHex({ ...hsl, l: clampUnit(hsl.l + (1 - hsl.l) * 0.58) }),
-    ];
   }
   const offsets = paletteHueOffsets(resolvedMode);
   if (!offsets) return [normalized];
@@ -290,20 +289,20 @@ export function derivePaletteBaseFromSchemeColor(
     resolvedMode === "tone-on-tone" ||
     resolvedMode === "dominant-tone" ||
     resolvedMode === "tone-in-tone" ||
-    resolvedMode === "tonal-color"
+    resolvedMode === "tonal-color" ||
+    resolvedMode === "camaieu" ||
+    resolvedMode === "faux-camaieu"
   ) {
-    if (pointIndex === 0) {
-      return hslToHex({ h: colorHsl.h, s: clampUnit(colorHsl.s / 0.55), l: clampUnit(colorHsl.l / 0.82) });
-    }
-    if (pointIndex === 1) return normalized;
-    if (pointIndex === 2) {
-      return hslToHex({
-        h: colorHsl.h,
-        s: clampUnit(colorHsl.s / 1.2),
-        l: clampUnit((colorHsl.l - (1 - colorHsl.l) * 0.28) / 0.72),
-      });
-    }
-    return normalized;
+    const profile = getSimilarityPaletteProfile(colorHsl, resolvedMode);
+    const entry = profile[pointIndex];
+    if (!entry) return normalized;
+    const baseHue = normalizeHue(colorHsl.h - entry.hueOffset);
+    const lightnessDivisor = entry.lightnessScale === 0 ? 1 : entry.lightnessScale;
+    return hslToHex({
+      h: baseHue,
+      s: clampUnit(colorHsl.s / entry.saturationScale),
+      l: clampUnit((colorHsl.l - entry.lightnessAdd) / lightnessDivisor),
+    });
   }
 
   if (resolvedMode === "natural-harmony") {
@@ -326,15 +325,6 @@ export function derivePaletteBaseFromSchemeColor(
       l: clampUnit(colorHsl.l / profile.lightnessScale),
     });
   }
-  if (resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
-    const lightnessByIndex = [colorHsl.l / 0.42, colorHsl.l / 0.68, colorHsl.l, (colorHsl.l - 0.34) / 0.66, (colorHsl.l - 0.58) / 0.42];
-    return hslToHex({
-      h: colorHsl.h,
-      s: colorHsl.s,
-      l: clampUnit(lightnessByIndex[pointIndex] ?? colorHsl.l),
-    });
-  }
-
   const offsets = paletteHueOffsets(resolvedMode);
   if (offsets?.[pointIndex] !== undefined) {
     return hslToHex({
@@ -373,12 +363,90 @@ interface HarmonyProfile {
   saturationScale: number;
 }
 
+interface SimilarityPaletteProfileEntry {
+  hueOffset: number;
+  lightnessScale: number;
+  saturationScale: number;
+  lightnessAdd: number;
+}
+
 function getNaturalHarmonyProfileForHue(hue: number): readonly HarmonyProfile[] {
   return getHarmonyProfileForHue(hue, "natural-harmony");
 }
 
 function getComplexHarmonyProfileForHue(hue: number): readonly HarmonyProfile[] {
   return getHarmonyProfileForHue(hue, "complex-harmony");
+}
+
+function getSimilarityPaletteProfile(
+  _baseHsl: { h: number; l: number; s: number },
+  mode:
+    | "dominant-color"
+    | "tone-on-tone"
+    | "dominant-tone"
+    | "tone-in-tone"
+    | "tonal-color"
+    | "camaieu"
+    | "faux-camaieu",
+): readonly SimilarityPaletteProfileEntry[] {
+  switch (mode) {
+    case "dominant-color":
+      return [
+        { hueOffset: 0, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: 0, saturationScale: 0.9, lightnessScale: 1.0, lightnessAdd: -0.08 },
+        { hueOffset: 0, saturationScale: 1.02, lightnessScale: 1.0, lightnessAdd: -0.02 },
+        { hueOffset: 0, saturationScale: 1.04, lightnessScale: 1.0, lightnessAdd: 0.08 },
+        { hueOffset: 0, saturationScale: 0.95, lightnessScale: 1.0, lightnessAdd: 0.16 },
+      ];
+    case "tone-on-tone":
+      return [
+        { hueOffset: 0, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: 0, saturationScale: 0.88, lightnessScale: 1.0, lightnessAdd: -0.38 },
+        { hueOffset: 0, saturationScale: 0.95, lightnessScale: 1.0, lightnessAdd: -0.18 },
+        { hueOffset: 0, saturationScale: 1.05, lightnessScale: 1.0, lightnessAdd: 0.16 },
+        { hueOffset: 0, saturationScale: 0.9, lightnessScale: 1.0, lightnessAdd: 0.34 },
+      ];
+    case "dominant-tone":
+      return [
+        { hueOffset: 0, saturationScale: 0.94, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: -36, saturationScale: 1.04, lightnessScale: 1.0, lightnessAdd: 0.02 },
+        { hueOffset: -18, saturationScale: 0.98, lightnessScale: 1.0, lightnessAdd: -0.02 },
+        { hueOffset: 18, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.01 },
+        { hueOffset: 36, saturationScale: 1.02, lightnessScale: 1.0, lightnessAdd: -0.01 },
+      ];
+    case "tone-in-tone":
+      return [
+        { hueOffset: 0, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: -30, saturationScale: 0.98, lightnessScale: 1.0, lightnessAdd: -0.08 },
+        { hueOffset: -12, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: -0.02 },
+        { hueOffset: 12, saturationScale: 0.95, lightnessScale: 1.0, lightnessAdd: 0.03 },
+        { hueOffset: 30, saturationScale: 0.9, lightnessScale: 1.0, lightnessAdd: 0.06 },
+      ];
+    case "tonal-color":
+      return [
+        { hueOffset: 0, saturationScale: 0.30, lightnessScale: 0.7, lightnessAdd: 0.25 },
+        { hueOffset: 72, saturationScale: 0.35, lightnessScale: 0.68, lightnessAdd: 0.22 },
+        { hueOffset: 144, saturationScale: 0.42, lightnessScale: 0.7, lightnessAdd: 0.2 },
+        { hueOffset: 216, saturationScale: 0.35, lightnessScale: 0.72, lightnessAdd: 0.22 },
+        { hueOffset: 288, saturationScale: 0.30, lightnessScale: 0.7, lightnessAdd: 0.24 },
+      ];
+    case "camaieu":
+      return [
+        { hueOffset: 0, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: -2, saturationScale: 0.98, lightnessScale: 1.0, lightnessAdd: -0.03 },
+        { hueOffset: 2, saturationScale: 1.02, lightnessScale: 1.0, lightnessAdd: 0.03 },
+        { hueOffset: -4, saturationScale: 0.96, lightnessScale: 1.0, lightnessAdd: 0.02 },
+        { hueOffset: 4, saturationScale: 1.04, lightnessScale: 1.0, lightnessAdd: -0.02 },
+      ];
+    case "faux-camaieu":
+      return [
+        { hueOffset: 0, saturationScale: 1.0, lightnessScale: 1.0, lightnessAdd: 0.0 },
+        { hueOffset: -6, saturationScale: 0.95, lightnessScale: 1.0, lightnessAdd: -0.07 },
+        { hueOffset: 6, saturationScale: 1.08, lightnessScale: 1.0, lightnessAdd: 0.07 },
+        { hueOffset: -12, saturationScale: 0.92, lightnessScale: 1.0, lightnessAdd: 0.01 },
+        { hueOffset: 12, saturationScale: 1.1, lightnessScale: 1.0, lightnessAdd: 0.1 },
+      ];
+  }
 }
 
 function getHarmonyProfileForHue(hue: number, mode: "natural-harmony" | "complex-harmony"): readonly HarmonyProfile[] {

@@ -177,4 +177,37 @@ describe("colorPalette", () => {
       identityPalette[1],
     );
   });
+
+  it("maps similarity principle drag points to readable inverse profiles", () => {
+    const similarityModes = [
+      "dominant-color",
+      "tone-on-tone",
+      "dominant-tone",
+      "tone-in-tone",
+      "tonal-color",
+      "camaieu",
+      "faux-camaieu",
+    ] as const;
+    const base = "#ffcc66";
+    const colorDelta = (left: string, right: string): number => {
+      const lhs = hexToRgbChannels(left);
+      const rhs = hexToRgbChannels(right);
+      if (!lhs || !rhs) return Number.MAX_SAFE_INTEGER;
+      return Math.max(Math.abs(lhs.r - rhs.r), Math.abs(lhs.g - rhs.g), Math.abs(lhs.b - rhs.b));
+    };
+
+    for (const mode of similarityModes) {
+      const palette = generatePaletteSchemeColors(base, mode);
+      expect(palette).toHaveLength(5);
+      expect(new Set(palette).size).toBeGreaterThan(1);
+      for (let index = 0; index < palette.length; index++) {
+        const point = palette[index];
+        const linkedBase = derivePaletteBaseFromSchemeColor(point, index, mode);
+        expect(linkedBase).not.toBeNull();
+        if (!linkedBase) continue;
+        const roundTrip = generatePaletteSchemeColors(linkedBase, mode)[index];
+        expect(colorDelta(roundTrip, point)).toBeLessThanOrEqual(4);
+      }
+    }
+  });
 });
