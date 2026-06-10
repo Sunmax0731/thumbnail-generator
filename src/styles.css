@@ -2198,11 +2198,19 @@ button:disabled {
 .schedule-slider-field input[type="range"] {
   min-height: 16px;
   padding: 0;
+  min-width: 0;
 }
 
 .schedule-slider-field input[type="number"] {
   min-height: 30px;
+  width: 64px;
   padding: 0 7px;
+  text-align: center;
+}
+
+.schedule-font-weight-field select {
+  width: 98px;
+  min-width: 0;
 }
 
 .schedule-preview-title {
