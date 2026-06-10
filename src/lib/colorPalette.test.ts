@@ -113,7 +113,7 @@ describe("colorPalette", () => {
     expect(getHarmonyPrinciple("dominant-color")).toBe("similarity");
     expect(getHarmonyPrinciple("camaieu")).toBe("similarity");
     expect(getHarmonyPrinciple("tricolor")).toBe("clarity");
-    expect(generatePaletteSchemeColors("#00ff00", "identity")).toHaveLength(1);
+    expect(generatePaletteSchemeColors("#00ff00", "identity")).toHaveLength(3);
     expect(generatePaletteSchemeColors("#ff0000", "tricolor")).toHaveLength(3);
     expect(generatePaletteSchemeColors("#ff0000", "intermediate")).toHaveLength(2);
     expect(generatePaletteSchemeColors("#ff0000", "opponent")).toHaveLength(2);
@@ -125,6 +125,7 @@ describe("colorPalette", () => {
     expect(generatePaletteSchemeColors("#ff0000", "square")).toHaveLength(4);
     expect(generatePaletteSchemeColors("#ff0000", "shades")).toHaveLength(5);
     expect(generatePaletteSchemeColors("#ff0000", "monochromatic")).toHaveLength(3);
+    expect(generatePaletteSchemeColors("#ff0000", "complex-harmony")).toHaveLength(5);
 
     const now = new Date("2026-06-07T00:00:00.000Z");
     const palettes = addSavedColorPalette([], { name: "Stream set", baseColor: "#ff0000", mode: "triad" }, now);
@@ -162,6 +163,18 @@ describe("colorPalette", () => {
     );
     expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor("#6c6c6c", 1, "shades") ?? "", "shades")[1]).toBe(
       "#6c6c6c",
+    );
+    const naturalPalette = generatePaletteSchemeColors("#ffcc66", "natural-harmony");
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor(naturalPalette[2], 2, "natural-harmony") ?? "", "natural-harmony")[2]).toBe(
+      naturalPalette[2],
+    );
+    const complexPalette = generatePaletteSchemeColors("#ffcc66", "complex-harmony");
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor(complexPalette[2], 2, "complex-harmony") ?? "", "complex-harmony")[2]).toBe(
+      complexPalette[2],
+    );
+    const identityPalette = generatePaletteSchemeColors("#ffcc66", "identity");
+    expect(generatePaletteSchemeColors(derivePaletteBaseFromSchemeColor(identityPalette[1], 1, "identity") ?? "", "identity")[1]).toBe(
+      identityPalette[1],
     );
   });
 });

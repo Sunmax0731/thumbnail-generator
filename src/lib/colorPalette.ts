@@ -211,7 +211,13 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
   if (!normalized) return [];
   const hsl = hexToHsl(normalized);
   const resolvedMode = resolveHarmonyMode(mode);
-  if (resolvedMode === "identity") return [normalized];
+  if (resolvedMode === "identity") {
+    return [
+      normalized,
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 0.65), l: clampUnit(hsl.l * 0.62) }),
+      hslToHex({ ...hsl, s: clampUnit(hsl.s * 1.25), l: clampUnit(hsl.l * 1.2) }),
+    ];
+  }
   if (
     resolvedMode === "dominant-color" ||
     resolvedMode === "tone-on-tone" ||
@@ -225,7 +231,25 @@ export function generatePaletteSchemeColors(baseColor: string, mode: HarmonyMode
       hslToHex({ ...hsl, s: clampUnit(Math.min(1, hsl.s * 1.2)), l: clampUnit(hsl.l + (1 - hsl.l) * 0.28) }),
     ];
   }
-  if (resolvedMode === "natural-harmony" || resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
+  if (resolvedMode === "natural-harmony") {
+    return getNaturalHarmonyProfileForHue(hsl.h).map((entry) =>
+      hslToHex({
+        h: normalizeHue(hsl.h + entry.offset),
+        s: clampUnit(hsl.s * entry.saturationScale),
+        l: clampUnit(hsl.l * entry.lightnessScale),
+      }),
+    );
+  }
+  if (resolvedMode === "complex-harmony") {
+    return getComplexHarmonyProfileForHue(hsl.h).map((entry) =>
+      hslToHex({
+        h: normalizeHue(hsl.h + entry.offset),
+        s: clampUnit(hsl.s * entry.saturationScale),
+        l: clampUnit(hsl.l * entry.lightnessScale),
+      }),
+    );
+  }
+  if (resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
     return [
       hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.42) }),
       hslToHex({ ...hsl, l: clampUnit(hsl.l * 0.68) }),
@@ -250,7 +274,17 @@ export function derivePaletteBaseFromSchemeColor(
 
   const colorHsl = hexToHsl(normalized);
   const resolvedMode = resolveHarmonyMode(mode);
-  if (resolvedMode === "identity") return normalized;
+  if (resolvedMode === "identity") {
+    if (pointIndex === 1) return hslToHex({ h: colorHsl.h, s: clampUnit(colorHsl.s / 0.65), l: clampUnit(colorHsl.l / 0.62) });
+    if (pointIndex === 2) {
+      return hslToHex({
+        h: colorHsl.h,
+        s: clampUnit(colorHsl.s / 1.25),
+        l: clampUnit(colorHsl.l / 1.2),
+      });
+    }
+    return normalized;
+  }
   if (
     resolvedMode === "dominant-color" ||
     resolvedMode === "tone-on-tone" ||
@@ -272,7 +306,27 @@ export function derivePaletteBaseFromSchemeColor(
     return normalized;
   }
 
-  if (resolvedMode === "natural-harmony" || resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
+  if (resolvedMode === "natural-harmony") {
+    const profile = getNaturalHarmonyProfileForHue(colorHsl.h)[pointIndex];
+    if (!profile) return normalized;
+    const baseHue = normalizeHue(colorHsl.h - profile.offset);
+    return hslToHex({
+      h: baseHue,
+      s: clampUnit(colorHsl.s / profile.saturationScale),
+      l: clampUnit(colorHsl.l / profile.lightnessScale),
+    });
+  }
+  if (resolvedMode === "complex-harmony") {
+    const profile = getComplexHarmonyProfileForHue(colorHsl.h)[pointIndex];
+    if (!profile) return normalized;
+    const baseHue = normalizeHue(colorHsl.h - profile.offset);
+    return hslToHex({
+      h: baseHue,
+      s: clampUnit(colorHsl.s / profile.saturationScale),
+      l: clampUnit(colorHsl.l / profile.lightnessScale),
+    });
+  }
+  if (resolvedMode === "camaieu" || resolvedMode === "faux-camaieu") {
     const lightnessByIndex = [colorHsl.l / 0.42, colorHsl.l / 0.68, colorHsl.l, (colorHsl.l - 0.34) / 0.66, (colorHsl.l - 0.58) / 0.42];
     return hslToHex({
       h: colorHsl.h,
@@ -310,8 +364,49 @@ function paletteHueOffsets(mode: HarmonyMode): readonly number[] | undefined {
   if (resolvedMode === "tetrad" || resolvedMode === "rectangular") return [0, 90, 180, 270];
   if (resolvedMode === "pentad") return generateHueIntervalOffsets(5);
   if (resolvedMode === "hexad") return generateHueIntervalOffsets(6);
-  if (resolvedMode === "complex-harmony") return [0, 150, 210];
   return undefined;
+}
+
+interface HarmonyProfile {
+  offset: number;
+  lightnessScale: number;
+  saturationScale: number;
+}
+
+function getNaturalHarmonyProfileForHue(hue: number): readonly HarmonyProfile[] {
+  return getHarmonyProfileForHue(hue, "natural-harmony");
+}
+
+function getComplexHarmonyProfileForHue(hue: number): readonly HarmonyProfile[] {
+  return getHarmonyProfileForHue(hue, "complex-harmony");
+}
+
+function getHarmonyProfileForHue(hue: number, mode: "natural-harmony" | "complex-harmony"): readonly HarmonyProfile[] {
+  const offsets = [-45, -22, 0, 22, 45];
+  const isNatural = mode === "natural-harmony";
+  return offsets.map((offset) => {
+    const sampledHue = normalizeHue(hue + offset);
+    const warmth = hueTemperatureBias(sampledHue);
+    const effectiveWarmth = isNatural ? warmth : 1 - warmth;
+    return {
+      offset,
+      saturationScale: 0.76 + 0.24 * effectiveWarmth,
+      lightnessScale: 0.72 + 0.28 * effectiveWarmth,
+    };
+  });
+}
+
+function hueTemperatureBias(hue: number): number {
+  const warmDistance = hueDistance(hue, 60);
+  const coolDistance = hueDistance(hue, 270);
+  return clampUnit((coolDistance - warmDistance) / 180 + 0.5);
+}
+
+function hueDistance(first: number, second: number): number {
+  const normalizedFirst = normalizeHue(first);
+  const normalizedSecond = normalizeHue(second);
+  const delta = Math.abs(normalizedFirst - normalizedSecond);
+  return Math.min(delta, 360 - delta);
 }
 
 export function addHarmonyColors(
