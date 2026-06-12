@@ -1,6 +1,6 @@
-# Thumbnail Generator
+# サムネいる？
 
-Thumbnail Generator is a static browser app for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms. It runs entirely in the browser, supports Japanese and English UI labels, and exports finished thumbnails as PNG, JPEG, or WebP.
+サムネいる？ is a static browser app for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms. It runs entirely in the browser, supports Japanese and English UI labels, installs as a PWA, and exports finished thumbnails as PNG, JPEG, or WebP.
 
 Published app: <https://sunmax0731.github.io/thumbnail-generator/>
 
@@ -24,7 +24,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
-- Add multiple layer animation sets from Motion, choose presets, split movement motions from non-moving effects, show text-only controls only for text layers, toggle the easing graph, and edit animated layer timing from the Motion-only bottom timeline.
+- Add multiple layer animation sets from the アニメ tab, choose presets, split movement motions from non-moving effects, show text-only controls only for text layers, toggle the easing graph, and edit animated layer timing from the アニメ-only bottom timeline.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the top-right edit-state icon cluster; autosave remains text-labeled there.
@@ -36,13 +36,15 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
+- Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
+- Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
 
 See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide.md](docs/user-guide.md) for step-by-step usage, and [docs/screenshot-guide.md](docs/screenshot-guide.md) for screenshot-based feature walkthroughs.
 
 ## Use The Published App
 
-Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data.
+Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data. Browsers that support PWA installation can install サムネいる？ from the address-bar install action or browser menu.
 
 Use the in-app GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data.
 
@@ -69,7 +71,7 @@ To package the documentation artifact:
 npm run docs:zip
 ```
 
-The built `dist/` output is static and can be served by GitHub Pages or any static file host.
+The built `dist/` output is static and can be served by GitHub Pages or any static file host. `public/manifest.webmanifest`, `public/sw.js`, and the icons provide the PWA shell. `src/lib/extensionBridge.ts` exposes the stable page-message bridge for Chrome extension content scripts.
 
 ## Report Bugs Or Requests
 

@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create a static web service for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms.
+Create a static web service named サムネいる？ for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms.
 
 ## Functional Requirements
 
@@ -38,8 +38,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Provide a beta schedule generator in Templates that creates monthly or weekly editable schedule layer sets from calendar date inputs, Sunday/Monday week-start settings, weekday language, date format, uniform or per-day action counts, canvas orientation, grid style, Adjust-shared font choices, separate title/weekday/date/plan font-size sliders, color, corner radius, line-width, pre-generation preview, month-aware badge labels, generated-layer grouping controls, and reload-persistent generator settings.
 - Provide image generators for standard thumbnails, vertical thumbnails, and stream waiting screens with five placement patterns, editable text, shared font choices, grouped common/title/subtitle/label text controls, color, image-slot, grouping, live preview, Generate layers, and Save settings controls. Stream waiting screens include optional animation metadata.
 - Keep generator modal text sliders compact, allow letter spacing to be set to `0`, keep corner radius in common generator controls, use wider landscape previews for standard thumbnail, schedule, and stream waiting generators, preserve portrait preview aspect ratios, place generator action buttons at the preview/modal lower edge, and keep portrait generator preview columns free of excessive right-side whitespace.
-- Configure one or more per-layer animation sets with easings.net-style easing choices, motion presets, selected-object Motion preview, toggleable easing graph, disabled direction controls when an animation type does not use movement, a bottom timeline of animated layers, text-only motion controls only for selected text layers, movement and non-moving/effect dropdowns in common parameters, greyed-out effect intensity when the selected non-moving effect cannot use intensity, and a popup-style OBS preview window without editor controls or selection handles.
-- Show the bottom motion timeline only while the Motion tab is active, and let users edit animation start/end visually with segment handles, move a segment by dragging the bar, and resize the timeline section height by dragging its handle.
+- Configure one or more per-layer animation sets from the アニメ tab with easings.net-style easing choices, motion presets, selected-object preview, toggleable easing graph, disabled direction controls when an animation type does not use movement, a bottom timeline of animated layers, text-only motion controls only for selected text layers, movement and non-moving/effect dropdowns in common parameters, greyed-out effect intensity when the selected non-moving effect cannot use intensity, and a popup-style OBS preview window without editor controls or selection handles.
+- Show the bottom motion timeline only while the アニメ tab is active, and let users collapse the timeline, edit animation start/end visually with segment handles, move a segment by dragging the bar, and resize the timeline section height by dragging its handle.
 - Provide OBS preview-window controls for Play/Pause, Reset, and hiding/showing the control overlay for clean capture, with `P`, `R`, and `H` keyboard shortcuts.
 - Keep the left panel focused on Templates, Layers, and Assets by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
@@ -54,6 +54,8 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Switch major UI labels between Japanese and English, auto-selecting from browser/OS language when supported and falling back clearly when unsupported.
 - Preserve CSV and HTML-like layout text in saved edit states and templates.
 - Export the composed thumbnail to PNG, JPEG, or WebP at selected resolution and aspect ratio.
+- Provide PWA install metadata and a service worker app-shell cache for supported browsers.
+- Provide a Chrome-extension-friendly page bridge that lets a content script detect readiness, read the current edit-state snapshot, and apply a valid edit-state snapshot without changing the saved-state schema.
 - Provide common presets and custom output dimensions from the preview header.
 - Confirm before applying a template that replaces the current layer state, and apply the template's canvas aspect ratio automatically.
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.

@@ -1125,6 +1125,12 @@ button:disabled {
   max-height: 320px;
 }
 
+.stage-timeline.collapsed {
+  grid-template-rows: auto;
+  min-height: auto;
+  height: auto;
+}
+
 .stage-timeline-header {
   display: flex;
   align-items: center;
@@ -1137,6 +1143,18 @@ button:disabled {
 
 .stage-timeline-header span {
   color: var(--muted);
+  font-size: 11px;
+}
+
+.timeline-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.timeline-collapse-button {
+  min-height: 26px;
+  padding: 0 9px;
   font-size: 11px;
 }
 

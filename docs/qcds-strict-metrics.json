@@ -14,11 +14,11 @@
   ],
   "quality": {
     "rating": "A+",
-    "rationale": "Current app coverage includes the preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, bottom motion timeline, motion presets, separated common/text-only/glow-effect motion controls, OBS preview Play/Pause/Reset/Hide controls, existing template/generator/layer/color/Image Lab workflows, CSV/HTML animation text/effect compatibility, automated tests, production build, and headless Chromium runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
+    "rationale": "Current app coverage includes the サムネいる？ title, アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, collapsible bottom motion timeline, motion presets, separated common/text-only/glow-effect motion controls, OBS preview Play/Pause/Reset/Hide controls, existing template/generator/layer/color/Image Lab workflows, CSV/HTML animation text/effect compatibility, automated tests, production build, and headless Chromium runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
   },
   "cost": {
     "rating": "A+",
-    "rationale": "Static browser-only GitHub Pages app with no backend, no paid service dependency, browser-local edit state, template, color, saved palette, and custom font storage, and client-side YouTube thumbnail import."
+    "rationale": "Static browser-only GitHub Pages app with no backend, no paid service dependency, static PWA public assets, a same-origin service worker, a page-message extension bridge that reuses edit-state JSON, browser-local edit state, template, color, saved palette, and custom font storage, and client-side YouTube thumbnail import."
   },
   "delivery": {
     "rating": "A+",
@@ -26,7 +26,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested UI and motion changes passed validation: export choices are consolidated into one Output menu, old preview-bottom Output/Edit state sections are removed, edit-state actions are compact top-right icons with tooltips while autosave remains text-labeled, the preview bottom now hosts a timeline, Motion has presets plus text-only and glow/effect sections, OBS preview controls can be hidden and restored with H, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
+    "rationale": "Requested UI, PWA, extension, and title changes passed validation: the page title/header are サムネいる？, the right inspector Motion tab is アニメ, the preview bottom timeline can collapse and expand, manifest/service worker load under /thumbnail-generator/, the extension bridge handles ping/getSnapshot/applySnapshot, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -65,12 +65,15 @@
     "tool": "Playwright headless Chromium",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin attempt failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4177/thumbnail-generator/?runtime=motion-ui",
+    "url": "http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "passed for pushed codex/thumbnail-generator-static-app branch",
     "desktopViewport": "1440x1000",
     "mobileViewport": "390x900",
     "screenshots": [
+      "output/runtime-20260612-pwa-extension/desktop-initial.png",
+      "output/runtime-20260612-pwa-extension/anime-timeline-expanded.png",
+      "output/runtime-20260612-pwa-extension/mobile.png",
       "docs/assets/runtime-20260612-ui-tags-decoration-standard.png",
       "docs/assets/runtime-20260612-ui-tags-decoration-vertical.png",
       "docs/assets/runtime-20260612-ui-tags-decoration-schedule-portrait.png",
@@ -88,6 +91,14 @@
       "output/runtime-20260612-motion-ui/mobile.png"
     ],
     "checks": [
+      "document title and app header are サムネいる？",
+      "old title text absent",
+      "right inspector tab label is アニメ",
+      "manifest loads from /thumbnail-generator/manifest.webmanifest",
+      "service worker scope is /thumbnail-generator/",
+      "extension bridge ping getSnapshot applySnapshot pass",
+      "timeline hidden before アニメ and visible inside アニメ",
+      "timeline collapse and expand preserve default height",
       "nonblank canvas",
       "primary UI visible",
       "Standard thumbnail letter spacing increments from -1 to 0",
@@ -133,7 +144,7 @@
       "Dark theme DOM state and localStorage persistence",
       "left Templates Layers Assets tabs without the hidden Layouts tab",
       "left tab buttons do not wrap",
-      "right Adjust Colors Motion tabs",
+      "right Adjust Colors アニメ tabs",
       "right inspector tabs use three equal-width columns",
       "top toolbar output controls hidden",
       "preview-header Preset Width Height controls",

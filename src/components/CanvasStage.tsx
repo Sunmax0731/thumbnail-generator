@@ -370,6 +370,7 @@ function MotionTimeline({
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
   const [timelineHeight, setTimelineHeight] = useState(170);
+  const [isCollapsed, setIsCollapsed] = useState(false);
   const motionLayers = layers.filter((layer) => {
     const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
     return animations.length > 0;
@@ -417,79 +418,98 @@ function MotionTimeline({
   };
 
   return (
-    <section className="stage-timeline" aria-label={t("timeline.aria")} ref={sectionRef} style={{ height: timelineHeight }}>
+    <section
+      className={`stage-timeline ${isCollapsed ? "collapsed" : ""}`}
+      aria-label={t("timeline.aria")}
+      ref={sectionRef}
+      style={isCollapsed ? undefined : { height: timelineHeight }}
+    >
       <div className="stage-timeline-header">
         <strong>{t("timeline.title")}</strong>
-        <span>{(duration / 1000).toFixed(1)}s</span>
+        <div className="timeline-header-actions">
+          <span>{(duration / 1000).toFixed(1)}s</span>
+          <button
+            type="button"
+            className="ghost-button timeline-collapse-button"
+            aria-expanded={!isCollapsed}
+            onClick={() => setIsCollapsed((current) => !current)}
+          >
+            {isCollapsed ? t("timeline.expand") : t("timeline.collapse")}
+          </button>
+        </div>
       </div>
-      <div className="timeline-ruler" aria-hidden="true">
-        {[0, 0.25, 0.5, 0.75, 1].map((point) => (
-          <span key={point} style={{ left: `${point * 100}%` }}>
-            {(point * duration / 1000).toFixed(point === 0 ? 0 : 1)}s
-          </span>
-        ))}
-      </div>
-      <div className="timeline-track-list">
-        {motionLayers.length === 0 ? (
-          <p className="empty-note">{t("timeline.empty")}</p>
-        ) : (
-          motionLayers.map((layer) => {
-            const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
-            return (
-              <div
-                role="button"
-                tabIndex={0}
-                className={`timeline-row ${selectedIds.includes(layer.id) ? "selected" : ""}`}
-                key={layer.id}
-                onClick={(event) => onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
-                onKeyDown={(event) => {
-                  if (event.key === "Enter" || event.key === " ") {
-                    event.preventDefault();
-                    onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
-                  }
-                }}
-              >
-                <span className="timeline-layer-name">{layer.name}</span>
-                <span className="timeline-track">
-                  {animations.map((animation, index) => {
-                    const left = Math.max(0, (animation.startMs / duration) * 100);
-                    const width = Math.min(100 - left, Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100));
-                    return (
-                      <TimelineSegment
-                        key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
-                        animation={animation}
-                        duration={duration}
-                        left={left}
-                        width={width}
-                        layerId={layer.id}
-                        animationIndex={index}
-                        onUpdateTiming={updateAnimationTiming}
-                      />
-                    );
-                  })}
-                </span>
-              </div>
-            );
-          })
-        )}
-      </div>
-      <div
-        className="timeline-resize-handle"
-        role="separator"
-        aria-label={t("timeline.resize")}
-        tabIndex={0}
-        onPointerDown={beginTimelineResize}
-        onKeyDown={(event) => {
-          if (event.key === "ArrowDown") {
-            event.preventDefault();
-            setTimelineHeight((height) => Math.min(320, height + 20));
-          }
-          if (event.key === "ArrowUp") {
-            event.preventDefault();
-            setTimelineHeight((height) => Math.max(120, height - 20));
-          }
-        }}
-      />
+      {isCollapsed ? null : (
+        <>
+          <div className="timeline-ruler" aria-hidden="true">
+            {[0, 0.25, 0.5, 0.75, 1].map((point) => (
+              <span key={point} style={{ left: `${point * 100}%` }}>
+                {(point * duration / 1000).toFixed(point === 0 ? 0 : 1)}s
+              </span>
+            ))}
+          </div>
+          <div className="timeline-track-list">
+            {motionLayers.length === 0 ? (
+              <p className="empty-note">{t("timeline.empty")}</p>
+            ) : (
+              motionLayers.map((layer) => {
+                const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
+                return (
+                  <div
+                    role="button"
+                    tabIndex={0}
+                    className={`timeline-row ${selectedIds.includes(layer.id) ? "selected" : ""}`}
+                    key={layer.id}
+                    onClick={(event) => onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+                    onKeyDown={(event) => {
+                      if (event.key === "Enter" || event.key === " ") {
+                        event.preventDefault();
+                        onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                      }
+                    }}
+                  >
+                    <span className="timeline-layer-name">{layer.name}</span>
+                    <span className="timeline-track">
+                      {animations.map((animation, index) => {
+                        const left = Math.max(0, (animation.startMs / duration) * 100);
+                        const width = Math.min(100 - left, Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100));
+                        return (
+                          <TimelineSegment
+                            key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
+                            animation={animation}
+                            duration={duration}
+                            left={left}
+                            width={width}
+                            layerId={layer.id}
+                            animationIndex={index}
+                            onUpdateTiming={updateAnimationTiming}
+                          />
+                        );
+                      })}
+                    </span>
+                  </div>
+                );
+              })
+            )}
+          </div>
+          <div
+            className="timeline-resize-handle"
+            role="separator"
+            aria-label={t("timeline.resize")}
+            tabIndex={0}
+            onPointerDown={beginTimelineResize}
+            onKeyDown={(event) => {
+              if (event.key === "ArrowDown") {
+                event.preventDefault();
+                setTimelineHeight((height) => Math.min(320, height + 20));
+              }
+              if (event.key === "ArrowUp") {
+                event.preventDefault();
+                setTimelineHeight((height) => Math.max(120, height - 20));
+              }
+            }}
+          />
+        </>
+      )}
     </section>
   );
 }

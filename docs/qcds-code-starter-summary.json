@@ -26,7 +26,7 @@
       "label": "Quality",
       "rating": "A+",
       "state": "pass",
-      "summary": "Feature coverage, motion presets, text-only and glow/effect motion sections, bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
+      "summary": "Feature coverage, motion presets, text-only and glow/effect motion sections, collapsible bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, PWA manifest/service worker, Chrome extension bridge, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
       "evidence": [
         "docs/qcds-evaluation.md",
         "docs/qcds-strict-metrics.json",
@@ -59,7 +59,7 @@
       "label": "Satisfaction",
       "rating": "A+",
       "state": "pass",
-      "summary": "Primary editing/export workflows, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
+      "summary": "Primary editing/export workflows, サムネいる？ title, アニメ tab label, PWA install metadata, extension bridge commands, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, collapsible bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
       "evidence": [
         "docs/user-guide.md",
         "docs/features.md",
@@ -84,13 +84,13 @@
   "validation": {
     "npmTest": "pass",
     "npmRunBuild": "pass",
-    "browserRuntimeGate": "pass; Playwright headless Chromium gate passed at http://127.0.0.1:4215/thumbnail-generator/",
+    "browserRuntimeGate": "pass; Playwright headless Chromium gate passed at http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
     "manualCodeStarterCheck": "repo-side source files added; reload VS Code Code Starter if the view is cached"
   },
   "latestRuntimeGate": {
     "tool": "Playwright headless Chromium",
-    "url": "http://127.0.0.1:4177/thumbnail-generator/?runtime=motion-ui",
+    "url": "http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
     "date": "2026-06-12",
-    "evidence": "output/runtime-20260612-motion-ui/"
+    "evidence": "output/runtime-20260612-pwa-extension/"
   }
 }

@@ -1,0 +1,8 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="サムネいる？ icon">
+  <rect width="512" height="512" rx="112" fill="#10b6d7"/>
+  <rect x="74" y="104" width="364" height="250" rx="34" fill="#ffffff"/>
+  <path d="M116 304 205 204l62 68 48-47 81 79v28H116z" fill="#152033"/>
+  <circle cx="352" cy="170" r="34" fill="#ff4f5f"/>
+  <rect x="116" y="382" width="280" height="34" rx="17" fill="#ffd166"/>
+  <rect x="152" y="432" width="208" height="22" rx="11" fill="#ffffff"/>
+</svg>

@@ -23,10 +23,10 @@ npm run preview
 - Assets: review imported assets, add a selected asset as an image layer, open Image Lab from an imported asset row, or delete an imported asset.
 - Output: use the preview-header Output button to choose JPG, PNG, WebP, or OBS preview.
 - Edit state: use the top-right icon cluster to save/restore the current edit state, export/import JSON, and delete the saved work-in-progress slot. Autosave remains text-labeled beside those icons.
-- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while Motion is open.
+- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while アニメ is open.
 - Adjust: edit the selected layer's collapsible Common settings and type-specific settings, including position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, shadow enable/parameters, pseudo-3D X/Y rotation, signed bevel, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
-- Motion: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated layers in the Motion-only bottom timeline for OBS preview playback.
+- アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated layers in the アニメ-only bottom timeline for OBS preview playback.
 
 ## Layout Compatibility
 
@@ -73,7 +73,7 @@ Open Templates and choose one of the generator buttons. **Generate schedule** cr
 
 Loading a browser template asks for confirmation before the current layers and canvas size are replaced. Deleting a browser template also opens the same confirmation modal style used by other destructive actions. Use the tag field before saving when you want to classify a browser template; existing tags appear as suggestions, and free-form tags are accepted. Use the tag filter dropdown to show only templates with one saved tag. Drag the resize handle under Browser templates to change how much vertical space the list uses.
 
-Use **Generate schedule** to choose monthly or weekly schedule, canvas orientation, month/date from the browser calendar-style input, Sunday or Monday week start, weekday language, date format, title, the same font list used by Adjust, title/weekday/date/plan size sliders, grid style, corner radius, line width, colors, and whether generated layers should be grouped. Schedule landscape preview is widened on desktop, and portrait preview keeps the generated portrait ratio. Use **Standard thumbnail** for a general 1280x720 video thumbnail and **Vertical thumbnail** for a 1080x1920 short-form thumbnail. Use **Stream waiting** when you need an animated waiting screen layer set for Motion/OBS preview. Each image generator has five placement patterns. Its Grid / text controls are grouped into Common, Title, Subtitle, and Label sections covering font family/weight, letter spacing, common corner radius, font sizes, stroke widths, and text alignment; desktop modals place paired sliders side by side to reduce height. Letter spacing can be set to `0` from the number field or slider. The Tone selector updates the preview for all three image generators, while the animation checkbox is shown only for Stream waiting. The modals also provide content, color, image-slot, grouping, preview, **Generate layers**, and **Save settings** controls. **Generate layers** saves the generator settings before replacing the current layer list, updating canvas size where needed, and refreshing the internal CSV/HTML layout text used by edit state and templates. **Save settings** stores only the modal settings so they are restored after reload without changing the current canvas.
+Use **Generate schedule** to choose monthly or weekly schedule, canvas orientation, month/date from the browser calendar-style input, Sunday or Monday week start, weekday language, date format, title, the same font list used by Adjust, title/weekday/date/plan size sliders, grid style, corner radius, line width, colors, and whether generated layers should be grouped. Schedule landscape preview is widened on desktop, and portrait preview keeps the generated portrait ratio. Use **Standard thumbnail** for a general 1280x720 video thumbnail and **Vertical thumbnail** for a 1080x1920 short-form thumbnail. Use **Stream waiting** when you need an animated waiting screen layer set for アニメ/OBS preview. Each image generator has five placement patterns. Its Grid / text controls are grouped into Common, Title, Subtitle, and Label sections covering font family/weight, letter spacing, common corner radius, font sizes, stroke widths, and text alignment; desktop modals place paired sliders side by side to reduce height. Letter spacing can be set to `0` from the number field or slider. The Tone selector updates the preview for all three image generators, while the animation checkbox is shown only for Stream waiting. The modals also provide content, color, image-slot, grouping, preview, **Generate layers**, and **Save settings** controls. **Generate layers** saves the generator settings before replacing the current layer list, updating canvas size where needed, and refreshing the internal CSV/HTML layout text used by edit state and templates. **Save settings** stores only the modal settings so they are restored after reload without changing the current canvas.
 
 ## Brand Kit
 
@@ -133,10 +133,10 @@ Select an output preset from the top toolbar. The preview keeps the current zoom
 
 The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important layers, edge-safe-area risk, many layers, large image assets, 4K output, or large browser-storage estimates.
 
-## Motion And OBS Preview
+## アニメ And OBS Preview
 
 1. Select a layer.
-2. Open Motion.
+2. Open アニメ.
 3. Choose a preset, or use the Motion dropdown for movement choices such as Slide, Drift, or Shake.
 4. Use the Effect dropdown for non-moving/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, or Shine.
 5. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
@@ -144,7 +144,7 @@ The status bar can show quality warning chips while you work. Check these before
 7. Tune Effect intensity for Glow pulse, Blur in, or Shine. The intensity control is greyed out for choices that cannot use it.
 8. Add additional motion sets when one object needs multiple animation behaviors.
 9. Use the selected-object preview and the easing graph toggle while checking motion.
-10. Open Motion to show the bottom timeline. Drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
+10. Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
 11. Select OBS preview from the Output menu.
 
 The OBS preview opens a popup-style browser window that contains only the animated canvas plus a small operation overlay. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. Use Play/Pause and Reset while checking motion, or press `P` for Play/Pause and `R` for Reset. Click Hide to remove the overlay for capture, and press `H` in the OBS preview window to show or hide it again. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS/browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
@@ -175,6 +175,12 @@ Shape layers support Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, 
 ## Browser Storage
 
 The app stores the current edit state, autosave preference, templates, brand kit, color palette entries, saved palette sets, and custom fonts in localStorage. Clearing site data removes those browser-local entries. Large imported fonts and image-heavy saved states can consume more browser storage than templates or colors.
+
+## PWA And Extension Integration
+
+Browsers that support installation can install サムネいる？ from the address-bar install action or browser menu. The PWA metadata and service worker are static files, so the app continues to work as a normal browser page if installation or service worker registration is unavailable.
+
+Chrome extensions can integrate through the page bridge channel `thumbnail-generator.extension.v1`. The supported commands are `ping`, `getSnapshot`, and `applySnapshot`; `applySnapshot` accepts the same edit-state JSON schema used by the in-app import/export controls.
 
 ## Service And Privacy
 

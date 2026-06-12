@@ -59,9 +59,11 @@ import {
   readEditStatePreferences,
   readSavedEditState,
   serializeEditState,
+  type SavedEditState,
   writeEditStatePreferences,
   writeSavedEditState,
 } from "./lib/editState";
+import { installExtensionBridge } from "./lib/extensionBridge";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
@@ -748,22 +750,31 @@ function App() {
     [assets, csvText, htmlText, layers, settings, templateName],
   );
 
+  const applyEditStateSnapshot = useCallback(
+    (snapshot: SavedEditState, statusMessage: string, persist = false) => {
+      if (persist) writeSavedEditState(snapshot);
+      setSettings(snapshot.settings);
+      setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
+      setLayers(snapshot.layers);
+      setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
+      setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
+      setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
+      setTemplateName(snapshot.templateName);
+      setSavedEditStateUpdatedAt(snapshot.updatedAt);
+      setAutoFitRevision((current) => current + 1);
+      setStatus(statusMessage);
+    },
+    [],
+  );
+
   const restoreEditState = useCallback(() => {
     const snapshot = readSavedEditState();
     if (!snapshot) {
       setStatus("No saved edit state found.");
       return;
     }
-    setSettings(snapshot.settings);
-    setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
-    setLayers(snapshot.layers);
-    setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
-    setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
-    setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
-    setTemplateName(snapshot.templateName);
-    setSavedEditStateUpdatedAt(snapshot.updatedAt);
-    setStatus(`Restored saved edit state from ${formatSavedAt(snapshot.updatedAt)}.`);
-  }, []);
+    applyEditStateSnapshot(snapshot, `Restored saved edit state from ${formatSavedAt(snapshot.updatedAt)}.`);
+  }, [applyEditStateSnapshot]);
 
   const exportEditState = useCallback(() => {
     const snapshot = createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName);
@@ -784,20 +795,25 @@ function App() {
         setStatus("Edit state import failed: JSON did not match the saved state schema.");
         return;
       }
-      writeSavedEditState(snapshot);
-      setSettings(snapshot.settings);
-      setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
-      setLayers(snapshot.layers);
-      setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
-      setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
-      setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
-      setTemplateName(snapshot.templateName);
-      setSavedEditStateUpdatedAt(snapshot.updatedAt);
-      setStatus(`Imported edit state from ${file.name}.`);
+      applyEditStateSnapshot(snapshot, `Imported edit state from ${file.name}.`, true);
     } catch (error) {
       setStatus(`Edit state import failed: ${error instanceof Error ? error.message : String(error)}`);
     }
-  }, []);
+  }, [applyEditStateSnapshot]);
+
+  useEffect(() => {
+    return installExtensionBridge({
+      getSnapshot: () => createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName),
+      applySnapshot: (snapshot) => {
+        const serialized = JSON.stringify(snapshot);
+        if (!serialized) return false;
+        const normalized = parseEditStateJson(serialized);
+        if (!normalized) return false;
+        applyEditStateSnapshot(normalized, "Applied edit state from Chrome extension.", true);
+        return true;
+      },
+    });
+  }, [applyEditStateSnapshot, assets, csvText, htmlText, layers, settings, templateName]);
 
   const deleteEditState = useCallback(() => {
     try {

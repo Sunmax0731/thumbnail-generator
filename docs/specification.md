@@ -41,7 +41,34 @@ Layer animation is optional metadata on existing image, text, and shape layers. 
 
 Rendering applies each animation entry in order as a temporary draw-time transform. Text-only and effect motion can run even when the common `type` is `none`. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
-The Motion UI groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine.
+The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically, and supports direct segment start/end and whole-segment dragging.
+
+## PWA Shell
+
+The static build includes install metadata in `public/manifest.webmanifest`, a same-origin service worker in `public/sw.js`, and app icons in `public/favicon.svg` and `public/pwa-icon.svg`.
+
+- Manifest name and short name: `サムネいる？`.
+- GitHub Pages base path: `/thumbnail-generator/`.
+- Display mode: `standalone`.
+- Service worker scope: `/thumbnail-generator/`.
+- Service worker cache: app shell files plus same-origin runtime responses under the service worker scope.
+
+The app remains usable if service worker registration fails or the browser does not support PWA installation.
+
+## Chrome Extension Bridge
+
+Chrome extensions can integrate through a page-message bridge installed by `src/lib/extensionBridge.ts`. A content script should inject or use page-context messaging and communicate with `window.postMessage`.
+
+- Channel: `thumbnail-generator.extension.v1`.
+- Ready event: `thumbnail-generator:extension-ready`.
+- Request shape: `{ channel, direction: "request", requestId, command, payload }`.
+- Response shape: `{ channel, direction: "response", requestId, command, ok, payload, error }`.
+- Commands:
+  - `ping`: returns bridge capabilities.
+  - `getSnapshot`: returns the current `SavedEditState` snapshot.
+  - `applySnapshot`: accepts `{ snapshot }`, validates it through the saved edit-state parser, applies it to the editor, and persists it to the browser work-in-progress slot.
+
+The bridge reuses the existing `SavedEditState` schema so extension integrations do not need a second model for layers, assets, output settings, CSV/HTML compatibility text, or template name.
 
 ## Image Layers
 
@@ -213,9 +240,9 @@ The right inspector is grouped by task:
 
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, shadow, pseudo-3D rotation, signed bevel, text, shape, Fill/Stroke color, and image effects. Common controls are labeled Common settings and can be collapsed or expanded; Text, Shape, and Image-only controls use the same collapsible section behavior below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
-- Motion: ordered motion sets for the selected layer, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text layers, a movement Motion dropdown, a non-moving/effect dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- アニメ: ordered motion sets for the selected layer, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text layers, a movement Motion dropdown, a non-moving/effect dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the Motion tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, and includes a vertical resize handle while preserving the default height.
+The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a vertical resize handle while preserving the default expanded height.
 
 The Layers, Colors, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 

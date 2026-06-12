@@ -72,9 +72,9 @@ This page is the quick feature index for users and reviewers.
 - Use collapsible Adjust sections for Common settings and type-specific settings. Decoration controls include pseudo-3D X/Y rotation, signed bevel, and shadow parameters that appear only when shadow is enabled.
 - Controls that do not affect the current layer state are disabled, such as single-line text line height.
 
-## Motion And OBS Preview
+## アニメ And OBS Preview
 
-- Open Motion to assign one or more motion sets to the selected layer.
+- Open アニメ to assign one or more motion sets to the selected layer.
 - Apply motion presets for common entrance, ticker, neon, pop, type-on, and background-breathe behaviors.
 - Use the Motion dropdown for movement presets such as Slide, Drift, and Shake, and the Effect dropdown for non-moving animation/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, and Shine.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
@@ -82,7 +82,7 @@ This page is the quick feature index for users and reviewers.
 - Adjust effect intensity for Glow pulse, Blur in, or Shine; the control is greyed out for choices that cannot use intensity.
 - Review the selected-object Motion preview and show or hide the easing graph before opening the OBS preview.
 - Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
-- Open Motion to show the bottom timeline. Drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
+- Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
 - Open OBS preview from the Output menu to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
 - Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, provides Play/Pause and Reset controls, uses `P` for Play/Pause, `R` for Reset, hides the control overlay from its Hide button, toggles it again with `H`, and browser/OBS settings still decide whether OS/browser chrome is capturable.
 
@@ -103,3 +103,9 @@ This page is the quick feature index for users and reviewers.
 
 - Switch display language from the upper-right toolbar controls.
 - Choose System, Light, or Dark theme beside the language selector. System follows the browser or OS color-scheme preference.
+
+## PWA And Extension Integration
+
+- Install サムネいる？ from browsers that expose a PWA install action for the GitHub Pages app.
+- Use the service worker app-shell cache for faster repeat loads; the app still runs when service worker registration is unavailable.
+- Chrome extension content scripts can use the `thumbnail-generator.extension.v1` page bridge to `ping`, read the current edit-state snapshot, or apply a valid edit-state snapshot.

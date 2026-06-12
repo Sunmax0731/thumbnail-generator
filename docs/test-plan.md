@@ -31,6 +31,8 @@
 - Color palette helpers generate saved palette sets across order, proximity, similarity, and clarity principles: identity, analogous, intermediate, diod, opponent, split-complementary, triad, tetrad, pentad, hexad, rectangular, complex-harmony, natural-harmony, dominant-color, tone-on-tone, dominant-tone, tone-in-tone, tonal-color, camaieu, faux-camaieu, tricolor, and bicolor.
 - Color palette helpers convert HEX and RGB channel input for palette controls.
 - Edit state helpers save and read a browser-local work-in-progress snapshot and autosave preference.
+- PWA helper registers the service worker under the GitHub Pages base path when service workers are available and exits cleanly when they are unavailable.
+- Chrome extension bridge helpers respond to `ping`, return the current edit-state snapshot, and validate `applySnapshot` payloads.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
 - Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, weekly date ranges, weekday language, date format, action counts, month-aware badge labels, separate title/weekday/date/plan font sizes, and grouped/ungrouped layer metadata before generating editable text/shape layers.
@@ -48,14 +50,17 @@
 The WebApp runtime gate is passed only when Chrome or a headless browser confirms:
 
 - Nonblank app render.
-- Header, left import panel, canvas, layer list, inspector, Output menu, and edit-state icons are visible; the timeline appears only while Motion is active.
+- Header, left import panel, canvas, layer list, inspector, Output menu, and edit-state icons are visible; the timeline appears only while アニメ is active.
+- Page title, app header, manifest name, and installed-app labels use `サムネいる？`.
+- The PWA manifest and service worker are served from the GitHub Pages base path, and a supported browser registers the service worker without blocking normal rendering.
+- The Chrome extension bridge announces readiness, responds to `ping`, returns a current edit-state snapshot, and can re-apply a valid snapshot.
 - Japanese and English UI labels can be switched from the top toolbar.
 - Initial language detection chooses a supported language, and unsupported language tags fall back to English in unit coverage.
 - Clicking blank preview space clears selection and updates the stage/inspector state.
 - Clicking the preview area outside the output frame clears selection when pan mode is not active.
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
 - The preview-pane Generated layout section remains hidden from the GUI while edit-state and template compatibility keep CSV/HTML text internally.
-- Right inspector task tabs expose Adjust, Colors, and Motion without crowding the first viewport.
+- Right inspector task tabs expose Adjust, Colors, and アニメ without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
@@ -105,10 +110,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
-- Motion tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
-- Motion tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- Motion tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
-- The bottom timeline shows animated layers only while Motion is active, supports start/end handles, supports segment bar drag, and supports height resizing.
+- アニメ tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
+- アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
+- アニメ tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
+- The bottom timeline shows animated layers only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, and supports height resizing.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
 - OBS preview Play/Pause, Reset, and Hide controls are visible by default; `P`, `R`, and `H` trigger Play/Pause, Reset, and Hide/show.
 - Guided start is not visible in the left panel.
@@ -133,6 +138,34 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-12.
+
+### PWA, Extension Bridge, And Anime Label Follow-Up
+
+Completed on 2026-06-12 for the Motion-tab rename, collapsible timeline, PWA shell, Chrome extension bridge structure, and サムネいる？ title update.
+
+- Scope: renamed the right inspector Motion tab to `アニメ`, added timeline collapse/expand while preserving the expanded default height, added manifest/service worker PWA files, added the Chrome extension page bridge, updated the app title and related metadata to `サムネいる？`, and fixed public asset URLs so Vite dev and production builds both resolve manifest/icons/scripts under `/thumbnail-generator/`.
+- `npm test`: pass. 32 test files, 126 tests.
+- `npm run build`: pass. Vite emitted only the existing chunk-size warning.
+- Runtime gate URL: `http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Document title and app header were both `サムネいる？`; old `サムネイル作成支援サービス` text count was `0`.
+  - Right inspector tab exposed `アニメ`; right inspector `Motion` tab text count was `0`.
+  - Initial canvas rendered nonblank.
+  - Manifest loaded from `http://127.0.0.1:4341/thumbnail-generator/manifest.webmanifest`, returned `application/manifest+json`, and contained name/short name `サムネいる？`.
+  - Service worker registered with scope `http://127.0.0.1:4341/thumbnail-generator/` and script `http://127.0.0.1:4341/thumbnail-generator/sw.js`.
+  - Extension bridge `ping` returned `ping`, `getSnapshot`, and `applySnapshot`; `getSnapshot` returned seven layers; re-applying that snapshot returned `{ applied: true }`.
+  - Timeline count was `0` before opening `アニメ`, became visible in `アニメ`, collapsed to `47px`, and expanded back to the default `170px`.
+  - WebP export succeeded as `output/runtime-20260612-pwa-extension/thumbnail-1280x720-2026-06-12T08-12-59-986Z.webp` with size `714072` bytes.
+  - Mobile viewport rendered with horizontal overflow `0`.
+  - Console health: no page/app runtime errors were reported.
+- Evidence:
+  - `output/runtime-20260612-pwa-extension/desktop-initial.png`
+  - `output/runtime-20260612-pwa-extension/anime-timeline-expanded.png`
+  - `output/runtime-20260612-pwa-extension/mobile.png`
+  - `output/runtime-20260612-pwa-extension/runtime-result.json`
 
 ### Motion Tab Timeline And OBS Shortcut Follow-Up
 
