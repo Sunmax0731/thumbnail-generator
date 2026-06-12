@@ -131,6 +131,19 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-12.
 
+### Schedule Generator Button Height Fix
+
+Completed on 2026-06-12 for the schedule generator portrait modal button stretch regression.
+
+- `npm test`: pass. 30 test files, 120 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4338/thumbnail-generator/`.
+- Browser automation path: Playwright headless Chromium.
+- Desktop viewport: `1440x1000`.
+- Check: Schedule portrait generator action buttons stayed directly below the preview and measured normal button height: Cancel `32px`, Save settings `32px`, Generate layers `32px`.
+- Console health: no relevant page errors, app console errors, or non-analytics HTTP errors were reported.
+- Evidence: `output/runtime-20260612-schedule-button-height/schedule-portrait-buttons.png`.
+
 ### Generator Actions And Adjust Collapse Follow-Up
 
 Completed on 2026-06-12 for generator modal action placement and Adjust section collapse behavior.

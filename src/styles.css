@@ -2483,7 +2483,7 @@ button:disabled {
 
 .schedule-preview-section {
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) auto;
+  grid-template-rows: auto minmax(0, 1fr) auto;
   align-content: stretch;
 }
 
@@ -2866,6 +2866,8 @@ button:disabled {
 }
 
 .confirm-actions.schedule-builder-actions {
+  align-self: end;
+  align-items: center;
   justify-self: center;
   grid-template-columns: 1fr 1fr 1fr;
   width: min(390px, 100%);

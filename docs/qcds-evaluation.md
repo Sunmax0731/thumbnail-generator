@@ -41,6 +41,15 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms nonblank render, primary UI visibility, Schedule portrait action centering below the preview, Standard and Vertical action placement at the modal lower edge, Vertical modal width under `1300px` with preview width under `430px`, Common settings label visibility, Common settings and type-specific section collapse/expand behavior, signed bevel `-12`, shadow parameters hidden while disabled and visible after enabling, WebP export, mobile horizontal overflow `0`, and no relevant app console errors. Evidence is recorded under `output/runtime-20260612-ui-adjust-generator/`.
 
+## 2026-06-12 Schedule Generator Button Height Fix
+
+All QCDS axes remain A+.
+
+- Quality: A+. The schedule preview section grid now has exactly the three rows it renders, and the action row prevents vertical button stretching.
+- Cost: A+. CSS-only fix with no dependency, backend, or workflow change.
+- Delivery: A+. `npm test`, `npm run build`, and Playwright headless Chromium runtime measurement passed at `http://127.0.0.1:4338/thumbnail-generator/`.
+- Satisfaction: A+. The stretched portrait schedule modal buttons are back to normal `32px` height while staying below the preview.
+
 ## 2026-06-12 Creative Generator Modal Follow-Up
 
 All QCDS axes remain A+.
