@@ -1,23 +1,19 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import {
-  Download,
   FileDown,
-  FolderOpen,
   Hand,
   ImageDown,
   Maximize2,
   Monitor,
   MonitorPlay,
   MousePointer2,
-  Save,
-  Trash2,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
-import type { ExportFormat, OutputSettings } from "../lib/types";
+import type { ExportFormat, OutputSettings, ThumbnailLayer } from "../lib/types";
 
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -28,8 +24,8 @@ interface CanvasStageProps {
   cursor: string;
   previewPadding: number;
   isExporting: boolean;
-  autoSaveEnabled: boolean;
-  savedEditStateUpdatedAt: string | null;
+  layers: ThumbnailLayer[];
+  selectedIds: string[];
   onZoomChange: (zoom: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
@@ -37,13 +33,8 @@ interface CanvasStageProps {
   onExport: (format?: ExportFormat) => void;
   onSettingsChange: (next: Partial<OutputSettings>) => void;
   onPresetChange: (presetId: string) => void;
-  onAutoSaveChange: (enabled: boolean) => void;
-  onSaveEditState: () => void;
-  onRestoreEditState: () => void;
-  onExportEditState: () => void;
-  onImportEditState: (file: File | null) => void;
-  onDeleteEditState: () => void;
   onOpenObsPreview: () => void;
+  onSelectLayer: (id: string, additive?: boolean) => void;
   onClearSelection: () => void;
   t: Translator;
 }
@@ -57,8 +48,8 @@ export function CanvasStage({
   cursor,
   previewPadding,
   isExporting,
-  autoSaveEnabled,
-  savedEditStateUpdatedAt,
+  layers,
+  selectedIds,
   onZoomChange,
   onPointerDown,
   onPointerMove,
@@ -66,13 +57,8 @@ export function CanvasStage({
   onExport,
   onSettingsChange,
   onPresetChange,
-  onAutoSaveChange,
-  onSaveEditState,
-  onRestoreEditState,
-  onExportEditState,
-  onImportEditState,
-  onDeleteEditState,
   onOpenObsPreview,
+  onSelectLayer,
   onClearSelection,
   t,
 }: CanvasStageProps) {
@@ -81,6 +67,7 @@ export function CanvasStage({
   const [isPanMode, setIsPanMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [isSpacePanning, setIsSpacePanning] = useState(false);
+  const [isOutputMenuOpen, setIsOutputMenuOpen] = useState(false);
   const lastAutoFitRevision = useRef(0);
   const fitCanvas = useCallback(() => {
     const container = scrollRef.current;
@@ -227,14 +214,34 @@ export function CanvasStage({
           </label>
         </div>
         <div className="zoom-controls" aria-label={t("stage.zoom")}>
-          <button
-            type="button"
-            className="secondary-button icon-text obs-preview-button"
-            onClick={onOpenObsPreview}
-            title={t("stage.openObsPreview")}
-          >
-            <MonitorPlay size={16} /> {t("stage.openObsPreview")}
-          </button>
+          <div className="output-menu">
+            <button
+              type="button"
+              className="secondary-button icon-text obs-preview-button"
+              onClick={() => setIsOutputMenuOpen((current) => !current)}
+              title={t("toolbar.output")}
+              aria-haspopup="menu"
+              aria-expanded={isOutputMenuOpen}
+            >
+              <ImageDown size={16} /> {t("toolbar.output")}
+            </button>
+            {isOutputMenuOpen ? (
+              <div className="output-menu-popover" role="menu">
+                <button type="button" role="menuitem" onClick={() => runOutputAction(() => onExport("jpeg"))} disabled={isExporting}>
+                  <FileDown size={15} /> JPG
+                </button>
+                <button type="button" role="menuitem" onClick={() => runOutputAction(() => onExport("png"))} disabled={isExporting}>
+                  <ImageDown size={15} /> PNG
+                </button>
+                <button type="button" role="menuitem" onClick={() => runOutputAction(() => onExport("webp"))} disabled={isExporting}>
+                  <FileDown size={15} /> WebP
+                </button>
+                <button type="button" role="menuitem" onClick={() => runOutputAction(onOpenObsPreview)}>
+                  <MonitorPlay size={15} /> {t("stage.openObsPreview")}
+                </button>
+              </div>
+            ) : null}
+          </div>
           <button
             type="button"
             className={`icon-button ${isPanMode ? "selected" : ""}`}
@@ -322,69 +329,14 @@ export function CanvasStage({
           />
         </div>
       </div>
-      <div className="stage-bottom-row">
-        <section className="stage-export-panel" aria-label={t("toolbar.exportActions")}>
-          <div className="stage-export-header">
-            <div className="section-heading">
-              <ImageDown size={16} />
-              <h2>{t("toolbar.export")}</h2>
-            </div>
-          </div>
-          <div className="stage-export-actions">
-            <button className="secondary-button icon-text" type="button" onClick={() => onExport("png")} disabled={isExporting}>
-              <ImageDown size={16} /> PNG
-            </button>
-            <button className="secondary-button icon-text" type="button" onClick={() => onExport("jpeg")} disabled={isExporting}>
-              <FileDown size={16} /> JPG
-            </button>
-            <button className="secondary-button icon-text" type="button" onClick={() => onExport("webp")} disabled={isExporting}>
-              <FileDown size={16} /> WebP
-            </button>
-          </div>
-        </section>
-        <section className="stage-edit-state" aria-label={t("left.editState")}>
-          <div className="stage-edit-state-header">
-            <div className="section-heading">
-              <Save size={16} />
-              <h2>{t("left.editState")}</h2>
-            </div>
-            <p className="edit-state-meta">
-              {savedEditStateUpdatedAt
-                ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
-                : t("left.noSavedEditState")}
-            </p>
-          </div>
-          <label className="checkbox-row autosave-row">
-            <input
-              type="checkbox"
-              checked={autoSaveEnabled}
-              onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
-            />
-            <span>{t("left.autoSaveEditState")}</span>
-          </label>
-          <div className="stage-edit-actions">
-            <button type="button" className="secondary-button icon-text" onClick={onSaveEditState}>
-              <Save size={16} /> {t("left.saveEditState")}
-            </button>
-            <button type="button" className="secondary-button icon-text" onClick={onRestoreEditState}>
-              <FolderOpen size={16} /> {t("left.restoreEditState")}
-            </button>
-            <button type="button" className="secondary-button icon-text" onClick={onExportEditState}>
-              <Download size={16} /> {t("left.exportState")}
-            </button>
-            <label className="secondary-button icon-text file-action">
-              <FolderOpen size={16} /> {t("left.importState")}
-              <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
-            </label>
-            <button type="button" className="ghost-button danger-text icon-text" onClick={onDeleteEditState}>
-              <Trash2 size={15} /> {t("left.deleteEditState")}
-            </button>
-          </div>
-          <p className="privacy-note">{t("left.privacyNotice")}</p>
-        </section>
-      </div>
+      <MotionTimeline layers={layers} selectedIds={selectedIds} onSelectLayer={onSelectLayer} t={t} />
     </section>
   );
+
+  function runOutputAction(action: () => void) {
+    action();
+    setIsOutputMenuOpen(false);
+  }
 }
 
 function isKeyboardInputTarget(target: EventTarget | null): boolean {
@@ -392,13 +344,82 @@ function isKeyboardInputTarget(target: EventTarget | null): boolean {
   return Boolean(target.closest("input, textarea, select, [contenteditable='true']"));
 }
 
-function formatSavedAt(value: string): string {
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return value;
-  return date.toLocaleString();
-}
-
 function cssPixels(value: string): number {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function MotionTimeline({
+  layers,
+  selectedIds,
+  onSelectLayer,
+  t,
+}: {
+  layers: ThumbnailLayer[];
+  selectedIds: string[];
+  onSelectLayer: (id: string, additive?: boolean) => void;
+  t: Translator;
+}) {
+  const motionLayers = layers.filter((layer) => {
+    const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
+    return animations.length > 0;
+  });
+  const duration = Math.max(
+    4000,
+    ...motionLayers.flatMap((layer) => (layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : []).map((animation) => animation.startMs + animation.durationMs)),
+  );
+  return (
+    <section className="stage-timeline" aria-label={t("timeline.aria")}>
+      <div className="stage-timeline-header">
+        <strong>{t("timeline.title")}</strong>
+        <span>{(duration / 1000).toFixed(1)}s</span>
+      </div>
+      <div className="timeline-ruler" aria-hidden="true">
+        {[0, 0.25, 0.5, 0.75, 1].map((point) => (
+          <span key={point} style={{ left: `${point * 100}%` }}>
+            {(point * duration / 1000).toFixed(point === 0 ? 0 : 1)}s
+          </span>
+        ))}
+      </div>
+      <div className="timeline-track-list">
+        {motionLayers.length === 0 ? (
+          <p className="empty-note">{t("timeline.empty")}</p>
+        ) : (
+          motionLayers.map((layer) => {
+            const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
+            return (
+              <button
+                type="button"
+                className={`timeline-row ${selectedIds.includes(layer.id) ? "selected" : ""}`}
+                key={layer.id}
+                onClick={(event) => onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+              >
+                <span className="timeline-layer-name">{layer.name}</span>
+                <span className="timeline-track">
+                  {animations.map((animation, index) => (
+                    <span
+                      className="timeline-segment"
+                      key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
+                      style={{
+                        left: `${Math.max(0, (animation.startMs / duration) * 100)}%`,
+                        width: `${Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100)}%`,
+                      }}
+                    >
+                      {animationLabel(animation.type, animation.textAnimation, animation.effectAnimation)}
+                    </span>
+                  ))}
+                </span>
+              </button>
+            );
+          })
+        )}
+      </div>
+    </section>
+  );
+}
+
+function animationLabel(type: string, textAnimation?: string, effectAnimation?: string): string {
+  if (textAnimation && textAnimation !== "none") return textAnimation;
+  if (effectAnimation && effectAnimation !== "none") return effectAnimation;
+  return type;
 }

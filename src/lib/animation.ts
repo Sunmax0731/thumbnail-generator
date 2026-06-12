@@ -18,66 +18,69 @@ function applySingleLayerAnimation(
   timeMs: number,
   sceneDurationMs = defaultSceneDurationMs,
 ): ThumbnailLayer {
-  if (!animation || animation.type === "none") return layer;
+  if (!animation) return layer;
 
   const progress = animationProgress(animation, timeMs, sceneDurationMs);
   if (progress == null) return layer;
+  let animatedLayer = layer;
 
   if (animation.type === "fade") {
-    return { ...layer, opacity: layer.opacity * ease(progress, animation.easing) };
+    animatedLayer = { ...animatedLayer, opacity: animatedLayer.opacity * ease(progress, animation.easing) };
   }
 
   if (animation.type === "slide") {
     const eased = ease(progress, animation.easing);
     const offset = animation.distance * (1 - eased);
-    const { x, y } = offsetLayer(layer.x, layer.y, animation.direction, offset);
-    return { ...layer, x, y };
+    const { x, y } = offsetLayer(animatedLayer.x, animatedLayer.y, animation.direction, offset);
+    animatedLayer = { ...animatedLayer, x, y };
   }
 
   if (animation.type === "pop") {
-    return scaleLayer(layer, 0.82 + ease(progress, animation.easing) * 0.18);
+    animatedLayer = scaleLayer(animatedLayer, 0.82 + ease(progress, animation.easing) * 0.18);
   }
 
   if (animation.type === "zoom") {
-    return scaleLayer(layer, 0.9 + ease(progress, animation.easing) * 0.1);
+    animatedLayer = scaleLayer(animatedLayer, 0.9 + ease(progress, animation.easing) * 0.1);
   }
 
   if (animation.type === "spin") {
-    return { ...layer, rotation: layer.rotation - (1 - ease(progress, animation.easing)) * 16 };
+    animatedLayer = { ...animatedLayer, rotation: animatedLayer.rotation - (1 - ease(progress, animation.easing)) * 16 };
   }
 
   if (animation.type === "pulse") {
     const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
-    return scaleLayer({ ...layer, opacity: layer.opacity * (0.72 + wave * 0.28) }, 0.96 + wave * 0.06);
+    animatedLayer = scaleLayer({ ...animatedLayer, opacity: animatedLayer.opacity * (0.72 + wave * 0.28) }, 0.96 + wave * 0.06);
   }
 
   if (animation.type === "blink") {
     const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
-    return { ...layer, opacity: layer.opacity * (wave > 0.5 ? 1 : 0.28) };
+    animatedLayer = { ...animatedLayer, opacity: animatedLayer.opacity * (wave > 0.5 ? 1 : 0.28) };
   }
 
   if (animation.type === "drift") {
     const offset = Math.sin(progress * Math.PI * 2) * animation.distance;
-    const { x, y } = offsetLayer(layer.x, layer.y, animation.direction, offset);
-    return { ...layer, x, y };
+    const { x, y } = offsetLayer(animatedLayer.x, animatedLayer.y, animation.direction, offset);
+    animatedLayer = { ...animatedLayer, x, y };
   }
 
   if (animation.type === "sway") {
-    return { ...layer, rotation: layer.rotation + Math.sin(progress * Math.PI * 2) * 6 };
+    animatedLayer = { ...animatedLayer, rotation: animatedLayer.rotation + Math.sin(progress * Math.PI * 2) * 6 };
   }
 
   if (animation.type === "shake") {
     const offset = Math.sin(progress * Math.PI * 8) * animation.distance;
-    const { x, y } = offsetLayer(layer.x, layer.y, animation.direction, offset);
-    return { ...layer, x, y };
+    const { x, y } = offsetLayer(animatedLayer.x, animatedLayer.y, animation.direction, offset);
+    animatedLayer = { ...animatedLayer, x, y };
   }
 
   if (animation.type === "breathe") {
     const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
-    return scaleLayer(layer, 0.97 + wave * 0.08);
+    animatedLayer = scaleLayer(animatedLayer, 0.97 + wave * 0.08);
   }
 
-  return layer;
+  animatedLayer = applyTextAnimation(animatedLayer, animation, progress);
+  animatedLayer = applyEffectAnimation(animatedLayer, animation, progress);
+  return animatedLayer;
 }
 
 export function applyAnimationsToLayers(
@@ -117,6 +120,53 @@ function offsetLayer(
 
 function isCycleAnimation(type: LayerAnimation["type"]): boolean {
   return type === "pulse" || type === "blink" || type === "drift" || type === "sway" || type === "shake" || type === "breathe";
+}
+
+function applyTextAnimation(layer: ThumbnailLayer, animation: LayerAnimation, progress: number): ThumbnailLayer {
+  if (layer.type !== "text") return layer;
+  const textAnimation = animation.textAnimation ?? "none";
+  if (textAnimation === "none") return layer;
+  const eased = ease(progress, animation.easing);
+  if (textAnimation === "typewriter") {
+    const count = Math.max(0, Math.ceil(layer.text.length * eased));
+    return { ...layer, text: layer.text.slice(0, count) };
+  }
+  if (textAnimation === "lineReveal") {
+    const lines = layer.text.split(/\r?\n/);
+    const count = Math.max(1, Math.ceil(lines.length * eased));
+    return { ...layer, text: lines.slice(0, count).join("\n"), opacity: layer.opacity * eased };
+  }
+  const wave = Math.sin(progress * Math.PI * 2);
+  return {
+    ...layer,
+    y: layer.y + wave * 8,
+    letterSpacing: layer.letterSpacing + wave * 1.5,
+  };
+}
+
+function applyEffectAnimation(layer: ThumbnailLayer, animation: LayerAnimation, progress: number): ThumbnailLayer {
+  const effectAnimation = animation.effectAnimation ?? "none";
+  if (effectAnimation === "none") return layer;
+  const intensity = Math.max(0, Math.min(100, animation.effectIntensity ?? 40));
+  const wave = (Math.sin(progress * Math.PI * 2) + 1) / 2;
+  if (effectAnimation === "glow") {
+    return {
+      ...layer,
+      shadowOpacity: Math.min(1, Math.max(layer.shadowOpacity, 0.18 + (intensity / 100) * wave * 0.75)),
+      shadowBlur: Math.max(layer.shadowBlur, 6 + intensity * wave * 0.42),
+    };
+  }
+  if (effectAnimation === "blur") {
+    return {
+      ...layer,
+      layerBlur: Math.max(layer.layerBlur, (intensity / 100) * (1 - ease(progress, animation.easing)) * 18),
+    };
+  }
+  return {
+    ...layer,
+    bevelSize: Math.max(layer.bevelSize, 2 + (intensity / 100) * wave * 12),
+    bevelOpacity: Math.min(1, Math.max(layer.bevelOpacity, 0.15 + (intensity / 100) * wave * 0.7)),
+  };
 }
 
 export function animationTypeUsesDirection(type: LayerAnimation["type"]): boolean {

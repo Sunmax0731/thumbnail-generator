@@ -24,16 +24,17 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
-- Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
+- Add multiple layer animation sets from Motion, choose presets, split common controls from text-only and glow/effect motion controls, preview the selected object and easing graph, and use the bottom timeline to scan animated layers.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
-- Export, import, or delete the browser-local edit state JSON for backup and recovery from the preview pane.
+- Export, import, or delete the browser-local edit state JSON for backup and recovery from the top-right edit-state icon cluster; autosave remains text-labeled there.
 - Register, edit, reorder, preview, delete, collapse, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, a palette-pattern dropdown beside the wheel, palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, reorderable saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Open a draggable popup single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
 - Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
-- Export to common video presets or custom output sizes from the preview header at maximum quality.
+- Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
+- Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `H` in the preview window to show or hide those controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
 

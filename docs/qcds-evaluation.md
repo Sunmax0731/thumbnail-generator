@@ -429,3 +429,17 @@ Completed on 2026-06-10.
   - `output/runtime-downloads/20260610-image-palette-production/desktop/thumbnail-1280x720-1781102767692.webp`
   - `output/runtime-downloads/20260610-image-palette-production/mobile/thumbnail-1280x720-1781102774685.webp`
 - CSV/HTML note: visible panel controls remain unchanged from this build and parser compatibility is preserved.
+
+## Motion UI And Output Menu Evidence
+
+Completed on 2026-06-12.
+
+- Scope: consolidated JPG/PNG/WebP/OBS into one Output menu, moved edit-state controls to top-right icons with autosave text retained, added the bottom timeline, expanded Motion with presets/text-only/effect sections, and added OBS preview Play/Pause, Reset, Hide, and `H` toggle controls.
+- Quality: A+. `npm test` passed with 30 test files and 122 tests, `npm run build` passed, and the runtime gate caught and fixed an output-menu stacking bug before completion.
+- Cost: A+. The implementation stays inside the existing React/Vite static app, local layer model, canvas renderer, and CSV/HTML compatibility paths without adding dependencies or backend services.
+- Delivery: A+. Documentation, runtime evidence, and export/schema tests were updated in the same work unit.
+- Satisfaction: A+. The UI clears the preview bottom for timeline work, keeps the polished layout intact, gives creators faster motion setup through presets, and makes OBS capture cleaner with hideable preview controls.
+- Browser runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4177/thumbnail-generator/?runtime=motion-ui`.
+- Runtime checks: nonblank render, primary UI visible, old Output/Edit state sections removed, Output menu items present, WebP export downloaded, edit-state icons had tooltip titles, autosave text visible, 6 motion presets, timeline row after applying a preset, OBS controls visible/hidden/restored, OBS canvas nonblank, mobile overflow `0`, and no page/app console errors.
+- Evidence: screenshots and WebP export are under `output/runtime-20260612-motion-ui/`.
+- CSV/HTML note: visible panel controls remain absent in this build; parser/export compatibility is covered by focused unit tests for new animation text/effect fields.

@@ -48,14 +48,14 @@
 The WebApp runtime gate is passed only when Chrome or a headless browser confirms:
 
 - Nonblank app render.
-- Header, left import panel, canvas, layer list, inspector, and export controls are visible.
+- Header, left import panel, canvas, layer list, inspector, Output menu, edit-state icons, and timeline area are visible.
 - Japanese and English UI labels can be switched from the top toolbar.
 - Initial language detection chooses a supported language, and unsupported language tags fall back to English in unit coverage.
 - Clicking blank preview space clears selection and updates the stage/inspector state.
 - Clicking the preview area outside the output frame clears selection when pan mode is not active.
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
 - The preview-pane Generated layout section remains hidden from the GUI while edit-state and template compatibility keep CSV/HTML text internally.
-- Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
+- Right inspector task tabs expose Adjust, Colors, and Motion without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
@@ -107,9 +107,12 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
 - Motion tab can assign a selected-layer animation preset, preview the selected object, and show the easing graph.
 - Motion tab exposes 12 animation types, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- OBS preview opens in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
+- Motion tab exposes preset, common parameter, text-only motion, and glow/effect motion sections.
+- The bottom timeline shows animated layers after motion is applied.
+- OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
+- OBS preview Play/Pause, Reset, and Hide controls are visible by default and can be hidden/restored for capture.
 - Guided start is not visible in the left panel.
-- Edit state controls are visible in the preview pane and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
+- Edit state controls are visible as top-right icons and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
@@ -123,7 +126,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
-- Top toolbar exposes PNG, JPG, and WebP as direct export buttons without a separate format selector or generic export button.
+- Preview header exposes one Output menu with JPG, PNG, WebP, and OBS preview choices.
 - Desktop and mobile viewports have no incoherent overlap.
 - Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
 
@@ -953,3 +956,33 @@ Completed on 2026-06-10.
 - Export evidence:
   - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/desktop-thumbnail-1280x720-2026-06-10T05-35-56-556Z.webp`
   - `output/runtime-downloads/20260610-schedule-color-picker-gate-2/mobile-thumbnail-1280x720-2026-06-10T05-35-58-894Z.webp`
+
+## Motion UI And Output Menu Runtime Gate (2026-06-12)
+
+Completed on 2026-06-12.
+
+- Scope: moved export actions into one Output menu, moved edit-state actions to top-right icons, added bottom motion timeline, added Motion presets/text-only/effect controls, and added OBS preview operation controls.
+- `npm test`: pass. 30 test files, 122 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed. Existing analytics script and chunk-size Vite warnings remained non-blocking.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback was used.
+- Runtime gate URL: `http://127.0.0.1:4177/thumbnail-generator/?runtime=motion-ui`.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Runtime checks:
+  - Nonblank initial canvas: pass (`1280x720`, sampled nonblank pixels `230400`).
+  - Primary app/canvas visible: pass.
+  - Removed old preview-bottom Output/Edit state sections: pass (`.stage-export-panel` and `.stage-edit-state` count `0`).
+  - Output menu choices visible: pass (`JPG`, `PNG`, `WebP`, `OBSプレビューを開く`).
+  - WebP export path: pass, downloaded `output/runtime-20260612-motion-ui/thumbnail-1280x720-2026-06-12T06-41-52-232Z.webp`.
+  - Top-right edit-state icons: pass, each icon had a tooltip title; autosave text remained visible.
+  - Motion presets: pass (`6` preset buttons).
+  - Bottom timeline: pass after applying a preset (`1` animated layer row).
+  - OBS preview controls: pass. Overlay visible by default, Hide made it invisible, `H` restored it, and the OBS canvas was nonblank.
+  - Mobile horizontal overflow: `0`.
+  - Console health: no page errors or app console errors were reported.
+- Evidence screenshots:
+  - `output/runtime-20260612-motion-ui/desktop-initial.png`
+  - `output/runtime-20260612-motion-ui/motion-timeline.png`
+  - `output/runtime-20260612-motion-ui/obs-preview-controls.png`
+  - `output/runtime-20260612-motion-ui/mobile.png`
+- CSV/HTML compatibility: no dedicated visible CSV/HTML control panel in this build; compatibility is covered by unit tests for CSV import, HTML import, and CSV/HTML export of `animationText`, `animationEffect`, and `animationEffectIntensity`.

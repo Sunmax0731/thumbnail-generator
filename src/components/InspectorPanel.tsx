@@ -71,6 +71,8 @@ import type {
   ImageEffects,
   LayerAnimationDirection,
   LayerAnimationEasing,
+  LayerEffectAnimation,
+  LayerTextAnimation,
   LayerAnimationType,
   LineStyle,
   OutputSettings,
@@ -1731,6 +1733,8 @@ const animationTypes: LayerAnimationType[] = [
   "breathe",
 ];
 const animationDirections: LayerAnimationDirection[] = ["none", "left", "right", "up", "down"];
+const textAnimations: LayerTextAnimation[] = ["none", "typewriter", "lineReveal", "wave"];
+const effectAnimations: LayerEffectAnimation[] = ["none", "glow", "blur", "shine"];
 
 const animationTypeLabels: Record<LayerAnimationType, Parameters<Translator>[0]> = {
   none: "inspector.animationNone",
@@ -1754,6 +1758,53 @@ const animationDirectionLabels: Record<LayerAnimationDirection, Parameters<Trans
   up: "inspector.directionUp",
   down: "inspector.directionDown",
 };
+
+const textAnimationLabels: Record<LayerTextAnimation, Parameters<Translator>[0]> = {
+  none: "inspector.textMotionNone",
+  typewriter: "inspector.textMotionTypewriter",
+  lineReveal: "inspector.textMotionLineReveal",
+  wave: "inspector.textMotionWave",
+};
+
+const effectAnimationLabels: Record<LayerEffectAnimation, Parameters<Translator>[0]> = {
+  none: "inspector.effectMotionNone",
+  glow: "inspector.effectMotionGlow",
+  blur: "inspector.effectMotionBlur",
+  shine: "inspector.effectMotionShine",
+};
+
+const motionPresets: Array<{ id: string; label: Parameters<Translator>[0]; animation: Partial<typeof defaultAnimation> }> = [
+  {
+    id: "soft-entry",
+    label: "inspector.motionPresetSoftEntry",
+    animation: { type: "fade", startMs: 0, durationMs: 900, easing: "easeOutSine", loop: false, direction: "none", distance: 0 },
+  },
+  {
+    id: "news-ticker",
+    label: "inspector.motionPresetNewsTicker",
+    animation: { type: "slide", startMs: 0, durationMs: 900, easing: "easeOutCubic", loop: false, direction: "left", distance: 180 },
+  },
+  {
+    id: "neon-pulse",
+    label: "inspector.motionPresetNeonPulse",
+    animation: { type: "pulse", startMs: 0, durationMs: 1400, easing: "easeInOutSine", loop: true, direction: "none", distance: 0, effectAnimation: "glow", effectIntensity: 75 },
+  },
+  {
+    id: "countdown-pop",
+    label: "inspector.motionPresetCountdownPop",
+    animation: { type: "pop", startMs: 0, durationMs: 500, easing: "easeOutBack", loop: false, direction: "none", distance: 0, effectAnimation: "shine", effectIntensity: 60 },
+  },
+  {
+    id: "type-on",
+    label: "inspector.motionPresetTypeOn",
+    animation: { type: "none", startMs: 0, durationMs: 1600, easing: "linear", loop: false, direction: "none", distance: 0, textAnimation: "typewriter" },
+  },
+  {
+    id: "background-breathe",
+    label: "inspector.motionPresetBackgroundBreathe",
+    animation: { type: "breathe", startMs: 0, durationMs: 3200, easing: "easeInOutSine", loop: true, direction: "none", distance: 0, effectAnimation: "blur", effectIntensity: 18 },
+  },
+];
 
 function isKeyboardInputTarget(target: EventTarget | null): boolean {
   if (!(target instanceof HTMLElement)) return false;
@@ -1803,6 +1854,11 @@ function MotionControls({
     saveAnimations(editableAnimations.map((animation, index) => (index === activeMotionIndex ? nextAnimation : animation)));
   };
 
+  const applyPreset = (partial: Partial<typeof defaultAnimation>) => {
+    const nextAnimation = { ...defaultAnimation, ...activeAnimation, ...partial };
+    saveAnimations(editableAnimations.map((animation, index) => (index === activeMotionIndex ? nextAnimation : animation)));
+  };
+
   const addMotion = () => {
     const nextAnimation = { ...defaultAnimation, type: "fade" as LayerAnimationType };
     saveAnimations([...savedAnimations, nextAnimation]);
@@ -1815,7 +1871,10 @@ function MotionControls({
     setActiveMotionIndex(Math.max(0, activeMotionIndex - 1));
   };
 
-  const hasAnimation = activeAnimation.type !== "none";
+  const hasAnimation =
+    activeAnimation.type !== "none" ||
+    (activeAnimation.textAnimation ?? "none") !== "none" ||
+    (activeAnimation.effectAnimation ?? "none") !== "none";
   const directionSupported = animationTypeUsesDirection(activeAnimation.type);
   const directionDisabled = !hasAnimation || !directionSupported;
   const directionIsNone = directionDisabled || activeAnimation.direction === "none";
@@ -1874,8 +1933,11 @@ function MotionControls({
     activeAnimation.distance,
     activeAnimation.durationMs,
     activeAnimation.easing,
+    activeAnimation.effectAnimation,
+    activeAnimation.effectIntensity,
     activeAnimation.loop,
     activeAnimation.startMs,
+    activeAnimation.textAnimation,
     activeAnimation.type,
     assets,
     duration,
@@ -1917,89 +1979,140 @@ function MotionControls({
           <Trash2 size={15} /> {t("inspector.removeMotion")}
         </button>
       </div>
-      <label className="field">
-        <span>{t("inspector.animationType")}</span>
-        <select
-          value={activeAnimation.type}
-          onChange={(event) => updateAnimation({ type: event.currentTarget.value as LayerAnimationType })}
-        >
-          {animationTypes.map((type) => (
-            <option key={type} value={type}>
-              {t(animationTypeLabels[type])}
-            </option>
+      <CollapsibleControlGroup title={t("inspector.motionPresets")}>
+        <div className="motion-preset-grid">
+          {motionPresets.map((preset) => (
+            <button key={preset.id} type="button" className="secondary-button" onClick={() => applyPreset(preset.animation)}>
+              {t(preset.label)}
+            </button>
           ))}
-        </select>
-      </label>
-      <div className="field-grid two">
-        <SliderNumberInput
-          label={t("inspector.animationStart")}
-          value={activeAnimation.startMs}
-          min={0}
-          max={10000}
-          step={100}
-          suffix="ms"
-          disabled={!hasAnimation}
-          onChange={(value) => updateAnimation({ startMs: value })}
-        />
-        <SliderNumberInput
-          label={t("inspector.animationDuration")}
-          value={activeAnimation.durationMs}
-          min={100}
-          max={10000}
-          step={100}
-          suffix="ms"
-          disabled={!hasAnimation}
-          onChange={(value) => updateAnimation({ durationMs: value })}
-        />
-      </div>
-      <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
-        <span>{t("inspector.animationEasing")}</span>
-        <select
-          value={activeAnimation.easing}
-          disabled={!hasAnimation}
-          onChange={(event) => updateAnimation({ easing: event.currentTarget.value as LayerAnimationEasing })}
-        >
-          {easingOptions.map((easing) => (
-            <option key={easing} value={easing}>
-              {easing}
-            </option>
-          ))}
-        </select>
-      </label>
-      <div className="field-grid two">
-        <label className={`field ${directionDisabled ? "field-disabled" : ""}`}>
-          <span>{t("inspector.animationDirection")}</span>
+        </div>
+      </CollapsibleControlGroup>
+      <CollapsibleControlGroup title={t("inspector.motionCommon")}>
+        <label className="field">
+          <span>{t("inspector.animationType")}</span>
           <select
-            value={directionSupported ? activeAnimation.direction : "none"}
-            disabled={directionDisabled}
-            onChange={(event) => updateAnimation({ direction: event.currentTarget.value as LayerAnimationDirection })}
+            value={activeAnimation.type}
+            onChange={(event) => updateAnimation({ type: event.currentTarget.value as LayerAnimationType })}
           >
-            {animationDirections.map((direction) => (
-              <option key={direction} value={direction}>
-                {t(animationDirectionLabels[direction])}
+            {animationTypes.map((type) => (
+              <option key={type} value={type}>
+                {t(animationTypeLabels[type])}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="field-grid two">
+          <SliderNumberInput
+            label={t("inspector.animationStart")}
+            value={activeAnimation.startMs}
+            min={0}
+            max={10000}
+            step={100}
+            suffix="ms"
+            disabled={!hasAnimation}
+            onChange={(value) => updateAnimation({ startMs: value })}
+          />
+          <SliderNumberInput
+            label={t("inspector.animationDuration")}
+            value={activeAnimation.durationMs}
+            min={100}
+            max={10000}
+            step={100}
+            suffix="ms"
+            disabled={!hasAnimation}
+            onChange={(value) => updateAnimation({ durationMs: value })}
+          />
+        </div>
+        <label className={`field ${!hasAnimation ? "field-disabled" : ""}`}>
+          <span>{t("inspector.animationEasing")}</span>
+          <select
+            value={activeAnimation.easing}
+            disabled={!hasAnimation}
+            onChange={(event) => updateAnimation({ easing: event.currentTarget.value as LayerAnimationEasing })}
+          >
+            {easingOptions.map((easing) => (
+              <option key={easing} value={easing}>
+                {easing}
+              </option>
+            ))}
+          </select>
+        </label>
+        <div className="field-grid two">
+          <label className={`field ${directionDisabled ? "field-disabled" : ""}`}>
+            <span>{t("inspector.animationDirection")}</span>
+            <select
+              value={directionSupported ? activeAnimation.direction : "none"}
+              disabled={directionDisabled}
+              onChange={(event) => updateAnimation({ direction: event.currentTarget.value as LayerAnimationDirection })}
+            >
+              {animationDirections.map((direction) => (
+                <option key={direction} value={direction}>
+                  {t(animationDirectionLabels[direction])}
+                </option>
+              ))}
+            </select>
+          </label>
+          <SliderNumberInput
+            label={t("inspector.animationDistance")}
+            value={activeAnimation.distance}
+            min={0}
+            max={800}
+            step={10}
+            disabled={!hasAnimation || directionIsNone}
+            onChange={(value) => updateAnimation({ distance: value })}
+          />
+        </div>
+        <label className={`checkbox-row inline-checkbox ${!hasAnimation ? "field-disabled" : ""}`}>
+          <input
+            type="checkbox"
+            checked={activeAnimation.loop}
+            disabled={!hasAnimation}
+            onChange={(event) => updateAnimation({ loop: event.currentTarget.checked })}
+          />
+          <span>{t("inspector.animationLoop")}</span>
+        </label>
+      </CollapsibleControlGroup>
+      <CollapsibleControlGroup title={t("inspector.textMotion")}>
+        <label className={`field ${selected.type !== "text" ? "field-disabled" : ""}`}>
+          <span>{t("inspector.textMotion")}</span>
+          <select
+            value={activeAnimation.textAnimation ?? "none"}
+            disabled={selected.type !== "text"}
+            onChange={(event) => updateAnimation({ textAnimation: event.currentTarget.value as LayerTextAnimation })}
+          >
+            {textAnimations.map((type) => (
+              <option key={type} value={type}>
+                {t(textAnimationLabels[type])}
+              </option>
+            ))}
+          </select>
+        </label>
+      </CollapsibleControlGroup>
+      <CollapsibleControlGroup title={t("inspector.effectMotion")}>
+        <label className="field">
+          <span>{t("inspector.effectMotion")}</span>
+          <select
+            value={activeAnimation.effectAnimation ?? "none"}
+            onChange={(event) => updateAnimation({ effectAnimation: event.currentTarget.value as LayerEffectAnimation })}
+          >
+            {effectAnimations.map((type) => (
+              <option key={type} value={type}>
+                {t(effectAnimationLabels[type])}
               </option>
             ))}
           </select>
         </label>
         <SliderNumberInput
-          label={t("inspector.animationDistance")}
-          value={activeAnimation.distance}
+          label={t("inspector.effectIntensity")}
+          value={activeAnimation.effectIntensity ?? 40}
           min={0}
-          max={800}
-          step={10}
-          disabled={!hasAnimation || directionIsNone}
-          onChange={(value) => updateAnimation({ distance: value })}
+          max={100}
+          step={1}
+          disabled={(activeAnimation.effectAnimation ?? "none") === "none"}
+          onChange={(value) => updateAnimation({ effectIntensity: value })}
         />
-      </div>
-      <label className={`checkbox-row inline-checkbox ${!hasAnimation ? "field-disabled" : ""}`}>
-        <input
-          type="checkbox"
-          checked={activeAnimation.loop}
-          disabled={!hasAnimation}
-          onChange={(event) => updateAnimation({ loop: event.currentTarget.checked })}
-        />
-        <span>{t("inspector.animationLoop")}</span>
-      </label>
+      </CollapsibleControlGroup>
     </section>
   );
 }

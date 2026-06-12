@@ -53,6 +53,9 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
         loop: parseBoolean(attr(node, "animation-loop"), false),
         direction: attr(node, "animation-direction"),
         distance: numberOr(attr(node, "animation-distance"), 80),
+        textAnimation: attr(node, "animation-text"),
+        effectAnimation: attr(node, "animation-effect"),
+        effectIntensity: numberOr(attr(node, "animation-effect-intensity"), 40),
       }),
     };
 

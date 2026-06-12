@@ -5,6 +5,8 @@ import type {
   LayerAnimation,
   LayerAnimationDirection,
   LayerAnimationEasing,
+  LayerEffectAnimation,
+  LayerTextAnimation,
   LayerAnimationType,
   ShapeKind,
   ShapeLayer,
@@ -31,6 +33,9 @@ export const defaultAnimation: LayerAnimation = {
   loop: false,
   direction: "none",
   distance: 80,
+  textAnimation: "none",
+  effectAnimation: "none",
+  effectIntensity: 40,
 };
 
 export const defaultLayerDecoration = {
@@ -166,9 +171,11 @@ export function normalizeLayer(layer: ThumbnailLayer): ThumbnailLayer {
 }
 
 export function normalizeAnimation(animation: Partial<Record<keyof LayerAnimation, unknown>> | undefined): LayerAnimation | undefined {
-  if (!animation || animation.type === "none") return undefined;
+  if (!animation) return undefined;
   const type = parseAnimationType(animation.type);
-  if (type === "none") return undefined;
+  const textAnimation = parseTextAnimation(animation.textAnimation);
+  const effectAnimation = parseEffectAnimation(animation.effectAnimation);
+  if (type === "none" && textAnimation === "none" && effectAnimation === "none") return undefined;
   return {
     type,
     startMs: clampNumber(animation.startMs, 0, 60000, defaultAnimation.startMs),
@@ -177,6 +184,9 @@ export function normalizeAnimation(animation: Partial<Record<keyof LayerAnimatio
     loop: Boolean(animation.loop),
     direction: parseAnimationDirection(animation.direction),
     distance: clampNumber(animation.distance, 0, 4000, defaultAnimation.distance),
+    textAnimation,
+    effectAnimation,
+    effectIntensity: clampNumber(animation.effectIntensity, 0, 100, defaultAnimation.effectIntensity ?? 40),
   };
 }
 
@@ -232,6 +242,16 @@ function parseAnimationType(value: unknown): LayerAnimationType {
     return value;
   }
   return "none";
+}
+
+function parseTextAnimation(value: unknown): LayerTextAnimation {
+  if (value === "typewriter" || value === "lineReveal" || value === "wave") return value;
+  return defaultAnimation.textAnimation ?? "none";
+}
+
+function parseEffectAnimation(value: unknown): LayerEffectAnimation {
+  if (value === "glow" || value === "blur" || value === "shine") return value;
+  return defaultAnimation.effectAnimation ?? "none";
 }
 
 function parseAnimationEasing(value: unknown): LayerAnimationEasing {

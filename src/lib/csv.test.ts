@@ -41,8 +41,8 @@ shape,Plate,10,500,600,80,,0,rect,#ff0000,,`,
 
   it("reads layer effects, grouping, kerning, opacity, radius, animation, and line styles", () => {
     const result = parseCsvLayout(
-      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,text,letterSpacing,fillOpacity,strokeOpacity,writingMode,shape,lineStyle,strokeWidth
-text,Title,0,0,400,120,g1,Brand,3,-4,true,0,#112233,0.6,12,18,45,12,-8,-5,0.7,slide,200,1200,easeOut,true,up,90,HELLO,6,0.8,0.5,vertical,,,`,
+      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,animationText,animationEffect,animationEffectIntensity,text,letterSpacing,fillOpacity,strokeOpacity,writingMode,shape,lineStyle,strokeWidth
+text,Title,0,0,400,120,g1,Brand,3,-4,true,0,#112233,0.6,12,18,45,12,-8,-5,0.7,slide,200,1200,easeOut,true,up,90,wave,glow,70,HELLO,6,0.8,0.5,vertical,,,`,
       { baseWidth: 1280, baseHeight: 720 },
     );
     const shapeResult = parseCsvLayout(
@@ -70,6 +70,9 @@ shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
         loop: true,
         direction: "up",
         distance: 90,
+        textAnimation: "wave",
+        effectAnimation: "glow",
+        effectIntensity: 70,
       },
     });
     expect(shapeResult.layers[0]).toMatchObject({

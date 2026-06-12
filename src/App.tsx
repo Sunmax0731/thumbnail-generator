@@ -1674,6 +1674,36 @@ function App() {
         height: 100vh;
         cursor: none;
       }
+      .obs-controls {
+        position: fixed;
+        z-index: 10;
+        right: 14px;
+        bottom: 14px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        padding: 7px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 8px;
+        background: rgba(3, 7, 18, 0.78);
+        box-shadow: 0 16px 38px rgba(0, 0, 0, 0.35);
+        backdrop-filter: blur(10px);
+      }
+      .obs-controls.hidden {
+        display: none;
+      }
+      .obs-controls button {
+        min-height: 30px;
+        padding: 0 10px;
+        border: 1px solid rgba(255, 255, 255, 0.18);
+        border-radius: 6px;
+        background: rgba(255, 255, 255, 0.08);
+        color: #ffffff;
+        font: 800 12px/1 system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      }
+      .obs-controls button:hover {
+        background: rgba(255, 255, 255, 0.16);
+      }
     </style>
     <script>
       async function enterFullscreen() {
@@ -1687,15 +1717,53 @@ function App() {
       }
       window.__thumbnailObsPreviewEnterFullscreen = enterFullscreen;
       window.addEventListener("pointerdown", () => void enterFullscreen());
-      window.addEventListener("keydown", (event) => {
-        if (event.key === "f" || event.key === "F" || event.key === "Enter") {
-          void enterFullscreen();
-        }
-      });
       window.addEventListener("DOMContentLoaded", () => {
         const canvas = document.getElementById("obs-canvas");
+        const controls = document.getElementById("obs-controls");
+        const playPauseButton = document.getElementById("obs-play-pause");
+        const resetButton = document.getElementById("obs-reset");
+        const hideButton = document.getElementById("obs-hide-controls");
         const start = performance.now();
+        let timeOffset = 0;
+        let pausedAt = 0;
+        let paused = false;
+        let controlsVisible = true;
         let last = 0;
+        function elapsedTime(now) {
+          return paused ? pausedAt : now - start - timeOffset;
+        }
+        function setControlsVisible(nextVisible) {
+          controlsVisible = nextVisible;
+          controls.classList.toggle("hidden", !controlsVisible);
+        }
+        function setPaused(nextPaused) {
+          if (paused === nextPaused) return;
+          if (nextPaused) {
+            pausedAt = elapsedTime(performance.now());
+          } else {
+            timeOffset = performance.now() - start - pausedAt;
+          }
+          paused = nextPaused;
+          playPauseButton.textContent = paused ? "Play" : "Pause";
+        }
+        playPauseButton.addEventListener("click", () => setPaused(!paused));
+        resetButton.addEventListener("click", () => {
+          timeOffset = performance.now() - start;
+          pausedAt = 0;
+        });
+        hideButton.addEventListener("click", () => setControlsVisible(false));
+        window.addEventListener("keydown", (event) => {
+          if (event.key === "f" || event.key === "F" || event.key === "Enter") {
+            void enterFullscreen();
+          }
+          if (event.key === "h" || event.key === "H") {
+            setControlsVisible(!controlsVisible);
+          }
+          if (event.key === " ") {
+            event.preventDefault();
+            setPaused(!paused);
+          }
+        });
         async function frame(now) {
           if (now - last >= 33) {
             last = now;
@@ -1703,7 +1771,7 @@ function App() {
               if (!window.opener || window.opener.closed || !window.opener.__thumbnailObsPreviewRender) {
                 document.body.style.background = "#111827";
               } else {
-                await window.opener.__thumbnailObsPreviewRender(canvas, now - start);
+                await window.opener.__thumbnailObsPreviewRender(canvas, elapsedTime(now));
               }
             } catch (error) {
               console.error(error);
@@ -1718,6 +1786,11 @@ function App() {
   </head>
   <body>
     <canvas id="obs-canvas" aria-label="OBS preview canvas"></canvas>
+    <div id="obs-controls" class="obs-controls" aria-label="OBS preview controls">
+      <button id="obs-play-pause" type="button">Pause</button>
+      <button id="obs-reset" type="button">Reset</button>
+      <button id="obs-hide-controls" type="button" title="Press H to show controls again">Hide</button>
+    </div>
   </body>
 </html>`);
     previewWindow.document.close();
@@ -1812,8 +1885,16 @@ function App() {
       <TopToolbar
         language={language}
         themeMode={themeMode}
+        autoSaveEnabled={autoSaveEnabled}
+        savedEditStateUpdatedAt={savedEditStateUpdatedAt}
         onLanguageChange={setLanguage}
         onThemeChange={setThemeMode}
+        onAutoSaveChange={setAutoSaveEnabled}
+        onSaveEditState={() => saveEditState("manual")}
+        onRestoreEditState={restoreEditState}
+        onExportEditState={exportEditState}
+        onImportEditState={importEditState}
+        onDeleteEditState={deleteEditState}
         t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
@@ -1872,8 +1953,8 @@ function App() {
           cursor={canvasCursor}
           previewPadding={previewPadding}
           isExporting={isExporting}
-          autoSaveEnabled={autoSaveEnabled}
-          savedEditStateUpdatedAt={savedEditStateUpdatedAt}
+          layers={layers}
+          selectedIds={selectedIds}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
@@ -1881,13 +1962,8 @@ function App() {
           onExport={handleExport}
           onSettingsChange={updateSettings}
           onPresetChange={handlePresetChange}
-          onAutoSaveChange={setAutoSaveEnabled}
-          onSaveEditState={() => saveEditState("manual")}
-          onRestoreEditState={restoreEditState}
-          onExportEditState={exportEditState}
-          onImportEditState={importEditState}
-          onDeleteEditState={deleteEditState}
           onOpenObsPreview={openObsPreview}
+          onSelectLayer={selectLayer}
           onClearSelection={() => {
             setSelectedIds([]);
             setHoverInteractionMode(null);

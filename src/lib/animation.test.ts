@@ -164,4 +164,68 @@ describe("animation", () => {
     expect(animated.x).toBe(50);
     expect(animated.y).toBe(200);
   });
+
+  it("applies text-only animation without a base motion type", () => {
+    const layer = makeTextLayer({
+      text: "MOTION",
+      animation: {
+        type: "none",
+        startMs: 0,
+        durationMs: 1000,
+        easing: "linear",
+        loop: false,
+        direction: "none",
+        distance: 0,
+        textAnimation: "typewriter",
+      },
+    });
+
+    const animated = applyLayerAnimation(layer, 500);
+
+    expect(animated.type).toBe("text");
+    if (animated.type !== "text") throw new Error("Expected text layer");
+    expect(animated.text).toBe("MOT");
+  });
+
+  it("applies glow and blur effect animations", () => {
+    const glow = applyLayerAnimation(
+      makeTextLayer({
+        shadowOpacity: 0.2,
+        shadowBlur: 10,
+        animation: {
+          type: "none",
+          startMs: 0,
+          durationMs: 1000,
+          easing: "linear",
+          loop: false,
+          direction: "none",
+          distance: 0,
+          effectAnimation: "glow",
+          effectIntensity: 80,
+        },
+      }),
+      500,
+    );
+    const blur = applyLayerAnimation(
+      makeTextLayer({
+        layerBlur: 0,
+        animation: {
+          type: "none",
+          startMs: 0,
+          durationMs: 1000,
+          easing: "linear",
+          loop: false,
+          direction: "none",
+          distance: 0,
+          effectAnimation: "blur",
+          effectIntensity: 40,
+        },
+      }),
+      500,
+    );
+
+    expect(glow.shadowOpacity).toBeGreaterThan(0.2);
+    expect(glow.shadowBlur).toBeGreaterThan(10);
+    expect(blur.layerBlur).toBeGreaterThan(0);
+  });
 });

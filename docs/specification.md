@@ -35,8 +35,11 @@ Layer animation is optional metadata on existing image, text, and shape layers. 
 - `loop`: whether the animation repeats.
 - `direction`: `none`, `left`, `right`, `up`, or `down` for motion presets that use movement. Direction is enabled for Slide, Drift, and Shake. New animations default to `none`.
 - `distance`: movement distance in output pixels for movement presets. The Motion UI disables the distance control while direction is unavailable or `none`.
+- `textAnimation`: text-only animation mode. Supported values are `none`, `typewriter`, `lineReveal`, and `wave`. These controls are exposed separately from common motion parameters and are enabled for text layers.
+- `effectAnimation`: effect motion mode. Supported values are `none`, `glow`, `blur`, and `shine`.
+- `effectIntensity`: effect strength from `0` to `100`.
 
-Rendering applies each animation entry in order as a temporary draw-time transform. The stored layer position, size, rotation, and opacity are not mutated by playback.
+Rendering applies each animation entry in order as a temporary draw-time transform. Text-only and effect motion can run even when the common `type` is `none`. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
 ## Image Layers
 
@@ -90,7 +93,7 @@ Wave line rendering uses a smooth quadratic wave path based on stroke width and 
 CSV rows support the following columns:
 
 ```text
-type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
+type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,animationText,animationEffect,animationEffectIntensity,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
 ```
 
 Rules:
@@ -99,7 +102,7 @@ Rules:
 - Missing numbers fall back to safe defaults.
 - `effect` accepts semicolon-separated values such as `grayscale=1;blur=4;mosaic=12`.
 - `image` references an imported image name/key or a bundled sample key.
-- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, shadow, pseudo-3D rotation, bevel, `groupId`, `groupName`, `writingMode`, `lineStyle`, and animation columns are optional and fall back to safe defaults.
+- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, shadow, pseudo-3D rotation, bevel, `groupId`, `groupName`, `writingMode`, `lineStyle`, and animation columns including text/effect motion columns are optional and fall back to safe defaults.
 - Quoted CSV fields are supported.
 
 ## HTML Layout Schema
@@ -116,7 +119,7 @@ Examples:
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
 <div data-layer="text" data-shadow-color="#000000" data-shadow-opacity="45" data-shadow-blur="18" data-shadow-distance="20" data-shadow-angle="135" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="8" data-bevel-opacity="35">DECORATED</div>
-<div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true">MOTION</div>
+<div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true" data-animation-text="wave" data-animation-effect="glow" data-animation-effect-intensity="70">MOTION</div>
 ```
 
 ## Export
@@ -208,7 +211,9 @@ The right inspector is grouped by task:
 
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, shadow, pseudo-3D rotation, signed bevel, text, shape, Fill/Stroke color, and image effects. Common controls are labeled Common settings and can be collapsed or expanded; Text, Shape, and Image-only controls use the same collapsible section behavior below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
-- Motion: ordered motion sets for the selected layer, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- Motion: ordered motion sets for the selected layer, preset buttons, selected-object preview, easing graph, collapsible common parameters, collapsible text-only motion, collapsible glow/effect motion, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+
+The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane is reserved for the motion timeline, which lists animated layers and their start/duration segments.
 
 The Layers, Colors, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
@@ -257,7 +262,7 @@ Generator settings are stored in localStorage under `thumbnail-generator.generat
 
 ## OBS Preview
 
-The canvas toolbar can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays only a canvas, draws without editor controls or selection handles, stretches the canvas to the preview viewport to avoid document letterboxing, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It requests fullscreen after opening, retries fullscreen when the preview is clicked or `F`/`Enter` is pressed, and sizes the popup viewport to the current output aspect ratio when browser APIs allow it. Browser security rules still decide whether a normal browser window can hide OS/browser chrome; true frame removal depends on fullscreen permission or the OBS capture mode. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
+The Output menu can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays the animated canvas, draws without editor controls or selection handles, stretches the canvas to the preview viewport to avoid document letterboxing, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It requests fullscreen after opening, retries fullscreen when the preview is clicked or `F`/`Enter` is pressed, and sizes the popup viewport to the current output aspect ratio when browser APIs allow it. A small preview-only control overlay provides Play/Pause, Reset, and Hide actions; `H` toggles that overlay for clean OBS capture. Browser security rules still decide whether a normal browser window can hide OS/browser chrome; true frame removal depends on fullscreen permission or the OBS capture mode. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
 
 ## Brand Kit
 
@@ -270,9 +275,7 @@ The brand kit is stored in browser `localStorage` under `thumbnail-generator.bra
 - Shadow/outline color.
 - Optional logo asset key.
 
-Brand kit setup controls are hidden from Templates in the current GUI. The storage model and application helpers remain available for existing saved data and internal compatibility.
-
-Colors can register the current palette draft, saved palette colors, or registered single-color rows into the Brand kit primary, accent, or shadow/outline color slots without leaving the Colors tab.
+Brand kit setup controls are hidden from Templates in the current GUI, and Colors-side Brand kit registration buttons are also hidden. The storage model and application helpers remain available for existing saved data and internal compatibility.
 
 ## Quality Warnings
 
@@ -409,7 +412,7 @@ A saved edit state stores:
 
 The saved edit state is separate from named templates. Manual Save state overwrites this one work-in-progress slot. When Autosave current edit state is enabled, editor changes are saved after a short debounce. Reloading the app restores the saved edit state when one exists.
 
-The canvas preview pane contains the edit-state section. It supports edit-state JSON export, JSON import, and explicit saved-state deletion while the current thumbnail remains visible. Large snapshots show a backup warning before users rely on browser storage alone. Save failures include recovery guidance to export JSON, delete old browser data, or remove large image/font assets.
+The top-right edit-state icon cluster supports edit-state JSON export, JSON import, and explicit saved-state deletion while the current thumbnail remains visible. Autosave remains a text-labeled checkbox in the same cluster. Large snapshots show a backup warning before users rely on browser storage alone. Save failures include recovery guidance to export JSON, delete old browser data, or remove large image/font assets.
 
 ## Image Lab
 

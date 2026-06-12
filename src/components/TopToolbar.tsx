@@ -1,22 +1,41 @@
-import { ExternalLink, Moon, SquareStack } from "lucide-react";
+import { Download, ExternalLink, FolderOpen, Moon, Save, SquareStack, Trash2, Upload } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import type { ThemeMode } from "../lib/theme";
 
 interface TopToolbarProps {
   language: Language;
   themeMode: ThemeMode;
+  autoSaveEnabled: boolean;
+  savedEditStateUpdatedAt: string | null;
   onLanguageChange: (language: Language) => void;
   onThemeChange: (theme: ThemeMode) => void;
+  onAutoSaveChange: (enabled: boolean) => void;
+  onSaveEditState: () => void;
+  onRestoreEditState: () => void;
+  onExportEditState: () => void;
+  onImportEditState: (file: File | null) => void;
+  onDeleteEditState: () => void;
   t: Translator;
 }
 
 export function TopToolbar({
   language,
   themeMode,
+  autoSaveEnabled,
+  savedEditStateUpdatedAt,
   onLanguageChange,
   onThemeChange,
+  onAutoSaveChange,
+  onSaveEditState,
+  onRestoreEditState,
+  onExportEditState,
+  onImportEditState,
+  onDeleteEditState,
   t,
 }: TopToolbarProps) {
+  const savedStateLabel = savedEditStateUpdatedAt
+    ? t("left.savedEditStateAt", { time: formatSavedAt(savedEditStateUpdatedAt) })
+    : t("left.noSavedEditState");
   return (
     <header className="top-toolbar">
       <div className="brand-block" aria-label="App name">
@@ -33,6 +52,32 @@ export function TopToolbar({
 
       <div aria-hidden="true" />
       <div className="window-controls" aria-label={t("toolbar.windowSettings")}>
+        <div className="top-edit-state-actions" aria-label={t("left.editState")}>
+          <button type="button" className="icon-button" title={t("left.saveEditState")} onClick={onSaveEditState}>
+            <Save size={16} />
+          </button>
+          <button type="button" className="icon-button" title={`${t("left.restoreEditState")} - ${savedStateLabel}`} onClick={onRestoreEditState}>
+            <FolderOpen size={16} />
+          </button>
+          <button type="button" className="icon-button" title={t("left.exportState")} onClick={onExportEditState}>
+            <Download size={16} />
+          </button>
+          <label className="icon-button file-action" title={t("left.importState")}>
+            <Upload size={16} />
+            <input type="file" accept="application/json,.json" onChange={(event) => onImportEditState(event.currentTarget.files?.[0] ?? null)} />
+          </label>
+          <button type="button" className="icon-button danger-icon" title={t("left.deleteEditState")} onClick={onDeleteEditState}>
+            <Trash2 size={16} />
+          </button>
+          <label className="checkbox-row autosave-row top-autosave-row">
+            <input
+              type="checkbox"
+              checked={autoSaveEnabled}
+              onChange={(event) => onAutoSaveChange(event.currentTarget.checked)}
+            />
+            <span>{t("left.autoSaveEditState")}</span>
+          </label>
+        </div>
         <label className="field language-field">
           <span>{t("language.label")}</span>
           <select value={language} onChange={(event) => onLanguageChange(event.target.value as Language)}>
@@ -56,4 +101,10 @@ export function TopToolbar({
       </div>
     </header>
   );
+}
+
+function formatSavedAt(value: string): string {
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return date.toLocaleString();
 }

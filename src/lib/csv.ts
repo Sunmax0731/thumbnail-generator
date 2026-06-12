@@ -61,6 +61,9 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
         loop: boolOr(record.animationLoop, false),
         direction: record.animationDirection?.trim(),
         distance: numberOr(record.animationDistance, 80),
+        textAnimation: record.animationText?.trim(),
+        effectAnimation: record.animationEffect?.trim(),
+        effectIntensity: numberOr(record.animationEffectIntensity, 40),
       }),
     };
 

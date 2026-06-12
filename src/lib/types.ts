@@ -17,6 +17,8 @@ export type LayerAnimationType =
   | "sway"
   | "shake"
   | "breathe";
+export type LayerTextAnimation = "none" | "typewriter" | "lineReveal" | "wave";
+export type LayerEffectAnimation = "none" | "glow" | "blur" | "shine";
 export type LayerAnimationEasing =
   | "linear"
   | "easeInSine"
@@ -67,6 +69,9 @@ export interface LayerAnimation {
   loop: boolean;
   direction: LayerAnimationDirection;
   distance: number;
+  textAnimation?: LayerTextAnimation;
+  effectAnimation?: LayerEffectAnimation;
+  effectIntensity?: number;
 }
 
 export interface BaseLayer {

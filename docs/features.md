@@ -29,8 +29,8 @@ This page is the quick feature index for users and reviewers.
 ## Layout Import And Export
 
 - CSV and HTML layout text remain part of browser edit-state and template compatibility.
-- Export the rendered thumbnail as PNG, JPEG, or WebP from the preview-pane export panel at maximum quality.
-- Use the side-by-side preview-pane Export and Edit state sections on desktop; each section stacks its own action buttons vertically.
+- Export the rendered thumbnail as PNG, JPEG, or WebP from the preview-header Output menu at maximum quality.
+- Use the same Output menu to open OBS preview.
 
 ## Browser Storage
 
@@ -39,7 +39,7 @@ This page is the quick feature index for users and reviewers.
 - Use Save settings in generator modals to persist settings without generating; Generate layers also saves settings before replacing the current layers.
 - Resize the Browser templates list area from the Templates tab.
 - Use Templates to save named browser-local templates with optional tags, choose existing tags from suggestions while typing, and filter saved templates by tag from a dropdown.
-- Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
+- Use the top-right edit-state icon cluster to save the current work-in-progress state without creating a named template.
 - Export, import, or delete edit-state JSON for backup and recovery.
 - Enable Autosave current edit state to save the active editor state after changes.
 - Reloading the app restores the saved edit state when one exists.
@@ -75,12 +75,17 @@ This page is the quick feature index for users and reviewers.
 ## Motion And OBS Preview
 
 - Open Motion to assign one or more motion sets to the selected layer.
+- Apply motion presets for common entrance, ticker, neon, pop, type-on, and background-breathe behaviors.
 - Each motion set can use None, Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
+- Keep common motion parameters, text-only motion, and glow/effect motion in separate collapsible sections.
+- Use text-only Typewriter, Line reveal, or Text wave motion on text layers.
+- Use Glow pulse, Blur in, or Shine effect motion with an intensity control.
 - Review the selected-object Motion preview and easing graph before opening the OBS preview.
 - Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
-- Open OBS preview from the canvas toolbar to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
-- Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, and browser/OBS settings still decide whether OS/browser chrome is capturable.
+- Read the bottom timeline to scan animated layers and their start/duration spans.
+- Open OBS preview from the Output menu to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
+- Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, provides Play/Pause and Reset controls, hides the control overlay from its Hide button, toggles it again with `H`, and browser/OBS settings still decide whether OS/browser chrome is capturable.
 
 ## Color Palette
 

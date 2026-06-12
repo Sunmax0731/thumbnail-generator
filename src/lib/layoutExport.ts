@@ -33,6 +33,9 @@ const csvColumns = [
   "animationLoop",
   "animationDirection",
   "animationDistance",
+  "animationText",
+  "animationEffect",
+  "animationEffectIntensity",
   "text",
   "fontSize",
   "fontFamily",
@@ -100,6 +103,9 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     animationLoop: layer.animation?.loop ?? "",
     animationDirection: layer.animation?.direction ?? "",
     animationDistance: layer.animation ? round(layer.animation.distance) : "",
+    animationText: layer.animation?.textAnimation ?? "",
+    animationEffect: layer.animation?.effectAnimation ?? "",
+    animationEffectIntensity: layer.animation ? round(layer.animation.effectIntensity ?? 0) : "",
   };
   if (column in common) return common[column];
 
@@ -180,6 +186,9 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-animation-loop", layer.animation ? String(layer.animation.loop) : ""],
     ["data-animation-direction", layer.animation?.direction ?? ""],
     ["data-animation-distance", layer.animation ? round(layer.animation.distance) : ""],
+    ["data-animation-text", layer.animation?.textAnimation ?? ""],
+    ["data-animation-effect", layer.animation?.effectAnimation ?? ""],
+    ["data-animation-effect-intensity", layer.animation ? round(layer.animation.effectIntensity ?? 0) : ""],
   ];
 
   if (layer.type === "image") {
