@@ -18,9 +18,10 @@ import {
   createDefaultCreativeDraft,
   type CreativeGeneratorKind,
   type CreativeGeneratorRequest,
+  type CreativeLayoutPattern,
 } from "../lib/creativeGenerator";
 import type { FontOption } from "../lib/fonts";
-import type { Language, Translator } from "../lib/i18n";
+import type { Language, TranslationKey, Translator } from "../lib/i18n";
 import { readGeneratorSettings, writeGeneratorSettings } from "../lib/generatorSettings";
 import {
   addDays,
@@ -95,7 +96,7 @@ export function LeftPanel({
   );
   const [creativeDrafts, setCreativeDrafts] = useState<Record<CreativeGeneratorKind, CreativeGeneratorRequest>>(() => ({
     "standard-thumbnail": readGeneratorSettings("creative.standard-thumbnail", createDefaultCreativeDraft("standard-thumbnail")),
-    "horizontal-thumbnail": readGeneratorSettings("creative.horizontal-thumbnail", createDefaultCreativeDraft("horizontal-thumbnail")),
+    "vertical-thumbnail": readGeneratorSettings("creative.vertical-thumbnail", createDefaultCreativeDraft("vertical-thumbnail")),
     "stream-waiting": readGeneratorSettings("creative.stream-waiting", createDefaultCreativeDraft("stream-waiting")),
   }));
 
@@ -226,11 +227,11 @@ export function LeftPanel({
                   <small>{t("generator.standardThumbnail.copy")}</small>
                 </span>
               </button>
-              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("horizontal-thumbnail")}>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("vertical-thumbnail")}>
                 <Video size={17} />
                 <span>
-                  <strong>{t("generator.horizontalThumbnail.open")}</strong>
-                  <small>{t("generator.horizontalThumbnail.copy")}</small>
+                  <strong>{t("generator.verticalThumbnail.open")}</strong>
+                  <small>{t("generator.verticalThumbnail.copy")}</small>
                 </span>
               </button>
               <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("stream-waiting")}>
@@ -977,6 +978,13 @@ function CreativeBuilderDialog({
   const [settingsSaved, setSettingsSaved] = useState(false);
   const previewTemplate = useMemo(() => buildCreativeTemplate(draft, settings), [draft, settings]);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+  const layoutPatternOptions: Array<{ value: CreativeLayoutPattern; label: TranslationKey }> = [
+    { value: "pattern-1", label: "generator.layoutPattern.pattern-1" },
+    { value: "pattern-2", label: "generator.layoutPattern.pattern-2" },
+    { value: "pattern-3", label: "generator.layoutPattern.pattern-3" },
+    { value: "pattern-4", label: "generator.layoutPattern.pattern-4" },
+    { value: "pattern-5", label: "generator.layoutPattern.pattern-5" },
+  ];
 
   const setDraft = <Key extends keyof CreativeGeneratorRequest>(key: Key, value: CreativeGeneratorRequest[Key]) => {
     onDraftChange({ ...draft, [key]: value });
@@ -1035,6 +1043,16 @@ function CreativeBuilderDialog({
                 <option value="neon">{t("generator.tone.neon")}</option>
               </select>
             </label>
+            <label className="field">
+              <span>{t("generator.layoutPattern")}</span>
+              <select value={draft.layoutPattern} onChange={(event) => setDraft("layoutPattern", event.currentTarget.value as CreativeLayoutPattern)}>
+                {layoutPatternOptions.map((option) => (
+                  <option key={option.value} value={option.value}>
+                    {t(option.label)}
+                  </option>
+                ))}
+              </select>
+            </label>
             <label className="field checkbox-field">
               <input type="checkbox" checked={draft.includeImageSlot} onChange={(event) => setDraft("includeImageSlot", event.currentTarget.checked)} />
               <span>{t("generator.includeImageSlot")}</span>
@@ -1054,31 +1072,44 @@ function CreativeBuilderDialog({
               <LayoutTemplate size={16} />
               <h2>{t("generator.gridTextSection")}</h2>
             </div>
-            <div className="field-grid schedule-font-row">
-              <label className="field schedule-font-family-field">
-                <span>{t("scheduleBuilder.fontFamily")}</span>
-                <select value={draft.fontFamily} onChange={(event) => setDraft("fontFamily", event.currentTarget.value)}>
-                  {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
-                    <option value={draft.fontFamily}>{draft.fontFamily}</option>
-                  ) : null}
-                  {fontOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
-                      {option.label}
-                    </option>
-                  ))}
-                </select>
-              </label>
-              <label className="field schedule-font-weight-field">
-                <span>{t("scheduleBuilder.fontWeight")}</span>
-                <select value={draft.fontWeight} onChange={(event) => setDraft("fontWeight", event.currentTarget.value)}>
-                  <option value="600">600</option>
-                  <option value="700">700</option>
-                  <option value="800">800</option>
-                  <option value="900">900</option>
-                </select>
-              </label>
-            </div>
-            <div className="field-grid two">
+            <div className="generator-text-groups">
+              <div className="generator-text-group">
+                <h3>{t("generator.commonGroup")}</h3>
+                <div className="field-grid schedule-font-row">
+                  <label className="field schedule-font-family-field">
+                    <span>{t("scheduleBuilder.fontFamily")}</span>
+                    <select value={draft.fontFamily} onChange={(event) => setDraft("fontFamily", event.currentTarget.value)}>
+                      {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
+                        <option value={draft.fontFamily}>{draft.fontFamily}</option>
+                      ) : null}
+                      {fontOptions.map((option) => (
+                        <option key={option.value} value={option.value}>
+                          {option.label}
+                        </option>
+                      ))}
+                    </select>
+                  </label>
+                  <label className="field schedule-font-weight-field">
+                    <span>{t("scheduleBuilder.fontWeight")}</span>
+                    <select value={draft.fontWeight} onChange={(event) => setDraft("fontWeight", event.currentTarget.value)}>
+                      <option value="600">600</option>
+                      <option value="700">700</option>
+                      <option value="800">800</option>
+                      <option value="900">900</option>
+                    </select>
+                  </label>
+                </div>
+                <ScheduleSlider
+                  label={t("generator.letterSpacing")}
+                  value={draft.letterSpacing}
+                  min={-8}
+                  max={24}
+                  onChange={(value) => setDraft("letterSpacing", value)}
+                />
+              </div>
+
+              <div className="generator-text-group">
+                <h3>{t("generator.titleGroup")}</h3>
               <ScheduleSlider
                 label={t("generator.titleFontSize")}
                 value={draft.titleFontSize}
@@ -1086,6 +1117,18 @@ function CreativeBuilderDialog({
                 max={180}
                 onChange={(value) => setDraft("titleFontSize", value)}
               />
+                <ScheduleSlider
+                  label={t("generator.strokeWidth")}
+                  value={draft.titleStrokeWidth}
+                  min={0}
+                  max={20}
+                  onChange={(value) => setDraft("titleStrokeWidth", value)}
+                />
+                <CreativeAlignSelect value={draft.titleAlign} onChange={(value) => setDraft("titleAlign", value)} t={t} />
+              </div>
+
+              <div className="generator-text-group">
+                <h3>{t("generator.subtitleGroup")}</h3>
               <ScheduleSlider
                 label={t("generator.subtitleFontSize")}
                 value={draft.subtitleFontSize}
@@ -1093,6 +1136,18 @@ function CreativeBuilderDialog({
                 max={96}
                 onChange={(value) => setDraft("subtitleFontSize", value)}
               />
+                <ScheduleSlider
+                  label={t("generator.strokeWidth")}
+                  value={draft.subtitleStrokeWidth}
+                  min={0}
+                  max={14}
+                  onChange={(value) => setDraft("subtitleStrokeWidth", value)}
+                />
+                <CreativeAlignSelect value={draft.subtitleAlign} onChange={(value) => setDraft("subtitleAlign", value)} t={t} />
+              </div>
+
+              <div className="generator-text-group">
+                <h3>{t("generator.labelGroup")}</h3>
               <ScheduleSlider
                 label={t("generator.labelFontSize")}
                 value={draft.labelFontSize}
@@ -1100,6 +1155,22 @@ function CreativeBuilderDialog({
                 max={72}
                 onChange={(value) => setDraft("labelFontSize", value)}
               />
+                <ScheduleSlider
+                  label={t("generator.strokeWidth")}
+                  value={draft.labelStrokeWidth}
+                  min={0}
+                  max={12}
+                  onChange={(value) => setDraft("labelStrokeWidth", value)}
+                />
+                <ScheduleSlider
+                  label={t("generator.cornerRadius")}
+                  value={draft.labelCornerRadius}
+                  min={0}
+                  max={42}
+                  onChange={(value) => setDraft("labelCornerRadius", value)}
+                />
+                <CreativeAlignSelect value={draft.labelAlign} onChange={(value) => setDraft("labelAlign", value)} t={t} />
+              </div>
             </div>
           </section>
 
@@ -1176,8 +1247,29 @@ function CreativeBuilderDialog({
 
 function getCreativeDialogTitle(kind: CreativeGeneratorKind, t: Translator): string {
   if (kind === "stream-waiting") return t("generator.streamWaiting.title");
-  if (kind === "horizontal-thumbnail") return t("generator.horizontalThumbnail.title");
+  if (kind === "vertical-thumbnail") return t("generator.verticalThumbnail.title");
   return t("generator.standardThumbnail.title");
+}
+
+function CreativeAlignSelect({
+  value,
+  onChange,
+  t,
+}: {
+  value: TextLayer["align"];
+  onChange: (value: TextLayer["align"]) => void;
+  t: Translator;
+}) {
+  return (
+    <label className="field">
+      <span>{t("generator.align")}</span>
+      <select value={value} onChange={(event) => onChange(event.currentTarget.value as TextLayer["align"])}>
+        <option value="left">{t("generator.align.left")}</option>
+        <option value="center">{t("generator.align.center")}</option>
+        <option value="right">{t("generator.align.right")}</option>
+      </select>
+    </label>
+  );
 }
 
 function ScheduleSlider({

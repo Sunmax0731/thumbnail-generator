@@ -21,8 +21,8 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
-- Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, horizontal thumbnails, and stream waiting screens.
-- Generate standard and horizontal thumbnail layouts from separate modals, each with saved content, typography, color, image-slot, grouping, and preview settings.
+- Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
+- Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
 - Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.

@@ -57,9 +57,9 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
-- The Templates tab exposes generator buttons for schedule, standard thumbnail, horizontal thumbnail, and stream waiting screen, while the previous default-template list is not shown.
+- The Templates tab exposes generator buttons for schedule, standard thumbnail, vertical thumbnail, and stream waiting screen, while the previous default-template list is not shown.
 - The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly or weekly schedule layers with localized badge text.
-- The image generator modals open from Templates, provide live previews, shared font choices, separate title/subtitle/label font-size controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, horizontal thumbnail, and stream waiting layer sets.
+- The image generator modals open from Templates, provide live previews, five placement patterns per generator, grouped common/title/subtitle/label text controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, vertical thumbnail, and stream waiting layer sets.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Preview selection respects layer stacking order when layers overlap.
@@ -131,34 +131,36 @@ Latest completed on 2026-06-12.
 
 Completed on 2026-06-12 for the generator modal follow-up.
 
-- `npm test`: pass. 30 test files, 117 tests.
+- `npm test`: pass. 30 test files, 118 tests.
 - `npm run build`: pass.
-- Runtime gate URL: `http://127.0.0.1:4331/thumbnail-generator/`.
+- Runtime gate URL: `http://127.0.0.1:4332/thumbnail-generator/`.
 - Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
 - Desktop viewport: `1440x1000`.
 - Mobile viewport: `390x844`.
 - Checks:
   - Nonblank app render and primary workspace visible.
-  - Templates exposed four generator buttons: Schedule, Standard thumbnail, Horizontal thumbnail, and Stream waiting.
+  - Templates exposed four generator buttons: Schedule, Standard thumbnail, Vertical thumbnail, and Stream waiting.
+  - The old Horizontal thumbnail button was absent.
   - YouTube waiting generator button/modal/function was absent from the current UI.
   - Previous default-template list count was `0`.
-  - Standard thumbnail modal exposed Grid / text with shared font, title font size, subtitle font size, and label font size.
-  - Standard thumbnail Save settings wrote and restored label font size `48` after reload.
-  - Standard thumbnail generated a nonblank `1280x720` canvas.
-  - The old video thumbnail variant selector was absent; no Vertical or Cutout options were present.
-  - Horizontal thumbnail opened as its own modal, exposed title/subtitle/label font-size controls, generated a nonblank `1280x720` canvas, and produced 10 visible layer rows after switching to Layers.
-  - Horizontal thumbnail generated a `Wide source image` layer.
-  - Stream waiting generated a nonblank `1920x1080` canvas and saved generator settings under the new creative storage keys.
+  - Standard thumbnail, Vertical thumbnail, and Stream waiting modals each exposed five placement patterns.
+  - Each image generator Grid / text section grouped controls into Common, Title, Subtitle, and Label with letter spacing, stroke width, alignment, and label corner radius controls.
+  - Cancel, Save settings, and Generate layers rendered on one horizontal row in all three image generator modals; desktop button widths were `125px`.
+  - Vertical thumbnail Save settings wrote and restored placement pattern `pattern-5` and letter spacing `12` after reload.
+  - Standard thumbnail generated a nonblank `1280x720` canvas from placement pattern 3.
+  - Vertical thumbnail opened as its own modal, generated a nonblank `1080x1920` canvas from placement pattern 5, and produced visible layer rows after switching to Layers.
+  - Vertical thumbnail generated a `Vertical source image` layer.
+  - Stream waiting generated a nonblank `1920x1080` canvas from placement pattern 4 and saved generator settings under the creative storage keys.
   - Canvas drag interaction kept the generated canvas nonblank.
   - WebP export downloaded successfully.
-  - Mobile Horizontal thumbnail modal opened with title/subtitle/label font-size controls and mobile horizontal overflow was `0`.
+  - Mobile Vertical thumbnail modal opened with five placement patterns, grouped text controls, three action buttons on one row at `112px` each, and mobile horizontal overflow was `0`.
   - No page errors, app console errors, or app HTTP errors were reported.
   - CSV/HTML import controls remain hidden in this build; parser/import/export compatibility is covered by unit tests and internal layout text refresh checks.
 - Evidence screenshots:
-  - `docs/assets/runtime-20260612-generator-followup-desktop.png`
-  - `docs/assets/runtime-20260612-generator-followup-mobile.png`
+  - `docs/assets/runtime-20260612-generator-patterns-desktop.png`
+  - `docs/assets/runtime-20260612-generator-patterns-mobile.png`
 - Export evidence:
-  - `output/runtime-downloads/20260612-generator-followup/thumbnail-1920x1080-2026-06-12T02-13-49-338Z.webp`.
+  - `output/runtime-downloads/20260612-generator-patterns/thumbnail-1920x1080-2026-06-12T02-39-19-763Z.webp`.
 
 ### Generator Modals And Default Template List Removal
 

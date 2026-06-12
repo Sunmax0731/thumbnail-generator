@@ -15,14 +15,36 @@ describe("creativeGenerator", () => {
 
   it("builds split thumbnail generators with expected output sizes and label typography", () => {
     const standard = buildCreativeTemplate({ ...createDefaultCreativeDraft("standard-thumbnail"), labelFontSize: 42 }, defaultOutputSettings);
-    const horizontal = buildCreativeTemplate(createDefaultCreativeDraft("horizontal-thumbnail"), defaultOutputSettings);
+    const vertical = buildCreativeTemplate(createDefaultCreativeDraft("vertical-thumbnail"), defaultOutputSettings);
 
     expect(standard.name).toBe("Standard Thumbnail");
     expect(standard.settings).toMatchObject({ width: 1280, height: 720 });
-    expect(horizontal.name).toBe("Horizontal Thumbnail");
-    expect(horizontal.settings).toMatchObject({ width: 1280, height: 720 });
-    expect(horizontal.layers.some((layer) => layer.name === "Wide source image")).toBe(true);
+    expect(vertical.name).toBe("Vertical Thumbnail");
+    expect(vertical.settings).toMatchObject({ width: 1080, height: 1920 });
+    expect(vertical.layers.some((layer) => layer.name === "Vertical source image")).toBe(true);
     expect(standard.layers.some((layer) => layer.type === "text" && layer.name === "Label text" && layer.fontSize === 42)).toBe(true);
+  });
+
+  it("applies layout and detailed text controls", () => {
+    const result = buildCreativeTemplate(
+      {
+        ...createDefaultCreativeDraft("standard-thumbnail"),
+        layoutPattern: "pattern-4",
+        letterSpacing: 6,
+        titleStrokeWidth: 12,
+        subtitleStrokeWidth: 3,
+        labelStrokeWidth: 2,
+        labelCornerRadius: 30,
+        titleAlign: "right",
+      },
+      defaultOutputSettings,
+    );
+
+    const title = result.layers.find((layer) => layer.type === "text" && layer.name === "Thumbnail title");
+    const labelBadge = result.layers.find((layer) => layer.type === "shape" && layer.name === "Label badge");
+
+    expect(title).toMatchObject({ type: "text", letterSpacing: 6, strokeWidth: 12, align: "right" });
+    expect(labelBadge).toMatchObject({ type: "shape", cornerRadius: 30 });
   });
 
   it("can generate ungrouped stream waiting layers", () => {
