@@ -2,13 +2,11 @@ import { makeImageLayer, makeShapeLayer, makeTextLayer } from "./layerFactory";
 import { defaultOutputSettings } from "./presets";
 import type { LayerAnimation, OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
-export type CreativeGeneratorKind = "youtube-waiting" | "video-thumbnail" | "stream-waiting";
-export type VideoThumbnailVariant = "standard" | "vertical" | "cutout";
+export type CreativeGeneratorKind = "standard-thumbnail" | "horizontal-thumbnail" | "stream-waiting";
 export type CreativeGeneratorTone = "bold" | "clean" | "neon";
 
 export interface CreativeGeneratorRequest {
   kind: CreativeGeneratorKind;
-  variant: VideoThumbnailVariant;
   tone: CreativeGeneratorTone;
   title: string;
   subtitle: string;
@@ -17,6 +15,7 @@ export interface CreativeGeneratorRequest {
   fontWeight: string;
   titleFontSize: number;
   subtitleFontSize: number;
+  labelFontSize: number;
   backgroundColor: string;
   surfaceColor: string;
   accentColor: string;
@@ -73,15 +72,6 @@ const loopDrift: LayerAnimation = {
 };
 
 export function createDefaultCreativeDraft(kind: CreativeGeneratorKind): CreativeGeneratorRequest {
-  if (kind === "youtube-waiting") {
-    return baseDraft(kind, {
-      title: "STARTING SOON",
-      subtitle: "YouTube Live",
-      label: "PLEASE WAIT",
-      tone: "neon",
-      animated: true,
-    });
-  }
   if (kind === "stream-waiting") {
     return baseDraft(kind, {
       title: "STREAM STARTS SOON",
@@ -89,6 +79,15 @@ export function createDefaultCreativeDraft(kind: CreativeGeneratorKind): Creativ
       label: "LIVE",
       tone: "bold",
       animated: true,
+    });
+  }
+  if (kind === "horizontal-thumbnail") {
+    return baseDraft(kind, {
+      title: "HIGHLIGHT REEL",
+      subtitle: "Best moments from the stream",
+      label: "CLIP",
+      tone: "clean",
+      animated: false,
     });
   }
   return baseDraft(kind, {
@@ -116,9 +115,7 @@ export function buildCreativeTemplate(
     groupName: name,
   };
   const layers =
-    normalized.kind === "video-thumbnail"
-      ? createVideoThumbnailLayers(context)
-      : createWaitingScreenLayers(context, normalized.kind === "youtube-waiting" ? "youtube" : "stream");
+    normalized.kind === "stream-waiting" ? createWaitingScreenLayers(context) : createVideoThumbnailLayers(context);
   return { name, settings, layers };
 }
 
@@ -128,7 +125,6 @@ function baseDraft(
 ): CreativeGeneratorRequest {
   return {
     kind,
-    variant: "standard",
     tone: "bold",
     title: "",
     subtitle: "",
@@ -137,6 +133,7 @@ function baseDraft(
     fontWeight: "900",
     titleFontSize: 92,
     subtitleFontSize: 34,
+    labelFontSize: 28,
     backgroundColor: "#111827",
     surfaceColor: "#ffffff",
     accentColor: "#10b6d7",
@@ -149,13 +146,13 @@ function baseDraft(
   };
 }
 
-function createWaitingScreenLayers(context: CreativeContext, flavor: "youtube" | "stream"): ThumbnailLayer[] {
+function createWaitingScreenLayers(context: CreativeContext): ThumbnailLayer[] {
   const { request, width, height } = context;
   const scale = width / 1280;
   const yScale = height / 720;
-  const title = request.title.trim() || (flavor === "youtube" ? "STARTING SOON" : "STREAM STARTS SOON");
-  const subtitle = request.subtitle.trim() || (flavor === "youtube" ? "YouTube Live" : "Chat is open");
-  const label = request.label.trim() || (flavor === "youtube" ? "PLEASE WAIT" : "LIVE");
+  const title = request.title.trim() || "STREAM STARTS SOON";
+  const subtitle = request.subtitle.trim() || "Chat is open";
+  const label = request.label.trim() || "LIVE";
   const titleAnimation = request.animated ? [loopPulse] : undefined;
   const accentAnimation = request.animated ? [loopDrift] : undefined;
 
@@ -181,7 +178,7 @@ function createWaitingScreenLayers(context: CreativeContext, flavor: "youtube" |
     shape(context, "Top signal line", width * 0.08, height * 0.17, width * 0.52, Math.max(8, 16 * yScale), request.accentColor, 999, request.accentColor, 0, 0.95, accentAnimation),
     shape(context, "Bottom signal line", width * 0.4, height * 0.79, width * 0.48, Math.max(8, 16 * yScale), request.secondaryColor, 999, request.secondaryColor, 0, 0.9, accentAnimation),
     shape(context, "Status badge", width * 0.08, height * 0.27, width * 0.22, height * 0.075, request.secondaryColor, 12 * scale, request.secondaryColor, 0, 1, request.animated ? [loopFade] : undefined),
-    text(context, "Status badge text", width * 0.095, height * 0.288, width * 0.19, height * 0.04, label, 25 * scale, "#ffffff", "center", 0),
+    text(context, "Status badge text", width * 0.095, height * 0.288, width * 0.19, height * 0.04, label, request.labelFontSize * scale, "#ffffff", "center", 0),
     text(context, "Waiting title", width * 0.08, height * 0.38, width * 0.68, height * 0.19, title, request.titleFontSize * scale, request.textColor, "left", 8 * scale, titleAnimation),
     text(context, "Waiting subtitle", width * 0.08, height * 0.61, width * 0.54, height * 0.08, subtitle, request.subtitleFontSize * scale, request.textColor, "left", 0),
     shape(context, "Waiting circle", width * 0.76, height * 0.26, width * 0.16, width * 0.16, request.accentColor, 999, request.surfaceColor, 8 * scale, 0.9, request.animated ? [loopPulse] : undefined, "ellipse"),
@@ -191,56 +188,52 @@ function createWaitingScreenLayers(context: CreativeContext, flavor: "youtube" |
 
 function createVideoThumbnailLayers(context: CreativeContext): ThumbnailLayer[] {
   const { request, width, height } = context;
-  const portrait = request.variant === "vertical";
-  const cutout = request.variant === "cutout";
-  const scale = width / (portrait ? 1080 : 1280);
-  const title = request.title.trim() || (portrait ? "SHORT CLIP" : "BIG UPDATE");
-  const subtitle = request.subtitle.trim() || "What changed and why it matters";
-  const label = request.label.trim() || (cutout ? "CUTOUT" : "NEW VIDEO");
-  const titleY = portrait ? height * 0.48 : height * 0.18;
-  const titleHeight = portrait ? height * 0.22 : height * 0.25;
+  const horizontal = request.kind === "horizontal-thumbnail";
+  const scale = width / 1280;
+  const title = request.title.trim() || (horizontal ? "HIGHLIGHT REEL" : "BIG UPDATE");
+  const subtitle = request.subtitle.trim() || (horizontal ? "Best moments from the stream" : "What changed and why it matters");
+  const label = request.label.trim() || (horizontal ? "CLIP" : "NEW VIDEO");
+  const titleY = horizontal ? height * 0.44 : height * 0.18;
+  const titleHeight = horizontal ? height * 0.28 : height * 0.25;
 
   return [
     shape(context, "Thumbnail background", 0, 0, width, height, request.backgroundColor, 0, request.backgroundColor, 0),
     ...(request.includeImageSlot
       ? [
           makeImageLayer({
-            name: cutout ? "Cutout source image" : "Video background image",
+            name: horizontal ? "Wide source image" : "Video background image",
             imageKey: "sample-bg",
-            x: cutout ? width * 0.58 : 0,
-            y: cutout ? height * 0.12 : 0,
-            width: cutout ? width * 0.32 : width,
-            height: cutout ? height * 0.65 : height,
-            opacity: cutout ? 0.78 : 0.45,
-            effects: { grayscale: cutout ? 0 : 0.18, blur: cutout ? 0 : 3, brightness: cutout ? 105 : 72, contrast: 122, mosaic: 0 },
-            cornerRadius: cutout ? 28 : 0,
+            x: horizontal ? width * 0.54 : 0,
+            y: horizontal ? height * 0.1 : 0,
+            width: horizontal ? width * 0.38 : width,
+            height: horizontal ? height * 0.68 : height,
+            opacity: horizontal ? 0.82 : 0.45,
+            effects: { grayscale: horizontal ? 0 : 0.18, blur: horizontal ? 0 : 3, brightness: horizontal ? 106 : 72, contrast: 122, mosaic: 0 },
+            cornerRadius: horizontal ? 28 : 0,
             groupId: groupId(context),
             groupName: groupName(context),
           }),
         ]
       : []),
-    shape(context, "Title plate", portrait ? width * 0.08 : width * 0.06, titleY - height * 0.04, portrait ? width * 0.84 : width * 0.58, titleHeight, request.surfaceColor, 22 * scale, request.accentColor, 8 * scale, request.tone === "clean" ? 0.96 : 0.9),
-    shape(context, "Accent slash", portrait ? width * 0.12 : width * 0.08, portrait ? height * 0.76 : height * 0.72, portrait ? width * 0.76 : width * 0.54, Math.max(22, height * 0.045), request.secondaryColor, 8 * scale, request.secondaryColor, 0, 1),
-    shape(context, "Label badge", portrait ? width * 0.12 : width * 0.07, portrait ? height * 0.16 : height * 0.1, portrait ? width * 0.42 : width * 0.2, portrait ? height * 0.065 : height * 0.08, request.accentColor, 14 * scale, request.accentColor, 0),
-    text(context, "Label text", portrait ? width * 0.14 : width * 0.085, portrait ? height * 0.18 : height * 0.123, portrait ? width * 0.38 : width * 0.17, portrait ? height * 0.034 : height * 0.035, label, portrait ? 34 * scale : 29 * scale, "#ffffff", "center", 0),
-    text(context, "Thumbnail title", portrait ? width * 0.12 : width * 0.09, titleY, portrait ? width * 0.76 : width * 0.52, titleHeight * 0.62, title, request.titleFontSize * scale, request.textColor, portrait ? "center" : "left", 9 * scale),
-    text(context, "Thumbnail subtitle", portrait ? width * 0.14 : width * 0.09, portrait ? height * 0.67 : height * 0.56, portrait ? width * 0.72 : width * 0.46, portrait ? height * 0.06 : height * 0.07, subtitle, request.subtitleFontSize * scale, request.textColor, portrait ? "center" : "left", 0),
-    ...(cutout
+    shape(context, "Title plate", horizontal ? width * 0.06 : width * 0.06, titleY - height * 0.04, horizontal ? width * 0.5 : width * 0.58, titleHeight, request.surfaceColor, 22 * scale, request.accentColor, 8 * scale, request.tone === "clean" ? 0.96 : 0.9),
+    shape(context, "Accent slash", horizontal ? width * 0.08 : width * 0.08, horizontal ? height * 0.79 : height * 0.72, horizontal ? width * 0.44 : width * 0.54, Math.max(22, height * 0.045), request.secondaryColor, 8 * scale, request.secondaryColor, 0, 1),
+    shape(context, "Label badge", horizontal ? width * 0.07 : width * 0.07, horizontal ? height * 0.13 : height * 0.1, horizontal ? width * 0.18 : width * 0.2, height * 0.08, request.accentColor, 14 * scale, request.accentColor, 0),
+    text(context, "Label text", horizontal ? width * 0.085 : width * 0.085, horizontal ? height * 0.153 : height * 0.123, horizontal ? width * 0.15 : width * 0.17, height * 0.035, label, request.labelFontSize * scale, "#ffffff", "center", 0),
+    text(context, "Thumbnail title", width * 0.09, titleY, horizontal ? width * 0.44 : width * 0.52, titleHeight * 0.62, title, request.titleFontSize * scale, request.textColor, "left", 9 * scale),
+    text(context, "Thumbnail subtitle", width * 0.09, horizontal ? height * 0.69 : height * 0.56, horizontal ? width * 0.42 : width * 0.46, height * 0.07, subtitle, request.subtitleFontSize * scale, request.textColor, "left", 0),
+    ...(horizontal
       ? [
-          shape(context, "Cutout halo", width * 0.55, height * 0.1, width * 0.38, height * 0.7, request.accentColor, 42 * scale, request.secondaryColor, 10 * scale, 0.2),
-          shape(context, "Cutout floor", width * 0.54, height * 0.77, width * 0.36, height * 0.08, request.secondaryColor, 999, request.secondaryColor, 0, 0.86),
+          shape(context, "Wide image halo", width * 0.52, height * 0.08, width * 0.42, height * 0.72, request.accentColor, 42 * scale, request.secondaryColor, 10 * scale, 0.2),
+          shape(context, "Wide image floor", width * 0.53, height * 0.79, width * 0.38, height * 0.08, request.secondaryColor, 999, request.secondaryColor, 0, 0.86),
         ]
       : [
-          shape(context, "Thumbnail side block", portrait ? width * 0.18 : width * 0.7, portrait ? height * 0.25 : height * 0.18, portrait ? width * 0.64 : width * 0.22, portrait ? height * 0.16 : height * 0.36, request.accentColor, 24 * scale, request.surfaceColor, 7 * scale, 0.86),
+          shape(context, "Thumbnail side block", width * 0.7, height * 0.18, width * 0.22, height * 0.36, request.accentColor, 24 * scale, request.surfaceColor, 7 * scale, 0.86),
         ]),
   ];
 }
 
 function resolveCreativeSettings(request: CreativeGeneratorRequest, currentSettings: OutputSettings): OutputSettings {
-  if (request.kind === "video-thumbnail" && request.variant === "vertical") {
-    return { ...currentSettings, presetId: "portrait", width: 1080, height: 1920 };
-  }
-  if (request.kind === "youtube-waiting" || request.kind === "stream-waiting") {
+  if (request.kind === "stream-waiting") {
     return { ...currentSettings, presetId: "fullhd", width: 1920, height: 1080 };
   }
   return { ...currentSettings, presetId: "youtube-720", width: 1280, height: 720 };
@@ -249,20 +242,18 @@ function resolveCreativeSettings(request: CreativeGeneratorRequest, currentSetti
 function sanitizeCreativeRequest(request: CreativeGeneratorRequest): CreativeGeneratorRequest {
   return {
     ...request,
-    variant: request.kind === "video-thumbnail" ? request.variant : "standard",
     titleFontSize: clamp(request.titleFontSize, 24, 180),
     subtitleFontSize: clamp(request.subtitleFontSize, 12, 96),
+    labelFontSize: clamp(request.labelFontSize, 10, 72),
     fontWeight: ["600", "700", "800", "900"].includes(request.fontWeight) ? request.fontWeight : "900",
     tone: request.tone === "clean" || request.tone === "neon" ? request.tone : "bold",
   };
 }
 
 function buildCreativeName(request: CreativeGeneratorRequest): string {
-  if (request.kind === "youtube-waiting") return "YouTube Waiting Screen";
   if (request.kind === "stream-waiting") return "Stream Waiting Screen";
-  if (request.variant === "vertical") return "Vertical Video Thumbnail";
-  if (request.variant === "cutout") return "Cutout Video Thumbnail";
-  return "Video Thumbnail";
+  if (request.kind === "horizontal-thumbnail") return "Horizontal Thumbnail";
+  return "Standard Thumbnail";
 }
 
 function shape(

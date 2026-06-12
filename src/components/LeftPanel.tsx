@@ -11,7 +11,6 @@ import {
   Scissors,
   Video,
   Trash2,
-  Youtube,
 } from "lucide-react";
 import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
 import {
@@ -95,8 +94,8 @@ export function LeftPanel({
     readGeneratorSettings("schedule", createDefaultScheduleDraft()),
   );
   const [creativeDrafts, setCreativeDrafts] = useState<Record<CreativeGeneratorKind, CreativeGeneratorRequest>>(() => ({
-    "youtube-waiting": readGeneratorSettings("creative.youtube-waiting", createDefaultCreativeDraft("youtube-waiting")),
-    "video-thumbnail": readGeneratorSettings("creative.video-thumbnail", createDefaultCreativeDraft("video-thumbnail")),
+    "standard-thumbnail": readGeneratorSettings("creative.standard-thumbnail", createDefaultCreativeDraft("standard-thumbnail")),
+    "horizontal-thumbnail": readGeneratorSettings("creative.horizontal-thumbnail", createDefaultCreativeDraft("horizontal-thumbnail")),
     "stream-waiting": readGeneratorSettings("creative.stream-waiting", createDefaultCreativeDraft("stream-waiting")),
   }));
 
@@ -220,18 +219,18 @@ export function LeftPanel({
                   <small>{t("scheduleBuilder.entryCopy")}</small>
                 </span>
               </button>
-              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("youtube-waiting")}>
-                <Youtube size={17} />
-                <span>
-                  <strong>{t("generator.youtubeWaiting.open")}</strong>
-                  <small>{t("generator.youtubeWaiting.copy")}</small>
-                </span>
-              </button>
-              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("video-thumbnail")}>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("standard-thumbnail")}>
                 <Video size={17} />
                 <span>
-                  <strong>{t("generator.videoThumbnail.open")}</strong>
-                  <small>{t("generator.videoThumbnail.copy")}</small>
+                  <strong>{t("generator.standardThumbnail.open")}</strong>
+                  <small>{t("generator.standardThumbnail.copy")}</small>
+                </span>
+              </button>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("horizontal-thumbnail")}>
+                <Video size={17} />
+                <span>
+                  <strong>{t("generator.horizontalThumbnail.open")}</strong>
+                  <small>{t("generator.horizontalThumbnail.copy")}</small>
                 </span>
               </button>
               <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("stream-waiting")}>
@@ -1016,16 +1015,6 @@ function CreativeBuilderDialog({
               <LayoutTemplate size={16} />
               <h2>{t("generator.contentSection")}</h2>
             </div>
-            {draft.kind === "video-thumbnail" ? (
-              <label className="field">
-                <span>{t("generator.videoVariant")}</span>
-                <select value={draft.variant} onChange={(event) => setDraft("variant", event.currentTarget.value as CreativeGeneratorRequest["variant"])}>
-                  <option value="standard">{t("generator.videoVariant.standard")}</option>
-                  <option value="vertical">{t("generator.videoVariant.vertical")}</option>
-                  <option value="cutout">{t("generator.videoVariant.cutout")}</option>
-                </select>
-              </label>
-            ) : null}
             <label className="field">
               <span>{t("scheduleBuilder.titleLabel")}</span>
               <input value={draft.title} onChange={(event) => setDraft("title", event.currentTarget.value)} />
@@ -1063,7 +1052,7 @@ function CreativeBuilderDialog({
           <section className="panel-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
-              <h2>{t("scheduleBuilder.styleSection")}</h2>
+              <h2>{t("generator.gridTextSection")}</h2>
             </div>
             <div className="field-grid schedule-font-row">
               <label className="field schedule-font-family-field">
@@ -1091,18 +1080,25 @@ function CreativeBuilderDialog({
             </div>
             <div className="field-grid two">
               <ScheduleSlider
-                label={t("scheduleBuilder.titleFontSize")}
+                label={t("generator.titleFontSize")}
                 value={draft.titleFontSize}
                 min={24}
                 max={180}
                 onChange={(value) => setDraft("titleFontSize", value)}
               />
               <ScheduleSlider
-                label={t("scheduleBuilder.eventFontSize")}
+                label={t("generator.subtitleFontSize")}
                 value={draft.subtitleFontSize}
                 min={12}
                 max={96}
                 onChange={(value) => setDraft("subtitleFontSize", value)}
+              />
+              <ScheduleSlider
+                label={t("generator.labelFontSize")}
+                value={draft.labelFontSize}
+                min={10}
+                max={72}
+                onChange={(value) => setDraft("labelFontSize", value)}
               />
             </div>
           </section>
@@ -1179,9 +1175,9 @@ function CreativeBuilderDialog({
 }
 
 function getCreativeDialogTitle(kind: CreativeGeneratorKind, t: Translator): string {
-  if (kind === "youtube-waiting") return t("generator.youtubeWaiting.title");
   if (kind === "stream-waiting") return t("generator.streamWaiting.title");
-  return t("generator.videoThumbnail.title");
+  if (kind === "horizontal-thumbnail") return t("generator.horizontalThumbnail.title");
+  return t("generator.standardThumbnail.title");
 }
 
 function ScheduleSlider({

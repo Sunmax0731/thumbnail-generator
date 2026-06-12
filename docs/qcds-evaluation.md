@@ -23,12 +23,12 @@ Satisfaction is A+ because this pass expands the requested beta schedule generat
 
 All QCDS axes remain A+.
 
-- Quality: A+. Templates now exposes focused generators for schedule layouts, YouTube waiting screens, video thumbnails, and stream waiting screens, while the previous bundled default-template list is removed from the current GUI. Generator settings persist separately from layers and named browser templates.
+- Quality: A+. Templates now exposes focused generators for schedule layouts, standard thumbnails, horizontal thumbnails, and stream waiting screens, while the previous bundled default-template list is removed from the current GUI. YouTube waiting generation was removed from the current generator surface, and generator settings persist separately from layers and named browser templates.
 - Cost: A+. The implementation remains static, browser-only, and GitHub Pages compatible with no backend or hosted storage dependency.
-- Delivery: A+. `npm test`, `npm run build`, and a Playwright Chromium runtime gate passed, and evidence screenshots plus export output are recorded.
-- Satisfaction: A+. The requested image generation entry points are available as modal workflows matching the schedule generator tone. Video thumbnails support standard, vertical, and cutout variants, and both Generate layers and Save settings persist settings across reload.
+- Delivery: A+. `npm test`, `npm run build`, and a Playwright Chromium runtime gate passed after the follow-up, and evidence screenshots plus export output are recorded.
+- Satisfaction: A+. The requested image generation entry points are available as modal workflows matching the schedule generator tone. Standard and horizontal thumbnails are separate modal workflows, the image generator Grid / text section exposes shared font plus title/subtitle/label font-size controls, the YouTube waiting generator is removed, and both Generate layers and Save settings persist settings across reload.
 
-Runtime evidence confirms four generator buttons, no default-template list, schedule settings persistence, video variant persistence after reload, nonblank generated canvases, asset import, canvas drag, WebP export, mobile modal rendering, and mobile horizontal overflow `0`.
+Runtime evidence confirms four generator buttons, no default-template list, no YouTube waiting generator, Standard thumbnail settings persistence after reload, no old Vertical/Cutout variant selector, Standard and Horizontal thumbnail nonblank `1280x720` output, Stream waiting nonblank `1920x1080` output, horizontal layer rows, canvas drag, WebP export, mobile modal rendering, and mobile horizontal overflow `0`.
 
 ## Codex Work Dashboard Re-Evaluation
 

@@ -227,7 +227,7 @@ Each quick add inserts an editable layer, selects it, and keeps the canvas state
 
 ## Generators
 
-The Templates tab exposes four generator entry buttons: schedule, YouTube waiting screen, video thumbnail, and stream waiting screen. The previous bundled default-template catalog is no longer shown in the current GUI after these generators are available. Browser-local templates remain separate named snapshots saved in localStorage, and loading or deleting one uses the existing confirmation dialog pattern.
+The Templates tab exposes four generator entry buttons: schedule, standard thumbnail, horizontal thumbnail, and stream waiting screen. The previous bundled default-template catalog is no longer shown in the current GUI after these generators are available. Browser-local templates remain separate named snapshots saved in localStorage, and loading or deleting one uses the existing confirmation dialog pattern.
 
 The beta schedule generator opens in a modal and accepts:
 
@@ -241,10 +241,10 @@ The beta schedule generator opens in a modal and accepts:
 
 The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
 
-The image generators use the same modal tone, layout, color picker, font choices, live preview, Generate layers action, and Save settings action:
+The image generators use the same modal tone, layout, color picker, font choices, live preview, Generate layers action, and Save settings action. Their Grid / text section exposes one shared font family and weight plus separate title, subtitle, and label font-size controls:
 
-- YouTube waiting screen: creates a 1920x1080 animated waiting screen with title, subtitle, label, accent shapes, optional sample image atmosphere, and looped animation metadata for Motion/OBS preview.
-- Video thumbnail: creates an editable thumbnail with three variants: standard 1280x720 video, vertical 1080x1920 video, and 1280x720 cutout-style thumbnail.
+- Standard thumbnail: creates a 1280x720 editable thumbnail layout for general video thumbnails.
+- Horizontal thumbnail: creates a 1280x720 editable wide thumbnail layout with a stronger horizontal image area.
 - Stream waiting screen: creates a 1920x1080 animated livestream waiting screen with title, subtitle, label, accent shapes, optional sample image atmosphere, and looped animation metadata.
 
 Generator settings are stored in localStorage under `thumbnail-generator.generatorSettings.v1.*` keys. The saved settings are separate from edit state and browser-local named templates.
