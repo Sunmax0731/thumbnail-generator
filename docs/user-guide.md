@@ -23,10 +23,10 @@ npm run preview
 - Assets: review imported assets, add a selected asset as an image layer, open Image Lab from an imported asset row, or delete an imported asset.
 - Output: use the preview-header Output button to choose JPG, PNG, WebP, or OBS preview.
 - Edit state: use the top-right icon cluster to save/restore the current edit state, export/import JSON, and delete the saved work-in-progress slot. Autosave remains text-labeled beside those icons.
-- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom contains the motion timeline.
+- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while Motion is open.
 - Adjust: edit the selected layer's collapsible Common settings and type-specific settings, including position, size, rotation, layer blur, signed edge blur, stroke/outline blur participation, corner radius, shadow enable/parameters, pseudo-3D X/Y rotation, signed bevel, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
-- Motion: assign multiple ordered motion sets, apply presets, separate common/text/effect parameters, preview the selected object, inspect the easing graph, and review animated layers in the bottom timeline for OBS preview playback.
+- Motion: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated layers in the Motion-only bottom timeline for OBS preview playback.
 
 ## Layout Compatibility
 
@@ -137,15 +137,17 @@ The status bar can show quality warning chips while you work. Check these before
 
 1. Select a layer.
 2. Open Motion.
-3. Choose a preset, or choose Fade, Slide, Pop, Pulse, Blink, Drift, Zoom, Spin, Sway, Shake, or Breathe for the active motion set.
-4. Adjust common start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
-5. Expand Text-only motion for Typewriter, Line reveal, or Text wave on text layers.
-6. Expand Glow / effects for Glow pulse, Blur in, or Shine and tune intensity.
-7. Add additional motion sets when one object needs multiple animation behaviors.
-8. Use the selected-object preview, easing graph, and bottom timeline to check motion timing.
-9. Select OBS preview from the Output menu.
+3. Choose a preset, or use the Motion dropdown for movement choices such as Slide, Drift, or Shake.
+4. Use the Effect dropdown for non-moving/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, or Shine.
+5. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
+6. Use Text-only motion for Typewriter, Line reveal, or Text wave only when a text layer is selected.
+7. Tune Effect intensity for Glow pulse, Blur in, or Shine. The intensity control is greyed out for choices that cannot use it.
+8. Add additional motion sets when one object needs multiple animation behaviors.
+9. Use the selected-object preview and the easing graph toggle while checking motion.
+10. Open Motion to show the bottom timeline. Drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
+11. Select OBS preview from the Output menu.
 
-The OBS preview opens a popup-style browser window that contains only the animated canvas plus a small operation overlay. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. Use Play/Pause and Reset while checking motion. Click Hide to remove the overlay for capture, and press `H` in the OBS preview window to show or hide it again. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS/browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
+The OBS preview opens a popup-style browser window that contains only the animated canvas plus a small operation overlay. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. Use Play/Pause and Reset while checking motion, or press `P` for Play/Pause and `R` for Reset. Click Hide to remove the overlay for capture, and press `H` in the OBS preview window to show or hide it again. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS/browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 
 ## Image Lab
 

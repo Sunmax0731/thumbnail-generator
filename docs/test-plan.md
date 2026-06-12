@@ -48,7 +48,7 @@
 The WebApp runtime gate is passed only when Chrome or a headless browser confirms:
 
 - Nonblank app render.
-- Header, left import panel, canvas, layer list, inspector, Output menu, edit-state icons, and timeline area are visible.
+- Header, left import panel, canvas, layer list, inspector, Output menu, and edit-state icons are visible; the timeline appears only while Motion is active.
 - Japanese and English UI labels can be switched from the top toolbar.
 - Initial language detection chooses a supported language, and unsupported language tags fall back to English in unit coverage.
 - Clicking blank preview space clears selection and updates the stage/inspector state.
@@ -105,12 +105,12 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
-- Motion tab can assign a selected-layer animation preset, preview the selected object, and show the easing graph.
-- Motion tab exposes 12 animation types, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- Motion tab exposes preset, common parameter, text-only motion, and glow/effect motion sections.
-- The bottom timeline shows animated layers after motion is applied.
+- Motion tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
+- Motion tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
+- Motion tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
+- The bottom timeline shows animated layers only while Motion is active, supports start/end handles, supports segment bar drag, and supports height resizing.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
-- OBS preview Play/Pause, Reset, and Hide controls are visible by default and can be hidden/restored for capture.
+- OBS preview Play/Pause, Reset, and Hide controls are visible by default; `P`, `R`, and `H` trigger Play/Pause, Reset, and Hide/show.
 - Guided start is not visible in the left panel.
 - Edit state controls are visible as top-right icons and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
@@ -133,6 +133,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-12.
+
+### Motion Tab Timeline And OBS Shortcut Follow-Up
+
+Completed on 2026-06-12 for the Motion tab visibility, timeline editing, and OBS shortcut follow-up.
+
+- Scope: hid text-only motion controls for non-text selections, hid the bottom timeline outside Motion, split movement and non-moving/effect dropdowns inside common parameters, added easing-graph show/hide, added draggable timeline start/end handles plus segment drag and timeline height resizing, and added OBS preview `P`/`R` shortcuts.
+- `npm test`: pass. 30 test files, 122 tests.
+- `npm run build`: pass. Vite emitted the existing analytics script and chunk-size warnings.
+- Runtime gate URL: `http://127.0.0.1:4340/thumbnail-generator/?runtime=motion-followup`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Nonblank app render and primary stage visible.
+  - No Vite/React framework overlay detected.
+  - Timeline hidden before opening Motion, visible while Motion is active, and hidden again after switching back to Adjust.
+  - Easing graph visible by default, hidden by the toggle, and restored by the toggle.
+  - Movement Motion dropdown and non-moving/effect dropdown both rendered.
+  - Effect intensity disabled for Fade and enabled for Glow pulse.
+  - Text-only motion select hidden for a shape layer and visible for a text layer.
+  - Timeline row rendered after applying a preset, exposed two segment handles, accepted handle/body drag edits, and resized from `170px` to `215px`.
+  - WebP export succeeded as `output/runtime-20260612-motion-followup/thumbnail-1280x720-2026-06-12T07-27-17-072Z.webp`.
+  - OBS preview rendered nonblank; `P` changed the button to `Play`, a second `P` changed it back to `Pause`, `R` reset without error, and `H` hid/restored controls.
+  - Mobile viewport rendered with horizontal overflow `0`.
+  - Console health: no page/app runtime errors were reported. The dev server logged non-blocking 404s for existing analytics static script requests in this local runtime.
+- Evidence:
+  - `output/runtime-20260612-motion-followup/desktop-initial.png`
+  - `output/runtime-20260612-motion-followup/motion-timeline-edited.png`
+  - `output/runtime-20260612-motion-followup/obs-shortcuts.png`
+  - `output/runtime-20260612-motion-followup/mobile.png`
+  - `output/runtime-20260612-motion-followup/runtime-result.json`
 
 ### OBS Preview Fullscreen And Viewport Fill
 

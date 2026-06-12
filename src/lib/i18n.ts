@@ -32,6 +32,7 @@ const en = {
   "timeline.aria": "Motion timeline",
   "timeline.title": "Timeline",
   "timeline.empty": "No motion layers yet.",
+  "timeline.resize": "Resize timeline height",
   "selection.none": "None",
   "selection.multiple": "{count} layers selected",
   "left.aria": "Imports and layout sources",
@@ -273,6 +274,9 @@ const en = {
   "inspector.textMotion": "Text-only motion",
   "inspector.effectMotion": "Glow / effects",
   "inspector.effectIntensity": "Effect intensity",
+  "inspector.motionType": "Motion",
+  "inspector.showEasingGraph": "Show easing graph",
+  "inspector.hideEasingGraph": "Hide easing graph",
   "inspector.motionSequence": "Motion sequence",
   "inspector.addMotion": "Add motion",
   "inspector.removeMotion": "Remove motion",
@@ -992,6 +996,10 @@ const ja: Partial<Record<TranslationKey, string>> = {
 };
 
 const jaOverrides: Partial<Record<TranslationKey, string>> = {
+  "inspector.motionType": "モーション",
+  "inspector.showEasingGraph": "イージンググラフを表示",
+  "inspector.hideEasingGraph": "イージンググラフを非表示",
+  "timeline.resize": "タイムラインの高さを変更",
   "left.applyTemplateQuestion": "テンプレートを適用しますか?",
   "left.applyTemplateCopy": "{name} を適用します。現在のレイヤー、素材、キャンバスサイズは置き換わります。",
   "left.applyTemplate": "適用",

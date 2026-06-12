@@ -24,7 +24,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
-- Add multiple layer animation sets from Motion, choose presets, split common controls from text-only and glow/effect motion controls, preview the selected object and easing graph, and use the bottom timeline to scan animated layers.
+- Add multiple layer animation sets from Motion, choose presets, split movement motions from non-moving effects, show text-only controls only for text layers, toggle the easing graph, and edit animated layer timing from the Motion-only bottom timeline.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the top-right edit-state icon cluster; autosave remains text-labeled there.
@@ -34,7 +34,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
-- Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `H` in the preview window to show or hide those controls for clean OBS capture.
+- Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
 

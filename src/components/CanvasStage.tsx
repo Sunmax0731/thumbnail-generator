@@ -13,7 +13,7 @@ import {
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
 import type { Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
-import type { ExportFormat, OutputSettings, ThumbnailLayer } from "../lib/types";
+import type { ExportFormat, LayerAnimation, OutputSettings, ThumbnailLayer } from "../lib/types";
 
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -26,6 +26,7 @@ interface CanvasStageProps {
   isExporting: boolean;
   layers: ThumbnailLayer[];
   selectedIds: string[];
+  showMotionTimeline: boolean;
   onZoomChange: (zoom: number) => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
@@ -35,6 +36,7 @@ interface CanvasStageProps {
   onPresetChange: (presetId: string) => void;
   onOpenObsPreview: () => void;
   onSelectLayer: (id: string, additive?: boolean) => void;
+  onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   onClearSelection: () => void;
   t: Translator;
 }
@@ -50,6 +52,7 @@ export function CanvasStage({
   isExporting,
   layers,
   selectedIds,
+  showMotionTimeline,
   onZoomChange,
   onPointerDown,
   onPointerMove,
@@ -59,6 +62,7 @@ export function CanvasStage({
   onPresetChange,
   onOpenObsPreview,
   onSelectLayer,
+  onUpdateLayer,
   onClearSelection,
   t,
 }: CanvasStageProps) {
@@ -329,7 +333,9 @@ export function CanvasStage({
           />
         </div>
       </div>
-      <MotionTimeline layers={layers} selectedIds={selectedIds} onSelectLayer={onSelectLayer} t={t} />
+      {showMotionTimeline ? (
+        <MotionTimeline layers={layers} selectedIds={selectedIds} onSelectLayer={onSelectLayer} onUpdateLayer={onUpdateLayer} t={t} />
+      ) : null}
     </section>
   );
 
@@ -353,23 +359,65 @@ function MotionTimeline({
   layers,
   selectedIds,
   onSelectLayer,
+  onUpdateLayer,
   t,
 }: {
   layers: ThumbnailLayer[];
   selectedIds: string[];
   onSelectLayer: (id: string, additive?: boolean) => void;
+  onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   t: Translator;
 }) {
+  const sectionRef = useRef<HTMLElement | null>(null);
+  const [timelineHeight, setTimelineHeight] = useState(170);
   const motionLayers = layers.filter((layer) => {
     const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
     return animations.length > 0;
   });
   const duration = Math.max(
-    4000,
+    10000,
     ...motionLayers.flatMap((layer) => (layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : []).map((animation) => animation.startMs + animation.durationMs)),
   );
+
+  const updateAnimationTiming = (layerId: string, animationIndex: number, next: Partial<Pick<LayerAnimation, "startMs" | "durationMs">>) => {
+    onUpdateLayer(layerId, (layer) => {
+      const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
+      if (!animations[animationIndex]) return layer;
+      const nextAnimations = animations.map((animation, index) =>
+        index === animationIndex
+          ? {
+              ...animation,
+              ...next,
+              startMs: Math.max(0, Math.round((next.startMs ?? animation.startMs) / 50) * 50),
+              durationMs: Math.max(100, Math.round((next.durationMs ?? animation.durationMs) / 50) * 50),
+            }
+          : animation,
+      );
+      return {
+        ...layer,
+        animation: nextAnimations[0],
+        animations: nextAnimations.length > 0 ? nextAnimations : undefined,
+      };
+    });
+  };
+
+  const beginTimelineResize = (event: React.PointerEvent<HTMLDivElement>) => {
+    event.preventDefault();
+    const startY = event.clientY;
+    const startHeight = sectionRef.current?.getBoundingClientRect().height ?? timelineHeight;
+    const handlePointerMove = (moveEvent: PointerEvent) => {
+      setTimelineHeight(Math.min(320, Math.max(120, startHeight + moveEvent.clientY - startY)));
+    };
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
   return (
-    <section className="stage-timeline" aria-label={t("timeline.aria")}>
+    <section className="stage-timeline" aria-label={t("timeline.aria")} ref={sectionRef} style={{ height: timelineHeight }}>
       <div className="stage-timeline-header">
         <strong>{t("timeline.title")}</strong>
         <span>{(duration / 1000).toFixed(1)}s</span>
@@ -388,33 +436,134 @@ function MotionTimeline({
           motionLayers.map((layer) => {
             const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
             return (
-              <button
-                type="button"
+              <div
+                role="button"
+                tabIndex={0}
                 className={`timeline-row ${selectedIds.includes(layer.id) ? "selected" : ""}`}
                 key={layer.id}
                 onClick={(event) => onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+                onKeyDown={(event) => {
+                  if (event.key === "Enter" || event.key === " ") {
+                    event.preventDefault();
+                    onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                  }
+                }}
               >
                 <span className="timeline-layer-name">{layer.name}</span>
                 <span className="timeline-track">
-                  {animations.map((animation, index) => (
-                    <span
-                      className="timeline-segment"
-                      key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
-                      style={{
-                        left: `${Math.max(0, (animation.startMs / duration) * 100)}%`,
-                        width: `${Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100)}%`,
-                      }}
-                    >
-                      {animationLabel(animation.type, animation.textAnimation, animation.effectAnimation)}
-                    </span>
-                  ))}
+                  {animations.map((animation, index) => {
+                    const left = Math.max(0, (animation.startMs / duration) * 100);
+                    const width = Math.min(100 - left, Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100));
+                    return (
+                      <TimelineSegment
+                        key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
+                        animation={animation}
+                        duration={duration}
+                        left={left}
+                        width={width}
+                        layerId={layer.id}
+                        animationIndex={index}
+                        onUpdateTiming={updateAnimationTiming}
+                      />
+                    );
+                  })}
                 </span>
-              </button>
+              </div>
             );
           })
         )}
       </div>
+      <div
+        className="timeline-resize-handle"
+        role="separator"
+        aria-label={t("timeline.resize")}
+        tabIndex={0}
+        onPointerDown={beginTimelineResize}
+        onKeyDown={(event) => {
+          if (event.key === "ArrowDown") {
+            event.preventDefault();
+            setTimelineHeight((height) => Math.min(320, height + 20));
+          }
+          if (event.key === "ArrowUp") {
+            event.preventDefault();
+            setTimelineHeight((height) => Math.max(120, height - 20));
+          }
+        }}
+      />
     </section>
+  );
+}
+
+function TimelineSegment({
+  animation,
+  duration,
+  left,
+  width,
+  layerId,
+  animationIndex,
+  onUpdateTiming,
+}: {
+  animation: LayerAnimation;
+  duration: number;
+  left: number;
+  width: number;
+  layerId: string;
+  animationIndex: number;
+  onUpdateTiming: (layerId: string, animationIndex: number, next: Partial<Pick<LayerAnimation, "startMs" | "durationMs">>) => void;
+}) {
+  const [dragged, setDragged] = useState(false);
+
+  const beginDrag = (event: React.PointerEvent<HTMLElement>, mode: "start" | "end" | "move") => {
+    const track = event.currentTarget.closest(".timeline-track") as HTMLElement | null;
+    if (!track) return;
+    event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    const trackWidth = Math.max(1, track.getBoundingClientRect().width);
+    const initialX = event.clientX;
+    const initialStartMs = animation.startMs;
+    const initialDurationMs = Math.max(100, animation.durationMs);
+    setDragged(false);
+
+    const updateFromPointer = (clientX: number) => {
+      const deltaMs = ((clientX - initialX) / trackWidth) * duration;
+      if (Math.abs(deltaMs) > 8) setDragged(true);
+      if (mode === "start") {
+        const initialEndMs = initialStartMs + initialDurationMs;
+        const nextStartMs = Math.min(initialEndMs - 100, Math.max(0, initialStartMs + deltaMs));
+        onUpdateTiming(layerId, animationIndex, { startMs: nextStartMs, durationMs: initialEndMs - nextStartMs });
+        return;
+      }
+      if (mode === "end") {
+        const nextEndMs = Math.min(duration, Math.max(initialStartMs + 100, initialStartMs + initialDurationMs + deltaMs));
+        onUpdateTiming(layerId, animationIndex, { durationMs: nextEndMs - initialStartMs });
+        return;
+      }
+      const nextStartMs = Math.min(duration - initialDurationMs, Math.max(0, initialStartMs + deltaMs));
+      onUpdateTiming(layerId, animationIndex, { startMs: nextStartMs, durationMs: initialDurationMs });
+    };
+
+    const handlePointerMove = (moveEvent: PointerEvent) => updateFromPointer(moveEvent.clientX);
+    const handlePointerUp = () => {
+      window.removeEventListener("pointermove", handlePointerMove);
+      window.removeEventListener("pointerup", handlePointerUp);
+      window.setTimeout(() => setDragged(false), 0);
+    };
+    window.addEventListener("pointermove", handlePointerMove);
+    window.addEventListener("pointerup", handlePointerUp);
+  };
+
+  return (
+    <span
+      className={`timeline-segment ${dragged ? "dragging" : ""}`}
+      style={{ left: `${left}%`, width: `${width}%` }}
+      onPointerDown={(event) => beginDrag(event, "move")}
+      onClick={(event) => event.stopPropagation()}
+    >
+      <span className="timeline-handle start" aria-hidden="true" onPointerDown={(event) => beginDrag(event, "start")} />
+      <span className="timeline-segment-label">{animationLabel(animation.type, animation.textAnimation, animation.effectAnimation)}</span>
+      <span className="timeline-handle end" aria-hidden="true" onPointerDown={(event) => beginDrag(event, "end")} />
+    </span>
   );
 }
 

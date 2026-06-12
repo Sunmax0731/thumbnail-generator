@@ -82,7 +82,7 @@ import type {
   ThumbnailLayer,
 } from "../lib/types";
 
-type InspectorSection = "layers" | "edit" | "colors" | "motion";
+export type InspectorSection = "layers" | "edit" | "colors" | "motion";
 type LayerColorTarget = "textFill" | "textStroke" | "shapeFill" | "shapeStroke";
 
 interface LayerColorPickerState {
@@ -149,6 +149,8 @@ interface InspectorPanelProps {
   onOpenImageColorPalette: () => void;
   isExtractingImagePalette: boolean;
   hasSelectedImageLayer: boolean;
+  activeSection: InspectorSection;
+  onActiveSectionChange: (section: InspectorSection) => void;
   t: Translator;
 }
 
@@ -208,13 +210,14 @@ export function InspectorPanel({
   onOpenImageColorPalette,
   isExtractingImagePalette,
   hasSelectedImageLayer,
+  activeSection,
+  onActiveSectionChange,
   t,
 }: InspectorPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
   const selected = selectedLayers.length === 1 ? selectedLayers[0] : undefined;
   const paletteCompatibleCount = selectedLayers.filter((layer) => layer.type === "text" || layer.type === "shape").length;
   const [draggingId, setDraggingId] = useState<string | null>(null);
-  const [activeSection, setActiveSection] = useState<InspectorSection>("edit");
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
   const [relativeTransform, setRelativeTransform] = useState(emptyLiveRelativeTransformState);
   const [layerListHeight, setLayerListHeight] = useState(360);
@@ -281,7 +284,7 @@ export function InspectorPanel({
           role="tab"
           aria-selected={activeSection === "edit"}
           className={activeSection === "edit" ? "selected" : ""}
-          onClick={() => setActiveSection("edit")}
+          onClick={() => onActiveSectionChange("edit")}
         >
           <SlidersHorizontal size={15} /> {t("inspector.adjust")}
         </button>
@@ -290,7 +293,7 @@ export function InspectorPanel({
           role="tab"
           aria-selected={activeSection === "colors"}
           className={activeSection === "colors" ? "selected" : ""}
-          onClick={() => setActiveSection("colors")}
+          onClick={() => onActiveSectionChange("colors")}
         >
           <Palette size={15} /> {t("inspector.colors")}
         </button>
@@ -299,7 +302,7 @@ export function InspectorPanel({
           role="tab"
           aria-selected={activeSection === "motion"}
           className={activeSection === "motion" ? "selected" : ""}
-          onClick={() => setActiveSection("motion")}
+          onClick={() => onActiveSectionChange("motion")}
         >
           <Play size={15} /> {t("inspector.motion")}
         </button>
@@ -1718,23 +1721,26 @@ function palettePrincipleLabelKey(principle: PalettePrinciple): Parameters<Trans
   return keys[principle];
 }
 
-const animationTypes: LayerAnimationType[] = [
-  "none",
-  "fade",
-  "slide",
-  "pop",
-  "pulse",
-  "blink",
-  "drift",
-  "zoom",
-  "spin",
-  "sway",
-  "shake",
-  "breathe",
-];
 const animationDirections: LayerAnimationDirection[] = ["none", "left", "right", "up", "down"];
 const textAnimations: LayerTextAnimation[] = ["none", "typewriter", "lineReveal", "wave"];
-const effectAnimations: LayerEffectAnimation[] = ["none", "glow", "blur", "shine"];
+const movingAnimationTypes: LayerAnimationType[] = ["none", "slide", "drift", "shake"];
+const effectAnimationChoices: Array<
+  | { id: `type:${LayerAnimationType}`; kind: "type"; type: LayerAnimationType; label: Parameters<Translator>[0]; supportsIntensity: false }
+  | { id: `effect:${LayerEffectAnimation}`; kind: "effect"; type: LayerEffectAnimation; label: Parameters<Translator>[0]; supportsIntensity: boolean }
+> = [
+  { id: "type:none", kind: "type", type: "none", label: "inspector.animationNone", supportsIntensity: false },
+  { id: "type:fade", kind: "type", type: "fade", label: "inspector.animationFade", supportsIntensity: false },
+  { id: "type:pop", kind: "type", type: "pop", label: "inspector.animationPop", supportsIntensity: false },
+  { id: "type:pulse", kind: "type", type: "pulse", label: "inspector.animationPulse", supportsIntensity: false },
+  { id: "type:blink", kind: "type", type: "blink", label: "inspector.animationBlink", supportsIntensity: false },
+  { id: "type:zoom", kind: "type", type: "zoom", label: "inspector.animationZoom", supportsIntensity: false },
+  { id: "type:spin", kind: "type", type: "spin", label: "inspector.animationSpin", supportsIntensity: false },
+  { id: "type:sway", kind: "type", type: "sway", label: "inspector.animationSway", supportsIntensity: false },
+  { id: "type:breathe", kind: "type", type: "breathe", label: "inspector.animationBreathe", supportsIntensity: false },
+  { id: "effect:glow", kind: "effect", type: "glow", label: "inspector.effectMotionGlow", supportsIntensity: true },
+  { id: "effect:blur", kind: "effect", type: "blur", label: "inspector.effectMotionBlur", supportsIntensity: true },
+  { id: "effect:shine", kind: "effect", type: "shine", label: "inspector.effectMotionShine", supportsIntensity: true },
+];
 
 const animationTypeLabels: Record<LayerAnimationType, Parameters<Translator>[0]> = {
   none: "inspector.animationNone",
@@ -1764,13 +1770,6 @@ const textAnimationLabels: Record<LayerTextAnimation, Parameters<Translator>[0]>
   typewriter: "inspector.textMotionTypewriter",
   lineReveal: "inspector.textMotionLineReveal",
   wave: "inspector.textMotionWave",
-};
-
-const effectAnimationLabels: Record<LayerEffectAnimation, Parameters<Translator>[0]> = {
-  none: "inspector.effectMotionNone",
-  glow: "inspector.effectMotionGlow",
-  blur: "inspector.effectMotionBlur",
-  shine: "inspector.effectMotionShine",
 };
 
 const motionPresets: Array<{ id: string; label: Parameters<Translator>[0]; animation: Partial<typeof defaultAnimation> }> = [
@@ -1830,6 +1829,7 @@ function MotionControls({
   const activeAnimation = editableAnimations[Math.min(activeMotionIndex, editableAnimations.length - 1)] ?? defaultAnimation;
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [previewProgress, setPreviewProgress] = useState(0);
+  const [isEasingGraphVisible, setIsEasingGraphVisible] = useState(true);
 
   useEffect(() => {
     if (activeMotionIndex >= editableAnimations.length) setActiveMotionIndex(Math.max(0, editableAnimations.length - 1));
@@ -1869,6 +1869,38 @@ function MotionControls({
     if (savedAnimations.length === 0) return;
     saveAnimations(savedAnimations.filter((_, index) => index !== activeMotionIndex));
     setActiveMotionIndex(Math.max(0, activeMotionIndex - 1));
+  };
+
+  const activeEffectChoice = effectChoiceId(activeAnimation);
+  const activeEffectOption = effectAnimationChoices.find((choice) => choice.id === activeEffectChoice) ?? effectAnimationChoices[0];
+  const intensityEnabled = activeEffectOption.kind === "effect" && activeEffectOption.supportsIntensity;
+
+  const updateMovingAnimationType = (type: LayerAnimationType) => {
+    if (type === "none") {
+      updateAnimation({ type: "none", direction: "none" });
+      return;
+    }
+    updateAnimation({
+      type,
+      direction: activeAnimation.direction === "none" ? "left" : activeAnimation.direction,
+      distance: activeAnimation.distance > 0 ? activeAnimation.distance : 120,
+    });
+  };
+
+  const updateEffectChoice = (choiceId: string) => {
+    const choice = effectAnimationChoices.find((candidate) => candidate.id === choiceId) ?? effectAnimationChoices[0];
+    if (choice.kind === "effect") {
+      updateAnimation({
+        type: animationTypeUsesDirection(activeAnimation.type) ? activeAnimation.type : "none",
+        effectAnimation: choice.type,
+      });
+      return;
+    }
+    updateAnimation({
+      type: choice.type,
+      direction: "none",
+      effectAnimation: "none",
+    });
   };
 
   const hasAnimation =
@@ -1956,7 +1988,15 @@ function MotionControls({
         <div className="motion-object-preview">
           <canvas ref={previewCanvasRef} width={320} height={180} />
         </div>
-        <EasingGraph easing={activeAnimation.easing} progress={previewProgress} t={t} />
+        <button
+          type="button"
+          className="ghost-button motion-graph-toggle"
+          aria-pressed={isEasingGraphVisible}
+          onClick={() => setIsEasingGraphVisible((current) => !current)}
+        >
+          {isEasingGraphVisible ? t("inspector.hideEasingGraph") : t("inspector.showEasingGraph")}
+        </button>
+        {isEasingGraphVisible ? <EasingGraph easing={activeAnimation.easing} progress={previewProgress} t={t} /> : null}
       </div>
       <div className="motion-sequence-list" aria-label={t("inspector.motionSequence")}>
         {editableAnimations.map((animation, index) => (
@@ -1990,18 +2030,37 @@ function MotionControls({
       </CollapsibleControlGroup>
       <CollapsibleControlGroup title={t("inspector.motionCommon")}>
         <label className="field">
-          <span>{t("inspector.animationType")}</span>
+          <span>{t("inspector.motionType")}</span>
           <select
-            value={activeAnimation.type}
-            onChange={(event) => updateAnimation({ type: event.currentTarget.value as LayerAnimationType })}
+            value={animationTypeUsesDirection(activeAnimation.type) ? activeAnimation.type : "none"}
+            onChange={(event) => updateMovingAnimationType(event.currentTarget.value as LayerAnimationType)}
           >
-            {animationTypes.map((type) => (
+            {movingAnimationTypes.map((type) => (
               <option key={type} value={type}>
                 {t(animationTypeLabels[type])}
               </option>
             ))}
           </select>
         </label>
+        <label className="field">
+          <span>{t("inspector.effectMotion")}</span>
+          <select value={activeEffectChoice} onChange={(event) => updateEffectChoice(event.currentTarget.value)}>
+            {effectAnimationChoices.map((choice) => (
+              <option key={choice.id} value={choice.id}>
+                {t(choice.label)}
+              </option>
+            ))}
+          </select>
+        </label>
+        <SliderNumberInput
+          label={t("inspector.effectIntensity")}
+          value={activeAnimation.effectIntensity ?? 40}
+          min={0}
+          max={100}
+          step={1}
+          disabled={!intensityEnabled}
+          onChange={(value) => updateAnimation({ effectIntensity: value })}
+        />
         <div className="field-grid two">
           <SliderNumberInput
             label={t("inspector.animationStart")}
@@ -2073,48 +2132,32 @@ function MotionControls({
           <span>{t("inspector.animationLoop")}</span>
         </label>
       </CollapsibleControlGroup>
-      <CollapsibleControlGroup title={t("inspector.textMotion")}>
-        <label className={`field ${selected.type !== "text" ? "field-disabled" : ""}`}>
-          <span>{t("inspector.textMotion")}</span>
-          <select
-            value={activeAnimation.textAnimation ?? "none"}
-            disabled={selected.type !== "text"}
-            onChange={(event) => updateAnimation({ textAnimation: event.currentTarget.value as LayerTextAnimation })}
-          >
-            {textAnimations.map((type) => (
-              <option key={type} value={type}>
-                {t(textAnimationLabels[type])}
-              </option>
-            ))}
-          </select>
-        </label>
-      </CollapsibleControlGroup>
-      <CollapsibleControlGroup title={t("inspector.effectMotion")}>
-        <label className="field">
-          <span>{t("inspector.effectMotion")}</span>
-          <select
-            value={activeAnimation.effectAnimation ?? "none"}
-            onChange={(event) => updateAnimation({ effectAnimation: event.currentTarget.value as LayerEffectAnimation })}
-          >
-            {effectAnimations.map((type) => (
-              <option key={type} value={type}>
-                {t(effectAnimationLabels[type])}
-              </option>
-            ))}
-          </select>
-        </label>
-        <SliderNumberInput
-          label={t("inspector.effectIntensity")}
-          value={activeAnimation.effectIntensity ?? 40}
-          min={0}
-          max={100}
-          step={1}
-          disabled={(activeAnimation.effectAnimation ?? "none") === "none"}
-          onChange={(value) => updateAnimation({ effectIntensity: value })}
-        />
-      </CollapsibleControlGroup>
+      {selected.type === "text" ? (
+        <CollapsibleControlGroup title={t("inspector.textMotion")}>
+          <label className="field">
+            <span>{t("inspector.textMotion")}</span>
+            <select
+              value={activeAnimation.textAnimation ?? "none"}
+              onChange={(event) => updateAnimation({ textAnimation: event.currentTarget.value as LayerTextAnimation })}
+            >
+              {textAnimations.map((type) => (
+                <option key={type} value={type}>
+                  {t(textAnimationLabels[type])}
+                </option>
+              ))}
+            </select>
+          </label>
+        </CollapsibleControlGroup>
+      ) : null}
     </section>
   );
+}
+
+function effectChoiceId(animation: typeof defaultAnimation): string {
+  const effectAnimation = animation.effectAnimation ?? "none";
+  if (effectAnimation !== "none") return `effect:${effectAnimation}`;
+  if (animationTypeUsesDirection(animation.type)) return "type:none";
+  return `type:${animation.type}`;
 }
 
 function EasingGraph({ easing, progress, t }: { easing: LayerAnimationEasing; progress: number; t: Translator }) {

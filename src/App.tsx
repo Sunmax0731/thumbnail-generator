@@ -1,7 +1,7 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CanvasStage } from "./components/CanvasStage";
 import { ImageLabPanel } from "./components/ImageLabPanel";
-import { InspectorPanel } from "./components/InspectorPanel";
+import { InspectorPanel, type InspectorSection } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
 import { StatusBar } from "./components/StatusBar";
 import { TopToolbar } from "./components/TopToolbar";
@@ -222,6 +222,7 @@ function App() {
   const [selectedAssetKey, setSelectedAssetKey] = useState(() => assets[0]?.key ?? "");
   const [imagePaletteHoverState, setImagePaletteHoverState] = useState<ImagePalettePreviewHoverState | null>(null);
   const [imagePaletteHoverColor, setImagePaletteHoverColor] = useState("");
+  const [activeInspectorSection, setActiveInspectorSection] = useState<InspectorSection>("edit");
   const obsWindowRef = useRef<Window | null>(null);
   const obsPreviewStateRef = useRef({ layers, assets, settings, customFonts });
   const imagePaletteHoverSampleVersion = useRef(0);
@@ -1746,11 +1747,12 @@ function App() {
           paused = nextPaused;
           playPauseButton.textContent = paused ? "Play" : "Pause";
         }
-        playPauseButton.addEventListener("click", () => setPaused(!paused));
-        resetButton.addEventListener("click", () => {
+        function resetPlayback() {
           timeOffset = performance.now() - start;
           pausedAt = 0;
-        });
+        }
+        playPauseButton.addEventListener("click", () => setPaused(!paused));
+        resetButton.addEventListener("click", resetPlayback);
         hideButton.addEventListener("click", () => setControlsVisible(false));
         window.addEventListener("keydown", (event) => {
           if (event.key === "f" || event.key === "F" || event.key === "Enter") {
@@ -1758,6 +1760,14 @@ function App() {
           }
           if (event.key === "h" || event.key === "H") {
             setControlsVisible(!controlsVisible);
+          }
+          if (event.key === "p" || event.key === "P") {
+            event.preventDefault();
+            setPaused(!paused);
+          }
+          if (event.key === "r" || event.key === "R") {
+            event.preventDefault();
+            resetPlayback();
           }
           if (event.key === " ") {
             event.preventDefault();
@@ -1955,6 +1965,7 @@ function App() {
           isExporting={isExporting}
           layers={layers}
           selectedIds={selectedIds}
+          showMotionTimeline={activeInspectorSection === "motion"}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
@@ -1964,6 +1975,7 @@ function App() {
           onPresetChange={handlePresetChange}
           onOpenObsPreview={openObsPreview}
           onSelectLayer={selectLayer}
+          onUpdateLayer={updateLayer}
           onClearSelection={() => {
             setSelectedIds([]);
             setHoverInteractionMode(null);
@@ -1987,6 +1999,8 @@ function App() {
           savedColorPalettes={savedColorPalettes}
           fontOptions={fontOptions}
           hasSelectedImageLayer={hasSelectedImageLayer}
+          activeSection={activeInspectorSection}
+          onActiveSectionChange={setActiveInspectorSection}
           onPaletteDraftChange={setPaletteDraft}
           onPaletteNameDraftChange={setPaletteNameDraft}
           onPaletteAlphaDraftChange={setPaletteAlphaDraft}
