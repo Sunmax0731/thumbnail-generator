@@ -118,6 +118,26 @@ type ObsPreviewHostWindow = Window & {
   __thumbnailObsPreviewRender?: (canvas: HTMLCanvasElement, timeMs: number) => Promise<void>;
 };
 
+type ObsPreviewChildWindow = Window & {
+  __thumbnailObsPreviewEnterFullscreen?: () => Promise<void>;
+};
+
+const OBS_PREVIEW_WINDOW_NAME = "thumbnail-generator-obs-preview";
+const OBS_PREVIEW_SCENE_DURATION_MS = 4000;
+
+function fitObsPreviewWindowToOutput(previewWindow: Window, settings: OutputSettings): void {
+  const availableWidth = Math.max(320, previewWindow.screen?.availWidth || window.screen.availWidth || settings.width);
+  const availableHeight = Math.max(320, previewWindow.screen?.availHeight || window.screen.availHeight || settings.height);
+  const scale = Math.min(1, availableWidth / settings.width, availableHeight / settings.height);
+  const targetViewportWidth = Math.max(320, Math.round(settings.width * scale));
+  const targetViewportHeight = Math.max(180, Math.round(settings.height * scale));
+  const browserChromeWidth = Math.max(0, previewWindow.outerWidth - previewWindow.innerWidth);
+  const browserChromeHeight = Math.max(0, previewWindow.outerHeight - previewWindow.innerHeight);
+
+  previewWindow.moveTo(0, 0);
+  previewWindow.resizeTo(targetViewportWidth + browserChromeWidth, targetViewportHeight + browserChromeHeight);
+}
+
 function App() {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const activeCanvasInteraction = useRef<ActiveCanvasInteraction | null>(null);
@@ -1610,8 +1630,8 @@ function App() {
 
     const previewWindow = window.open(
       "",
-      "thumbnail-generator-obs-preview",
-      "popup=yes,width=1280,height=720,menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes",
+      OBS_PREVIEW_WINDOW_NAME,
+      "popup=yes,width=1280,height=720,left=0,top=0,menubar=no,toolbar=no,location=no,status=no,scrollbars=no,resizable=yes",
     );
     if (!previewWindow) {
       setStatus("OBS preview could not open. Allow popups for this site and try again.");
@@ -1626,7 +1646,7 @@ function App() {
         drawSelection: false,
         previewPadding: 0,
         animationTimeMs: timeMs,
-        sceneDurationMs: 4000,
+        sceneDurationMs: OBS_PREVIEW_SCENE_DURATION_MS,
       });
     };
 
@@ -1646,52 +1666,70 @@ function App() {
         background: #000000;
       }
       body {
-        display: grid;
-        place-items: center;
+        display: block;
       }
       canvas {
         display: block;
-        max-width: 100vw;
-        max-height: 100vh;
-        object-fit: contain;
+        width: 100vw;
+        height: 100vh;
+        cursor: none;
       }
     </style>
+    <script>
+      async function enterFullscreen() {
+        try {
+          if (!document.fullscreenElement) {
+            await document.documentElement.requestFullscreen({ navigationUI: "hide" });
+          }
+        } catch {
+          // Browsers may require another user activation in the child window.
+        }
+      }
+      window.__thumbnailObsPreviewEnterFullscreen = enterFullscreen;
+      window.addEventListener("pointerdown", () => void enterFullscreen());
+      window.addEventListener("keydown", (event) => {
+        if (event.key === "f" || event.key === "F" || event.key === "Enter") {
+          void enterFullscreen();
+        }
+      });
+      window.addEventListener("DOMContentLoaded", () => {
+        const canvas = document.getElementById("obs-canvas");
+        const start = performance.now();
+        let last = 0;
+        async function frame(now) {
+          if (now - last >= 33) {
+            last = now;
+            try {
+              if (!window.opener || window.opener.closed || !window.opener.__thumbnailObsPreviewRender) {
+                document.body.style.background = "#111827";
+              } else {
+                await window.opener.__thumbnailObsPreviewRender(canvas, now - start);
+              }
+            } catch (error) {
+              console.error(error);
+            }
+          }
+          requestAnimationFrame(frame);
+        }
+        void enterFullscreen();
+        requestAnimationFrame(frame);
+      });
+    </script>
   </head>
   <body>
     <canvas id="obs-canvas" aria-label="OBS preview canvas"></canvas>
-    <script>
-      const canvas = document.getElementById("obs-canvas");
-      const start = performance.now();
-      let last = 0;
-      async function frame(now) {
-        if (now - last >= 33) {
-          last = now;
-          try {
-            if (!window.opener || window.opener.closed || !window.opener.__thumbnailObsPreviewRender) {
-              document.body.style.background = "#111827";
-            } else {
-              await window.opener.__thumbnailObsPreviewRender(canvas, now - start);
-            }
-          } catch (error) {
-            console.error(error);
-          }
-        }
-        requestAnimationFrame(frame);
-      }
-      requestAnimationFrame(frame);
-    </script>
   </body>
 </html>`);
     previewWindow.document.close();
     try {
-      previewWindow.moveTo(0, 0);
-      previewWindow.resizeTo(window.screen.availWidth, window.screen.availHeight);
-      void previewWindow.document.documentElement.requestFullscreen?.().catch(() => undefined);
+      fitObsPreviewWindowToOutput(previewWindow, obsPreviewStateRef.current.settings);
+      window.setTimeout(() => fitObsPreviewWindowToOutput(previewWindow, obsPreviewStateRef.current.settings), 120);
+      void (previewWindow as ObsPreviewChildWindow).__thumbnailObsPreviewEnterFullscreen?.();
     } catch {
       // Browser chrome/fullscreen behavior is controlled by the user's browser and OBS capture mode.
     }
     previewWindow.focus();
-    setStatus("OBS preview window opened. Capture that window in OBS.");
+    setStatus("OBS preview opened. If browser chrome remains, click the preview or press F to enter fullscreen.");
   }, []);
 
   const handleExport = useCallback(

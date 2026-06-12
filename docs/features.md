@@ -79,8 +79,8 @@ This page is the quick feature index for users and reviewers.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
 - Review the selected-object Motion preview and easing graph before opening the OBS preview.
 - Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
-- Open OBS preview from the canvas toolbar to show the current animated canvas in a popup-style window without editor controls or selection handles.
-- Capture the OBS preview window in OBS with Window Capture for browser-only live display. Browser and OBS settings still decide whether OS/browser chrome is capturable.
+- Open OBS preview from the canvas toolbar to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
+- Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, and browser/OBS settings still decide whether OS/browser chrome is capturable.
 
 ## Color Palette
 

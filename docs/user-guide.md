@@ -143,7 +143,7 @@ The status bar can show quality warning chips while you work. Check these before
 6. Use the selected-object preview and easing graph to check motion timing.
 7. Select Open OBS preview in the canvas toolbar.
 
-The OBS preview opens a popup-style browser window that contains only the animated canvas on a black background. It does not draw editor controls or selection handles, and the app requests fullscreen where the browser permits it. Capture that window in OBS with Window Capture. Browser and OBS settings still decide whether OS or browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
+The OBS preview opens a popup-style browser window that contains only the animated canvas. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS or browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 
 ## Image Lab
 

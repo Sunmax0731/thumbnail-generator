@@ -131,6 +131,31 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-12.
 
+### OBS Preview Fullscreen And Viewport Fill
+
+Completed on 2026-06-12 for the OBS preview window chrome/letterboxing follow-up.
+
+- Scope: changed the OBS preview document to keep the body canvas-only, stretch the animated canvas to the preview viewport, size the popup to the current output aspect ratio where browser APIs allow it, and retry fullscreen from the preview click, `F`, or `Enter`.
+- `npm test`: pass. 30 test files, 120 tests.
+- `npm run build`: pass. Vite emitted the existing analytics script and chunk-size warnings.
+- Runtime gate URL: `http://127.0.0.1:4339/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render and primary stage visible.
+  - Layer edit: first Adjust number input changed from `890` to `900`, and the canvas stayed nonblank.
+  - OBS preview: pass. Separate preview window opened with title `OBS Preview - Thumbnail Generator`; the document body had no visible text, contained exactly one canvas and no toolbar/header/nav/form controls, rendered nonblank at intrinsic `1280x720`, filled the viewport with CSS `1280px x 720px`, hid the cursor, and exposed the fullscreen retry hook after pressing `F`.
+  - Export path: WebP download succeeded as `thumbnail-1280x720-2026-06-12T06-07-57-216Z.webp`.
+  - Mobile viewport rendered nonblank with horizontal overflow `0`.
+  - Console health: no relevant app console errors, app warnings, or non-analytics HTTP errors were reported. Canvas `getImageData` readback warnings were test-induced and ignored.
+  - CSV/HTML compatibility note: dedicated CSV/HTML text controls are hidden in the current GUI; parser/import compatibility remains covered by `npm test` and saved layout metadata.
+- Evidence:
+  - `output/runtime-20260612-obs-frameless/main-desktop.png`
+  - `output/runtime-20260612-obs-frameless/obs-popup.png`
+  - `output/runtime-20260612-obs-frameless/mobile.png`
+  - `output/runtime-20260612-obs-frameless/thumbnail-1280x720-2026-06-12T06-07-57-216Z.webp`
+
 ### Schedule Generator Button Height Fix
 
 Completed on 2026-06-12 for the schedule generator portrait modal button stretch regression.

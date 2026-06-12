@@ -257,7 +257,7 @@ Generator settings are stored in localStorage under `thumbnail-generator.generat
 
 ## OBS Preview
 
-The canvas toolbar can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays only a canvas on a black background, draws without editor controls or selection handles, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It also requests fullscreen after opening; browser and OBS capture settings ultimately decide whether OS or browser chrome is captured. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
+The canvas toolbar can open an OBS preview window. The child window is opened with popup/no-toolbar feature flags where the browser permits them, displays only a canvas, draws without editor controls or selection handles, stretches the canvas to the preview viewport to avoid document letterboxing, and runs a `requestAnimationFrame` loop capped to approximately 30fps. It requests fullscreen after opening, retries fullscreen when the preview is clicked or `F`/`Enter` is pressed, and sizes the popup viewport to the current output aspect ratio when browser APIs allow it. Browser security rules still decide whether a normal browser window can hide OS/browser chrome; true frame removal depends on fullscreen permission or the OBS capture mode. It uses the parent editor's latest browser-local layer, asset, output setting, and custom font state. Browser Source URLs, cloud scene hosting, and video export are out of scope for this MVP.
 
 ## Brand Kit
 
