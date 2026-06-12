@@ -20,6 +20,7 @@
 - Color palette registration preserves names, color-value uniqueness, opacity, legacy storage migration, and per-row Fill/Stroke application.
 - Color palette editing preserves selected swatch updates, opacity, saved multi-color palette generation, and legacy group metadata tolerance.
 - CSV/HTML import and layout export preserve group metadata, layer blur, edge blur, corner radius, text kerning, fill/stroke opacity, expanded shape kinds, and line styles.
+- CSV/HTML import and layout export preserve shadow, pseudo-3D rotation, and bevel decoration fields.
 - CSV/HTML import and layout export preserve signed edge blur direction, stroke/outline blur participation, and text writing mode.
 - Text fit accounts for kerning/letter spacing.
 - Text fit accounts for vertical text column width and character height.
@@ -40,6 +41,7 @@
 - Brand kit helpers normalize stored data, capture current layer style, and apply brand font/colors to selected editable layers.
 - Edit state helpers serialize, parse, and delete portable JSON recovery files.
 - Quality warning helpers flag long text, low contrast, safe-area edges, many layers, large exports, large assets, and large storage estimates.
+- Browser template helpers normalize, sanitize, deduplicate, and preserve saved template tags.
 
 ## Manual Browser Runtime Gate
 
@@ -87,6 +89,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Text alignment uses three direct buttons, and the selected alignment state is visible.
 - Adjust tab numeric controls edit through paired range/number inputs without duplicated value readouts in labels.
 - Named templates can be saved to browser storage, loaded, and deleted.
+- Named templates can be saved with free-form tags, existing tags appear as suggestions, and the saved template list can be filtered by a tag dropdown.
 - Multiple saved templates with the same display name are preserved.
 - Current edit state can be manually saved, restored after reload, and autosaved when the autosave toggle is on.
 - Image Lab opens from imported asset rows in a modal workspace and supports chroma key, rectangle/circle cutout, and polygon/free cutout.
@@ -111,6 +114,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Adjust reset controls return selected-layer rotation to 0 degrees.
 - Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open a draggable popup compact single-color picker with alpha.
+- Adjust supports shadow color/opacity/blur/distance/angle, pseudo-3D X/Y rotation, bevel size/opacity, and smooth wave line rendering.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
@@ -126,6 +130,39 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-12.
+
+### UI Tags Decoration Follow-Up
+
+Completed on 2026-06-12 for generator modal polish, browser-template tags, and decoration controls.
+
+- `npm test`: pass. 30 test files, 120 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4337/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render and four generator buttons visible.
+  - Standard thumbnail letter spacing number input increments from `-1` to `0` and direct `0` input is retained.
+  - Standard thumbnail common controls include letter spacing and corner radius together; standard modal shows only image-slot and grouping checkboxes.
+  - Standard preview measured `647.0625x363.96875`; action buttons measured the same x-position and width as the preview pane.
+  - Vertical thumbnail preview measured `393.75x700`; action buttons measured the same x-position and width as the preview pane.
+  - Schedule landscape preview measured at least `600px` wide with 16:9 ratio after layout update.
+  - Schedule portrait preview measured `382.5x680` with 9:16 ratio.
+  - Browser template save accepted a free-form tag, the tag appeared in the filter dropdown, and filtering showed only matching template rows.
+  - Adjust decoration controls exposed 17 inputs covering shadow, pseudo-3D rotation, and bevel, and editing those values kept the canvas nonblank.
+  - WebP export downloaded successfully.
+  - Mobile viewport horizontal overflow was `0`.
+  - No relevant page errors, app console errors, or non-analytics HTTP errors were reported.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260612-ui-tags-decoration-standard.png`
+  - `docs/assets/runtime-20260612-ui-tags-decoration-vertical.png`
+  - `docs/assets/runtime-20260612-ui-tags-decoration-schedule-portrait.png`
+  - `docs/assets/runtime-20260612-ui-tags-decoration-template-filter.png`
+  - `docs/assets/runtime-20260612-ui-tags-decoration-adjust.png`
+  - `docs/assets/runtime-20260612-ui-tags-decoration-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260612-template-tags-decoration/thumbnail-1280x720-2026-06-12T04-33-12-656Z.webp`.
 
 ### Creative Generator Modal Compact Preview Follow-Up
 

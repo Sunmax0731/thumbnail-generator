@@ -20,7 +20,9 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Add common text, shape, line, headline, subtitle, badge, divider, and selected-asset image layers through expanded quick-add controls in the left-panel Layers tab.
 - Add simple shapes with fill color, stroke color, size, position, rotation, and shape kinds for rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line.
 - Add line layers and edit line style as solid, dotted, dashed, or wave.
+- Render wave line style as a smooth visible wave in preview and export.
 - Adjust layer blur, edge blur, and corner radius where applicable, including rounded polygon corners for non-rect shape kinds.
+- Adjust per-layer decoration with shadow color/opacity/blur/distance/angle, pseudo-3D X/Y rotation, and bevel size/opacity.
 - Adjust text/shape fill and stroke alpha through a draggable popup single-color picker opened from Fill and Stroke color displays.
 - Clear the current selection by clicking non-layer blank space in the preview or the preview area outside the output frame.
 - Edit selected layer groups with live relative X/Y movement and relative rotation deltas.
@@ -32,8 +34,10 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
 - Provide Templates-tab generators for editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Keep the previous bundled default-template list out of the current GUI after generator flows are available, while browser-local named templates remain available for user snapshots.
+- Save browser-local named templates with optional tags, offer existing tags as dropdown suggestions while allowing free tag input, and filter saved templates by a dropdown tag selector.
 - Provide a beta schedule generator in Templates that creates monthly or weekly editable schedule layer sets from calendar date inputs, Sunday/Monday week-start settings, weekday language, date format, uniform or per-day action counts, canvas orientation, grid style, Adjust-shared font choices, separate title/weekday/date/plan font-size sliders, color, corner radius, line-width, pre-generation preview, month-aware badge labels, generated-layer grouping controls, and reload-persistent generator settings.
 - Provide image generators for standard thumbnails, vertical thumbnails, and stream waiting screens with five placement patterns, editable text, shared font choices, grouped common/title/subtitle/label text controls, color, image-slot, grouping, live preview, Generate layers, and Save settings controls. Stream waiting screens include optional animation metadata.
+- Keep generator modal text sliders compact, allow letter spacing to be set to `0`, keep corner radius in common generator controls, use wider landscape previews for standard thumbnail, schedule, and stream waiting generators, preserve portrait preview aspect ratios, and constrain creative generator action buttons to the preview pane width.
 - Configure one or more per-layer animation sets with easings.net-style easing choices, selected-object Motion preview, easing graph, disabled direction controls when an animation type does not use movement, and a popup-style OBS preview window without editor controls or selection handles.
 - Keep the left panel focused on Templates, Layers, and Assets by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.

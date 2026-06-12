@@ -17,6 +17,15 @@ const csvColumns = [
   "edgeBlur",
   "edgeBlurStroke",
   "cornerRadius",
+  "shadowColor",
+  "shadowOpacity",
+  "shadowBlur",
+  "shadowDistance",
+  "shadowAngle",
+  "rotateX",
+  "rotateY",
+  "bevelSize",
+  "bevelOpacity",
   "animationType",
   "animationStartMs",
   "animationDurationMs",
@@ -75,6 +84,15 @@ function valueForCsvColumn(layer: ThumbnailLayer, column: (typeof csvColumns)[nu
     edgeBlur: round(layer.edgeBlur ?? 0),
     edgeBlurStroke: layer.edgeBlurStroke ?? false,
     cornerRadius: round(layer.cornerRadius ?? 0),
+    shadowColor: layer.shadowColor ?? "#000000",
+    shadowOpacity: round(layer.shadowOpacity ?? 0, 2),
+    shadowBlur: round(layer.shadowBlur ?? 0),
+    shadowDistance: round(layer.shadowDistance ?? 0),
+    shadowAngle: round(layer.shadowAngle ?? 135),
+    rotateX: round(layer.rotateX ?? 0),
+    rotateY: round(layer.rotateY ?? 0),
+    bevelSize: round(layer.bevelSize ?? 0),
+    bevelOpacity: round(layer.bevelOpacity ?? 0, 2),
     animationType: layer.animation?.type ?? "",
     animationStartMs: layer.animation ? round(layer.animation.startMs) : "",
     animationDurationMs: layer.animation ? round(layer.animation.durationMs) : "",
@@ -146,6 +164,15 @@ function layerToHtml(layer: ThumbnailLayer): string {
     ["data-edge-blur", round(layer.edgeBlur ?? 0)],
     ["data-edge-blur-stroke", String(layer.edgeBlurStroke ?? false)],
     ["data-corner-radius", round(layer.cornerRadius ?? 0)],
+    ["data-shadow-color", layer.shadowColor ?? "#000000"],
+    ["data-shadow-opacity", round(layer.shadowOpacity ?? 0, 2)],
+    ["data-shadow-blur", round(layer.shadowBlur ?? 0)],
+    ["data-shadow-distance", round(layer.shadowDistance ?? 0)],
+    ["data-shadow-angle", round(layer.shadowAngle ?? 135)],
+    ["data-rotate-x", round(layer.rotateX ?? 0)],
+    ["data-rotate-y", round(layer.rotateY ?? 0)],
+    ["data-bevel-size", round(layer.bevelSize ?? 0)],
+    ["data-bevel-opacity", round(layer.bevelOpacity ?? 0, 2)],
     ["data-animation-type", layer.animation?.type ?? ""],
     ["data-animation-start-ms", layer.animation ? round(layer.animation.startMs) : ""],
     ["data-animation-duration-ms", layer.animation ? round(layer.animation.durationMs) : ""],
@@ -224,6 +251,7 @@ function escapeHtml(value: string): string {
     .replace(/"/g, "&quot;");
 }
 
-function round(value: number): number {
-  return Math.round(value * 100) / 100;
+function round(value: number, decimals = 2): number {
+  const multiplier = 10 ** decimals;
+  return Math.round(value * multiplier) / multiplier;
 }

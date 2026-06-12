@@ -25,6 +25,15 @@ describe("layoutExport", () => {
         layerBlur: 2,
         edgeBlur: -6,
         edgeBlurStroke: true,
+        shadowColor: "#112233",
+        shadowOpacity: 0.6,
+        shadowBlur: 12,
+        shadowDistance: 18,
+        shadowAngle: 45,
+        rotateX: 12,
+        rotateY: -8,
+        bevelSize: 5,
+        bevelOpacity: 0.7,
         letterSpacing: 5,
         fillOpacity: 0.8,
         writingMode: "vertical",
@@ -46,6 +55,10 @@ describe("layoutExport", () => {
     expect(html).toContain('data-group-id="g1"');
     expect(html).toContain('data-edge-blur="-6"');
     expect(html).toContain('data-edge-blur-stroke="true"');
+    expect(html).toContain('data-shadow-color="#112233"');
+    expect(html).toContain('data-shadow-opacity="0.6"');
+    expect(html).toContain('data-rotate-x="12"');
+    expect(html).toContain('data-bevel-size="5"');
     expect(html).toContain('data-writing-mode="vertical"');
     expect(html).toContain('data-letter-spacing="5"');
     expect(html).toContain('data-animation-type="slide"');

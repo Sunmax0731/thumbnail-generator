@@ -91,6 +91,8 @@ async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLaye
   context.globalAlpha = layer.opacity;
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
+  applyLayerPlaneRotation(context, layer);
+  applyLayerShadow(context, layer);
 
   if (layer.edgeBlur < 0) {
     await drawLayerInnerEdgeBlur(context, layer, assets);
@@ -104,7 +106,30 @@ async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLaye
       layerBlur: layer.layerBlur,
     });
   }
+  drawLayerBevel(context, layer);
   context.restore();
+}
+
+function applyLayerPlaneRotation(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
+  const rotateX = clamp(layer.rotateX, -75, 75);
+  const rotateY = clamp(layer.rotateY, -75, 75);
+  if (rotateX === 0 && rotateY === 0) return;
+  const xRad = (rotateX * Math.PI) / 180;
+  const yRad = (rotateY * Math.PI) / 180;
+  const scaleX = Math.max(0.22, Math.cos(yRad));
+  const scaleY = Math.max(0.22, Math.cos(xRad));
+  const skewX = Math.sin(yRad) * 0.18;
+  const skewY = -Math.sin(xRad) * 0.18;
+  context.transform(scaleX, skewY, skewX, scaleY, 0, 0);
+}
+
+function applyLayerShadow(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
+  if (layer.shadowOpacity <= 0 || (layer.shadowBlur <= 0 && layer.shadowDistance <= 0)) return;
+  const angle = (layer.shadowAngle * Math.PI) / 180;
+  context.shadowColor = colorWithAlpha(layer.shadowColor, layer.shadowOpacity);
+  context.shadowBlur = layer.shadowBlur;
+  context.shadowOffsetX = Math.cos(angle) * layer.shadowDistance;
+  context.shadowOffsetY = Math.sin(angle) * layer.shadowDistance;
 }
 
 async function drawLayerOuterEdgeBlur(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
@@ -474,12 +499,19 @@ function drawLineShape(
   if (layer.lineStyle === "dashed") context.setLineDash([context.lineWidth * 2.6, context.lineWidth * 1.25]);
   if (layer.lineStyle === "wave") {
     context.beginPath();
-    const amplitude = Math.max(4, context.lineWidth * 0.8);
-    const step = Math.max(12, context.lineWidth * 2);
-    for (let x = -layer.width / 2; x <= layer.width / 2; x += step) {
-      const y = Math.sin(((x + layer.width / 2) / step) * Math.PI * 2) * amplitude;
-      if (x === -layer.width / 2) context.moveTo(x, y);
-      else context.lineTo(x, y);
+    const amplitude = Math.max(3, Math.min(layer.height / 2 || 12, context.lineWidth * 1.1));
+    const halfWave = Math.max(10, context.lineWidth * 2.4);
+    const startX = -layer.width / 2;
+    const endX = layer.width / 2;
+    context.moveTo(startX, 0);
+    let x = startX;
+    let direction = -1;
+    while (x < endX) {
+      const nextX = Math.min(endX, x + halfWave);
+      const controlX = x + (nextX - x) / 2;
+      context.quadraticCurveTo(controlX, direction * amplitude, nextX, 0);
+      x = nextX;
+      direction *= -1;
     }
     context.stroke();
   } else {
@@ -490,6 +522,74 @@ function drawLineShape(
   }
   context.setLineDash([]);
   context.globalAlpha = baseAlpha;
+}
+
+function drawLayerBevel(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
+  if (layer.bevelSize <= 0 || layer.bevelOpacity <= 0 || (layer.type === "shape" && layer.shape === "line")) return;
+  const size = clamp(layer.bevelSize, 0, 48);
+  const opacity = clamp(layer.bevelOpacity, 0, 1);
+  context.save();
+  context.shadowColor = "transparent";
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.lineJoin = "round";
+  context.lineCap = "round";
+  context.lineWidth = Math.max(1, size);
+
+  context.save();
+  context.translate(-size * 0.35, -size * 0.35);
+  context.strokeStyle = `rgba(255, 255, 255, ${0.52 * opacity})`;
+  drawLayerBevelStroke(context, layer, size);
+  context.restore();
+
+  context.save();
+  context.translate(size * 0.35, size * 0.35);
+  context.strokeStyle = `rgba(0, 0, 0, ${0.42 * opacity})`;
+  drawLayerBevelStroke(context, layer, size);
+  context.restore();
+
+  context.restore();
+}
+
+function drawLayerBevelStroke(context: CanvasRenderingContext2D, layer: ThumbnailLayer, size: number): void {
+  if (layer.type === "image") {
+    context.beginPath();
+    context.roundRect(-layer.width / 2, -layer.height / 2, layer.width, layer.height, Math.min(layer.cornerRadius, layer.width / 2, layer.height / 2));
+    context.stroke();
+    return;
+  }
+  if (layer.type === "shape") {
+    drawShapeLayer(context, { ...layer, strokeWidth: size, strokeOpacity: 1 }, { includeFill: false, includeStroke: true });
+    return;
+  }
+  drawTextLayer(
+    context,
+    {
+      ...layer,
+      strokeColor: context.strokeStyle.toString(),
+      strokeWidth: Math.max(size, layer.strokeWidth),
+      strokeOpacity: 1,
+    },
+    { includeFill: false, includeStroke: true },
+  );
+}
+
+function colorWithAlpha(color: string, alpha: number): string {
+  const normalized = color.trim();
+  const hex = normalized.match(/^#([0-9a-f]{3}|[0-9a-f]{6})$/i);
+  if (!hex) return normalized;
+  const value = hex[1];
+  const expanded = value.length === 3 ? value.split("").map((part) => part + part).join("") : value;
+  const red = Number.parseInt(expanded.slice(0, 2), 16);
+  const green = Number.parseInt(expanded.slice(2, 4), 16);
+  const blue = Number.parseInt(expanded.slice(4, 6), 16);
+  return `rgba(${red}, ${green}, ${blue}, ${clamp(alpha, 0, 1)})`;
+}
+
+function clamp(value: number, min: number, max: number): number {
+  if (!Number.isFinite(value)) return min;
+  return Math.min(max, Math.max(min, value));
 }
 
 function shouldIncludeStrokeForEdgeBlur(layer: ThumbnailLayer): boolean {

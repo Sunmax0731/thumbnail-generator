@@ -33,6 +33,18 @@ export const defaultAnimation: LayerAnimation = {
   distance: 80,
 };
 
+export const defaultLayerDecoration = {
+  shadowColor: "#000000",
+  shadowOpacity: 0,
+  shadowBlur: 0,
+  shadowDistance: 0,
+  shadowAngle: 135,
+  rotateX: 0,
+  rotateY: 0,
+  bevelSize: 0,
+  bevelOpacity: 0,
+};
+
 let layerCounter = 0;
 
 export function makeLayerId(prefix = "layer"): string {
@@ -60,6 +72,7 @@ export function makeImageLayer(partial: Partial<ImageLayer> = {}): ImageLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 0,
+    ...normalizeLayerDecorationFields(partial),
     ...animationFields,
     imageKey: partial.imageKey ?? "sample-bg",
     effects: { ...defaultEffects, ...partial.effects },
@@ -86,6 +99,7 @@ export function makeTextLayer(partial: Partial<TextLayer> = {}): TextLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 0,
+    ...normalizeLayerDecorationFields(partial),
     ...animationFields,
     text: partial.text ?? "NEW THUMBNAIL",
     fontSize: partial.fontSize ?? 88,
@@ -123,6 +137,7 @@ export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
     edgeBlur: partial.edgeBlur ?? 0,
     edgeBlurStroke: partial.edgeBlurStroke ?? false,
     cornerRadius: partial.cornerRadius ?? 12,
+    ...normalizeLayerDecorationFields(partial),
     ...animationFields,
     shape: (partial.shape as ShapeKind) ?? "rect",
     fill: partial.fill ?? "#10b6d7",
@@ -181,6 +196,22 @@ function normalizeLayerAnimationFields(partial: Partial<BaseLayer>): Pick<BaseLa
   return {
     animation: animations[0],
     animations: animations.length > 0 ? animations : undefined,
+  };
+}
+
+function normalizeLayerDecorationFields(
+  partial: Partial<BaseLayer>,
+): Pick<BaseLayer, "shadowColor" | "shadowOpacity" | "shadowBlur" | "shadowDistance" | "shadowAngle" | "rotateX" | "rotateY" | "bevelSize" | "bevelOpacity"> {
+  return {
+    shadowColor: typeof partial.shadowColor === "string" ? partial.shadowColor : defaultLayerDecoration.shadowColor,
+    shadowOpacity: clampNumber(partial.shadowOpacity, 0, 1, defaultLayerDecoration.shadowOpacity),
+    shadowBlur: clampNumber(partial.shadowBlur, 0, 96, defaultLayerDecoration.shadowBlur),
+    shadowDistance: clampNumber(partial.shadowDistance, 0, 240, defaultLayerDecoration.shadowDistance),
+    shadowAngle: clampNumber(partial.shadowAngle, -180, 180, defaultLayerDecoration.shadowAngle),
+    rotateX: clampNumber(partial.rotateX, -75, 75, defaultLayerDecoration.rotateX),
+    rotateY: clampNumber(partial.rotateY, -75, 75, defaultLayerDecoration.rotateY),
+    bevelSize: clampNumber(partial.bevelSize, 0, 48, defaultLayerDecoration.bevelSize),
+    bevelOpacity: clampNumber(partial.bevelOpacity, 0, 1, defaultLayerDecoration.bevelOpacity),
   };
 }
 

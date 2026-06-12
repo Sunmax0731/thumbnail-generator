@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { createTemplateSnapshot, sanitizeTemplateName, upsertTemplate } from "./templates";
+import { createTemplateSnapshot, sanitizeTemplateName, sanitizeTemplateTags, upsertTemplate } from "./templates";
 import { defaultOutputSettings } from "./presets";
 import { makeTextLayer } from "./layerFactory";
 
@@ -21,6 +21,20 @@ describe("templates", () => {
     expect(template.name).toBe("My template");
     expect(template.csv).toContain("TITLE");
     expect(template.html).toContain("TITLE");
+  });
+
+  it("stores sanitized browser template tags", () => {
+    const template = createTemplateSnapshot(
+      "Tagged template",
+      [makeTextLayer({ text: "TITLE" })],
+      [],
+      defaultOutputSettings,
+      new Date("2026-06-06T00:00:00Z"),
+      ["  stream   ", "Stream", "weekly"],
+    );
+
+    expect(template.tags).toEqual(["stream", "weekly"]);
+    expect(sanitizeTemplateTags(["", " Shorts ", "shorts"])).toEqual(["Shorts"]);
   });
 
   it("keeps multiple templates even when names match", () => {

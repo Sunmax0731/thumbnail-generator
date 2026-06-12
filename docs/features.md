@@ -34,11 +34,11 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, month-aware badge labels, and reload-persistent settings.
-- Generate standard thumbnails, vertical thumbnails, and stream waiting screens from Templates. Each image generator has five placement patterns plus content, grouped Grid / text controls, color, preview, Generate layers, and Save settings controls. Standard and stream waiting previews are wider on desktop, vertical previews keep the generated 9:16 aspect ratio, and animation controls appear only for stream waiting screens.
+- Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, month-aware badge labels, and reload-persistent settings. Schedule landscape previews are wider on desktop, and portrait previews keep the generated portrait ratio.
+- Generate standard thumbnails, vertical thumbnails, and stream waiting screens from Templates. Each image generator has five placement patterns plus content, grouped Grid / text controls, color, preview, Generate layers, and Save settings controls. Standard and stream waiting previews are wider on desktop, vertical previews keep the generated 9:16 aspect ratio, letter spacing accepts `0`, common corner radius lives in Common controls, preview action buttons stay within the preview pane, and animation controls appear only for stream waiting screens.
 - Use Save settings in generator modals to persist settings without generating; Generate layers also saves settings before replacing the current layers.
 - Resize the Browser templates list area from the Templates tab.
-- Use Templates to save named browser-local templates.
+- Use Templates to save named browser-local templates with optional tags, choose existing tags from suggestions while typing, and filter saved templates by tag from a dropdown.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
 - Export, import, or delete edit-state JSON for backup and recovery.
 - Enable Autosave current edit state to save the active editor state after changes.
@@ -61,7 +61,7 @@ This page is the quick feature index for users and reviewers.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
 - Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from the collapsible Quick Add section in Layers.
-- Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer.
+- Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer. Wave lines render as smooth visible waves in preview and export.
 - Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.
 - Select a text layer to change font, size, fill, outline, line height, kerning, and alignment.
 - Click Fill or Stroke color displays in Adjust to open a draggable popup Sketch-style single-color picker with alpha.
@@ -69,7 +69,7 @@ This page is the quick feature index for users and reviewers.
 - Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
-- Use Adjust reset controls to return selected-layer rotation to 0 degrees.
+- Use Adjust decoration controls for layer shadow, pseudo-3D X/Y rotation, and bevel, and use reset controls to return selected-layer rotation to 0 degrees.
 - Controls that do not affect the current layer state are disabled, such as single-line text line height.
 
 ## Motion And OBS Preview

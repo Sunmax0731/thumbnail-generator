@@ -87,6 +87,15 @@ export interface BaseLayer {
   edgeBlur: number;
   edgeBlurStroke: boolean;
   cornerRadius: number;
+  shadowColor: string;
+  shadowOpacity: number;
+  shadowBlur: number;
+  shadowDistance: number;
+  shadowAngle: number;
+  rotateX: number;
+  rotateY: number;
+  bevelSize: number;
+  bevelOpacity: number;
   animation?: LayerAnimation;
   animations?: LayerAnimation[];
 }

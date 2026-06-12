@@ -9,10 +9,10 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 ## What You Can Do
 
 - Compose thumbnails with image, text, and shape layers, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
-- Add line layers from Quick Add with solid, dotted, dashed, or wave strokes.
+- Add line layers from Quick Add with solid, dotted, dashed, or smooth wave strokes.
 - Import local images from the Assets tab and edit their position, size, rotation, opacity, and simple effects.
 - Keep browser-only YouTube thumbnail import support in code while the current Assets UI hides the YouTube URL controls.
-- Adjust layer blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, fill/stroke color alpha, and text kerning.
+- Adjust layer blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, shadow, pseudo-3D rotation, bevel, fill/stroke color alpha, and text kerning.
 - Select imported assets to add them as image layers, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image layers that reference it.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
 - Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
@@ -20,9 +20,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Group selected layers, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped row individually from Layers, and fit selected image/shape layers to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
-- Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
+- Save a browser-local work-in-progress state, enable autosave, and store tagged named templates in `localStorage` with dropdown tag filtering.
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
-- Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, and preview settings.
+- Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
 - Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.

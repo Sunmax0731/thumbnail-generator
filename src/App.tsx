@@ -1553,8 +1553,8 @@ function App() {
     setStatus("Generated CSV and HTML layout text from the current canvas.");
   }, [layers]);
 
-  const saveCurrentTemplate = useCallback(() => {
-    const snapshot = createTemplateSnapshot(templateName, layers, assets, settings);
+  const saveCurrentTemplate = useCallback((tags: string[] = []) => {
+    const snapshot = createTemplateSnapshot(templateName, layers, assets, settings, new Date(), tags);
     const next = upsertTemplate(templates, snapshot);
     try {
       writeSavedTemplates(next);

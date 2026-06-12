@@ -7,6 +7,7 @@ export const templateStorageKey = "thumbnail-generator.savedTemplates.v1";
 export interface SavedTemplate {
   id: string;
   name: string;
+  tags: string[];
   createdAt: string;
   updatedAt: string;
   settings: OutputSettings;
@@ -22,11 +23,13 @@ export function createTemplateSnapshot(
   assets: ImageAsset[],
   settings: OutputSettings,
   now = new Date(),
+  tags: string[] = [],
 ): SavedTemplate {
   const timestamp = now.toISOString();
   return {
     id: `template-${now.getTime().toString(36)}-${Math.random().toString(36).slice(2, 8)}`,
     name: sanitizeTemplateName(name),
+    tags: sanitizeTemplateTags(tags),
     createdAt: timestamp,
     updatedAt: timestamp,
     settings: structuredClone(settings),
@@ -40,6 +43,23 @@ export function createTemplateSnapshot(
 export function sanitizeTemplateName(name: string): string {
   const trimmed = name.trim().replace(/\s+/g, " ");
   return trimmed || "Untitled template";
+}
+
+export function sanitizeTemplateTag(tag: string): string {
+  return tag.trim().replace(/\s+/g, " ");
+}
+
+export function sanitizeTemplateTags(tags: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const tag of tags) {
+    const normalized = sanitizeTemplateTag(tag);
+    const key = normalized.toLocaleLowerCase();
+    if (!normalized || seen.has(key)) continue;
+    seen.add(key);
+    result.push(normalized);
+  }
+  return result.slice(0, 8);
 }
 
 export function readSavedTemplates(storage: Pick<Storage, "getItem"> = window.localStorage): SavedTemplate[] {
@@ -68,6 +88,7 @@ export function upsertTemplate(templates: SavedTemplate[], template: SavedTempla
 function normalizeTemplate(template: SavedTemplate): SavedTemplate {
   return {
     ...template,
+    tags: sanitizeTemplateTags(Array.isArray(template.tags) ? template.tags : []),
     layers: template.layers.map((layer) => normalizeLayer({ ...layer, selectable: layer.selectable !== false })),
   };
 }

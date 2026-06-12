@@ -55,7 +55,7 @@ interface LeftPanelProps {
   onGenerateScheduleTemplate: (request: ScheduleBuilderRequest) => void;
   onGenerateCreativeTemplate: (request: CreativeGeneratorRequest) => void;
   onTemplateNameChange: (value: string) => void;
-  onSaveTemplate: () => void;
+  onSaveTemplate: (tags?: string[]) => void;
   onLoadTemplate: (id: string) => void;
   onDeleteTemplate: (id: string) => void;
   onOpenImageLab: (assetKey?: string) => void;
@@ -90,6 +90,8 @@ export function LeftPanel({
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
   const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
+  const [templateTagDraft, setTemplateTagDraft] = useState("");
+  const [templateFilterTag, setTemplateFilterTag] = useState("");
   const [isScheduleBuilderOpen, setIsScheduleBuilderOpen] = useState(false);
   const [activeCreativeBuilder, setActiveCreativeBuilder] = useState<CreativeGeneratorKind | null>(null);
   const [scheduleDraft, setScheduleDraft] = useState<ScheduleBuilderRequest>(() =>
@@ -108,6 +110,14 @@ export function LeftPanel({
   const saveScheduleDraft = () => writeGeneratorSettings("schedule", scheduleDraft);
   const saveCreativeDraft = (kind: CreativeGeneratorKind, draft = creativeDrafts[kind]) =>
     writeGeneratorSettings(`creative.${kind}`, draft);
+  const browserTemplateTags = useMemo(() => {
+    const tags = templates.flatMap((template) => template.tags ?? []);
+    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
+  }, [templates]);
+  const visibleTemplates = useMemo(
+    () => (templateFilterTag ? templates.filter((template) => template.tags?.includes(templateFilterTag)) : templates),
+    [templateFilterTag, templates],
+  );
 
   return (
     <aside className="side-panel left-panel" aria-label={t("left.aria")}>
@@ -259,14 +269,43 @@ export function LeftPanel({
                 onChange={(event) => onTemplateNameChange(event.currentTarget.value)}
               />
             </label>
-            <button type="button" className="primary-button icon-text wide-button" onClick={onSaveTemplate}>
+            <label className="field">
+              <span>{t("left.templateTag")}</span>
+              <input
+                type="text"
+                list="browser-template-tag-options"
+                value={templateTagDraft}
+                onChange={(event) => setTemplateTagDraft(event.currentTarget.value)}
+              />
+              <datalist id="browser-template-tag-options">
+                {browserTemplateTags.map((tag) => (
+                  <option key={tag} value={tag} />
+                ))}
+              </datalist>
+            </label>
+            <button
+              type="button"
+              className="primary-button icon-text wide-button"
+              onClick={() => onSaveTemplate(templateTagDraft.trim() ? [templateTagDraft] : [])}
+            >
               <Save size={16} /> {t("left.saveTemplate")}
             </button>
+            <label className="field">
+              <span>{t("left.templateTagFilter")}</span>
+              <select value={templateFilterTag} onChange={(event) => setTemplateFilterTag(event.currentTarget.value)}>
+                <option value="">{t("left.templateTagAll")}</option>
+                {browserTemplateTags.map((tag) => (
+                  <option key={tag} value={tag}>
+                    {tag}
+                  </option>
+                ))}
+              </select>
+            </label>
             <div className="template-list" aria-label={t("left.savedTemplates")} style={{ height: browserTemplateListHeight }}>
-              {templates.length === 0 ? (
+              {visibleTemplates.length === 0 ? (
                 <p className="empty-note">{t("left.noTemplates")}</p>
               ) : (
-                templates.map((template) => (
+                visibleTemplates.map((template) => (
                   <div className="template-row" key={template.id}>
                     <button
                       type="button"
@@ -274,7 +313,10 @@ export function LeftPanel({
                       onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name })}
                     >
                       <FolderOpen size={15} />
-                      <span>{template.name}</span>
+                      <span>
+                        <span>{template.name}</span>
+                        {template.tags?.[0] ? <small className="template-tag-pill">{template.tags[0]}</small> : null}
+                      </span>
                     </button>
                     <button
                       type="button"
@@ -521,7 +563,10 @@ function ScheduleBuilderDialog({
     );
     return titleLayer?.text ?? "";
   }, [previewTemplate]);
-  const previewAspectRatio = `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`;
+  const previewShellStyle = {
+    aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`,
+    "--preview-ratio": String(previewTemplate.settings.width / previewTemplate.settings.height),
+  } as CSSProperties;
 
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
@@ -803,7 +848,7 @@ function ScheduleBuilderDialog({
               <CalendarDays size={16} />
               <h2>{t("scheduleBuilder.previewSection")}</h2>
             </div>
-            <div className="schedule-preview-canvas-shell" style={{ aspectRatio: previewAspectRatio }}>
+            <div className="schedule-preview-canvas-shell generator-preview-canvas-shell schedule-generator-preview-canvas-shell" style={previewShellStyle}>
               <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={previewTitle} />
             </div>
           </section>
@@ -1014,7 +1059,13 @@ function CreativeBuilderDialog({
 
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
-      <section className="schedule-builder-dialog creative-builder-dialog" role="dialog" aria-modal="true" aria-labelledby="creative-builder-title">
+      <section
+        className="schedule-builder-dialog creative-builder-dialog"
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="creative-builder-title"
+        style={previewShellStyle}
+      >
         <div className="modal-header">
           <div className="modal-title-block">
             <h2 id="creative-builder-title">{title}</h2>
@@ -1106,13 +1157,22 @@ function CreativeBuilderDialog({
                     </select>
                   </label>
                 </div>
-                <ScheduleSlider
-                  label={t("generator.letterSpacing")}
-                  value={draft.letterSpacing}
-                  min={-8}
-                  max={24}
-                  onChange={(value) => setDraft("letterSpacing", value)}
-                />
+                <div className="field-grid two">
+                  <ScheduleSlider
+                    label={t("generator.letterSpacing")}
+                    value={draft.letterSpacing}
+                    min={-8}
+                    max={24}
+                    onChange={(value) => setDraft("letterSpacing", value)}
+                  />
+                  <ScheduleSlider
+                    label={t("generator.cornerRadius")}
+                    value={draft.labelCornerRadius}
+                    min={0}
+                    max={42}
+                    onChange={(value) => setDraft("labelCornerRadius", value)}
+                  />
+                </div>
               </div>
 
               <div className="generator-text-group generator-text-group--compact">
@@ -1169,13 +1229,6 @@ function CreativeBuilderDialog({
                   max={12}
                   onChange={(value) => setDraft("labelStrokeWidth", value)}
                 />
-                <ScheduleSlider
-                  label={t("generator.cornerRadius")}
-                  value={draft.labelCornerRadius}
-                  min={0}
-                  max={42}
-                  onChange={(value) => setDraft("labelCornerRadius", value)}
-                />
                 <CreativeAlignSelect value={draft.labelAlign} onChange={(value) => setDraft("labelAlign", value)} t={t} />
               </div>
             </div>
@@ -1223,29 +1276,28 @@ function CreativeBuilderDialog({
               <Video size={16} />
               <h2>{t("scheduleBuilder.previewSection")}</h2>
             </div>
-            <div className="schedule-preview-canvas-shell creative-preview-canvas-shell" style={previewShellStyle}>
+            <div className="schedule-preview-canvas-shell generator-preview-canvas-shell creative-preview-canvas-shell" style={previewShellStyle}>
               <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={title} />
             </div>
+            <div className="confirm-actions schedule-builder-actions creative-builder-actions">
+              <button type="button" className="secondary-button" onClick={onCancel}>
+                {t("inspector.cancel")}
+              </button>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  onSaveSettings();
+                  setSettingsSaved(true);
+                }}
+              >
+                {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
+              </button>
+              <button type="button" className="primary-button" onClick={onConfirm}>
+                {t("scheduleBuilder.generate")}
+              </button>
+            </div>
           </section>
-        </div>
-
-        <div className="confirm-actions schedule-builder-actions">
-          <button type="button" className="secondary-button" onClick={onCancel}>
-            {t("inspector.cancel")}
-          </button>
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={() => {
-              onSaveSettings();
-              setSettingsSaved(true);
-            }}
-          >
-            {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
-          </button>
-          <button type="button" className="primary-button" onClick={onConfirm}>
-            {t("scheduleBuilder.generate")}
-          </button>
         </div>
       </section>
     </div>
@@ -1292,7 +1344,11 @@ function ScheduleSlider({
   max: number;
   onChange: (value: number) => void;
 }) {
-  const handleChange = (raw: string) => onChange(Number.parseInt(raw, 10) || min);
+  const handleChange = (raw: string) => {
+    const parsed = Number.parseInt(raw, 10);
+    if (!Number.isFinite(parsed)) return;
+    onChange(Math.min(max, Math.max(min, parsed)));
+  };
   return (
     <label className="field schedule-slider-field">
       <span>{label}</span>

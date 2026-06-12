@@ -724,6 +724,7 @@ export function InspectorPanel({
                     onChange={(value) => updateNumber(selected, "cornerRadius", value, onUpdateLayer)}
                   />
                 </div>
+                <DecorationControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />
               </ControlGroup>
 
               {selected.type === "image" && (
@@ -795,6 +796,103 @@ export function InspectorPanel({
         />
       ) : null}
     </aside>
+  );
+}
+
+function DecorationControls({
+  selected,
+  onUpdateLayer,
+  t,
+}: {
+  selected: ThumbnailLayer;
+  onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
+  t: Translator;
+}) {
+  return (
+    <div className="field-stack compact-decoration-controls">
+      <label className="field">
+        <span>{t("inspector.shadowColor")}</span>
+        <input
+          type="color"
+          value={normalizeColorInput(selected.shadowColor)}
+          onChange={(event) => {
+            const shadowColor = event.currentTarget.value;
+            onUpdateLayer(selected.id, (layer) => ({ ...layer, shadowColor }));
+          }}
+        />
+      </label>
+      <div className="field-grid two compact-adjust-grid">
+        <SliderNumberInput
+          label={t("inspector.shadowOpacity")}
+          value={selected.shadowOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          onChange={(value) => updateNumber(selected, "shadowOpacity", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.shadowBlur")}
+          value={selected.shadowBlur}
+          min={0}
+          max={96}
+          step={1}
+          onChange={(value) => updateNumber(selected, "shadowBlur", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.shadowDistance")}
+          value={selected.shadowDistance}
+          min={0}
+          max={240}
+          step={1}
+          onChange={(value) => updateNumber(selected, "shadowDistance", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.shadowAngle")}
+          value={selected.shadowAngle}
+          min={-180}
+          max={180}
+          step={1}
+          suffix="deg"
+          onChange={(value) => updateNumber(selected, "shadowAngle", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.rotateX")}
+          value={selected.rotateX}
+          min={-75}
+          max={75}
+          step={1}
+          suffix="deg"
+          onChange={(value) => updateNumber(selected, "rotateX", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.rotateY")}
+          value={selected.rotateY}
+          min={-75}
+          max={75}
+          step={1}
+          suffix="deg"
+          onChange={(value) => updateNumber(selected, "rotateY", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.bevelSize")}
+          value={selected.bevelSize}
+          min={0}
+          max={48}
+          step={1}
+          onChange={(value) => updateNumber(selected, "bevelSize", value, onUpdateLayer)}
+        />
+        <SliderNumberInput
+          label={t("inspector.bevelOpacity")}
+          value={selected.bevelOpacity}
+          min={0}
+          max={1}
+          step={0.05}
+          decimals={2}
+          onChange={(value) => updateNumber(selected, "bevelOpacity", value, onUpdateLayer)}
+        />
+      </div>
+    </div>
   );
 }
 
@@ -2548,11 +2646,32 @@ function LayerColorPickerDialog({
 
 function updateNumber(
   selected: ThumbnailLayer,
-  key: "x" | "y" | "width" | "height" | "rotation" | "opacity" | "layerBlur" | "edgeBlur" | "cornerRadius",
+  key:
+    | "x"
+    | "y"
+    | "width"
+    | "height"
+    | "rotation"
+    | "opacity"
+    | "layerBlur"
+    | "edgeBlur"
+    | "cornerRadius"
+    | "shadowOpacity"
+    | "shadowBlur"
+    | "shadowDistance"
+    | "shadowAngle"
+    | "rotateX"
+    | "rotateY"
+    | "bevelSize"
+    | "bevelOpacity",
   value: number,
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"],
 ) {
   onUpdateLayer(selected.id, (layer) => ({ ...layer, [key]: value }));
+}
+
+function normalizeColorInput(value: string): string {
+  return /^#[0-9a-f]{6}$/i.test(value) ? value : "#000000";
 }
 
 function round(value: number, decimals = 0): number {
