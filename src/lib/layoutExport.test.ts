@@ -32,7 +32,7 @@ describe("layoutExport", () => {
         shadowAngle: 45,
         rotateX: 12,
         rotateY: -8,
-        bevelSize: 5,
+        bevelSize: -5,
         bevelOpacity: 0.7,
         letterSpacing: 5,
         fillOpacity: 0.8,
@@ -58,7 +58,7 @@ describe("layoutExport", () => {
     expect(html).toContain('data-shadow-color="#112233"');
     expect(html).toContain('data-shadow-opacity="0.6"');
     expect(html).toContain('data-rotate-x="12"');
-    expect(html).toContain('data-bevel-size="5"');
+    expect(html).toContain('data-bevel-size="-5"');
     expect(html).toContain('data-writing-mode="vertical"');
     expect(html).toContain('data-letter-spacing="5"');
     expect(html).toContain('data-animation-type="slide"');

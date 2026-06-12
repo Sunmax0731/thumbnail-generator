@@ -525,9 +525,10 @@ function drawLineShape(
 }
 
 function drawLayerBevel(context: CanvasRenderingContext2D, layer: ThumbnailLayer): void {
-  if (layer.bevelSize <= 0 || layer.bevelOpacity <= 0 || (layer.type === "shape" && layer.shape === "line")) return;
-  const size = clamp(layer.bevelSize, 0, 48);
+  if (layer.bevelSize === 0 || layer.bevelOpacity <= 0 || (layer.type === "shape" && layer.shape === "line")) return;
+  const size = Math.abs(clamp(layer.bevelSize, -48, 48));
   const opacity = clamp(layer.bevelOpacity, 0, 1);
+  const direction = layer.bevelSize > 0 ? 1 : -1;
   context.save();
   context.shadowColor = "transparent";
   context.shadowBlur = 0;
@@ -538,13 +539,13 @@ function drawLayerBevel(context: CanvasRenderingContext2D, layer: ThumbnailLayer
   context.lineWidth = Math.max(1, size);
 
   context.save();
-  context.translate(-size * 0.35, -size * 0.35);
+  context.translate(-size * 0.35 * direction, -size * 0.35 * direction);
   context.strokeStyle = `rgba(255, 255, 255, ${0.52 * opacity})`;
   drawLayerBevelStroke(context, layer, size);
   context.restore();
 
   context.save();
-  context.translate(size * 0.35, size * 0.35);
+  context.translate(size * 0.35 * direction, size * 0.35 * direction);
   context.strokeStyle = `rgba(0, 0, 0, ${0.42 * opacity})`;
   drawLayerBevelStroke(context, layer, size);
   context.restore();

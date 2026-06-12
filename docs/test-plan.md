@@ -131,6 +131,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-12.
 
+### Generator Actions And Adjust Collapse Follow-Up
+
+Completed on 2026-06-12 for generator modal action placement and Adjust section collapse behavior.
+
+- `npm test`: pass. 30 test files, 120 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4338/thumbnail-generator/`.
+- Browser plugin attempt: failed because `scripts/browser-client.mjs` was missing from the installed Browser plugin path; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render and primary workspace visible.
+  - Schedule portrait generator action buttons measured directly under the preview, centered to the preview pane.
+  - Standard thumbnail generator action buttons measured at the modal lower edge.
+  - Vertical thumbnail modal used the reduced portrait preview column, preview width stayed under `430px`, and modal width stayed under `1300px`.
+  - Vertical thumbnail action buttons measured at the modal lower edge.
+  - Adjust common section label changed to Common settings / 共通設定.
+  - Common settings collapsed and expanded from its heading.
+  - Text/Shape/Image-specific settings expose the same collapse behavior.
+  - Signed bevel value accepted `-12` in the Adjust number field.
+  - Shadow enable checkbox is visible; shadow parameter sliders are hidden while off and appear after enabling.
+  - WebP export downloaded successfully.
+  - Mobile viewport horizontal overflow was `0`.
+  - No relevant page errors, app console errors, or non-analytics HTTP errors were reported.
+- Evidence:
+  - `output/runtime-20260612-ui-adjust-generator/schedule-portrait.png`
+  - `output/runtime-20260612-ui-adjust-generator/standard.png`
+  - `output/runtime-20260612-ui-adjust-generator/vertical.png`
+  - `output/runtime-20260612-ui-adjust-generator/adjust.png`
+  - `output/runtime-20260612-ui-adjust-generator/mobile.png`
+
 ### UI Tags Decoration Follow-Up
 
 Completed on 2026-06-12 for generator modal polish, browser-template tags, and decoration controls.

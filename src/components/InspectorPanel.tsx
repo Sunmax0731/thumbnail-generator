@@ -618,7 +618,7 @@ export function InspectorPanel({
             </div>
 
             <div className="field-stack">
-              <ControlGroup title={t("inspector.layerControls")}>
+              <CollapsibleControlGroup title={t("inspector.layerControls")}>
                 <TextInput
                   label={t("inspector.name")}
                   value={selected.name}
@@ -725,15 +725,15 @@ export function InspectorPanel({
                   />
                 </div>
                 <DecorationControls selected={selected} onUpdateLayer={onUpdateLayer} t={t} />
-              </ControlGroup>
+              </CollapsibleControlGroup>
 
               {selected.type === "image" && (
-                <ControlGroup title={t("inspector.imageControls")}>
+                <CollapsibleControlGroup title={t("inspector.imageControls")}>
                   <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
-                </ControlGroup>
+                </CollapsibleControlGroup>
               )}
               {selected.type === "text" && (
-                <ControlGroup title={t("inspector.textControls")}>
+                <CollapsibleControlGroup title={t("inspector.textControls")}>
                   <TextControls
                     selected={selected}
                     fontOptions={fontOptions}
@@ -743,12 +743,12 @@ export function InspectorPanel({
                     onOpenColorPicker={openLayerColorPicker}
                     t={t}
                   />
-                </ControlGroup>
+                </CollapsibleControlGroup>
               )}
               {selected.type === "shape" && (
-                <ControlGroup title={t("inspector.shapeControls")}>
+                <CollapsibleControlGroup title={t("inspector.shapeControls")}>
                   <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} onOpenColorPicker={openLayerColorPicker} t={t} />
-                </ControlGroup>
+                </CollapsibleControlGroup>
               )}
             </div>
           </section>
@@ -808,54 +808,11 @@ function DecorationControls({
   onUpdateLayer: InspectorPanelProps["onUpdateLayer"];
   t: Translator;
 }) {
+  const shadowEnabled = selected.shadowOpacity > 0;
+
   return (
     <div className="field-stack compact-decoration-controls">
-      <label className="field">
-        <span>{t("inspector.shadowColor")}</span>
-        <input
-          type="color"
-          value={normalizeColorInput(selected.shadowColor)}
-          onChange={(event) => {
-            const shadowColor = event.currentTarget.value;
-            onUpdateLayer(selected.id, (layer) => ({ ...layer, shadowColor }));
-          }}
-        />
-      </label>
       <div className="field-grid two compact-adjust-grid">
-        <SliderNumberInput
-          label={t("inspector.shadowOpacity")}
-          value={selected.shadowOpacity}
-          min={0}
-          max={1}
-          step={0.05}
-          decimals={2}
-          onChange={(value) => updateNumber(selected, "shadowOpacity", value, onUpdateLayer)}
-        />
-        <SliderNumberInput
-          label={t("inspector.shadowBlur")}
-          value={selected.shadowBlur}
-          min={0}
-          max={96}
-          step={1}
-          onChange={(value) => updateNumber(selected, "shadowBlur", value, onUpdateLayer)}
-        />
-        <SliderNumberInput
-          label={t("inspector.shadowDistance")}
-          value={selected.shadowDistance}
-          min={0}
-          max={240}
-          step={1}
-          onChange={(value) => updateNumber(selected, "shadowDistance", value, onUpdateLayer)}
-        />
-        <SliderNumberInput
-          label={t("inspector.shadowAngle")}
-          value={selected.shadowAngle}
-          min={-180}
-          max={180}
-          step={1}
-          suffix="deg"
-          onChange={(value) => updateNumber(selected, "shadowAngle", value, onUpdateLayer)}
-        />
         <SliderNumberInput
           label={t("inspector.rotateX")}
           value={selected.rotateX}
@@ -877,7 +834,7 @@ function DecorationControls({
         <SliderNumberInput
           label={t("inspector.bevelSize")}
           value={selected.bevelSize}
-          min={0}
+          min={-48}
           max={48}
           step={1}
           onChange={(value) => updateNumber(selected, "bevelSize", value, onUpdateLayer)}
@@ -892,6 +849,73 @@ function DecorationControls({
           onChange={(value) => updateNumber(selected, "bevelOpacity", value, onUpdateLayer)}
         />
       </div>
+      <label className="checkbox-row inline-checkbox">
+        <input
+          type="checkbox"
+          checked={shadowEnabled}
+          onChange={(event) => {
+            const checked = event.currentTarget.checked;
+            onUpdateLayer(selected.id, (layer) => ({
+              ...layer,
+              shadowOpacity: checked ? Math.max(layer.shadowOpacity, 0.45) : 0,
+              shadowBlur: checked ? Math.max(layer.shadowBlur, 18) : layer.shadowBlur,
+              shadowDistance: checked ? Math.max(layer.shadowDistance, 18) : layer.shadowDistance,
+            }));
+          }}
+        />
+        <span>{t("inspector.shadowEnabled")}</span>
+      </label>
+      {shadowEnabled ? (
+        <>
+          <label className="field">
+            <span>{t("inspector.shadowColor")}</span>
+            <input
+              type="color"
+              value={normalizeColorInput(selected.shadowColor)}
+              onChange={(event) => {
+                const shadowColor = event.currentTarget.value;
+                onUpdateLayer(selected.id, (layer) => ({ ...layer, shadowColor }));
+              }}
+            />
+          </label>
+          <div className="field-grid two compact-adjust-grid">
+            <SliderNumberInput
+              label={t("inspector.shadowOpacity")}
+              value={selected.shadowOpacity}
+              min={0}
+              max={1}
+              step={0.05}
+              decimals={2}
+              onChange={(value) => updateNumber(selected, "shadowOpacity", value, onUpdateLayer)}
+            />
+            <SliderNumberInput
+              label={t("inspector.shadowBlur")}
+              value={selected.shadowBlur}
+              min={0}
+              max={96}
+              step={1}
+              onChange={(value) => updateNumber(selected, "shadowBlur", value, onUpdateLayer)}
+            />
+            <SliderNumberInput
+              label={t("inspector.shadowDistance")}
+              value={selected.shadowDistance}
+              min={0}
+              max={240}
+              step={1}
+              onChange={(value) => updateNumber(selected, "shadowDistance", value, onUpdateLayer)}
+            />
+            <SliderNumberInput
+              label={t("inspector.shadowAngle")}
+              value={selected.shadowAngle}
+              min={-180}
+              max={180}
+              step={1}
+              suffix="deg"
+              onChange={(value) => updateNumber(selected, "shadowAngle", value, onUpdateLayer)}
+            />
+          </div>
+        </>
+      ) : null}
     </div>
   );
 }
@@ -955,11 +979,21 @@ function ResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: n
   );
 }
 
-function ControlGroup({ title, children }: { title: string; children: ReactNode }) {
+function CollapsibleControlGroup({ title, children }: { title: string; children: ReactNode }) {
+  const [expanded, setExpanded] = useState(true);
+
   return (
     <div className="control-group">
-      <h3>{title}</h3>
-      <div className="control-group-body">{children}</div>
+      <button
+        type="button"
+        className="control-group-heading"
+        aria-expanded={expanded}
+        onClick={() => setExpanded((current) => !current)}
+      >
+        {expanded ? <ChevronDown size={15} /> : <ChevronRight size={15} />}
+        <span>{title}</span>
+      </button>
+      {expanded ? <div className="control-group-body">{children}</div> : null}
     </div>
   );
 }

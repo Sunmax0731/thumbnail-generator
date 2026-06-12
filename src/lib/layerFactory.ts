@@ -210,7 +210,7 @@ function normalizeLayerDecorationFields(
     shadowAngle: clampNumber(partial.shadowAngle, -180, 180, defaultLayerDecoration.shadowAngle),
     rotateX: clampNumber(partial.rotateX, -75, 75, defaultLayerDecoration.rotateX),
     rotateY: clampNumber(partial.rotateY, -75, 75, defaultLayerDecoration.rotateY),
-    bevelSize: clampNumber(partial.bevelSize, 0, 48, defaultLayerDecoration.bevelSize),
+    bevelSize: clampNumber(partial.bevelSize, -48, 48, defaultLayerDecoration.bevelSize),
     bevelOpacity: clampNumber(partial.bevelOpacity, 0, 1, defaultLayerDecoration.bevelOpacity),
   };
 }

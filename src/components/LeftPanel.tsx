@@ -567,10 +567,17 @@ function ScheduleBuilderDialog({
     aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`,
     "--preview-ratio": String(previewTemplate.settings.width / previewTemplate.settings.height),
   } as CSSProperties;
+  const isPortraitPreview = previewTemplate.settings.height > previewTemplate.settings.width;
 
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
-      <section className="schedule-builder-dialog" role="dialog" aria-modal="true" aria-labelledby="schedule-builder-title">
+      <section
+        className={`schedule-builder-dialog ${isPortraitPreview ? "portrait-builder-dialog" : ""}`}
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="schedule-builder-title"
+        style={previewShellStyle}
+      >
         <div className="modal-header">
           <div className="modal-title-block">
             <h2 id="schedule-builder-title">{t("scheduleBuilder.title")}</h2>
@@ -851,27 +858,26 @@ function ScheduleBuilderDialog({
             <div className="schedule-preview-canvas-shell generator-preview-canvas-shell schedule-generator-preview-canvas-shell" style={previewShellStyle}>
               <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={previewTitle} />
             </div>
+            <div className="confirm-actions schedule-builder-actions">
+              <button type="button" className="secondary-button" onClick={onCancel}>
+                {t("inspector.cancel")}
+              </button>
+              <button
+                type="button"
+                className="secondary-button"
+                onClick={() => {
+                  onSaveSettings();
+                  setSettingsSaved(true);
+                }}
+              >
+                {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
+              </button>
+              <button type="button" className="primary-button" onClick={onConfirm}>
+                {t("scheduleBuilder.generate")}
+              </button>
+            </div>
           </section>
         </div>
-
-        <div className="confirm-actions schedule-builder-actions">
-          <button type="button" className="secondary-button" onClick={onCancel}>
-            {t("inspector.cancel")}
-          </button>
-          <button
-            type="button"
-            className="secondary-button"
-            onClick={() => {
-              onSaveSettings();
-              setSettingsSaved(true);
-            }}
-          >
-            {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
-          </button>
-          <button type="button" className="primary-button" onClick={onConfirm}>
-            {t("scheduleBuilder.generate")}
-          </button>
-          </div>
       </section>
     </div>
   );
@@ -1048,6 +1054,7 @@ function CreativeBuilderDialog({
     aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`,
     "--preview-ratio": String(previewTemplate.settings.width / previewTemplate.settings.height),
   } as CSSProperties;
+  const isPortraitPreview = previewTemplate.settings.height > previewTemplate.settings.width;
   const colorTargets = [
     { key: "backgroundColor" as const, label: t("scheduleBuilder.backgroundColor"), value: draft.backgroundColor },
     { key: "surfaceColor" as const, label: t("scheduleBuilder.surfaceColor"), value: draft.surfaceColor },
@@ -1060,7 +1067,7 @@ function CreativeBuilderDialog({
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section
-        className="schedule-builder-dialog creative-builder-dialog"
+        className={`schedule-builder-dialog creative-builder-dialog ${isPortraitPreview ? "portrait-builder-dialog" : ""}`}
         role="dialog"
         aria-modal="true"
         aria-labelledby="creative-builder-title"

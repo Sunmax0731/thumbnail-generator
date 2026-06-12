@@ -22,7 +22,7 @@ describe("parseHtmlLayout", () => {
   it("reads advanced layer and text attributes", () => {
     const result = parseHtmlLayout(
       `<section>
-        <div data-layer="text" data-group-id="g1" data-group-name="Brand" data-layer-blur="2" data-edge-blur="-3" data-edge-blur-stroke="true" data-shadow-color="#112233" data-shadow-opacity="0.6" data-shadow-blur="12" data-shadow-distance="18" data-shadow-angle="45" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="5" data-bevel-opacity="0.7" data-writing-mode="vertical" data-letter-spacing="5" data-fill-opacity="0.7" data-stroke-opacity="0.4" data-animation-type="fade" data-animation-duration-ms="900" data-animation-loop="true">TIGHT</div>
+        <div data-layer="text" data-group-id="g1" data-group-name="Brand" data-layer-blur="2" data-edge-blur="-3" data-edge-blur-stroke="true" data-shadow-color="#112233" data-shadow-opacity="0.6" data-shadow-blur="12" data-shadow-distance="18" data-shadow-angle="45" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="-5" data-bevel-opacity="0.7" data-writing-mode="vertical" data-letter-spacing="5" data-fill-opacity="0.7" data-stroke-opacity="0.4" data-animation-type="fade" data-animation-duration-ms="900" data-animation-loop="true">TIGHT</div>
         <div data-layer="shape" data-shape="line" data-line-style="dotted" data-corner-radius="18" data-stroke-width="9"></div>
       </section>`,
       { baseWidth: 1280, baseHeight: 720 },
@@ -42,7 +42,7 @@ describe("parseHtmlLayout", () => {
       shadowAngle: 45,
       rotateX: 12,
       rotateY: -8,
-      bevelSize: 5,
+      bevelSize: -5,
       bevelOpacity: 0.7,
       writingMode: "vertical",
       letterSpacing: 5,

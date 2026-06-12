@@ -30,6 +30,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms Standard letter spacing increments `-1 -> 0` and retains direct `0`, Standard preview renders at `647.0625x363.96875`, Vertical preview renders at `393.75x700`, Schedule portrait renders at `382.5x680`, creative generator action rows align to preview pane width, browser-template tags appear in the filter dropdown and constrain visible rows, Adjust exposes 17 decoration inputs, WebP export succeeds, mobile horizontal overflow is `0`, and no relevant app console errors were reported. Evidence screenshots are `docs/assets/runtime-20260612-ui-tags-decoration-standard.png`, `docs/assets/runtime-20260612-ui-tags-decoration-vertical.png`, `docs/assets/runtime-20260612-ui-tags-decoration-schedule-portrait.png`, `docs/assets/runtime-20260612-ui-tags-decoration-template-filter.png`, `docs/assets/runtime-20260612-ui-tags-decoration-adjust.png`, and `docs/assets/runtime-20260612-ui-tags-decoration-mobile.png`.
 
+## 2026-06-12 Generator Actions And Adjust Collapse Follow-Up
+
+All QCDS axes remain A+.
+
+- Quality: A+. Generator action placement, portrait generator whitespace, collapsible Adjust sections, signed bevel persistence, and shadow-gated controls are implemented with unit/build coverage plus runtime evidence.
+- Cost: A+. The change remains static React/TypeScript/CSS with no backend, service, or dependency addition.
+- Delivery: A+. `npm test`, `npm run build`, and Playwright headless Chromium runtime gate passed at `http://127.0.0.1:4338/thumbnail-generator/`.
+- Satisfaction: A+. The requested Japanese UI adjustments are verified in the rendered app: schedule portrait buttons sit below the preview, standard/vertical generator buttons align to the modal lower edge, vertical modal whitespace is reduced, Adjust common/type-specific sections collapse, bevel accepts negative values, and shadow controls appear only after enabling shadow.
+
+Runtime evidence confirms nonblank render, primary UI visibility, Schedule portrait action centering below the preview, Standard and Vertical action placement at the modal lower edge, Vertical modal width under `1300px` with preview width under `430px`, Common settings label visibility, Common settings and type-specific section collapse/expand behavior, signed bevel `-12`, shadow parameters hidden while disabled and visible after enabling, WebP export, mobile horizontal overflow `0`, and no relevant app console errors. Evidence is recorded under `output/runtime-20260612-ui-adjust-generator/`.
+
 ## 2026-06-12 Creative Generator Modal Follow-Up
 
 All QCDS axes remain A+.

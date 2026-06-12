@@ -69,7 +69,7 @@ This page is the quick feature index for users and reviewers.
 - Vertical text display bounds can be resized from the preview handles or Adjust width/height controls like horizontal text.
 - Use Fit text to box to choose the largest font size that fits the text layer bounds.
 - Import browser-local WOFF2, WOFF, TTF, or OTF font files from Adjust while a text layer is selected.
-- Use Adjust decoration controls for layer shadow, pseudo-3D X/Y rotation, and bevel, and use reset controls to return selected-layer rotation to 0 degrees.
+- Use collapsible Adjust sections for Common settings and type-specific settings. Decoration controls include pseudo-3D X/Y rotation, signed bevel, and shadow parameters that appear only when shadow is enabled.
 - Controls that do not affect the current layer state are disabled, such as single-line text line height.
 
 ## Motion And OBS Preview
