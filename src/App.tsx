@@ -51,7 +51,7 @@ import {
   type CustomFont,
   writeCustomFonts,
 } from "./lib/customFonts";
-import { defaultTemplates } from "./lib/defaultTemplates";
+import { buildCreativeTemplate, type CreativeGeneratorRequest } from "./lib/creativeGenerator";
 import {
   createEditStateSnapshot,
   deleteSavedEditState,
@@ -674,25 +674,6 @@ function App() {
     setStatus("Sample creator template restored.");
   }, []);
 
-  const loadDefaultTemplate = useCallback(
-    (templateId: string) => {
-      const template = defaultTemplates.find((candidate) => candidate.id === templateId);
-      if (!template) return;
-      const nextLayers = template.createLayers();
-      setSettings(template.settings);
-      setAssets(initialAssets(import.meta.env.BASE_URL));
-      setSelectedAssetKey("sample-bg");
-      setLayers(nextLayers);
-      setSelectedIds(selectTopSelectableLayerIds(nextLayers));
-      setCsvText(layersToCsv(nextLayers));
-      setHtmlText(layersToHtml(nextLayers));
-      setTemplateName(template.name);
-      setAutoFitRevision((current) => current + 1);
-      setStatus(`Loaded default template "${template.name}".`);
-    },
-    [],
-  );
-
   const generateScheduleTemplate = useCallback(
     (request: ScheduleBuilderRequest) => {
       const schedule = buildScheduleTemplate(request, settings, language);
@@ -703,9 +684,24 @@ function App() {
       setHtmlText(layersToHtml(schedule.layers));
       setTemplateName(schedule.name);
       setAutoFitRevision((current) => current + 1);
-      setStatus(`Generated beta schedule template "${schedule.name}" with ${schedule.layers.length} layers.`);
+      setStatus(`Generated schedule template "${schedule.name}" with ${schedule.layers.length} layers and saved generator settings.`);
     },
     [language, settings],
+  );
+
+  const generateCreativeTemplate = useCallback(
+    (request: CreativeGeneratorRequest) => {
+      const template = buildCreativeTemplate(request, settings);
+      setSettings(template.settings);
+      setLayers(template.layers);
+      setSelectedIds(selectTopSelectableLayerIds(template.layers));
+      setCsvText(layersToCsv(template.layers));
+      setHtmlText(layersToHtml(template.layers));
+      setTemplateName(template.name);
+      setAutoFitRevision((current) => current + 1);
+      setStatus(`Generated ${template.name} with ${template.layers.length} layers and saved generator settings.`);
+    },
+    [settings],
   );
 
   const saveEditState = useCallback(
@@ -1809,13 +1805,12 @@ function App() {
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
           onDeleteAsset={deleteAsset}
-              defaultTemplates={defaultTemplates}
               fontOptions={fontOptions}
               language={language}
               settings={settings}
-              onLoadDefaultTemplate={loadDefaultTemplate}
               paletteColors={paletteColors}
               onGenerateScheduleTemplate={generateScheduleTemplate}
+              onGenerateCreativeTemplate={generateCreativeTemplate}
               savedColorPalettes={savedColorPalettes}
               templateName={templateName}
               templates={templates}

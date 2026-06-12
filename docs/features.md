@@ -34,10 +34,10 @@ This page is the quick feature index for users and reviewers.
 
 ## Browser Storage
 
-- Load 38 bundled default templates, with five starts each for YouTube, Shorts, Stream, and Cutout categories, eight Schedule starts, and ten animated eyecatch/waiting starts.
-- Filter bundled templates by All, YouTube, Shorts, Stream, Cutout, Schedule, or Motion, with mini preview swatches and output-size badges.
-- Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, and month-aware badge labels.
-- Resize the Default templates and Browser templates list areas from the Templates tab.
+- Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, month-aware badge labels, and reload-persistent settings.
+- Generate YouTube waiting screens, video thumbnails, and stream waiting screens from Templates. Video thumbnails support standard, vertical, and cutout variants.
+- Use Save settings in generator modals to persist settings without generating; Generate layers also saves settings before replacing the current layers.
+- Resize the Browser templates list area from the Templates tab.
 - Use Templates to save named browser-local templates.
 - Use the preview-pane Edit state section to save the current work-in-progress state without creating a named template.
 - Export, import, or delete edit-state JSON for backup and recovery.

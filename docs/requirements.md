@@ -30,9 +30,10 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Fit selected image or shape layers to the current canvas size from Layers.
 - Match multiple selected editable layer angles to the first selected editable layer.
 - Save the current edit state in browser storage, restore it after reload, and enable or disable autosave.
-- Load 38 bundled default templates, with five entries each for YouTube, Shorts, stream, and cutout use cases, eight schedule entries for yearly, monthly, weekly, and daily layouts, and ten animated eyecatch/waiting templates, without depending on localStorage.
-- Filter bundled templates by use case, show compact template previews before loading, and resize the Default templates and Browser templates list areas.
-- Provide a beta schedule generator in Templates that creates monthly or weekly editable schedule layer sets from calendar date inputs, Sunday/Monday week-start settings, weekday language, date format, uniform or per-day action counts, canvas orientation, grid style, Adjust-shared font choices, separate title/weekday/date/plan font-size sliders, color, corner radius, line-width, pre-generation preview, month-aware badge labels, and generated-layer grouping controls.
+- Provide Templates-tab generators for editable schedule layouts, YouTube waiting screens, video thumbnails, and stream waiting screens.
+- Keep the previous bundled default-template list out of the current GUI after generator flows are available, while browser-local named templates remain available for user snapshots.
+- Provide a beta schedule generator in Templates that creates monthly or weekly editable schedule layer sets from calendar date inputs, Sunday/Monday week-start settings, weekday language, date format, uniform or per-day action counts, canvas orientation, grid style, Adjust-shared font choices, separate title/weekday/date/plan font-size sliders, color, corner radius, line-width, pre-generation preview, month-aware badge labels, generated-layer grouping controls, and reload-persistent generator settings.
+- Provide image generators for YouTube waiting screens with animation metadata, video thumbnails with standard/vertical/cutout variants, and stream waiting screens with animation metadata, each with editable text, typography, color, image-slot, grouping, live preview, Generate layers, and Save settings controls.
 - Configure one or more per-layer animation sets with easings.net-style easing choices, selected-object Motion preview, easing graph, disabled direction controls when an animation type does not use movement, and a popup-style OBS preview window without editor controls or selection handles.
 - Keep the left panel focused on Templates, Layers, and Assets by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
@@ -49,7 +50,7 @@ Create a static web service for making video thumbnails for YouTube, NicoNico, T
 - Provide common presets and custom output dimensions from the preview header.
 - Confirm before applying a template that replaces the current layer state, and apply the template's canvas aspect ratio automatically.
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
-- Resize the Layers, Colors, Default templates, and Browser templates list areas while preserving core editor controls.
+- Resize the Layers, Colors, and Browser templates list areas while preserving core editor controls.
 - Delete the final remaining layer when requested, leaving the canvas with zero layer objects.
 - Delete registered/imported image assets from Assets, and remove any image layers that reference the deleted asset.
 - Disable controls that do not affect the current selected layer or selected state.

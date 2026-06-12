@@ -56,8 +56,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Right inspector task tabs expose Layers, Adjust, and Colors without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible layer list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
-- Default templates and Browser templates expose resizable list areas with no overlap or horizontal overflow.
-- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, and color settings, and generates editable monthly or weekly schedule layers with localized badge text.
+- Browser templates expose a resizable list area with no overlap or horizontal overflow.
+- The Templates tab exposes generator buttons for schedule, YouTube waiting screen, video thumbnail, and stream waiting screen, while the previous default-template list is not shown.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly or weekly schedule layers with localized badge text.
+- The image generator modals open from Templates, provide live previews, save settings without generating, restore saved settings after reload, and generate editable YouTube waiting, video thumbnail, and stream waiting layer sets.
 - CSV import updates the canvas/layer list.
 - HTML import updates the canvas/layer list.
 - Preview selection respects layer stacking order when layers overlap.
@@ -96,7 +98,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab does not duplicate image import or asset-selection controls; source changes stay in Assets before opening the modal.
 - Expanded quick add in Layers inserts text, shape, line, headline, subtitle, badge, divider, and selected-image starters.
-- All 38 bundled default templates can be loaded from Templates without unsupported parameters or layout collapse.
+- The previous bundled default-template list is not visible in Templates after generator flows are available.
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
@@ -123,7 +125,36 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 ## Current Results
 
-Latest completed on 2026-06-10.
+Latest completed on 2026-06-12.
+
+### Generator Modals And Default Template List Removal
+
+Completed on 2026-06-12 for the generator-entry rollout.
+
+- `npm test`: pass. 30 test files, 117 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4327/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render and primary workspace visible.
+  - Templates exposed four generator buttons.
+  - Previous default-template list count was `0`.
+  - Schedule generator Save settings wrote `thumbnail-generator.generatorSettings.v1.schedule`.
+  - Schedule generation rendered nonblank and produced 203 visible layer rows in Layers.
+  - Video thumbnail generator saved the `vertical` variant, generated a `1080x1920` canvas, and restored that variant after reload.
+  - Canvas drag interaction kept the generated canvas nonblank.
+  - Assets image import added a second asset row and kept the canvas nonblank.
+  - WebP export downloaded successfully.
+  - Mobile YouTube waiting modal opened and mobile horizontal overflow was `0`.
+  - No page errors, app console errors, or app HTTP errors were reported.
+  - CSV/HTML import controls remain hidden in this build; parser/import/export compatibility is covered by unit tests and internal layout text refresh checks.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260612-generator-modals-desktop.png`
+  - `docs/assets/runtime-20260612-generator-modals-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260612-generator-modals/desktop-thumbnail-1280x720-2026-06-12T00-34-28-592Z.webp`.
 
 ### Color Palette Extraction Modal (Image-based, Production Gate)
 

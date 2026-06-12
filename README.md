@@ -21,9 +21,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store named templates in `localStorage`.
-- Load 38 bundled default templates, with five starts each for YouTube, Shorts, stream, and cutout use cases, eight schedule starts, and ten animated eyecatch/waiting starts.
-- Filter bundled templates by YouTube, Shorts, stream, cutout, schedule, or motion use case, and resize the Default templates and Browser templates list areas.
-- Use the beta schedule generator from Templates to create monthly or weekly schedule layers from calendar date inputs, with pre-generation preview, per-day or uniform action counts, weekday language, date format, grid style, Adjust-tab shared font choices, separate title/weekday/date/plan size sliders, color, corner radius, line width, Sunday/Monday-start, month-aware badge labels, and layer grouping options.
+- Use the Templates tab generator buttons to create editable schedule layouts, YouTube waiting screens, video thumbnails, and stream waiting screens.
+- Generate video thumbnails as standard 16:9 videos, vertical videos, or cutout-style thumbnails from one modal.
+- Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
 - Add multiple layer animation sets from Motion, choose easings.net-style easing curves, preview the selected object and easing graph, and open a popup-style OBS preview window that loops only the current canvas without editor controls or selection handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.

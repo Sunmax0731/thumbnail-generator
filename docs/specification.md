@@ -192,7 +192,7 @@ The Layers tab also includes:
 
 The left sidebar is grouped by task in this order:
 
-- Templates: bundled default templates plus browser-local template naming, saving, loading, deletion, and independent list resizing. Applying a template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
+- Templates: generator entry buttons plus browser-local template naming, saving, loading, deletion, and independent list resizing. Applying a browser-local template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
 - Assets: local image import, imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, and asset deletion. Deleting an asset also removes image layers that reference it.
 - The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
@@ -204,7 +204,7 @@ The right inspector is grouped by task:
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
 - Motion: ordered motion sets for the selected layer, selected-object preview, easing graph, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The Layers, Colors, Default templates, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
+The Layers, Colors, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
 Controls that cannot affect the current edit target are disabled instead of accepting inert input. Examples include single-line text line height, outline or stroke colors when stroke width is `0`, image asset switching when there is only one asset, and palette application when no selected text or shape layer can receive the color.
 
@@ -225,26 +225,11 @@ Layers includes collapsible quick-add controls for:
 
 Each quick add inserts an editable layer, selects it, and keeps the canvas state immediately exportable.
 
-## Default Templates
+## Generators
 
-Bundled default templates are static browser assets, not localStorage records. Loading one first shows a localized confirmation dialog, then replaces the current output settings, layer list, generated CSV, generated HTML, and template name draft. The template's output aspect ratio is applied automatically, and the preview zoom auto-fits so portrait or square starts are not clipped in the visible preview area. Browser-local templates use the same confirmation style when applied or deleted. The current shipped set contains 38 practical layouts built only from supported image, text, shape, and line layers:
+The Templates tab exposes four generator entry buttons: schedule, YouTube waiting screen, video thumbnail, and stream waiting screen. The previous bundled default-template catalog is no longer shown in the current GUI after these generators are available. Browser-local templates remain separate named snapshots saved in localStorage, and loading or deleting one uses the existing confirmation dialog pattern.
 
-- YouTube: Product Review, Tutorial Steps, Versus Comparison, Podcast Guest, Before After Reveal.
-- Shorts: Shorts Quote, Vertical Tip, Reaction Clip, Daily Vlog, Fitness Challenge.
-- Stream: Creator Live, Breaking News, Gaming Highlight, Event Countdown, Music Premiere.
-- Cutout: Minimal Launch, Profile Cutout, Product Cutout, Food Cutout, Fashion Cutout.
-- Schedule: Yearly Schedule Landscape, Yearly Schedule Portrait, Monthly Schedule Landscape, Monthly Schedule Portrait, Weekly Schedule Landscape, Weekly Schedule Portrait, Daily Schedule Landscape, Daily Schedule Portrait.
-- Motion: Animated Eyecatch Neon Pulse, Animated Eyecatch Pop Title, Animated Eyecatch News Flash, Animated Eyecatch Countdown, Animated Eyecatch Product Reveal, Animated Waiting Stream Start, Animated Waiting Chat Lobby, Animated Waiting Countdown, Animated Waiting Calm Screen, Animated Waiting Game Room.
-
-Each bundled template also carries browser-rendered catalog metadata:
-
-- Category: `youtube`, `shorts`, `stream`, `cutout`, `schedule`, or `motion`.
-- Preview colors: three representative swatches used by the compact template preview.
-- Output size badge: shown in the template row so users can distinguish 16:9, square, and portrait starts before loading.
-
-The left panel no longer shows a guided start strip. Template filters remain the primary way to narrow bundled starts by `All`, `YouTube`, `Shorts`, `Stream`, `Cutout`, `Schedule`, and `Motion`.
-
-The Templates tab also exposes a beta schedule generator. The generator opens in a modal and accepts:
+The beta schedule generator opens in a modal and accepts:
 
 - Schedule type: monthly or weekly.
 - Canvas orientation: landscape `1280x720`, portrait `1080x1920`, or the current canvas size.
@@ -252,8 +237,17 @@ The Templates tab also exposes a beta schedule generator. The generator opens in
 - Style inputs: title, the same font family choices exposed by Adjust, font weight, separate title/weekday/date/plan font-size sliders, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
 - Schedule density inputs: one uniform action count for every day, or individual counts for all seven days in weekly schedules.
 - Output behavior inputs: whether the generated layers should share group metadata.
+- Persistence inputs: Generate layers saves the generator settings before replacing layers, and Save settings stores the settings without generating.
 
 The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+
+The image generators use the same modal tone, layout, color picker, font choices, live preview, Generate layers action, and Save settings action:
+
+- YouTube waiting screen: creates a 1920x1080 animated waiting screen with title, subtitle, label, accent shapes, optional sample image atmosphere, and looped animation metadata for Motion/OBS preview.
+- Video thumbnail: creates an editable thumbnail with three variants: standard 1280x720 video, vertical 1080x1920 video, and 1280x720 cutout-style thumbnail.
+- Stream waiting screen: creates a 1920x1080 animated livestream waiting screen with title, subtitle, label, accent shapes, optional sample image atmosphere, and looped animation metadata.
+
+Generator settings are stored in localStorage under `thumbnail-generator.generatorSettings.v1.*` keys. The saved settings are separate from edit state and browser-local named templates.
 
 ## OBS Preview
 

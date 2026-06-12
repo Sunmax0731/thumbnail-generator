@@ -1,6 +1,6 @@
 # QCDS Evaluation
 
-Completed on 2026-06-10.
+Completed on 2026-06-12.
 
 ## Scores
 
@@ -18,6 +18,17 @@ Cost is A+ because the app remains static, browser-only, GitHub Pages compatible
 Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, docs can be packaged with the repo workflow, and the pushed branch's GitHub Pages workflow passed.
 
 Satisfaction is A+ because this pass expands the requested beta schedule generator with Adjust-shared font choices, separate sliders for title, weekday, date, and plan text sizes, slider controls for schedule numeric values, a monthly badge that shows `JUNE` or `6月` according to weekday language, and a wider four-column modal that keeps the preview beside the settings. Prior schedule work remains in place: calendar-style date inputs, pre-generation preview, per-day or uniform action counts, weekday language, day-only or month/day date format, and optional generated-layer grouping. Prior cleanup also remains in place: Output buttons and Edit state action buttons stay horizontal by section, template application confirmation is localized, applying a portrait template auto-fits the preview zoom so the canvas is not clipped, browser-template deletion uses the same confirmation modal pattern as other destructive actions, saved palettes and registered single colors can be reordered by drag-and-drop, language moved to the upper-right window controls, the adjacent theme selector supports System, Light, and Dark, registered single-color Fill buttons show the word `Fill`, legacy registered color names hide the `Fill`/`Stroke` prefix before HEX values, saved palette rows omit `Color 1`-style labels, Adjust groups common layer controls above Text, Shape, or Image-specific controls, Adjust Fill/Stroke opens a draggable popup alpha-capable single-color picker without a color wheel, redundant opacity controls are gone, the preview frame no longer stretches around off-canvas content, clicking outside the output frame clears selection, Image Lab is opened from imported asset rows without duplicated import controls, OBS preview opens a popup-style canvas-only document, and template lists are resizable. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, and real-device checks.
+
+## 2026-06-12 Generator Update
+
+All QCDS axes remain A+.
+
+- Quality: A+. Templates now exposes focused generators for schedule layouts, YouTube waiting screens, video thumbnails, and stream waiting screens, while the previous bundled default-template list is removed from the current GUI. Generator settings persist separately from layers and named browser templates.
+- Cost: A+. The implementation remains static, browser-only, and GitHub Pages compatible with no backend or hosted storage dependency.
+- Delivery: A+. `npm test`, `npm run build`, and a Playwright Chromium runtime gate passed, and evidence screenshots plus export output are recorded.
+- Satisfaction: A+. The requested image generation entry points are available as modal workflows matching the schedule generator tone. Video thumbnails support standard, vertical, and cutout variants, and both Generate layers and Save settings persist settings across reload.
+
+Runtime evidence confirms four generator buttons, no default-template list, schedule settings persistence, video variant persistence after reload, nonblank generated canvases, asset import, canvas drag, WebP export, mobile modal rendering, and mobile horizontal overflow `0`.
 
 ## Codex Work Dashboard Re-Evaluation
 

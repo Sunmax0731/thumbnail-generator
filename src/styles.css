@@ -686,6 +686,59 @@ button:disabled {
   line-height: 1.35;
 }
 
+.generator-entry-grid {
+  display: grid;
+  gap: 8px;
+}
+
+.generator-entry-button {
+  display: grid;
+  grid-template-columns: 30px minmax(0, 1fr);
+  align-items: center;
+  gap: 9px;
+  min-height: 58px;
+  padding: 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
+  color: var(--text);
+  text-align: left;
+}
+
+.generator-entry-button:hover {
+  border-color: var(--accent);
+  background: rgba(16, 182, 215, 0.08);
+}
+
+.generator-entry-button svg {
+  justify-self: center;
+  color: var(--accent-strong);
+}
+
+.generator-entry-button span {
+  display: grid;
+  min-width: 0;
+  gap: 2px;
+}
+
+.generator-entry-button strong,
+.generator-entry-button small {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.generator-entry-button strong {
+  font-size: 12px;
+  font-weight: 900;
+}
+
+.generator-entry-button small {
+  color: var(--muted);
+  font-size: 10px;
+  font-weight: 750;
+}
+
 .guided-steps {
   display: grid;
   grid-template-columns: repeat(5, minmax(0, 1fr));
@@ -2688,7 +2741,8 @@ button:disabled {
 
 .schedule-builder-actions {
   justify-self: end;
-  width: min(320px, 100%);
+  grid-template-columns: 1fr 1fr 1fr;
+  width: min(500px, 100%);
 }
 
 .schedule-builder-actions button {

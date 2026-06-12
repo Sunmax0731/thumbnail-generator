@@ -6,14 +6,23 @@ import {
   ImagePlus,
   Layers,
   LayoutTemplate,
+  Radio,
   Save,
   Scissors,
+  Video,
   Trash2,
+  Youtube,
 } from "lucide-react";
 import { LayerPanel, type LayerPanelProps } from "./LayerPanel";
-import type { DefaultTemplateDefinition } from "../lib/defaultTemplates";
+import {
+  buildCreativeTemplate,
+  createDefaultCreativeDraft,
+  type CreativeGeneratorKind,
+  type CreativeGeneratorRequest,
+} from "../lib/creativeGenerator";
 import type { FontOption } from "../lib/fonts";
 import type { Language, Translator } from "../lib/i18n";
+import { readGeneratorSettings, writeGeneratorSettings } from "../lib/generatorSettings";
 import {
   addDays,
   buildScheduleTemplate,
@@ -25,7 +34,6 @@ import type { ImageAsset, OutputSettings, TextLayer } from "../lib/types";
 import { renderThumbnailToCanvas } from "../lib/renderCanvas";
 
 type LeftPanelSection = "templates" | "layers" | "assets";
-type TemplateFilter = "all" | DefaultTemplateDefinition["category"];
 export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
@@ -34,7 +42,6 @@ interface LeftPanelProps {
   layerPanelProps: Omit<LayerPanelProps, "t">;
   templateName: string;
   templates: SavedTemplate[];
-  defaultTemplates: DefaultTemplateDefinition[];
   fontOptions: FontOption[];
   settings: OutputSettings;
   language: Language;
@@ -44,8 +51,8 @@ interface LeftPanelProps {
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
   onDeleteAsset: (key: string) => void;
-  onLoadDefaultTemplate: (id: string) => void;
   onGenerateScheduleTemplate: (request: ScheduleBuilderRequest) => void;
+  onGenerateCreativeTemplate: (request: CreativeGeneratorRequest) => void;
   onTemplateNameChange: (value: string) => void;
   onSaveTemplate: () => void;
   onLoadTemplate: (id: string) => void;
@@ -60,7 +67,6 @@ export function LeftPanel({
   layerPanelProps,
   templateName,
   templates,
-  defaultTemplates,
   fontOptions,
   settings,
   language,
@@ -70,8 +76,8 @@ export function LeftPanel({
   onSelectAsset,
   onAddImageAssetLayer,
   onDeleteAsset,
-  onLoadDefaultTemplate,
   onGenerateScheduleTemplate,
+  onGenerateCreativeTemplate,
   onTemplateNameChange,
   onSaveTemplate,
   onLoadTemplate,
@@ -80,20 +86,27 @@ export function LeftPanel({
   t,
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("templates");
-  const [templateFilter, setTemplateFilter] = useState<TemplateFilter>("all");
-  const [defaultTemplateListHeight, setDefaultTemplateListHeight] = useState(260);
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
-  const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string; kind: "default" | "browser" } | null>(null);
+  const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const [isScheduleBuilderOpen, setIsScheduleBuilderOpen] = useState(false);
-  const [scheduleDraft, setScheduleDraft] = useState<ScheduleBuilderRequest>(() => createDefaultScheduleDraft());
-  const filteredDefaultTemplates = useMemo(
-    () =>
-      templateFilter === "all"
-        ? defaultTemplates
-        : defaultTemplates.filter((template) => template.category === templateFilter),
-    [defaultTemplates, templateFilter],
+  const [activeCreativeBuilder, setActiveCreativeBuilder] = useState<CreativeGeneratorKind | null>(null);
+  const [scheduleDraft, setScheduleDraft] = useState<ScheduleBuilderRequest>(() =>
+    readGeneratorSettings("schedule", createDefaultScheduleDraft()),
   );
+  const [creativeDrafts, setCreativeDrafts] = useState<Record<CreativeGeneratorKind, CreativeGeneratorRequest>>(() => ({
+    "youtube-waiting": readGeneratorSettings("creative.youtube-waiting", createDefaultCreativeDraft("youtube-waiting")),
+    "video-thumbnail": readGeneratorSettings("creative.video-thumbnail", createDefaultCreativeDraft("video-thumbnail")),
+    "stream-waiting": readGeneratorSettings("creative.stream-waiting", createDefaultCreativeDraft("stream-waiting")),
+  }));
+
+  const updateCreativeDraft = (kind: CreativeGeneratorKind, draft: CreativeGeneratorRequest) => {
+    setCreativeDrafts((current) => ({ ...current, [kind]: draft }));
+  };
+
+  const saveScheduleDraft = () => writeGeneratorSettings("schedule", scheduleDraft);
+  const saveCreativeDraft = (kind: CreativeGeneratorKind, draft = creativeDrafts[kind]) =>
+    writeGeneratorSettings(`creative.${kind}`, draft);
 
   return (
     <aside className="side-panel left-panel" aria-label={t("left.aria")}>
@@ -193,55 +206,42 @@ export function LeftPanel({
 
       {activeSection === "templates" ? (
         <>
-          <section className="panel-section default-template-section">
+          <section className="panel-section generator-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
-              <h2>{t("left.defaultTemplates")}</h2>
-              <span className="section-count">{filteredDefaultTemplates.length}</span>
+              <h2>{t("generator.sectionTitle")}</h2>
+              <span className="section-count">4</span>
             </div>
-            <div className="schedule-builder-entry">
-              <button type="button" className="secondary-button icon-text wide-button" onClick={() => setIsScheduleBuilderOpen(true)}>
-                <CalendarDays size={16} /> {t("scheduleBuilder.open")}
+            <div className="generator-entry-grid">
+              <button type="button" className="generator-entry-button" onClick={() => setIsScheduleBuilderOpen(true)}>
+                <CalendarDays size={17} />
+                <span>
+                  <strong>{t("scheduleBuilder.open")}</strong>
+                  <small>{t("scheduleBuilder.entryCopy")}</small>
+                </span>
               </button>
-              <p>{t("scheduleBuilder.entryCopy")}</p>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("youtube-waiting")}>
+                <Youtube size={17} />
+                <span>
+                  <strong>{t("generator.youtubeWaiting.open")}</strong>
+                  <small>{t("generator.youtubeWaiting.copy")}</small>
+                </span>
+              </button>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("video-thumbnail")}>
+                <Video size={17} />
+                <span>
+                  <strong>{t("generator.videoThumbnail.open")}</strong>
+                  <small>{t("generator.videoThumbnail.copy")}</small>
+                </span>
+              </button>
+              <button type="button" className="generator-entry-button" onClick={() => setActiveCreativeBuilder("stream-waiting")}>
+                <Radio size={17} />
+                <span>
+                  <strong>{t("generator.streamWaiting.open")}</strong>
+                  <small>{t("generator.streamWaiting.copy")}</small>
+                </span>
+              </button>
             </div>
-            <div className="template-filter-tabs" role="tablist" aria-label={t("left.templateFilters")}>
-              {templateFilterOptions.map((option) => (
-                <button
-                  type="button"
-                  key={option.id}
-                  className={templateFilter === option.id ? "selected" : ""}
-                  onClick={() => setTemplateFilter(option.id)}
-                >
-                  {t(option.labelKey)}
-                </button>
-              ))}
-            </div>
-            <div className="default-template-list" aria-label={t("left.defaultTemplates")} style={{ height: defaultTemplateListHeight }}>
-              {filteredDefaultTemplates.map((template) => (
-                <button
-                  type="button"
-                  className="template-preset-row"
-                  key={template.id}
-                  onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name, kind: "default" })}
-                >
-                  <span className="template-mini-preview" aria-hidden="true">
-                    {template.previewColors.map((color) => (
-                      <span key={color} style={{ background: color }} />
-                    ))}
-                  </span>
-                  <span className="template-copy">
-                    <strong>{template.name}</strong>
-                    <small>{template.description}</small>
-                  </span>
-                  <em>{template.settings.width}x{template.settings.height}</em>
-                </button>
-              ))}
-            </div>
-            <TemplateResizeHandle
-              label={t("left.resizeDefaultTemplates")}
-              onResize={(delta) => setDefaultTemplateListHeight((height) => clampTemplateListHeight(height + delta))}
-            />
           </section>
 
           <section className="panel-section template-section">
@@ -270,7 +270,7 @@ export function LeftPanel({
                     <button
                       type="button"
                       className="template-load"
-                      onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name, kind: "browser" })}
+                      onClick={() => setTemplateApplyCandidate({ id: template.id, name: template.name })}
                     >
                       <FolderOpen size={15} />
                       <span>{template.name}</span>
@@ -304,8 +304,7 @@ export function LeftPanel({
           confirmClassName="primary-button"
           onCancel={() => setTemplateApplyCandidate(null)}
           onConfirm={() => {
-            if (templateApplyCandidate.kind === "default") onLoadDefaultTemplate(templateApplyCandidate.id);
-            else onLoadTemplate(templateApplyCandidate.id);
+            onLoadTemplate(templateApplyCandidate.id);
             setTemplateApplyCandidate(null);
           }}
           t={t}
@@ -334,10 +333,30 @@ export function LeftPanel({
           paletteColors={paletteColors}
           savedColorPalettes={savedColorPalettes}
           onDraftChange={setScheduleDraft}
+          onSaveSettings={saveScheduleDraft}
           onCancel={() => setIsScheduleBuilderOpen(false)}
           onConfirm={() => {
+            saveScheduleDraft();
             onGenerateScheduleTemplate(scheduleDraft);
             setIsScheduleBuilderOpen(false);
+          }}
+          t={t}
+        />
+      ) : null}
+      {activeCreativeBuilder ? (
+        <CreativeBuilderDialog
+          draft={creativeDrafts[activeCreativeBuilder]}
+          fontOptions={fontOptions}
+          settings={settings}
+          paletteColors={paletteColors}
+          savedColorPalettes={savedColorPalettes}
+          onDraftChange={(draft) => updateCreativeDraft(activeCreativeBuilder, draft)}
+          onSaveSettings={() => saveCreativeDraft(activeCreativeBuilder)}
+          onCancel={() => setActiveCreativeBuilder(null)}
+          onConfirm={() => {
+            saveCreativeDraft(activeCreativeBuilder);
+            onGenerateCreativeTemplate(creativeDrafts[activeCreativeBuilder]);
+            setActiveCreativeBuilder(null);
           }}
           t={t}
         />
@@ -345,16 +364,6 @@ export function LeftPanel({
     </aside>
   );
 }
-
-const templateFilterOptions: { id: TemplateFilter; labelKey: Parameters<Translator>[0] }[] = [
-  { id: "all", labelKey: "left.filter.all" },
-  { id: "youtube", labelKey: "left.filter.youtube" },
-  { id: "shorts", labelKey: "left.filter.shorts" },
-  { id: "stream", labelKey: "left.filter.stream" },
-  { id: "cutout", labelKey: "left.filter.cutout" },
-  { id: "schedule", labelKey: "left.filter.schedule" },
-  { id: "motion", labelKey: "left.filter.motion" },
-];
 
 function TemplateResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: number) => void }) {
   return (
@@ -442,6 +451,7 @@ function ScheduleBuilderDialog({
   paletteColors,
   savedColorPalettes,
   onDraftChange,
+  onSaveSettings,
   onCancel,
   onConfirm,
   t,
@@ -453,14 +463,20 @@ function ScheduleBuilderDialog({
   paletteColors: PaletteColor[];
   savedColorPalettes: SavedColorPalette[];
   onDraftChange: (draft: ScheduleBuilderRequest) => void;
+  onSaveSettings: () => void;
   onCancel: () => void;
   onConfirm: () => void;
   t: Translator;
 }) {
   type ScheduleColorTarget = "backgroundColor" | "surfaceColor" | "accentColor" | "textColor";
   const [activeColorTarget, setActiveColorTarget] = useState<ScheduleColorTarget | null>(null);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+  const updateDraft = (next: ScheduleBuilderRequest) => {
+    onDraftChange(next);
+    setSettingsSaved(false);
+  };
   const setDraft = <Key extends keyof ScheduleBuilderRequest>(key: Key, value: ScheduleBuilderRequest[Key]) => {
-    onDraftChange({ ...draft, [key]: value });
+    updateDraft({ ...draft, [key]: value });
   };
   const isMonthSchedule = draft.kind === "month";
   const isWeekSchedule = draft.kind === "week";
@@ -476,17 +492,17 @@ function ScheduleBuilderDialog({
 
   const updateMonthValue = (value: string) => {
     const [year, month] = value.split("-").map((part) => Number.parseInt(part, 10));
-    if (Number.isFinite(year) && Number.isFinite(month)) onDraftChange({ ...draft, year, month });
+    if (Number.isFinite(year) && Number.isFinite(month)) updateDraft({ ...draft, year, month });
   };
   const updateDateValue = (value: string) => {
     const [year, month, day] = value.split("-").map((part) => Number.parseInt(part, 10));
-    if (Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)) onDraftChange({ ...draft, year, month, day });
+    if (Number.isFinite(year) && Number.isFinite(month) && Number.isFinite(day)) updateDraft({ ...draft, year, month, day });
   };
   const updateDailyActionCount = (index: number, value: string) => {
     const nextCounts = normalizeDailyCounts(draft).map((count, countIndex) =>
       countIndex === index ? Number.parseInt(value, 10) || 0 : count,
     );
-    onDraftChange({ ...draft, dailyActionCounts: nextCounts });
+    updateDraft({ ...draft, dailyActionCounts: nextCounts });
   };
   const previewTemplate = useMemo(() => buildScheduleTemplate(draft, settings, language), [draft, language, settings]);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -796,6 +812,16 @@ function ScheduleBuilderDialog({
           <button type="button" className="secondary-button" onClick={onCancel}>
             {t("inspector.cancel")}
           </button>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => {
+              onSaveSettings();
+              setSettingsSaved(true);
+            }}
+          >
+            {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
+          </button>
           <button type="button" className="primary-button" onClick={onConfirm}>
             {t("scheduleBuilder.generate")}
           </button>
@@ -922,6 +948,240 @@ function ScheduleColorPickerModal({
     </section>
     </div>
   );
+}
+
+function CreativeBuilderDialog({
+  draft,
+  fontOptions,
+  settings,
+  paletteColors,
+  savedColorPalettes,
+  onDraftChange,
+  onSaveSettings,
+  onCancel,
+  onConfirm,
+  t,
+}: {
+  draft: CreativeGeneratorRequest;
+  fontOptions: FontOption[];
+  settings: OutputSettings;
+  paletteColors: PaletteColor[];
+  savedColorPalettes: SavedColorPalette[];
+  onDraftChange: (draft: CreativeGeneratorRequest) => void;
+  onSaveSettings: () => void;
+  onCancel: () => void;
+  onConfirm: () => void;
+  t: Translator;
+}) {
+  type CreativeColorTarget = "backgroundColor" | "surfaceColor" | "accentColor" | "secondaryColor" | "textColor";
+  const [activeColorTarget, setActiveColorTarget] = useState<CreativeColorTarget | null>(null);
+  const [settingsSaved, setSettingsSaved] = useState(false);
+  const previewTemplate = useMemo(() => buildCreativeTemplate(draft, settings), [draft, settings]);
+  const previewCanvasRef = useRef<HTMLCanvasElement>(null);
+
+  const setDraft = <Key extends keyof CreativeGeneratorRequest>(key: Key, value: CreativeGeneratorRequest[Key]) => {
+    onDraftChange({ ...draft, [key]: value });
+    setSettingsSaved(false);
+  };
+
+  useEffect(() => {
+    const canvas = previewCanvasRef.current;
+    if (!canvas) return;
+    renderThumbnailToCanvas(canvas, previewTemplate.layers, [], previewTemplate.settings, { drawSelection: false }).catch(() => {});
+  }, [previewTemplate]);
+
+  const title = getCreativeDialogTitle(draft.kind, t);
+  const colorTargets = [
+    { key: "backgroundColor" as const, label: t("scheduleBuilder.backgroundColor"), value: draft.backgroundColor },
+    { key: "surfaceColor" as const, label: t("scheduleBuilder.surfaceColor"), value: draft.surfaceColor },
+    { key: "accentColor" as const, label: t("scheduleBuilder.accentColor"), value: draft.accentColor },
+    { key: "secondaryColor" as const, label: t("generator.secondaryColor"), value: draft.secondaryColor },
+    { key: "textColor" as const, label: t("scheduleBuilder.textColor"), value: draft.textColor },
+  ];
+  const activeTargetMeta = activeColorTarget ? colorTargets.find((target) => target.key === activeColorTarget) : null;
+
+  return (
+    <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <section className="schedule-builder-dialog creative-builder-dialog" role="dialog" aria-modal="true" aria-labelledby="creative-builder-title">
+        <div className="modal-header">
+          <div className="modal-title-block">
+            <h2 id="creative-builder-title">{title}</h2>
+            <p>{t("generator.betaNotice")}</p>
+          </div>
+        </div>
+
+        <div className="schedule-builder-grid creative-builder-grid">
+          <section className="panel-section">
+            <div className="section-heading">
+              <LayoutTemplate size={16} />
+              <h2>{t("generator.contentSection")}</h2>
+            </div>
+            {draft.kind === "video-thumbnail" ? (
+              <label className="field">
+                <span>{t("generator.videoVariant")}</span>
+                <select value={draft.variant} onChange={(event) => setDraft("variant", event.currentTarget.value as CreativeGeneratorRequest["variant"])}>
+                  <option value="standard">{t("generator.videoVariant.standard")}</option>
+                  <option value="vertical">{t("generator.videoVariant.vertical")}</option>
+                  <option value="cutout">{t("generator.videoVariant.cutout")}</option>
+                </select>
+              </label>
+            ) : null}
+            <label className="field">
+              <span>{t("scheduleBuilder.titleLabel")}</span>
+              <input value={draft.title} onChange={(event) => setDraft("title", event.currentTarget.value)} />
+            </label>
+            <label className="field">
+              <span>{t("generator.subtitle")}</span>
+              <input value={draft.subtitle} onChange={(event) => setDraft("subtitle", event.currentTarget.value)} />
+            </label>
+            <label className="field">
+              <span>{t("generator.label")}</span>
+              <input value={draft.label} onChange={(event) => setDraft("label", event.currentTarget.value)} />
+            </label>
+            <label className="field">
+              <span>{t("generator.tone")}</span>
+              <select value={draft.tone} onChange={(event) => setDraft("tone", event.currentTarget.value as CreativeGeneratorRequest["tone"])}>
+                <option value="bold">{t("generator.tone.bold")}</option>
+                <option value="clean">{t("generator.tone.clean")}</option>
+                <option value="neon">{t("generator.tone.neon")}</option>
+              </select>
+            </label>
+            <label className="field checkbox-field">
+              <input type="checkbox" checked={draft.includeImageSlot} onChange={(event) => setDraft("includeImageSlot", event.currentTarget.checked)} />
+              <span>{t("generator.includeImageSlot")}</span>
+            </label>
+            <label className="field checkbox-field">
+              <input type="checkbox" checked={draft.groupLayers} onChange={(event) => setDraft("groupLayers", event.currentTarget.checked)} />
+              <span>{t("scheduleBuilder.groupLayers")}</span>
+            </label>
+            <label className="field checkbox-field">
+              <input type="checkbox" checked={draft.animated} onChange={(event) => setDraft("animated", event.currentTarget.checked)} />
+              <span>{t("generator.animated")}</span>
+            </label>
+          </section>
+
+          <section className="panel-section">
+            <div className="section-heading">
+              <LayoutTemplate size={16} />
+              <h2>{t("scheduleBuilder.styleSection")}</h2>
+            </div>
+            <div className="field-grid schedule-font-row">
+              <label className="field schedule-font-family-field">
+                <span>{t("scheduleBuilder.fontFamily")}</span>
+                <select value={draft.fontFamily} onChange={(event) => setDraft("fontFamily", event.currentTarget.value)}>
+                  {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
+                    <option value={draft.fontFamily}>{draft.fontFamily}</option>
+                  ) : null}
+                  {fontOptions.map((option) => (
+                    <option key={option.value} value={option.value}>
+                      {option.label}
+                    </option>
+                  ))}
+                </select>
+              </label>
+              <label className="field schedule-font-weight-field">
+                <span>{t("scheduleBuilder.fontWeight")}</span>
+                <select value={draft.fontWeight} onChange={(event) => setDraft("fontWeight", event.currentTarget.value)}>
+                  <option value="600">600</option>
+                  <option value="700">700</option>
+                  <option value="800">800</option>
+                  <option value="900">900</option>
+                </select>
+              </label>
+            </div>
+            <div className="field-grid two">
+              <ScheduleSlider
+                label={t("scheduleBuilder.titleFontSize")}
+                value={draft.titleFontSize}
+                min={24}
+                max={180}
+                onChange={(value) => setDraft("titleFontSize", value)}
+              />
+              <ScheduleSlider
+                label={t("scheduleBuilder.eventFontSize")}
+                value={draft.subtitleFontSize}
+                min={12}
+                max={96}
+                onChange={(value) => setDraft("subtitleFontSize", value)}
+              />
+            </div>
+          </section>
+
+          <section className="panel-section schedule-color-section">
+            <div className="section-heading">
+              <LayoutTemplate size={16} />
+              <h2>{t("scheduleBuilder.colorSection")}</h2>
+            </div>
+            <div className="schedule-color-target-grid">
+              {colorTargets.map((target) => (
+                <button
+                  className={`schedule-color-target-button ${activeColorTarget === target.key ? "selected" : ""}`}
+                  type="button"
+                  key={target.key}
+                  onClick={() => setActiveColorTarget(target.key)}
+                >
+                  <span>{target.label}</span>
+                  <div className="schedule-color-target-button-row">
+                    <span className="schedule-color-preview" style={{ background: normalizeColor(target.value) ?? target.value }} aria-hidden="true" />
+                  </div>
+                </button>
+              ))}
+            </div>
+            {activeTargetMeta ? (
+              <ScheduleColorPickerModal
+                targetLabel={activeTargetMeta.label}
+                value={activeTargetMeta.value}
+                paletteColors={paletteColors}
+                savedColorPalettes={savedColorPalettes}
+                onApply={(value) => {
+                  if (!activeColorTarget) return;
+                  setDraft(activeColorTarget, value);
+                  setActiveColorTarget(null);
+                }}
+                onClose={() => setActiveColorTarget(null)}
+                t={t}
+              />
+            ) : null}
+          </section>
+
+          <section className="panel-section schedule-preview-section">
+            <div className="section-heading">
+              <Video size={16} />
+              <h2>{t("scheduleBuilder.previewSection")}</h2>
+            </div>
+            <div className="schedule-preview-canvas-shell" style={{ aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}` }}>
+              <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={title} />
+            </div>
+          </section>
+        </div>
+
+        <div className="confirm-actions schedule-builder-actions">
+          <button type="button" className="secondary-button" onClick={onCancel}>
+            {t("inspector.cancel")}
+          </button>
+          <button
+            type="button"
+            className="secondary-button"
+            onClick={() => {
+              onSaveSettings();
+              setSettingsSaved(true);
+            }}
+          >
+            {settingsSaved ? t("generator.settingsSaved") : t("generator.saveSettings")}
+          </button>
+          <button type="button" className="primary-button" onClick={onConfirm}>
+            {t("scheduleBuilder.generate")}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function getCreativeDialogTitle(kind: CreativeGeneratorKind, t: Translator): string {
+  if (kind === "youtube-waiting") return t("generator.youtubeWaiting.title");
+  if (kind === "stream-waiting") return t("generator.streamWaiting.title");
+  return t("generator.videoThumbnail.title");
 }
 
 function ScheduleSlider({
