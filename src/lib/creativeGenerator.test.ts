@@ -47,6 +47,22 @@ describe("creativeGenerator", () => {
     expect(labelBadge).toMatchObject({ type: "shape", cornerRadius: 30 });
   });
 
+  it("applies tone changes to standard and vertical thumbnail visuals", () => {
+    const bold = buildCreativeTemplate({ ...createDefaultCreativeDraft("standard-thumbnail"), tone: "bold" }, defaultOutputSettings);
+    const neon = buildCreativeTemplate({ ...createDefaultCreativeDraft("standard-thumbnail"), tone: "neon" }, defaultOutputSettings);
+    const cleanVertical = buildCreativeTemplate({ ...createDefaultCreativeDraft("vertical-thumbnail"), tone: "clean" }, defaultOutputSettings);
+
+    const boldImage = bold.layers.find((layer) => layer.type === "image" && layer.name === "Video background image");
+    const neonImage = neon.layers.find((layer) => layer.type === "image" && layer.name === "Video background image");
+    const cleanTitlePlate = cleanVertical.layers.find((layer) => layer.type === "shape" && layer.name === "Title plate");
+    const boldTitlePlate = bold.layers.find((layer) => layer.type === "shape" && layer.name === "Title plate");
+
+    expect(boldImage).toMatchObject({ type: "image", effects: { grayscale: 0.18, brightness: 72, contrast: 122 } });
+    expect(neonImage).toMatchObject({ type: "image", effects: { grayscale: 0.42, brightness: 68, contrast: 150 } });
+    expect(cleanTitlePlate).toMatchObject({ type: "shape", opacity: 0.98 });
+    expect(boldTitlePlate).toMatchObject({ type: "shape", opacity: 0.9 });
+  });
+
   it("can generate ungrouped stream waiting layers", () => {
     const result = buildCreativeTemplate(
       { ...createDefaultCreativeDraft("stream-waiting"), groupLayers: false, animated: false },

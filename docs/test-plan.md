@@ -127,6 +127,42 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-12.
 
+### Creative Generator Modal Compact Preview Follow-Up
+
+Completed on 2026-06-12 for the standard thumbnail, vertical thumbnail, and stream waiting generator modal follow-up.
+
+- `npm test`: pass. 30 test files, 119 tests.
+- `npm run build`: pass.
+- Runtime gate URL: `http://127.0.0.1:4336/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x844`.
+- Checks:
+  - Nonblank app render and primary workspace visible.
+  - Templates exposed four generator buttons.
+  - Standard thumbnail and Vertical thumbnail modals removed the animation checkbox and kept only image-slot and grouping checkboxes.
+  - Stream waiting kept the animation checkbox.
+  - Standard thumbnail, Vertical thumbnail, and Stream waiting modals paired Title, Subtitle, and Label sliders two per row on desktop.
+  - Standard thumbnail preview widened to `647x364`.
+  - Stream waiting preview widened to `647x364`.
+  - Vertical thumbnail preview preserved the generated 9:16 ratio at `394x700` (`0.563`).
+  - Standard thumbnail Tone changed the live preview data URL.
+  - Standard thumbnail generated a nonblank canvas.
+  - Right-inspector numeric layer edit changed `896` to `897`.
+  - Stream waiting generated a nonblank canvas.
+  - WebP export downloaded successfully.
+  - Mobile Vertical thumbnail modal opened with horizontal overflow `0`.
+  - No relevant page errors, app console errors, or non-analytics HTTP errors were reported.
+  - Dev server still reports 404 for local analytics files under `/thumbnail-generator/thumbnail-generator/analytics*.js`; this is a local-dev static-path artifact and was excluded from app console health.
+  - CSV/HTML import controls remain hidden in this build; parser/import/export compatibility is covered by unit tests and internal layout text refresh checks.
+- Evidence screenshots:
+  - `docs/assets/runtime-20260612-creative-modal-standard-desktop.png`
+  - `docs/assets/runtime-20260612-creative-modal-vertical-desktop.png`
+  - `docs/assets/runtime-20260612-creative-modal-waiting-desktop.png`
+  - `docs/assets/runtime-20260612-creative-modal-mobile.png`
+- Export evidence:
+  - `output/runtime-downloads/20260612-creative-modal-compact/thumbnail-1920x1080-2026-06-12T03-02-31-384Z.webp`.
+
 ### Generator Modal Follow-Up
 
 Completed on 2026-06-12 for the generator modal follow-up.

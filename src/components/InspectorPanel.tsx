@@ -2090,8 +2090,8 @@ function TextControls({
           {!fontOptions.some((option) => option.value === selected.fontFamily) ? (
             <option value={selected.fontFamily}>{fontLabelFor(selected.fontFamily)}</option>
           ) : null}
-          {fontOptions.map((option) => (
-            <option key={option.value} value={option.value}>
+          {fontOptions.map((option, index) => (
+            <option key={`${option.value}-${index}`} value={option.value}>
               {option.label}
             </option>
           ))}

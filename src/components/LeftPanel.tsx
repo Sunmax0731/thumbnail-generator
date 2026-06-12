@@ -1,4 +1,5 @@
 ﻿import { useEffect, useMemo, useRef, useState } from "react";
+import type { CSSProperties } from "react";
 import {
   CalendarDays,
   FolderOpen,
@@ -645,8 +646,8 @@ function ScheduleBuilderDialog({
                   {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
                     <option value={draft.fontFamily}>{draft.fontFamily}</option>
                   ) : null}
-                  {fontOptions.map((option) => (
-                    <option key={option.value} value={option.value}>
+                  {fontOptions.map((option, index) => (
+                    <option key={`${option.value}-${index}`} value={option.value}>
                       {option.label}
                     </option>
                   ))}
@@ -998,6 +999,10 @@ function CreativeBuilderDialog({
   }, [previewTemplate]);
 
   const title = getCreativeDialogTitle(draft.kind, t);
+  const previewShellStyle = {
+    aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}`,
+    "--preview-ratio": String(previewTemplate.settings.width / previewTemplate.settings.height),
+  } as CSSProperties;
   const colorTargets = [
     { key: "backgroundColor" as const, label: t("scheduleBuilder.backgroundColor"), value: draft.backgroundColor },
     { key: "surfaceColor" as const, label: t("scheduleBuilder.surfaceColor"), value: draft.surfaceColor },
@@ -1061,10 +1066,12 @@ function CreativeBuilderDialog({
               <input type="checkbox" checked={draft.groupLayers} onChange={(event) => setDraft("groupLayers", event.currentTarget.checked)} />
               <span>{t("scheduleBuilder.groupLayers")}</span>
             </label>
-            <label className="field checkbox-field">
-              <input type="checkbox" checked={draft.animated} onChange={(event) => setDraft("animated", event.currentTarget.checked)} />
-              <span>{t("generator.animated")}</span>
-            </label>
+            {draft.kind === "stream-waiting" ? (
+              <label className="field checkbox-field">
+                <input type="checkbox" checked={draft.animated} onChange={(event) => setDraft("animated", event.currentTarget.checked)} />
+                <span>{t("generator.animated")}</span>
+              </label>
+            ) : null}
           </section>
 
           <section className="panel-section">
@@ -1082,8 +1089,8 @@ function CreativeBuilderDialog({
                       {!fontOptions.some((option) => option.value === draft.fontFamily) ? (
                         <option value={draft.fontFamily}>{draft.fontFamily}</option>
                       ) : null}
-                      {fontOptions.map((option) => (
-                        <option key={option.value} value={option.value}>
+                      {fontOptions.map((option, index) => (
+                        <option key={`${option.value}-${index}`} value={option.value}>
                           {option.label}
                         </option>
                       ))}
@@ -1108,15 +1115,15 @@ function CreativeBuilderDialog({
                 />
               </div>
 
-              <div className="generator-text-group">
+              <div className="generator-text-group generator-text-group--compact">
                 <h3>{t("generator.titleGroup")}</h3>
-              <ScheduleSlider
-                label={t("generator.titleFontSize")}
-                value={draft.titleFontSize}
-                min={24}
-                max={180}
-                onChange={(value) => setDraft("titleFontSize", value)}
-              />
+                <ScheduleSlider
+                  label={t("generator.titleFontSize")}
+                  value={draft.titleFontSize}
+                  min={24}
+                  max={180}
+                  onChange={(value) => setDraft("titleFontSize", value)}
+                />
                 <ScheduleSlider
                   label={t("generator.strokeWidth")}
                   value={draft.titleStrokeWidth}
@@ -1127,15 +1134,15 @@ function CreativeBuilderDialog({
                 <CreativeAlignSelect value={draft.titleAlign} onChange={(value) => setDraft("titleAlign", value)} t={t} />
               </div>
 
-              <div className="generator-text-group">
+              <div className="generator-text-group generator-text-group--compact">
                 <h3>{t("generator.subtitleGroup")}</h3>
-              <ScheduleSlider
-                label={t("generator.subtitleFontSize")}
-                value={draft.subtitleFontSize}
-                min={12}
-                max={96}
-                onChange={(value) => setDraft("subtitleFontSize", value)}
-              />
+                <ScheduleSlider
+                  label={t("generator.subtitleFontSize")}
+                  value={draft.subtitleFontSize}
+                  min={12}
+                  max={96}
+                  onChange={(value) => setDraft("subtitleFontSize", value)}
+                />
                 <ScheduleSlider
                   label={t("generator.strokeWidth")}
                   value={draft.subtitleStrokeWidth}
@@ -1146,15 +1153,15 @@ function CreativeBuilderDialog({
                 <CreativeAlignSelect value={draft.subtitleAlign} onChange={(value) => setDraft("subtitleAlign", value)} t={t} />
               </div>
 
-              <div className="generator-text-group">
+              <div className="generator-text-group generator-text-group--compact">
                 <h3>{t("generator.labelGroup")}</h3>
-              <ScheduleSlider
-                label={t("generator.labelFontSize")}
-                value={draft.labelFontSize}
-                min={10}
-                max={72}
-                onChange={(value) => setDraft("labelFontSize", value)}
-              />
+                <ScheduleSlider
+                  label={t("generator.labelFontSize")}
+                  value={draft.labelFontSize}
+                  min={10}
+                  max={72}
+                  onChange={(value) => setDraft("labelFontSize", value)}
+                />
                 <ScheduleSlider
                   label={t("generator.strokeWidth")}
                   value={draft.labelStrokeWidth}
@@ -1216,7 +1223,7 @@ function CreativeBuilderDialog({
               <Video size={16} />
               <h2>{t("scheduleBuilder.previewSection")}</h2>
             </div>
-            <div className="schedule-preview-canvas-shell" style={{ aspectRatio: `${previewTemplate.settings.width} / ${previewTemplate.settings.height}` }}>
+            <div className="schedule-preview-canvas-shell creative-preview-canvas-shell" style={previewShellStyle}>
               <canvas ref={previewCanvasRef} className="schedule-preview-canvas" aria-label={title} />
             </div>
           </section>

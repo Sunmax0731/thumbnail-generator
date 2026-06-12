@@ -2338,6 +2338,11 @@ button:disabled {
   box-shadow: 0 28px 72px rgba(15, 23, 42, 0.3);
 }
 
+.creative-builder-dialog {
+  width: min(1560px, calc(100vw - 24px));
+  max-width: 1560px;
+}
+
 .schedule-builder-dialog .modal-header {
   padding-bottom: 8px;
 }
@@ -2364,6 +2369,10 @@ button:disabled {
   align-items: start;
   grid-template-columns: minmax(240px, 1.02fr) minmax(324px, 1.14fr) minmax(148px, 0.42fr) minmax(400px, 1.72fr);
   gap: 10px;
+}
+
+.creative-builder-grid {
+  grid-template-columns: minmax(220px, 0.72fr) minmax(340px, 1fr) minmax(136px, 0.38fr) minmax(640px, 2fr);
 }
 
 .schedule-builder-grid .panel-section {
@@ -2413,6 +2422,12 @@ button:disabled {
   background: var(--panel-soft);
 }
 
+.creative-preview-canvas-shell {
+  width: min(100%, calc(min(70vh, 700px) * var(--preview-ratio)));
+  max-height: min(70vh, 700px);
+  justify-self: center;
+}
+
 .schedule-preview-canvas {
   width: 100%;
   height: 100%;
@@ -2448,6 +2463,16 @@ button:disabled {
   color: var(--text);
   font-size: 11px;
   font-weight: 850;
+}
+
+.generator-text-group--compact {
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: end;
+}
+
+.generator-text-group--compact h3,
+.generator-text-group--compact .field:not(.schedule-slider-field) {
+  grid-column: 1 / -1;
 }
 
 .schedule-font-family-field {

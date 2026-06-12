@@ -213,6 +213,7 @@ function createVideoThumbnailLayers(context: CreativeContext): ThumbnailLayer[] 
   const vertical = request.kind === "vertical-thumbnail";
   const scale = width / (vertical ? 1080 : 1280);
   const layout = thumbnailLayout(request.layoutPattern, vertical);
+  const toneStyle = thumbnailToneStyle(request.tone);
   const title = request.title.trim() || (vertical ? "SHORT CLIP" : "BIG UPDATE");
   const subtitle = request.subtitle.trim() || (vertical ? "Best moment from the stream" : "What changed and why it matters");
   const label = request.label.trim() || (vertical ? "VERTICAL" : "NEW VIDEO");
@@ -228,29 +229,103 @@ function createVideoThumbnailLayers(context: CreativeContext): ThumbnailLayer[] 
             y: height * layout.imageY,
             width: width * layout.imageW,
             height: height * layout.imageH,
-            opacity: layout.imageOpacity,
-            effects: { grayscale: layout.imageFocused ? 0 : 0.18, blur: layout.imageFocused ? 0 : 3, brightness: layout.imageFocused ? 106 : 72, contrast: 122, mosaic: 0 },
+            opacity: Math.min(1, layout.imageOpacity * toneStyle.imageOpacityMultiplier),
+            effects: {
+              grayscale: layout.imageFocused ? toneStyle.focusedImageGrayscale : toneStyle.backgroundImageGrayscale,
+              blur: layout.imageFocused ? toneStyle.focusedImageBlur : toneStyle.backgroundImageBlur,
+              brightness: layout.imageFocused ? toneStyle.focusedImageBrightness : toneStyle.backgroundImageBrightness,
+              contrast: toneStyle.imageContrast,
+              mosaic: 0,
+            },
             cornerRadius: layout.imageFocused ? 28 * scale : 0,
             groupId: groupId(context),
             groupName: groupName(context),
           }),
         ]
       : []),
-    shape(context, "Title plate", width * layout.titlePlateX, height * layout.titlePlateY, width * layout.titlePlateW, height * layout.titlePlateH, request.surfaceColor, 22 * scale, request.accentColor, 8 * scale, request.tone === "clean" ? 0.96 : 0.9),
-    shape(context, "Accent slash", width * layout.accentX, height * layout.accentY, width * layout.accentW, Math.max(22, height * layout.accentH), request.secondaryColor, 8 * scale, request.secondaryColor, 0, 1),
+    shape(context, "Title plate", width * layout.titlePlateX, height * layout.titlePlateY, width * layout.titlePlateW, height * layout.titlePlateH, request.surfaceColor, 22 * scale, request.accentColor, 8 * scale, toneStyle.titlePlateOpacity),
+    shape(context, "Accent slash", width * layout.accentX, height * layout.accentY, width * layout.accentW, Math.max(22, height * layout.accentH), request.secondaryColor, 8 * scale, request.secondaryColor, 0, toneStyle.accentOpacity),
     shape(context, "Label badge", width * layout.labelX, height * layout.labelY, width * layout.labelW, height * layout.labelH, request.accentColor, request.labelCornerRadius * scale, request.accentColor, 0),
     text(context, "Label text", width * (layout.labelX + 0.012), height * (layout.labelY + 0.023), width * Math.max(0.08, layout.labelW - 0.024), height * Math.max(0.03, layout.labelH - 0.04), label, request.labelFontSize * scale, "#ffffff", request.labelAlign, request.labelStrokeWidth * scale),
     text(context, "Thumbnail title", width * layout.titleX, height * layout.titleY, width * layout.titleW, height * layout.titleH, title, request.titleFontSize * scale, request.textColor, request.titleAlign, request.titleStrokeWidth * scale),
     text(context, "Thumbnail subtitle", width * layout.subtitleX, height * layout.subtitleY, width * layout.subtitleW, height * layout.subtitleH, subtitle, request.subtitleFontSize * scale, request.textColor, request.subtitleAlign, request.subtitleStrokeWidth * scale),
     ...(layout.imageFocused
       ? [
-          shape(context, "Image halo", width * Math.max(0, layout.imageX - 0.02), height * Math.max(0, layout.imageY - 0.02), width * Math.min(1, layout.imageW + 0.04), height * Math.min(1, layout.imageH + 0.04), request.accentColor, 42 * scale, request.secondaryColor, 10 * scale, 0.2),
-          shape(context, "Image floor", width * layout.imageX, height * Math.min(0.94, layout.imageY + layout.imageH + 0.02), width * layout.imageW, height * 0.055, request.secondaryColor, 999, request.secondaryColor, 0, 0.86),
+          shape(context, "Image halo", width * Math.max(0, layout.imageX - 0.02), height * Math.max(0, layout.imageY - 0.02), width * Math.min(1, layout.imageW + 0.04), height * Math.min(1, layout.imageH + 0.04), request.accentColor, 42 * scale, request.secondaryColor, 10 * scale, toneStyle.haloOpacity),
+          shape(context, "Image floor", width * layout.imageX, height * Math.min(0.94, layout.imageY + layout.imageH + 0.02), width * layout.imageW, height * 0.055, request.secondaryColor, 999, request.secondaryColor, 0, toneStyle.floorOpacity),
         ]
       : [
-          shape(context, "Thumbnail side block", width * layout.blockX, height * layout.blockY, width * layout.blockW, height * layout.blockH, request.accentColor, 24 * scale, request.surfaceColor, 7 * scale, 0.86),
+          shape(context, "Thumbnail side block", width * layout.blockX, height * layout.blockY, width * layout.blockW, height * layout.blockH, request.accentColor, 24 * scale, request.surfaceColor, 7 * scale, toneStyle.blockOpacity),
         ]),
   ];
+}
+
+interface ThumbnailToneStyle {
+  imageOpacityMultiplier: number;
+  backgroundImageGrayscale: number;
+  backgroundImageBlur: number;
+  backgroundImageBrightness: number;
+  focusedImageGrayscale: number;
+  focusedImageBlur: number;
+  focusedImageBrightness: number;
+  imageContrast: number;
+  titlePlateOpacity: number;
+  accentOpacity: number;
+  blockOpacity: number;
+  haloOpacity: number;
+  floorOpacity: number;
+}
+
+function thumbnailToneStyle(tone: CreativeGeneratorTone): ThumbnailToneStyle {
+  if (tone === "clean") {
+    return {
+      imageOpacityMultiplier: 0.78,
+      backgroundImageGrayscale: 0.05,
+      backgroundImageBlur: 1,
+      backgroundImageBrightness: 92,
+      focusedImageGrayscale: 0,
+      focusedImageBlur: 0,
+      focusedImageBrightness: 108,
+      imageContrast: 110,
+      titlePlateOpacity: 0.98,
+      accentOpacity: 0.82,
+      blockOpacity: 0.62,
+      haloOpacity: 0.12,
+      floorOpacity: 0.72,
+    };
+  }
+  if (tone === "neon") {
+    return {
+      imageOpacityMultiplier: 1.08,
+      backgroundImageGrayscale: 0.42,
+      backgroundImageBlur: 2,
+      backgroundImageBrightness: 68,
+      focusedImageGrayscale: 0.15,
+      focusedImageBlur: 0,
+      focusedImageBrightness: 114,
+      imageContrast: 150,
+      titlePlateOpacity: 0.72,
+      accentOpacity: 1,
+      blockOpacity: 0.94,
+      haloOpacity: 0.34,
+      floorOpacity: 0.95,
+    };
+  }
+  return {
+    imageOpacityMultiplier: 1,
+    backgroundImageGrayscale: 0.18,
+    backgroundImageBlur: 3,
+    backgroundImageBrightness: 72,
+    focusedImageGrayscale: 0,
+    focusedImageBlur: 0,
+    focusedImageBrightness: 106,
+    imageContrast: 122,
+    titlePlateOpacity: 0.9,
+    accentOpacity: 1,
+    blockOpacity: 0.86,
+    haloOpacity: 0.2,
+    floorOpacity: 0.86,
+  };
 }
 
 function resolveCreativeSettings(request: CreativeGeneratorRequest, currentSettings: OutputSettings): OutputSettings {

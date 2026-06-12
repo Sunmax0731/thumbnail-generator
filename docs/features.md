@@ -35,7 +35,7 @@ This page is the quick feature index for users and reviewers.
 ## Browser Storage
 
 - Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, month-aware badge labels, and reload-persistent settings.
-- Generate standard thumbnails, vertical thumbnails, and stream waiting screens from Templates. Each image generator has five placement patterns plus content, grouped Grid / text controls, color, preview, Generate layers, and Save settings controls.
+- Generate standard thumbnails, vertical thumbnails, and stream waiting screens from Templates. Each image generator has five placement patterns plus content, grouped Grid / text controls, color, preview, Generate layers, and Save settings controls. Standard and stream waiting previews are wider on desktop, vertical previews keep the generated 9:16 aspect ratio, and animation controls appear only for stream waiting screens.
 - Use Save settings in generator modals to persist settings without generating; Generate layers also saves settings before replacing the current layers.
 - Resize the Browser templates list area from the Templates tab.
 - Use Templates to save named browser-local templates.
