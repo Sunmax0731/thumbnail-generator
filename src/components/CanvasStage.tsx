@@ -15,6 +15,9 @@ import type { Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
 import type { ExportFormat, LayerAnimation, OutputSettings, ThumbnailLayer } from "../lib/types";
 
+const timelineMinHeight = 120;
+const timelineMaxHeight = 640;
+
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
   settings: OutputSettings;
@@ -458,7 +461,7 @@ function MotionTimeline({
     const startY = event.clientY;
     const startHeight = sectionRef.current?.getBoundingClientRect().height ?? timelineHeight;
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      setTimelineHeight(Math.min(320, Math.max(120, startHeight + startY - moveEvent.clientY)));
+      setTimelineHeight(Math.min(timelineMaxHeight, Math.max(timelineMinHeight, startHeight + startY - moveEvent.clientY)));
     };
     const handlePointerUp = () => {
       window.removeEventListener("pointermove", handlePointerMove);
@@ -485,11 +488,11 @@ function MotionTimeline({
           onKeyDown={(event) => {
             if (event.key === "ArrowUp") {
               event.preventDefault();
-              setTimelineHeight((height) => Math.min(320, height + 20));
+              setTimelineHeight((height) => Math.min(timelineMaxHeight, height + 20));
             }
             if (event.key === "ArrowDown") {
               event.preventDefault();
-              setTimelineHeight((height) => Math.max(120, height - 20));
+              setTimelineHeight((height) => Math.max(timelineMinHeight, height - 20));
             }
           }}
         />

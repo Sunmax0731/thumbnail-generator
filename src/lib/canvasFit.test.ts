@@ -36,7 +36,19 @@ describe("canvas fit zoom", () => {
         documentHeight: 720,
         previewPadding: 88,
       }),
-    ).toBe(0.66);
+    ).toBe(0.75);
+  });
+
+  it("rounds fit zoom down so the canvas does not spill past the container", () => {
+    expect(
+      calculateCanvasFitZoom({
+        containerWidth: 840,
+        containerHeight: 668,
+        documentWidth: 1280,
+        documentHeight: 720,
+        previewPadding: 0,
+      }),
+    ).toBe(0.65);
   });
 
   it("keeps smaller documents at the preferred fit when both axes allow it", () => {

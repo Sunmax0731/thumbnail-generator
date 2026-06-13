@@ -51,7 +51,9 @@ interface LeftPanelProps {
   paletteColors: PaletteColor[];
   savedColorPalettes: SavedColorPalette[];
   groupObjects: GroupObjectAsset[];
-  registeredTags: string[];
+  imageRegisteredTags: string[];
+  groupObjectRegisteredTags: string[];
+  templateRegisteredTags: string[];
   onImageFiles: (files: FileList | File[] | null, tags?: string[]) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
@@ -82,7 +84,9 @@ export function LeftPanel({
   paletteColors,
   savedColorPalettes,
   groupObjects,
-  registeredTags,
+  imageRegisteredTags,
+  groupObjectRegisteredTags,
+  templateRegisteredTags,
   onImageFiles,
   onSelectAsset,
   onAddImageAssetLayer,
@@ -131,18 +135,6 @@ export function LeftPanel({
   const saveScheduleDraft = () => writeGeneratorSettings("schedule", scheduleDraft);
   const saveCreativeDraft = (kind: CreativeGeneratorKind, draft = creativeDrafts[kind]) =>
     writeGeneratorSettings(`creative.${kind}`, draft);
-  const browserTemplateTags = useMemo(() => {
-    const tags = templates.flatMap((template) => template.tags ?? []);
-    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
-  }, [templates]);
-  const imageAssetTags = useMemo(() => {
-    const tags = assets.flatMap((asset) => asset.tags ?? []);
-    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
-  }, [assets]);
-  const groupObjectTags = useMemo(() => {
-    const tags = groupObjects.flatMap((groupObject) => groupObject.tags ?? []);
-    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
-  }, [groupObjects]);
   const visibleAssets = useMemo(
     () => (imageAssetFilterTag ? assets.filter((asset) => asset.tags?.includes(imageAssetFilterTag)) : assets),
     [imageAssetFilterTag, assets],
@@ -236,7 +228,7 @@ export function LeftPanel({
                   <span>{t("left.assetTagFilter")}</span>
                   <select value={imageAssetFilterTag} onChange={(event) => setImageAssetFilterTag(event.currentTarget.value)}>
                     <option value="">{t("left.templateTagAll")}</option>
-                    {imageAssetTags.map((tag) => (
+                    {imageRegisteredTags.map((tag) => (
                       <option key={tag} value={tag}>
                         {tag}
                       </option>
@@ -282,7 +274,7 @@ export function LeftPanel({
                         </button>
                         <TagEditor
                           tags={asset.tags ?? []}
-                          suggestions={registeredTags}
+                          suggestions={imageRegisteredTags}
                           datalistId={`asset-tag-options-${asset.key}`}
                           onChange={(tags) => onUpdateAssetTags(asset.key, tags)}
                           t={t}
@@ -315,7 +307,7 @@ export function LeftPanel({
                   <span>{t("left.groupObjectTagFilter")}</span>
                   <select value={groupObjectFilterTag} onChange={(event) => setGroupObjectFilterTag(event.currentTarget.value)}>
                     <option value="">{t("left.templateTagAll")}</option>
-                    {groupObjectTags.map((tag) => (
+                    {groupObjectRegisteredTags.map((tag) => (
                       <option key={tag} value={tag}>
                         {tag}
                       </option>
@@ -345,7 +337,7 @@ export function LeftPanel({
                         </button>
                         <TagEditor
                           tags={groupObject.tags ?? []}
-                          suggestions={registeredTags}
+                          suggestions={groupObjectRegisteredTags}
                           datalistId={`group-object-tag-options-${groupObject.id}`}
                           onChange={(tags) => onUpdateGroupObjectTags(groupObject.id, tags)}
                           t={t}
@@ -429,7 +421,7 @@ export function LeftPanel({
                 onChange={(event) => setTemplateTagDraft(event.currentTarget.value)}
               />
               <datalist id="browser-template-tag-options">
-                {browserTemplateTags.map((tag) => (
+                {templateRegisteredTags.map((tag) => (
                   <option key={tag} value={tag} />
                 ))}
               </datalist>
@@ -445,7 +437,7 @@ export function LeftPanel({
               <span>{t("left.templateTagFilter")}</span>
               <select value={templateFilterTag} onChange={(event) => setTemplateFilterTag(event.currentTarget.value)}>
                 <option value="">{t("left.templateTagAll")}</option>
-                {browserTemplateTags.map((tag) => (
+                {templateRegisteredTags.map((tag) => (
                   <option key={tag} value={tag}>
                     {tag}
                   </option>
@@ -527,7 +519,7 @@ export function LeftPanel({
       {pendingImageFiles ? (
         <ImportImageTagDialog
           files={pendingImageFiles}
-          suggestions={registeredTags}
+          suggestions={imageRegisteredTags}
           onCancel={() => setPendingImageFiles(null)}
           onConfirm={(tags) => {
             onImageFiles(pendingImageFiles, tags);

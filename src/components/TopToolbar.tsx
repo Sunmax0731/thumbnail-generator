@@ -1,4 +1,4 @@
-import { Download, ExternalLink, FolderOpen, Moon, Save, SquareStack, Trash2, Upload } from "lucide-react";
+import { Download, ExternalLink, FolderOpen, Moon, Save, SquareStack, Tags, Trash2, Upload } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import type { ThemeMode } from "../lib/theme";
 
@@ -15,6 +15,7 @@ interface TopToolbarProps {
   onExportEditState: () => void;
   onImportEditState: (file: File | null) => void;
   onDeleteEditState: () => void;
+  onOpenTagSettings: () => void;
   t: Translator;
 }
 
@@ -31,6 +32,7 @@ export function TopToolbar({
   onExportEditState,
   onImportEditState,
   onDeleteEditState,
+  onOpenTagSettings,
   t,
 }: TopToolbarProps) {
   const savedStateLabel = savedEditStateUpdatedAt
@@ -78,6 +80,9 @@ export function TopToolbar({
             <span>{t("left.autoSaveEditState")}</span>
           </label>
         </div>
+        <button type="button" className="icon-button" title={t("tags.open")} onClick={onOpenTagSettings}>
+          <Tags size={16} />
+        </button>
         <label className="field language-field">
           <span>{t("language.label")}</span>
           <select value={language} onChange={(event) => onLanguageChange(event.target.value as Language)}>

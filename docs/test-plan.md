@@ -5,7 +5,7 @@
 - CSV parser handles quoted fields, numeric defaults, image references, and effect strings.
 - HTML parser handles text, image, and shape layers.
 - Export presets resolve to expected width/height/format settings.
-- Canvas fit calculation shrinks tall or wide presets by visible width/height and preserves preferred fit only when both axes allow it.
+- Canvas fit calculation shrinks tall or wide presets by visible width/height, preserves preferred fit only when both axes allow it, and rounds down so the fitted frame does not spill past the container.
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers retain other selected layers but leave no fallback selection after deleting the only selected layer.
@@ -44,6 +44,7 @@
 - Edit state helpers serialize, parse, and delete portable JSON recovery files.
 - Quality warning helpers flag long text, low contrast, safe-area edges, many layers, large exports, large assets, and large storage estimates.
 - Browser template helpers normalize, sanitize, deduplicate, and preserve saved template tags.
+- Tag registry helpers normalize, deduplicate, read/write, and remove common/image/group-object/template tags independently.
 
 ## Manual Browser Runtime Gate
 
@@ -140,6 +141,30 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-13.
+
+### Selection Display, Tag Settings, Fit Canvas, And Timeline Height Follow-Up
+
+Completed on 2026-06-13 for selection rendering stability, category-scoped tag settings, canvas-fit sizing, and doubled timeline height.
+
+- Scope: reset transient canvas state before drawing selection handles, added a top-toolbar Tag settings dialog, separated common/image/group-object/template tag registries, kept common tags available across filters, changed Fit canvas to fit the output canvas only and round zoom down, and raised the timeline maximum height to `640px`.
+- `npm test`: pass. 34 test files, 134 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4358/thumbnail-generator/`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback was used.
+- Desktop viewport: `1600x1000`.
+- Checks:
+  - Initial canvas rendered nonblank.
+  - Tag settings kept `shared-tag` under Common only, and `image-only`, `group-only`, and `template-only` under their own categories.
+  - Image, group-object, and template tag filters each showed their category tag plus the common tag, without leaking tags from other categories.
+  - Selecting a layer kept canvas dimensions `1280x720`, frame ratio `1.778`, and Preview overflow hidden.
+  - Fit canvas after zooming in produced `65%`, with frame `832x468` inside visible content `840x668`.
+  - Timeline top-edge resize expanded from `170px` to `640px`.
+  - PNG export succeeded with size `1141605` bytes.
+- Evidence:
+  - `output/playwright/runtime-gate.json`
+  - `output/playwright/selection-gate.png`
+  - `output/playwright/runtime-export.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
 
 ### Asset Tag Filter, Group Delete, ImageLab Handle, And Timeline Follow-Up
 

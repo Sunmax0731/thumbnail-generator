@@ -5,6 +5,7 @@ import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel, type InspectorSection } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
 import { StatusBar } from "./components/StatusBar";
+import { TagSettingsDialog } from "./components/TagSettingsDialog";
 import { TopToolbar } from "./components/TopToolbar";
 import { alignLayers, type AlignmentMode } from "./lib/alignment";
 import {
@@ -97,6 +98,14 @@ import {
   upsertTemplate,
   writeSavedTemplates,
 } from "./lib/templates";
+import {
+  mergeTags,
+  readTagRegistry,
+  removeTag,
+  writeTagRegistry,
+  type TagCategory,
+  type TagRegistry,
+} from "./lib/tagRegistry";
 import { readThemeMode, resolveThemeMode, writeThemeMode, type ThemeMode } from "./lib/theme";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
 import type { BrandKit, ExportFormat, GroupObjectAsset, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
@@ -191,6 +200,10 @@ function App() {
   const [groupObjects, setGroupObjects] = useState<GroupObjectAsset[]>(() =>
     typeof window === "undefined" ? [] : readGroupObjects(),
   );
+  const [tagRegistry, setTagRegistry] = useState<TagRegistry>(() =>
+    typeof window === "undefined" ? { common: [], images: [], groupObjects: [], templates: [] } : readTagRegistry(),
+  );
+  const [isTagSettingsOpen, setIsTagSettingsOpen] = useState(false);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(initialEditStatePreferences.autoSaveEnabled);
   const [savedEditStateUpdatedAt, setSavedEditStateUpdatedAt] = useState<string | null>(
     initialSavedEditState?.updatedAt ?? null,
@@ -265,15 +278,30 @@ function App() {
     () => evaluateThumbnailWarnings({ layers, assets, settings, estimatedStorageBytes }),
     [assets, estimatedStorageBytes, layers, settings],
   );
-  const registeredTags = useMemo(() => {
-    const tags = [
-      ...assets.flatMap((asset) => asset.tags ?? []),
-      ...templates.flatMap((template) => template.tags ?? []),
-      ...groupObjects.flatMap((groupObject) => groupObject.tags ?? []),
-    ];
-    return Array.from(new Set(sanitizeTemplateTags(tags))).sort((a, b) => a.localeCompare(b));
-  }, [assets, groupObjects, templates]);
-
+  const imageCategoryTags = useMemo(
+    () => mergeTags(tagRegistry.images, assets.flatMap((asset) => asset.tags ?? [])),
+    [assets, tagRegistry.images],
+  );
+  const groupObjectCategoryTags = useMemo(
+    () => mergeTags(tagRegistry.groupObjects, groupObjects.flatMap((groupObject) => groupObject.tags ?? [])),
+    [groupObjects, tagRegistry.groupObjects],
+  );
+  const templateCategoryTags = useMemo(
+    () => mergeTags(tagRegistry.templates, templates.flatMap((template) => template.tags ?? [])),
+    [tagRegistry.templates, templates],
+  );
+  const imageRegisteredTags = useMemo(
+    () => mergeTags(tagRegistry.common, imageCategoryTags),
+    [imageCategoryTags, tagRegistry.common],
+  );
+  const groupObjectRegisteredTags = useMemo(
+    () => mergeTags(tagRegistry.common, groupObjectCategoryTags),
+    [groupObjectCategoryTags, tagRegistry.common],
+  );
+  const templateRegisteredTags = useMemo(
+    () => mergeTags(tagRegistry.common, templateCategoryTags),
+    [tagRegistry.common, templateCategoryTags],
+  );
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
     const query = window.matchMedia("(prefers-color-scheme: dark)");
@@ -962,6 +990,66 @@ function App() {
       }
     },
     [groupObjects],
+  );
+
+  const persistTagRegistry = useCallback((next: TagRegistry) => {
+    const normalized = {
+      common: mergeTags(next.common),
+      images: mergeTags(next.images),
+      groupObjects: mergeTags(next.groupObjects),
+      templates: mergeTags(next.templates),
+    };
+    try {
+      writeTagRegistry(normalized);
+      setTagRegistry(normalized);
+    } catch (error) {
+      setStatus(`Tag settings save failed: ${error instanceof Error ? error.message : String(error)}`);
+    }
+  }, []);
+
+  const addRegisteredTag = useCallback(
+    (category: TagCategory, tag: string) => {
+      const currentTags = tagRegistry[category];
+      const next = { ...tagRegistry, [category]: mergeTags(currentTags, [tag]) };
+      persistTagRegistry(next);
+      setStatus(`Registered tag "${tag.trim()}".`);
+    },
+    [persistTagRegistry, tagRegistry],
+  );
+
+  const deleteRegisteredTag = useCallback(
+    (category: TagCategory, tag: string) => {
+      const categoriesToUpdate: TagCategory[] = category === "common" ? ["common", "images", "groupObjects", "templates"] : [category];
+      const nextRegistry = categoriesToUpdate.reduce<TagRegistry>(
+        (next, currentCategory) => ({ ...next, [currentCategory]: removeTag(next[currentCategory], tag) }),
+        tagRegistry,
+      );
+      persistTagRegistry(nextRegistry);
+
+      if (category === "common" || category === "images") {
+        setAssets((current) => current.map((asset) => ({ ...asset, tags: removeTag(asset.tags ?? [], tag) })));
+      }
+      if (category === "common" || category === "groupObjects") {
+        const nextGroupObjects = groupObjects.map((groupObject) => ({ ...groupObject, tags: removeTag(groupObject.tags ?? [], tag) }));
+        try {
+          writeGroupObjects(nextGroupObjects);
+          setGroupObjects(nextGroupObjects);
+        } catch (error) {
+          setStatus(`Group object tag deletion failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+      if (category === "common" || category === "templates") {
+        const nextTemplates = templates.map((template) => ({ ...template, tags: removeTag(template.tags ?? [], tag) }));
+        try {
+          writeSavedTemplates(nextTemplates);
+          setTemplates(nextTemplates);
+        } catch (error) {
+          setStatus(`Template tag deletion failed: ${error instanceof Error ? error.message : String(error)}`);
+        }
+      }
+      setStatus(`Deleted tag "${tag}".`);
+    },
+    [groupObjects, persistTagRegistry, tagRegistry, templates],
   );
 
   const deleteGroupObject = useCallback(
@@ -2042,6 +2130,7 @@ function App() {
         onExportEditState={exportEditState}
         onImportEditState={importEditState}
         onDeleteEditState={deleteEditState}
+        onOpenTagSettings={() => setIsTagSettingsOpen(true)}
         t={t}
       />
       <main className="workspace" aria-label="Thumbnail editor workspace">
@@ -2051,7 +2140,7 @@ function App() {
             layers,
             selectedIds,
             selectedAssetKey,
-            registeredTags,
+            registeredTags: groupObjectRegisteredTags,
             onSelect: selectLayer,
             onSelectIndividual: selectIndividualLayer,
             onDelete: deleteLayer,
@@ -2075,7 +2164,9 @@ function App() {
           onDeleteAsset={deleteAsset}
           onUpdateAssetTags={updateAssetTags}
           groupObjects={groupObjects}
-          registeredTags={registeredTags}
+          imageRegisteredTags={imageRegisteredTags}
+          groupObjectRegisteredTags={groupObjectRegisteredTags}
+          templateRegisteredTags={templateRegisteredTags}
           onAddGroupObject={addGroupObjectToCanvas}
           onUpdateGroupObjectTags={updateGroupObjectTags}
           onDeleteGroupObject={deleteGroupObject}
@@ -2221,6 +2312,20 @@ function App() {
             />
           </section>
         </div>
+      ) : null}
+      {isTagSettingsOpen ? (
+        <TagSettingsDialog
+          tags={{
+            common: tagRegistry.common,
+            images: imageCategoryTags,
+            groupObjects: groupObjectCategoryTags,
+            templates: templateCategoryTags,
+          }}
+          onAddTag={addRegisteredTag}
+          onDeleteTag={deleteRegisteredTag}
+          onClose={() => setIsTagSettingsOpen(false)}
+          t={t}
+        />
       ) : null}
       {isImagePaletteModalOpen ? (
         <div

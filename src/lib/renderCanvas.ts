@@ -57,6 +57,7 @@ export async function renderThumbnailToCanvas(
   }
 
   if (options.drawSelection) {
+    resetTransientCanvasState(context);
     const selectedIds = options.selectedLayerIds ?? (options.selectedLayerId ? [options.selectedLayerId] : []);
     const selectedLayers = selectedIds
       .map((id) => layers.find((layer) => layer.id === id))
@@ -70,6 +71,17 @@ export async function renderThumbnailToCanvas(
   }
 
   context.restore();
+}
+
+function resetTransientCanvasState(context: CanvasRenderingContext2D): void {
+  context.globalAlpha = 1;
+  context.globalCompositeOperation = "source-over";
+  context.filter = "none";
+  context.shadowColor = "transparent";
+  context.shadowBlur = 0;
+  context.shadowOffsetX = 0;
+  context.shadowOffsetY = 0;
+  context.setLineDash([]);
 }
 
 function drawPreviewBackdrop(context: CanvasRenderingContext2D, width: number, height: number): void {
@@ -662,6 +674,7 @@ function drawSelection(
   state: { hoverMode: CanvasInteractionMode | null; activeMode: CanvasInteractionMode | null },
 ) {
   context.save();
+  resetTransientCanvasState(context);
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
   const bounds = getLayerSelectionLocalBounds(layer);

@@ -13,12 +13,12 @@ export function calculateCanvasFitZoom({
   containerHeight,
   documentWidth,
   documentHeight,
-  previewPadding,
+  previewPadding: _previewPadding,
   maxZoom = 0.94,
   minZoom = 0.1,
 }: CanvasFitInput): number {
-  const frameWidth = Math.max(1, documentWidth + previewPadding * 2);
-  const frameHeight = Math.max(1, documentHeight + previewPadding * 2);
+  const frameWidth = Math.max(1, documentWidth);
+  const frameHeight = Math.max(1, documentHeight);
   const availableWidth = Math.max(1, containerWidth);
   const availableHeight = Math.max(1, containerHeight);
   const fitByWidth = availableWidth / frameWidth;
@@ -26,14 +26,14 @@ export function calculateCanvasFitZoom({
   const next = Math.min(maxZoom, fitByWidth, fitByHeight);
 
   if (!Number.isFinite(next)) return maxZoom;
-  return round(clamp(next, minZoom, maxZoom), 2);
+  return roundDown(clamp(next, minZoom, maxZoom), 2);
 }
 
 function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
 
-function round(value: number, decimals: number): number {
+function roundDown(value: number, decimals: number): number {
   const multiplier = 10 ** decimals;
-  return Math.round(value * multiplier) / multiplier;
+  return Math.floor(value * multiplier) / multiplier;
 }
