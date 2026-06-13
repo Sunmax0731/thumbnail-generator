@@ -25,6 +25,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
+- Use the bottom timeline Play/Pause button to preview animations directly in the editor; while playing, layer rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.
 - Add multiple layer animation sets from the アニメ tab, choose presets, split movement motions from non-moving effects, show text-only controls only for text layers, toggle the easing graph, and edit animated layer timing from the アニメ-only bottom timeline.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
 - See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
@@ -36,7 +37,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
-- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected.
+- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Layers outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
@@ -73,6 +74,8 @@ npm run docs:zip
 ```
 
 The built `dist/` output is static and can be served by GitHub Pages or any static file host. `public/manifest.webmanifest`, `public/sw.js`, and the icons provide the PWA shell. `src/lib/extensionBridge.ts` exposes the stable page-message bridge for Chrome extension content scripts.
+
+Debug captures and runtime-gate artifacts should be written under `output/`; that directory is ignored by Git.
 
 ## Report Bugs Or Requests
 

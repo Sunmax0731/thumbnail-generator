@@ -40,6 +40,7 @@ type LeftPanelSection = "templates" | "layers" | "assets";
 export type QuickLayerKind = "headline" | "subtitle" | "badge" | "divider";
 
 interface LeftPanelProps {
+  isPlaybackLocked?: boolean;
   assets: ImageAsset[];
   selectedAssetKey: string;
   layerPanelProps: Omit<LayerPanelProps, "t">;
@@ -73,6 +74,7 @@ interface LeftPanelProps {
 }
 
 export function LeftPanel({
+  isPlaybackLocked = false,
   assets,
   selectedAssetKey,
   layerPanelProps,
@@ -149,7 +151,26 @@ export function LeftPanel({
   );
 
   return (
-    <aside className="side-panel left-panel" aria-label={t("left.aria")}>
+    <aside
+      className={`side-panel left-panel ${isPlaybackLocked ? "playback-disabled-panel" : ""}`}
+      aria-label={t("left.aria")}
+      aria-disabled={isPlaybackLocked}
+      onPointerDownCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onClickCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onKeyDownCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
       <div className="panel-tabs source-tabs" role="tablist" aria-label={t("left.tabs")}>
         <button
           type="button"

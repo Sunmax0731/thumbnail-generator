@@ -10,6 +10,7 @@ export interface RenderOptions {
   selectedLayerIds?: string[];
   drawSelection?: boolean;
   previewPadding?: number;
+  dimOutsideCanvas?: boolean;
   animationTimeMs?: number;
   sceneDurationMs?: number;
   hoverInteractionMode?: CanvasInteractionMode | null;
@@ -52,8 +53,48 @@ export async function renderThumbnailToCanvas(
       ? layers
       : applyAnimationsToLayers(layers, options.animationTimeMs, options.sceneDurationMs ?? defaultSceneDurationMs);
   const sortedLayers = renderLayers.filter((layer) => layer.visible);
-  for (const layer of sortedLayers) {
-    await drawLayer(context, layer, assets);
+  if (options.dimOutsideCanvas && previewPadding > 0) {
+    const normalCanvas = document.createElement("canvas");
+    normalCanvas.width = canvas.width;
+    normalCanvas.height = canvas.height;
+    const normalContext = normalCanvas.getContext("2d");
+    if (!normalContext) {
+      throw new Error("Canvas 2D context is not available.");
+    }
+    normalContext.translate(previewPadding, previewPadding);
+    for (const layer of sortedLayers) {
+      await drawLayer(normalContext, layer, assets);
+    }
+    normalContext.setTransform(1, 0, 0, 1, 0, 0);
+    clearOutsideOutputRect(normalContext, previewPadding, settings.width, settings.height, canvas.width, canvas.height);
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.drawImage(normalCanvas, 0, 0);
+    context.restore();
+
+    resetTransientCanvasState(context);
+    const outsideCanvas = document.createElement("canvas");
+    outsideCanvas.width = canvas.width;
+    outsideCanvas.height = canvas.height;
+    const outsideContext = outsideCanvas.getContext("2d");
+    if (!outsideContext) {
+      throw new Error("Canvas 2D context is not available.");
+    }
+    outsideContext.translate(previewPadding, previewPadding);
+    outsideContext.globalAlpha = 0.34;
+    for (const layer of sortedLayers) {
+      await drawLayer(outsideContext, layer, assets);
+    }
+    outsideContext.setTransform(1, 0, 0, 1, 0, 0);
+    outsideContext.clearRect(previewPadding, previewPadding, settings.width, settings.height);
+    context.save();
+    context.setTransform(1, 0, 0, 1, 0, 0);
+    context.drawImage(outsideCanvas, 0, 0);
+    context.restore();
+  } else {
+    for (const layer of sortedLayers) {
+      await drawLayer(context, layer, assets);
+    }
   }
 
   if (options.drawSelection) {
@@ -71,6 +112,20 @@ export async function renderThumbnailToCanvas(
   }
 
   context.restore();
+}
+
+function clearOutsideOutputRect(
+  context: CanvasRenderingContext2D,
+  previewPadding: number,
+  outputWidth: number,
+  outputHeight: number,
+  canvasWidth: number,
+  canvasHeight: number,
+): void {
+  context.clearRect(0, 0, canvasWidth, previewPadding);
+  context.clearRect(0, previewPadding + outputHeight, canvasWidth, Math.max(0, canvasHeight - previewPadding - outputHeight));
+  context.clearRect(0, previewPadding, previewPadding, outputHeight);
+  context.clearRect(previewPadding + outputWidth, previewPadding, Math.max(0, canvasWidth - previewPadding - outputWidth), outputHeight);
 }
 
 function resetTransientCanvasState(context: CanvasRenderingContext2D): void {
@@ -100,7 +155,7 @@ function drawPreviewBackdrop(context: CanvasRenderingContext2D, width: number, h
 
 async function drawLayer(context: CanvasRenderingContext2D, layer: ThumbnailLayer, assets: ImageAsset[]) {
   context.save();
-  context.globalAlpha = layer.opacity;
+  context.globalAlpha *= layer.opacity;
   context.translate(layer.x + layer.width / 2, layer.y + layer.height / 2);
   context.rotate((layer.rotation * Math.PI) / 180);
   applyLayerPlaneRotation(context, layer);

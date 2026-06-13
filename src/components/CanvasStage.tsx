@@ -6,6 +6,8 @@ import {
   Maximize2,
   Monitor,
   MonitorPlay,
+  Pause,
+  Play,
   MousePointer2,
   ZoomIn,
   ZoomOut,
@@ -30,7 +32,10 @@ interface CanvasStageProps {
   layers: ThumbnailLayer[];
   selectedIds: string[];
   showMotionTimeline: boolean;
+  isPlaybackPlaying: boolean;
+  playbackTimeMs: number;
   onZoomChange: (zoom: number) => void;
+  onTogglePlayback: () => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
@@ -56,7 +61,10 @@ export function CanvasStage({
   layers,
   selectedIds,
   showMotionTimeline,
+  isPlaybackPlaying,
+  playbackTimeMs,
   onZoomChange,
+  onTogglePlayback,
   onPointerDown,
   onPointerMove,
   onPointerUp,
@@ -102,13 +110,14 @@ export function CanvasStage({
     if (!container) return undefined;
     const handleWheel = (event: WheelEvent) => {
       event.preventDefault();
+      if (isPlaybackPlaying) return;
       const direction = event.deltaY > 0 ? -1 : 1;
       const multiplier = event.ctrlKey || event.metaKey ? 0.18 : 0.1;
       setZoomWithAnchor(zoom * (1 + direction * multiplier), event.clientX, event.clientY);
     };
     container.addEventListener("wheel", handleWheel, { passive: false });
     return () => container.removeEventListener("wheel", handleWheel);
-  }, [setZoomWithAnchor, zoom]);
+  }, [isPlaybackPlaying, setZoomWithAnchor, zoom]);
 
   const fitCanvas = useCallback(() => {
     const container = scrollRef.current;
@@ -137,6 +146,7 @@ export function CanvasStage({
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isPlaybackPlaying) return;
       if (event.code === "Space" && !isKeyboardInputTarget(event.target)) setIsSpacePanning(true);
     };
     const handleKeyUp = (event: KeyboardEvent) => {
@@ -148,7 +158,15 @@ export function CanvasStage({
       window.removeEventListener("keydown", handleKeyDown);
       window.removeEventListener("keyup", handleKeyUp);
     };
-  }, []);
+  }, [isPlaybackPlaying]);
+
+  useEffect(() => {
+    if (!isPlaybackPlaying) return;
+    panDrag.current = null;
+    setIsPanMode(false);
+    setIsPanning(false);
+    setIsSpacePanning(false);
+  }, [isPlaybackPlaying]);
 
   const beginPan = (event: React.PointerEvent<HTMLElement>) => {
     const container = scrollRef.current;
@@ -187,7 +205,7 @@ export function CanvasStage({
   };
 
   const shouldPan = (event: React.PointerEvent<HTMLElement>) =>
-    isPanMode || isSpacePanning || event.altKey || event.button === 2 || (event.buttons & 2) === 2;
+    !isPlaybackPlaying && (isPanMode || isSpacePanning || event.altKey || event.button === 2 || (event.buttons & 2) === 2);
   const frameWidth = settings.width + previewPadding * 2;
   const frameHeight = settings.height + previewPadding * 2;
 
@@ -203,7 +221,7 @@ export function CanvasStage({
             <span>
               <Monitor size={14} /> {t("toolbar.preset")}
             </span>
-            <select value={settings.presetId} onChange={(event) => onPresetChange(event.target.value)}>
+            <select value={settings.presetId} disabled={isPlaybackPlaying} onChange={(event) => onPresetChange(event.target.value)}>
               {outputPresets.map((preset) => (
                 <option key={preset.id} value={preset.id}>
                   {preset.label}
@@ -219,6 +237,7 @@ export function CanvasStage({
               max={4096}
               step={16}
               value={settings.width}
+              disabled={isPlaybackPlaying}
               onChange={(event) =>
                 onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
               }
@@ -229,6 +248,7 @@ export function CanvasStage({
               max={4096}
               step={16}
               value={settings.width}
+              disabled={isPlaybackPlaying}
               onChange={(event) =>
                 onSettingsChange({ presetId: "custom", width: Number.parseInt(event.target.value, 10) || 1280 })
               }
@@ -242,6 +262,7 @@ export function CanvasStage({
               max={4096}
               step={16}
               value={settings.height}
+              disabled={isPlaybackPlaying}
               onChange={(event) =>
                 onSettingsChange({ presetId: "custom", height: Number.parseInt(event.target.value, 10) || 720 })
               }
@@ -252,6 +273,7 @@ export function CanvasStage({
               max={4096}
               step={16}
               value={settings.height}
+              disabled={isPlaybackPlaying}
               onChange={(event) =>
                 onSettingsChange({ presetId: "custom", height: Number.parseInt(event.target.value, 10) || 720 })
               }
@@ -292,6 +314,7 @@ export function CanvasStage({
             className={`icon-button ${isPanMode ? "selected" : ""}`}
             title={t("stage.panCanvas")}
             aria-pressed={isPanMode}
+            disabled={isPlaybackPlaying}
             onClick={() => setIsPanMode((current) => !current)}
           >
             <Hand size={16} />
@@ -300,6 +323,7 @@ export function CanvasStage({
             type="button"
             className="icon-button"
             title={t("stage.zoomOut")}
+            disabled={isPlaybackPlaying}
             onClick={() => setZoomWithAnchor(zoom - 0.08)}
           >
             <ZoomOut size={16} />
@@ -309,25 +333,37 @@ export function CanvasStage({
             type="button"
             className="icon-button"
             title={t("stage.zoomIn")}
+            disabled={isPlaybackPlaying}
             onClick={() => setZoomWithAnchor(zoom + 0.08)}
           >
             <ZoomIn size={16} />
           </button>
-          <button type="button" className="icon-button" title={t("stage.fitCanvas")} onClick={fitCanvas}>
+          <button type="button" className="icon-button" title={t("stage.fitCanvas")} disabled={isPlaybackPlaying} onClick={fitCanvas}>
             <Maximize2 size={16} />
           </button>
         </div>
       </div>
       <div
-        className={`canvas-scroll ${isPanMode || isSpacePanning ? "pan-ready" : ""} ${isPanning ? "panning" : ""}`}
+        className={`canvas-scroll ${isPanMode || isSpacePanning ? "pan-ready" : ""} ${isPanning ? "panning" : ""} ${
+          isPlaybackPlaying ? "playback-running" : ""
+        }`}
         ref={scrollRef}
         onContextMenu={(event) => event.preventDefault()}
         onPointerDownCapture={(event) => {
+          if (isPlaybackPlaying) {
+            event.preventDefault();
+            event.stopPropagation();
+            return;
+          }
           if (!shouldPan(event)) return;
           beginPan(event);
           event.stopPropagation();
         }}
         onPointerDown={(event) => {
+          if (isPlaybackPlaying) {
+            event.preventDefault();
+            return;
+          }
           if (panDrag.current) return;
           if (shouldPan(event)) {
             beginPan(event);
@@ -359,9 +395,13 @@ export function CanvasStage({
             ref={canvasRef}
             className="thumbnail-canvas"
             aria-label={t("stage.canvasLabel")}
-            style={{ cursor: isPanning ? "grabbing" : isPanMode || isSpacePanning ? "grab" : cursor }}
+            style={{ cursor: isPlaybackPlaying ? "not-allowed" : isPanning ? "grabbing" : isPanMode || isSpacePanning ? "grab" : cursor }}
             onContextMenu={(event) => event.preventDefault()}
             onPointerDown={(event) => {
+              if (isPlaybackPlaying) {
+                event.preventDefault();
+                return;
+              }
               if (shouldPan(event)) {
                 beginPan(event);
                 return;
@@ -384,7 +424,16 @@ export function CanvasStage({
         </div>
       </div>
       {showMotionTimeline ? (
-        <MotionTimeline layers={layers} selectedIds={selectedIds} onSelectLayer={onSelectLayer} onUpdateLayer={onUpdateLayer} t={t} />
+        <MotionTimeline
+          layers={layers}
+          selectedIds={selectedIds}
+          isPlaybackPlaying={isPlaybackPlaying}
+          playbackTimeMs={playbackTimeMs}
+          onTogglePlayback={onTogglePlayback}
+          onSelectLayer={onSelectLayer}
+          onUpdateLayer={onUpdateLayer}
+          t={t}
+        />
       ) : null}
     </section>
   );
@@ -412,12 +461,18 @@ function clampZoom(value: number): number {
 function MotionTimeline({
   layers,
   selectedIds,
+  isPlaybackPlaying,
+  playbackTimeMs,
+  onTogglePlayback,
   onSelectLayer,
   onUpdateLayer,
   t,
 }: {
   layers: ThumbnailLayer[];
   selectedIds: string[];
+  isPlaybackPlaying: boolean;
+  playbackTimeMs: number;
+  onTogglePlayback: () => void;
   onSelectLayer: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   t: Translator;
@@ -433,8 +488,10 @@ function MotionTimeline({
     10000,
     ...motionLayers.flatMap((layer) => (layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : []).map((animation) => animation.startMs + animation.durationMs)),
   );
+  const playbackPercent = Math.min(100, Math.max(0, (playbackTimeMs / duration) * 100));
 
   const updateAnimationTiming = (layerId: string, animationIndex: number, next: Partial<Pick<LayerAnimation, "startMs" | "durationMs">>) => {
+    if (isPlaybackPlaying) return;
     onUpdateLayer(layerId, (layer) => {
       const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
       if (!animations[animationIndex]) return layer;
@@ -457,6 +514,7 @@ function MotionTimeline({
   };
 
   const beginTimelineResize = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (isPlaybackPlaying) return;
     event.preventDefault();
     const startY = event.clientY;
     const startHeight = sectionRef.current?.getBoundingClientRect().height ?? timelineHeight;
@@ -503,6 +561,15 @@ function MotionTimeline({
           <span>{(duration / 1000).toFixed(1)}s</span>
           <button
             type="button"
+            className={`secondary-button icon-text timeline-playback-button ${isPlaybackPlaying ? "playing" : ""}`}
+            aria-pressed={isPlaybackPlaying}
+            onClick={onTogglePlayback}
+          >
+            {isPlaybackPlaying ? <Pause size={14} /> : <Play size={14} />}
+            {isPlaybackPlaying ? t("timeline.pause") : t("timeline.play")}
+          </button>
+          <button
+            type="button"
             className="ghost-button timeline-collapse-button"
             aria-expanded={!isCollapsed}
             onClick={() => setIsCollapsed((current) => !current)}
@@ -514,6 +581,9 @@ function MotionTimeline({
       {isCollapsed ? null : (
         <>
           <div className="timeline-ruler" aria-hidden="true">
+            <span className="timeline-playhead-label" style={{ left: `${playbackPercent}%` }}>
+              {(playbackTimeMs / 1000).toFixed(1)}s
+            </span>
             {[0, 0.25, 0.5, 0.75, 1].map((point) => (
               <span key={point} style={{ left: `${point * 100}%` }}>
                 {(point * duration / 1000).toFixed(point === 0 ? 0 : 1)}s
@@ -532,8 +602,12 @@ function MotionTimeline({
                     tabIndex={0}
                     className={`timeline-row ${selectedIds.includes(layer.id) ? "selected" : ""}`}
                     key={layer.id}
-                    onClick={(event) => onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey)}
+                    onClick={(event) => {
+                      if (isPlaybackPlaying) return;
+                      onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
+                    }}
                     onKeyDown={(event) => {
+                      if (isPlaybackPlaying) return;
                       if (event.key === "Enter" || event.key === " ") {
                         event.preventDefault();
                         onSelectLayer(layer.id, event.ctrlKey || event.metaKey || event.shiftKey);
@@ -542,6 +616,7 @@ function MotionTimeline({
                   >
                     <span className="timeline-layer-name">{layer.name}</span>
                     <span className="timeline-track">
+                      <span className="timeline-track-playhead" style={{ left: `${playbackPercent}%` }} aria-hidden="true" />
                       {animations.map((animation, index) => {
                         const left = Math.max(0, (animation.startMs / duration) * 100);
                         const width = Math.min(100 - left, Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100));
@@ -555,6 +630,7 @@ function MotionTimeline({
                             layerId={layer.id}
                             animationIndex={index}
                             onUpdateTiming={updateAnimationTiming}
+                            disabled={isPlaybackPlaying}
                           />
                         );
                       })}
@@ -578,6 +654,7 @@ function TimelineSegment({
   layerId,
   animationIndex,
   onUpdateTiming,
+  disabled,
 }: {
   animation: LayerAnimation;
   duration: number;
@@ -586,10 +663,16 @@ function TimelineSegment({
   layerId: string;
   animationIndex: number;
   onUpdateTiming: (layerId: string, animationIndex: number, next: Partial<Pick<LayerAnimation, "startMs" | "durationMs">>) => void;
+  disabled: boolean;
 }) {
   const [dragged, setDragged] = useState(false);
 
   const beginDrag = (event: React.PointerEvent<HTMLElement>, mode: "start" | "end" | "move") => {
+    if (disabled) {
+      event.preventDefault();
+      event.stopPropagation();
+      return;
+    }
     const track = event.currentTarget.closest(".timeline-track") as HTMLElement | null;
     if (!track) return;
     event.preventDefault();
@@ -631,7 +714,7 @@ function TimelineSegment({
 
   return (
     <span
-      className={`timeline-segment ${dragged ? "dragging" : ""}`}
+      className={`timeline-segment ${dragged ? "dragging" : ""} ${disabled ? "disabled" : ""}`}
       style={{ left: `${left}%`, width: `${width}%` }}
       onPointerDown={(event) => beginDrag(event, "move")}
       onClick={(event) => event.stopPropagation()}

@@ -117,6 +117,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
 - アニメ tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
 - The bottom timeline shows animated layers only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, and supports top-edge height resizing.
+- The bottom timeline Play/Pause control previews animation in the editor, defaults to paused/editable, shows a moving playhead bar, and locks layer, inspector, timeline, and preview editing while playing.
+- Middle-button pointer actions on the preview do not select, move, resize, rotate, or pan preview objects.
+- Objects outside the output frame remain visible in the editor preview with dimmed outside-frame portions, while export stays clipped to the output canvas.
+- Schedule generator landscape action buttons match the standard thumbnail generator modal action width; schedule portrait action width remains unchanged.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
 - OBS preview Play/Pause, Reset, and Hide controls are visible by default; `P`, `R`, and `H` trigger Play/Pause, Reset, and Hide/show.
 - Guided start is not visible in the left panel.
@@ -140,7 +144,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 ## Current Results
 
-Latest completed on 2026-06-13.
+Latest completed on 2026-06-14.
+
+### Preview Playback, Middle Button Lockout, Schedule Button Width, And Off-Canvas Display
+
+Completed on 2026-06-14 for editor-preview animation playback and edit locking, middle-button preview lockout, schedule landscape action width alignment, and dimmed off-canvas object display.
+
+- Scope: added timeline Play/Pause editor playback, playhead visualization, playback-time rendering on the main preview canvas, playback lock guards for Layers, Inspector, timeline editing, output/pan/zoom controls, and preview pointer operations; ignored non-left preview pointer down events including middle button; rendered off-canvas layer portions dimmed while preserving normal opacity inside the output frame; matched schedule landscape action width to the standard thumbnail generator modal and preserved portrait width; ignored `output/` debug artifacts in Git.
+- `npm test`: pass. 34 test files, 134 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4362/thumbnail-generator/?runtime=preview-playback-20260614-final2`.
+- Browser plugin attempt: failed because the bundled Browser skill script `scripts/browser-client.mjs` was missing; Playwright with local Chrome channel was used with service workers blocked for a clean current-source render.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Initial app workspace and canvas rendered nonblank.
+  - Off-canvas object pixels were dimmer outside the output frame (`outside rgb 242.4/136/155.6`) than inside (`inside rgb 255/61/90`).
+  - Middle-button preview click in pause mode did not change selection; left-click selection still worked while paused.
+  - Timeline showed one animated row, Play set `aria-pressed=true`, the main preview animation frame changed, and the playhead label advanced to `0.7s`.
+  - Playback set left panel and inspector `aria-disabled=true`, blocked left/right tab switching, and kept selected layer rows at `0` while playing despite left and middle preview clicks.
+  - Schedule landscape action row width matched the standard thumbnail generator action row (`647.0625px` each).
+  - Schedule portrait action row width remained `390px`.
+  - WebP export succeeded with size `51646` bytes.
+  - Mobile viewport horizontal overflow was `0`.
+  - Console health: no page/app runtime errors were reported. The only warnings were Playwright service-worker blocking and test-induced Canvas2D readback guidance.
+- Evidence:
+  - `output/runtime-20260614-preview-playback/runtime-result.json`
+  - `output/runtime-20260614-preview-playback/01-loaded.png`
+  - `output/runtime-20260614-preview-playback/02-playing-locked.png`
+  - `output/runtime-20260614-preview-playback/03-schedule-portrait.png`
+  - `output/runtime-20260614-preview-playback/04-mobile.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
 
 ### Selection Display, Tag Settings, Fit Canvas, And Timeline Height Follow-Up
 

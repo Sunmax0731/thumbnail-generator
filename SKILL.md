@@ -19,5 +19,5 @@ Build and validate a static browser thumbnail generator for video creators. The 
 
 - The app must remain static and GitHub Pages compatible.
 - Do not add backend services or server-only dependencies.
+- Keep runtime-gate screenshots, debug captures, and temporary browser outputs under Git-ignored `output/`.
 - Prefer reversible MVP choices and keep browser-only data handling explicit.
-

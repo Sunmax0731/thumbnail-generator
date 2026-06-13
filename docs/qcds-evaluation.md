@@ -1,6 +1,6 @@
 # QCDS Evaluation
 
-Completed on 2026-06-13.
+Completed on 2026-06-14.
 
 ## Scores
 
@@ -18,6 +18,17 @@ Cost is A+ because the app remains static, browser-only, GitHub Pages compatible
 Delivery is A+ because the open TODO/Issue backlog is closed, implementation and docs are aligned, tests and build pass, runtime evidence is recorded, the user guide and README are current, QCDS evidence is recorded, the release checklist is current, docs can be packaged with the repo workflow, and the pushed branch's GitHub Pages workflow passed.
 
 Satisfaction is A+ because this pass renames the Motion tab to `アニメ`, updates the app identity to `サムネいる？`, lets the timeline collapse without losing its expanded default height, adds PWA install support, and adds a Chrome extension bridge for snapshot-based feature expansion. Prior generator modal polish, browser templates, layer decoration, and Motion/OBS editing remain in place: letter spacing accepts `0`, corner radius is common to image generator controls, schedule landscape/portrait previews match the requested sizing behavior, creative generator action buttons stay inside the preview pane, browser templates can be saved and filtered by tags, Adjust exposes shadow/3D rotation/bevel controls, wave lines render smoothly, text-only controls hide for non-text layers, the timeline appears only while the animation tab is active, timing can be edited with timeline handles and bar dragging, the timeline height is resizable, and OBS preview supports `P`/`R`/`H` shortcuts. Prior cleanup also remains in place: Output buttons and Edit state action buttons stay horizontal by section, template application confirmation is localized, applying a portrait template auto-fits the preview zoom so the canvas is not clipped, browser-template deletion uses the same confirmation modal pattern as other destructive actions, saved palettes and registered single colors can be reordered by drag-and-drop, language moved to the upper-right window controls, the adjacent theme selector supports System, Light, and Dark, Adjust Fill/Stroke opens a draggable popup alpha-capable single-color picker, the preview frame no longer stretches around off-canvas content, clicking outside the output frame clears selection, Image Lab is opened from imported asset rows without duplicated import controls, OBS preview opens a popup-style canvas-only document, OBS preview now fills the preview viewport and retries fullscreen from the preview window, and template lists are resizable. Remaining satisfaction risk is mainly browser storage quota behavior, broader real-user font files, cross-browser behavior outside Chromium, OBS capture behavior on the user's real setup, browser permission limits around true OS/browser chrome removal, and real-device checks.
+
+## 2026-06-14 Preview Playback, Middle Button Lockout, Schedule Button Width, And Off-Canvas Display
+
+All QCDS axes remain A+.
+
+- Quality: A+. The editor preview now has Play/Pause animation playback, a visible timeline playhead, and explicit playback locks for layer rows, inspector controls, timeline timing edits, and preview canvas operations. Middle-button preview operations are ignored, off-canvas layer portions stay visible but dimmed outside the output frame, and schedule landscape action buttons match the standard thumbnail generator width while portrait width remains unchanged.
+- Cost: A+. The change remains scoped to existing React/TypeScript/CSS rendering and local docs, adds no backend, paid service, or dependency, and stores debug captures under Git-ignored `output/`.
+- Delivery: A+. `npm test` passed with 34 files and 134 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4362/thumbnail-generator/?runtime=preview-playback-20260614-final2`.
+- Satisfaction: A+. The four requested fixes are implemented and verified, and the branch workflow remains ready for GitHub Pages deployment.
+
+Runtime evidence confirms nonblank render, dimmed outside-frame pixels (`outside rgb 242.4/136/155.6` versus `inside rgb 255/61/90`), middle-button pause-mode lockout with left-click selection still working, one timeline row, playback `aria-pressed=true`, animated frame changes, visible playhead at `0.7s`, left panel and inspector `aria-disabled=true`, blocked panel tab switching while playing, selected layer rows staying `0` while playing, schedule landscape/standard action width match at `647.0625px`, schedule portrait action width `390px`, WebP export size `51646`, and mobile horizontal overflow `0`. Browser plugin automation was unavailable because its bundled `browser-client.mjs` script was missing, so Playwright with local Chrome and blocked service workers was used. Evidence files are under `output/runtime-20260614-preview-playback/`.
 
 ## 2026-06-13 Selection Display, Tag Settings, Fit Canvas, And Timeline Height Follow-Up
 

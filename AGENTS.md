@@ -12,6 +12,7 @@
 - Keep work scoped to this repository.
 - Update `README.md`, `AGENTS.md`, `SKILL.md`, and docs when repository workflow or canonical paths change.
 - Keep artifacts UTF-8 clean. Do not copy corrupted text fragments into docs or code.
+- Write runtime-gate screenshots, debug captures, and temporary browser outputs under `output/`; this directory is intentionally ignored by Git.
 
 ## Validation
 
@@ -25,4 +26,3 @@
 - Use one task branch named `codex/thumbnail-generator-static-app`.
 - Commit docs and implementation in the same work unit.
 - Push to `origin` when validation passes and permissions allow.
-

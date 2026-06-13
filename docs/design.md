@@ -47,6 +47,10 @@ The Colors tab treats registered single colors as editable rows. Selecting a row
 
 The status bar can show compact warning chips for long text, low contrast, hidden important layers, edge-safe-area risk, heavy assets, many layers, 4K output, and large storage estimates. These warnings are intentionally advisory and sit beside the status message without blocking the export controls.
 
+The editor playback state is explicit in the bottom timeline. The Play/Pause control lives beside the timeline duration, the playhead appears over the ruler and track rows, and the surrounding editor dims layer and inspector panels while interactions are locked. Playback is a preview mode, not an edit mode: selecting, dragging, resizing, rotating, timeline timing edits, and middle-button preview actions are all inactive until playback is paused.
+
+Off-canvas content remains spatially visible around the fixed output frame so users can recover or adjust objects placed beyond the export bounds. The outside-frame portions are dimmed against the workbench while the portion inside the output frame renders at normal opacity.
+
 ## UI Principles
 
 - Build the actual editor, not a landing page.

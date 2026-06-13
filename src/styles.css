@@ -1179,6 +1179,15 @@ button:disabled {
   cursor: grabbing;
 }
 
+.canvas-scroll.playback-running {
+  cursor: not-allowed;
+}
+
+.playback-disabled-panel {
+  opacity: 0.58;
+  filter: grayscale(0.18);
+}
+
 .canvas-frame {
   overflow: hidden;
   border: 1px solid rgba(17, 24, 39, 0.35);
@@ -1238,6 +1247,18 @@ button:disabled {
   gap: 8px;
 }
 
+.timeline-playback-button {
+  min-height: 28px;
+  padding: 0 9px;
+  color: var(--accent-strong);
+}
+
+.timeline-playback-button.playing {
+  border-color: rgba(255, 79, 95, 0.42);
+  background: rgba(255, 79, 95, 0.1);
+  color: var(--coral);
+}
+
 .timeline-collapse-button {
   min-height: 26px;
   padding: 0 9px;
@@ -1258,6 +1279,15 @@ button:disabled {
   color: var(--muted);
   font-size: 10px;
   font-weight: 850;
+}
+
+.timeline-ruler .timeline-playhead-label {
+  top: -1px;
+  z-index: 2;
+  padding: 1px 5px;
+  border-radius: 999px;
+  background: var(--coral);
+  color: #ffffff;
 }
 
 .timeline-track-list {
@@ -1309,6 +1339,19 @@ button:disabled {
   background: var(--panel);
 }
 
+.timeline-track-playhead {
+  position: absolute;
+  z-index: 3;
+  top: -2px;
+  bottom: -2px;
+  width: 2px;
+  transform: translateX(-1px);
+  border-radius: 999px;
+  background: var(--coral);
+  box-shadow: 0 0 0 2px rgba(255, 79, 95, 0.14);
+  pointer-events: none;
+}
+
 .timeline-segment {
   position: absolute;
   top: 2px;
@@ -1334,6 +1377,11 @@ button:disabled {
 .timeline-segment.dragging {
   cursor: grabbing;
   filter: brightness(1.04);
+}
+
+.timeline-segment.disabled {
+  cursor: not-allowed;
+  filter: saturate(0.62);
 }
 
 .timeline-segment-label {
@@ -2861,6 +2909,10 @@ button:disabled {
   grid-template-columns: minmax(220px, 0.72fr) minmax(340px, 1fr) minmax(136px, 0.38fr) minmax(640px, 2fr);
 }
 
+.schedule-builder-dialog:not(.portrait-builder-dialog):not(.creative-builder-dialog) .schedule-builder-grid {
+  grid-template-columns: minmax(220px, 0.72fr) minmax(340px, 1fr) minmax(136px, 0.38fr) minmax(640px, 2fr);
+}
+
 .creative-builder-dialog.portrait-builder-dialog {
   width: min(1240px, calc(100vw - 24px));
   max-width: 1240px;
@@ -3306,6 +3358,10 @@ button:disabled {
   justify-self: center;
   grid-template-columns: 1fr 1fr 1fr;
   width: min(390px, 100%);
+}
+
+.schedule-builder-dialog:not(.portrait-builder-dialog):not(.creative-builder-dialog) .confirm-actions.schedule-builder-actions {
+  width: min(100%, calc(min(70vh, 700px) * var(--preview-ratio)));
 }
 
 .confirm-actions.creative-builder-actions {

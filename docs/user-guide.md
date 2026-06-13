@@ -28,6 +28,8 @@ npm run preview
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape layers, and resize the color list area with the handle below the list.
 - アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated layers in the アニメ-only bottom timeline for OBS preview playback.
 
+- Timeline Play/Pause previews animation directly in the editor. Playback starts paused/editable; while playing, the layer list, inspector, timeline timing edits, and preview canvas edits are locked, and the timeline playhead shows the current playback position.
+
 ## Layout Compatibility
 
 CSV and HTML-like layout text remain in browser edit states and saved templates for compatibility. The GUI no longer shows a Generated layout editor in the preview pane.
@@ -53,7 +55,8 @@ CSV and HTML-like layout text remain in browser edit states and saved templates 
 - While one group is selected, use the group section's asset registration button to save that group as a tagged group object. Reuse it later from Assets.
 - Use Fit to canvas in Adjust to set selected image or shape layers to `x=0`, `y=0`, and the current output width/height.
 - Use the mouse wheel to zoom the preview beyond 100%. Use the Pan button, Space-drag, Alt-drag, or right-drag to move around a zoomed or tall preview without relying on visible scrollbars. Preset and output-size changes keep the current zoom until you select Fit canvas.
-- Layers can extend outside the document while editing; the preview keeps the output frame and zoom stable instead of stretching around off-canvas content. Exported images still include only the configured canvas size.
+- Layers can extend outside the document while editing; the preview keeps the output frame and zoom stable instead of stretching around off-canvas content. Outside-frame portions are dimmed so they are easy to identify, and exported images still include only the configured canvas size.
+- Middle-button pointer actions on the preview are ignored, so they do not select, move, resize, rotate, or pan objects.
 - In Adjust, use Reset rotation to return the selected layer to `0` degrees.
 - Disabled controls are intentionally inactive because they do not affect the current target. For example, Line height is disabled until a text layer contains multiple lines.
 

@@ -16,6 +16,7 @@ import {
   type CanvasInteractionMode,
   type CanvasPoint,
 } from "./lib/canvasInteraction";
+import { calculatePreviewPadding } from "./lib/previewPadding";
 import {
   applyBrandKitToLayers,
   createBrandKitFromCurrentState,
@@ -108,7 +109,7 @@ import {
 } from "./lib/tagRegistry";
 import { readThemeMode, resolveThemeMode, writeThemeMode, type ThemeMode } from "./lib/theme";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
-import type { BrandKit, ExportFormat, GroupObjectAsset, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+import type { BrandKit, ExportFormat, GroupObjectAsset, ImageAsset, LayerAnimation, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
 type ImagePalettePreviewHoverState = {
@@ -219,6 +220,8 @@ function App() {
   const [canvasCursor, setCanvasCursor] = useState("default");
   const [hoverInteractionMode, setHoverInteractionMode] = useState<CanvasInteractionMode | null>(null);
   const [activeInteractionMode, setActiveInteractionMode] = useState<CanvasInteractionMode | null>(null);
+  const [isPreviewPlaying, setIsPreviewPlaying] = useState(false);
+  const [previewPlaybackTimeMs, setPreviewPlaybackTimeMs] = useState(0);
   const [paletteColors, setPaletteColors] = useState<PaletteColor[]>(() =>
     typeof window === "undefined" ? [] : readColorPalette(),
   );
@@ -263,7 +266,11 @@ function App() {
     () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
     [customFonts],
   );
-  const previewPadding = 0;
+  const previewPadding = useMemo(
+    () => calculatePreviewPadding(layers, settings, { minimum: 0, margin: 48 }),
+    [layers, settings],
+  );
+  const previewPlaybackDurationMs = useMemo(() => calculateMotionTimelineDuration(layers), [layers]);
   const selectionLabel =
     selectedLayers.length === 0
       ? t("selection.none")
@@ -329,6 +336,33 @@ function App() {
   }, [layers]);
 
   useEffect(() => {
+    if (!isPreviewPlaying) return;
+    setSelectedIds([]);
+    activeCanvasInteraction.current = null;
+    pendingCanvasTransformPoint.current = null;
+    if (canvasTransformFrame.current !== null) {
+      window.cancelAnimationFrame(canvasTransformFrame.current);
+      canvasTransformFrame.current = null;
+    }
+    setActiveInteractionMode(null);
+    setHoverInteractionMode(null);
+    setCanvasCursor("default");
+  }, []);
+
+  useEffect(() => {
+    if (!isPreviewPlaying) return undefined;
+    const duration = Math.max(1000, previewPlaybackDurationMs);
+    const startedAt = performance.now() - previewPlaybackTimeMs;
+    let frame = 0;
+    const tick = (now: number) => {
+      setPreviewPlaybackTimeMs((now - startedAt) % duration);
+      frame = window.requestAnimationFrame(tick);
+    };
+    frame = window.requestAnimationFrame(tick);
+    return () => window.cancelAnimationFrame(frame);
+  }, [isPreviewPlaying, previewPlaybackDurationMs]);
+
+  useEffect(() => {
     if (!lastLayerSnapshot.current) {
       lastLayerSnapshot.current = structuredClone(layers);
       return;
@@ -349,9 +383,12 @@ function App() {
     if (!canvas) return;
 
     renderThumbnailToCanvas(canvas, layers, assets, settings, {
-      selectedLayerIds: selectedIds,
-      drawSelection: true,
+      selectedLayerIds: isPreviewPlaying ? [] : selectedIds,
+      drawSelection: !isPreviewPlaying,
       previewPadding,
+      dimOutsideCanvas: true,
+      animationTimeMs: isPreviewPlaying ? previewPlaybackTimeMs : undefined,
+      sceneDurationMs: previewPlaybackDurationMs,
       hoverInteractionMode,
       activeInteractionMode,
     })
@@ -369,7 +406,19 @@ function App() {
     return () => {
       cancelled = true;
     };
-  }, [activeInteractionMode, assets, fontReadyRevision, hoverInteractionMode, layers, previewPadding, selectedIds, settings]);
+  }, [
+    activeInteractionMode,
+    assets,
+    fontReadyRevision,
+    hoverInteractionMode,
+    isPreviewPlaying,
+    layers,
+    previewPadding,
+    previewPlaybackDurationMs,
+    previewPlaybackTimeMs,
+    selectedIds,
+    settings,
+  ]);
 
   useEffect(() => {
     if (customFonts.length === 0) return;
@@ -1664,7 +1713,10 @@ function App() {
 
   const handleCanvasPointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
-      if (event.button === 2 || (event.buttons & 2) === 2) return;
+      if (isPreviewPlaying || event.button !== 0) {
+        event.preventDefault();
+        return;
+      }
       const canvas = event.currentTarget;
       const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
       const additive = event.ctrlKey || event.metaKey || event.shiftKey;
@@ -1721,11 +1773,15 @@ function App() {
         setStatus("Selection cleared.");
       }
     },
-    [layers, selectLayer, selectedIds, selectedLayer, selectedLayers],
+    [isPreviewPlaying, layers, selectLayer, selectedIds, selectedLayer, selectedLayers],
   );
 
   const handleCanvasPointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      if (isPreviewPlaying) {
+        event.preventDefault();
+        return;
+      }
       const canvas = event.currentTarget;
       const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
       const active = activeCanvasInteraction.current;
@@ -1760,10 +1816,14 @@ function App() {
       setHoverInteractionMode(null);
       setCanvasCursor("default");
     },
-    [layers, selectedLayer],
+    [isPreviewPlaying, layers, selectedLayer],
   );
 
   const handleCanvasPointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isPreviewPlaying) {
+      event.preventDefault();
+      return;
+    }
     const active = activeCanvasInteraction.current;
     if (!active) return;
     if (canvasTransformFrame.current !== null) {
@@ -2038,7 +2098,7 @@ function App() {
     }
     previewWindow.focus();
     setStatus("OBS preview opened. If browser chrome remains, click the preview or press F to enter fullscreen.");
-  }, []);
+  }, [isPreviewPlaying]);
 
   const handleExport = useCallback(
     async (format?: ExportFormat) => {
@@ -2080,6 +2140,7 @@ function App() {
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
+      if (isPreviewPlaying) return;
       if (isShortcutSuppressed(event.target)) return;
       const key = event.key.toLowerCase();
       const command = event.ctrlKey || event.metaKey;
@@ -2113,7 +2174,7 @@ function App() {
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [copySelectedLayers, cutSelectedLayers, duplicateSelectedLayers, pasteSelectedLayers, redoLayers, undoLayers]);
+  }, [copySelectedLayers, cutSelectedLayers, duplicateSelectedLayers, isPreviewPlaying, pasteSelectedLayers, redoLayers, undoLayers]);
 
   return (
     <div className="app-shell" data-theme={effectiveTheme}>
@@ -2133,8 +2194,9 @@ function App() {
         onOpenTagSettings={() => setIsTagSettingsOpen(true)}
         t={t}
       />
-      <main className="workspace" aria-label="Thumbnail editor workspace">
+      <main className={`workspace ${isPreviewPlaying ? "preview-playback-locked" : ""}`} aria-label="Thumbnail editor workspace">
         <LeftPanel
+          isPlaybackLocked={isPreviewPlaying}
           selectedAssetKey={selectedAssetKey}
           layerPanelProps={{
             layers,
@@ -2202,6 +2264,9 @@ function App() {
           layers={layers}
           selectedIds={selectedIds}
           showMotionTimeline={activeInspectorSection === "motion"}
+          isPlaybackPlaying={isPreviewPlaying}
+          playbackTimeMs={previewPlaybackTimeMs}
+          onTogglePlayback={() => setIsPreviewPlaying((current) => !current)}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
@@ -2221,6 +2286,7 @@ function App() {
           t={t}
         />
         <InspectorPanel
+          isPlaybackLocked={isPreviewPlaying}
           assets={assets}
           layers={layers}
           selectedIds={selectedIds}
@@ -2463,6 +2529,17 @@ function transformLayersFromPointer(active: ActiveCanvasInteraction, point: Canv
   if (!active.layer) return active.layers;
   if (active.mode === "rotate") return [rotateLayer(active.layer, active.start, point)];
   return [resizeLayer(active.layer, active.mode, point)];
+}
+
+function calculateMotionTimelineDuration(layers: ThumbnailLayer[]): number {
+  const animationEnds = layers.flatMap((layer) =>
+    getLayerAnimations(layer).map((animation) => animation.startMs + animation.durationMs),
+  );
+  return Math.max(10000, ...animationEnds);
+}
+
+function getLayerAnimations(layer: ThumbnailLayer): LayerAnimation[] {
+  return layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
 }
 
 function applyCanvasTransform(

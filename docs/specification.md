@@ -43,6 +43,8 @@ Rendering applies each animation entry in order as a temporary draw-time transfo
 
 The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically from its top edge, and supports direct segment start/end and whole-segment dragging.
 
+Editor-preview playback is controlled from the bottom timeline Play/Pause button and starts in the paused/editable state. When playback is running, selected layers are cleared and layer rows, right-inspector controls, timeline timing edits, output-size controls, pan/zoom edit controls, and direct preview canvas interactions are inert until playback is paused. The timeline ruler and each animated row show a playhead bar for the current playback position.
+
 ## PWA Shell
 
 The static build includes install metadata in `public/manifest.webmanifest`, a same-origin service worker in `public/sw.js`, and app icons in `public/favicon.svg` and `public/pwa-icon.svg`.
@@ -203,6 +205,8 @@ The selected layer can be edited directly on the canvas:
 - Resize and rotation handles for the selected layer keep priority over body hit testing so direct editing remains reachable.
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Dragging an object outside the document does not change the user-selected zoom scale or expand the output frame.
+- Visible objects outside the output frame are still rendered in the editor preview, but only outside-frame portions are dimmed. Static export remains clipped to the configured output canvas.
+- Middle-button pointer actions on the preview are ignored; they do not select, move, resize, rotate, or pan preview objects.
 - Vertical text selection, hit testing, resize handles, and Adjust width/height edits use the configured layer display bounds so preview resizing behaves like horizontal text. Edit padding still accounts for the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts

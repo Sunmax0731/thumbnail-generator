@@ -94,6 +94,7 @@ interface LayerColorPickerState {
 }
 
 interface InspectorPanelProps {
+  isPlaybackLocked?: boolean;
   assets: ImageAsset[];
   layers: ThumbnailLayer[];
   selectedIds: string[];
@@ -155,6 +156,7 @@ interface InspectorPanelProps {
 }
 
 export function InspectorPanel({
+  isPlaybackLocked = false,
   assets,
   layers,
   selectedIds,
@@ -277,7 +279,26 @@ export function InspectorPanel({
   };
 
   return (
-    <aside className="side-panel inspector-panel" aria-label={t("inspector.aria")}>
+    <aside
+      className={`side-panel inspector-panel ${isPlaybackLocked ? "playback-disabled-panel" : ""}`}
+      aria-label={t("inspector.aria")}
+      aria-disabled={isPlaybackLocked}
+      onPointerDownCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onClickCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+      onKeyDownCapture={(event) => {
+        if (!isPlaybackLocked) return;
+        event.preventDefault();
+        event.stopPropagation();
+      }}
+    >
       <div className="panel-tabs inspector-tabs" role="tablist" aria-label={t("inspector.tabs")}>
         <button
           type="button"
