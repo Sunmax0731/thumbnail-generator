@@ -10,7 +10,7 @@ import type { Translator } from "../lib/i18n";
 import type { ImageAsset } from "../lib/types";
 
 type LabMode = CropMode;
-type RectDragMode = "new" | "move" | "nw" | "ne" | "sw" | "se";
+type RectDragMode = "new" | "move" | "nw" | "n" | "ne" | "e" | "se" | "s" | "sw" | "w";
 
 interface ImageLabPanelProps {
   assets: ImageAsset[];
@@ -38,9 +38,12 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
   const dragStartRect = useRef<RectSelection | null>(null);
   const rectDragMode = useRef<RectDragMode>("new");
   const polygonDragIndex = useRef<number | null>(null);
+  const panDrag = useRef<{ clientX: number; clientY: number; panX: number; panY: number } | null>(null);
   const [assetKey, setAssetKey] = useState(assets[0]?.key ?? "");
   const [imageSize, setImageSize] = useState({ width: 1, height: 1 });
   const [mode, setMode] = useState<LabMode>("none");
+  const [previewZoom, setPreviewZoom] = useState(1);
+  const [previewPan, setPreviewPan] = useState({ x: 0, y: 0 });
   const [cropRect, setCropRect] = useState<RectSelection>({ x: 0, y: 0, width: 0, height: 0 });
   const [polygonPoints, setPolygonPoints] = useState<ImagePoint[]>([]);
   const [chromaEnabled, setChromaEnabled] = useState(false);
@@ -49,6 +52,31 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
   const [isProcessing, setIsProcessing] = useState(false);
 
   const selectedAsset = useMemo(() => assets.find((asset) => asset.key === assetKey) ?? assets[0], [assetKey, assets]);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return undefined;
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      event.stopPropagation();
+      const nextZoom = clamp(previewZoom * (event.deltaY > 0 ? 0.9 : 1.1), 0.2, 6);
+      const rect = canvas.getBoundingClientRect();
+      const canvasWidth = canvas.width;
+      const canvasHeight = canvas.height;
+      const canvasX = ((event.clientX - rect.left) / rect.width) * canvasWidth;
+      const canvasY = ((event.clientY - rect.top) / rect.height) * canvasHeight;
+      setPreviewPan((current) => {
+        const ratio = nextZoom / previewZoom;
+        return {
+          x: canvasX - (canvasX - current.x - canvasWidth / 2) * ratio - canvasWidth / 2,
+          y: canvasY - (canvasY - current.y - canvasHeight / 2) * ratio - canvasHeight / 2,
+        };
+      });
+      setPreviewZoom(nextZoom);
+    };
+    canvas.addEventListener("wheel", handleWheel, { passive: false });
+    return () => canvas.removeEventListener("wheel", handleWheel);
+  }, [previewZoom]);
 
   useEffect(() => {
     if (initialAssetKey && assets.some((asset) => asset.key === initialAssetKey)) {
@@ -71,13 +99,13 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
       const nextSize = { width: image.naturalWidth || image.width, height: image.naturalHeight || image.height };
       setImageSize(nextSize);
       setCropRect((current) => (mode === "none" ? current : fitRect(current, nextSize.width, nextSize.height)));
-      drawPreview(image, cropRect, polygonPoints, mode, previewRect, canvasRef.current);
+      drawPreview(image, cropRect, polygonPoints, mode, previewRect, canvasRef.current, previewZoom, previewPan);
     };
     image.src = selectedAsset.src;
     return () => {
       cancelled = true;
     };
-  }, [selectedAsset]);
+  }, [cropRect, mode, polygonPoints, previewPan, previewZoom, selectedAsset]);
 
   useEffect(() => {
     if (!selectedAsset) return;
@@ -85,13 +113,13 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
     const image = new Image();
     image.crossOrigin = "anonymous";
     image.onload = () => {
-      if (!cancelled) drawPreview(image, cropRect, polygonPoints, mode, previewRect, canvasRef.current);
+      if (!cancelled) drawPreview(image, cropRect, polygonPoints, mode, previewRect, canvasRef.current, previewZoom, previewPan);
     };
     image.src = selectedAsset.src;
     return () => {
       cancelled = true;
     };
-  }, [cropRect, mode, polygonPoints, selectedAsset]);
+  }, [cropRect, mode, polygonPoints, previewPan, previewZoom, selectedAsset]);
 
   const pointerToImage = useCallback((event: React.PointerEvent<HTMLCanvasElement>): ImagePoint => {
     const canvas = event.currentTarget;
@@ -107,7 +135,15 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
 
   const handlePointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      event.stopPropagation();
+      if (event.button === 2 || (event.buttons & 2) === 2) {
+        event.preventDefault();
+        safelySetPointerCapture(event.currentTarget, event.pointerId);
+        panDrag.current = { clientX: event.clientX, clientY: event.clientY, panX: previewPan.x, panY: previewPan.y };
+        return;
+      }
       if (mode === "none") return;
+      if (event.button !== 0) return;
       const point = pointerToImage(event);
       if (mode === "polygon") {
         const hitIndex = hitPolygonPoint(point, polygonPoints, previewRect.current.scale);
@@ -129,7 +165,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
       rectDragMode.current = hitRectDragMode(point, dragStartRect.current, previewRect.current.scale);
       if (rectDragMode.current === "new") setCropRect({ x: point.x, y: point.y, width: 1, height: 1 });
     },
-    [cropRect, imageSize.height, imageSize.width, mode, pointerToImage, polygonPoints],
+    [cropRect, imageSize.height, imageSize.width, mode, pointerToImage, polygonPoints, previewPan],
   );
 
   const selectMode = (nextMode: LabMode) => {
@@ -145,6 +181,16 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
 
   const handlePointerMove = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      event.stopPropagation();
+      if (panDrag.current) {
+        event.preventDefault();
+        const active = panDrag.current;
+        setPreviewPan({
+          x: active.panX + event.clientX - active.clientX,
+          y: active.panY + event.clientY - active.clientY,
+        });
+        return;
+      }
       const point = pointerToImage(event);
       if (mode === "polygon" && polygonDragIndex.current !== null) {
         const index = polygonDragIndex.current;
@@ -169,7 +215,9 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
 
   const handlePointerUp = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      event.stopPropagation();
       const hadDragSelection = Boolean(dragStart.current) && mode !== "polygon";
+      panDrag.current = null;
       dragStart.current = null;
       dragStartRect.current = null;
       polygonDragIndex.current = null;
@@ -261,11 +309,12 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
           height={previewHeight}
           className="image-lab-canvas"
           aria-label={t("imageLab.preview")}
-          onPointerDown={handlePointerDown}
-          onPointerMove={handlePointerMove}
-          onPointerUp={handlePointerUp}
-          onPointerCancel={handlePointerUp}
-        />
+        onPointerDown={handlePointerDown}
+        onPointerMove={handlePointerMove}
+        onPointerUp={handlePointerUp}
+        onPointerCancel={handlePointerUp}
+          onContextMenu={(event) => event.preventDefault()}
+      />
         {mode === "polygon" ? (
           <div className="button-grid">
             <button type="button" className="secondary-button icon-text" onClick={() => setPolygonPoints([])}>
@@ -333,6 +382,8 @@ function drawPreview(
   mode: LabMode,
   previewRef: MutableRefObject<PreviewRect>,
   canvas: HTMLCanvasElement | null,
+  zoom = 1,
+  pan = { x: 0, y: 0 },
 ) {
   if (!canvas) return;
   const context = canvas.getContext("2d");
@@ -342,11 +393,11 @@ function drawPreview(
   context.fillRect(0, 0, canvas.width, canvas.height);
   const imageWidth = image.naturalWidth || image.width;
   const imageHeight = image.naturalHeight || image.height;
-  const scale = Math.min((canvas.width - 20) / imageWidth, (canvas.height - 20) / imageHeight);
+  const scale = Math.min((canvas.width - 20) / imageWidth, (canvas.height - 20) / imageHeight) * zoom;
   const width = imageWidth * scale;
   const height = imageHeight * scale;
-  const x = (canvas.width - width) / 2;
-  const y = (canvas.height - height) / 2;
+  const x = (canvas.width - width) / 2 + pan.x;
+  const y = (canvas.height - height) / 2 + pan.y;
   previewRef.current = { x, y, width, height, scale };
   context.drawImage(image, x, y, width, height);
   context.strokeStyle = "#10b6d7";
@@ -390,9 +441,13 @@ function drawPreview(
   context.setLineDash([]);
   drawRectHandles(context, [
     [rx, ry],
+    [rx + rw / 2, ry],
     [rx + rw, ry],
-    [rx, ry + rh],
+    [rx + rw, ry + rh / 2],
     [rx + rw, ry + rh],
+    [rx + rw / 2, ry + rh],
+    [rx, ry + rh],
+    [rx, ry + rh / 2],
   ]);
 }
 
@@ -467,9 +522,13 @@ function hitRectDragMode(point: ImagePoint, rect: RectSelection, scale: number):
   const threshold = Math.max(8, 12 / scale);
   const handles: Array<[RectDragMode, ImagePoint]> = [
     ["nw", { x: normalized.x, y: normalized.y }],
+    ["n", { x: normalized.x + normalized.width / 2, y: normalized.y }],
     ["ne", { x: normalized.x + normalized.width, y: normalized.y }],
-    ["sw", { x: normalized.x, y: normalized.y + normalized.height }],
+    ["e", { x: normalized.x + normalized.width, y: normalized.y + normalized.height / 2 }],
     ["se", { x: normalized.x + normalized.width, y: normalized.y + normalized.height }],
+    ["s", { x: normalized.x + normalized.width / 2, y: normalized.y + normalized.height }],
+    ["sw", { x: normalized.x, y: normalized.y + normalized.height }],
+    ["w", { x: normalized.x, y: normalized.y + normalized.height / 2 }],
   ];
   for (const [mode, handle] of handles) {
     if (Math.hypot(point.x - handle.x, point.y - handle.y) <= threshold) return mode;
@@ -488,14 +547,32 @@ function hitRectDragMode(point: ImagePoint, rect: RectSelection, scale: number):
 function updateRectFromDrag(rect: RectSelection, start: ImagePoint, point: ImagePoint, mode: RectDragMode): RectSelection {
   const right = rect.x + rect.width;
   const bottom = rect.y + rect.height;
+  const ratio = Math.max(0.001, rect.width / Math.max(1, rect.height));
   if (mode === "move") {
     return { ...rect, x: rect.x + point.x - start.x, y: rect.y + point.y - start.y };
   }
-  if (mode === "nw") return { x: point.x, y: point.y, width: right - point.x, height: bottom - point.y };
-  if (mode === "ne") return { x: rect.x, y: point.y, width: point.x - rect.x, height: bottom - point.y };
-  if (mode === "sw") return { x: point.x, y: rect.y, width: right - point.x, height: point.y - rect.y };
-  if (mode === "se") return { x: rect.x, y: rect.y, width: point.x - rect.x, height: point.y - rect.y };
+  if (mode === "n") return { x: rect.x, y: point.y, width: rect.width, height: bottom - point.y };
+  if (mode === "e") return { x: rect.x, y: rect.y, width: point.x - rect.x, height: rect.height };
+  if (mode === "s") return { x: rect.x, y: rect.y, width: rect.width, height: point.y - rect.y };
+  if (mode === "w") return { x: point.x, y: rect.y, width: right - point.x, height: rect.height };
+  if (mode === "nw") return resizeCornerWithAspect({ x: right, y: bottom }, point, ratio, "nw");
+  if (mode === "ne") return resizeCornerWithAspect({ x: rect.x, y: bottom }, point, ratio, "ne");
+  if (mode === "sw") return resizeCornerWithAspect({ x: right, y: rect.y }, point, ratio, "sw");
+  if (mode === "se") return resizeCornerWithAspect({ x: rect.x, y: rect.y }, point, ratio, "se");
   return { x: start.x, y: start.y, width: point.x - start.x, height: point.y - start.y };
+}
+
+function resizeCornerWithAspect(anchor: ImagePoint, point: ImagePoint, ratio: number, mode: "nw" | "ne" | "sw" | "se"): RectSelection {
+  const rawWidth = Math.abs(point.x - anchor.x);
+  const rawHeight = Math.abs(point.y - anchor.y);
+  const widthFromHeight = rawHeight * ratio;
+  const heightFromWidth = rawWidth / ratio;
+  const useWidth = rawWidth >= widthFromHeight;
+  const width = Math.max(1, useWidth ? rawWidth : widthFromHeight);
+  const height = Math.max(1, useWidth ? heightFromWidth : rawHeight);
+  const x = mode === "nw" || mode === "sw" ? anchor.x - width : anchor.x;
+  const y = mode === "nw" || mode === "ne" ? anchor.y - height : anchor.y;
+  return { x, y, width, height };
 }
 
 function hitPolygonPoint(point: ImagePoint, points: ImagePoint[], scale: number): number {

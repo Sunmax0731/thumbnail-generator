@@ -147,6 +147,17 @@ export interface ImageAsset {
   src: string;
   width?: number;
   height?: number;
+  tags?: string[];
+}
+
+export interface GroupObjectAsset {
+  id: string;
+  name: string;
+  tags: string[];
+  createdAt: string;
+  updatedAt: string;
+  layers: ThumbnailLayer[];
+  assets: ImageAsset[];
 }
 
 export interface OutputPreset {

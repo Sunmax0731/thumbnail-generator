@@ -81,6 +81,22 @@ Image layers include:
 - `effects.contrast`: percent, where `100` is unchanged.
 - `effects.mosaic`: pixel block size. `0` disables mosaic.
 
+Imported image assets may also store `tags`: an ordered list of browser-local free-form labels. Tags are assigned before imported images are registered, can be edited later from the Assets tab, are preserved in edit-state and template snapshots, and are used by the Assets tag filter.
+
+Folder import uses the browser file picker directory capability when available. Only files returned by the picker with supported image MIME types or common image extensions are registered; no backend or server scan is used.
+
+## Group Object Assets
+
+Group object assets are browser-local reusable layer groups stored under `thumbnail-generator.groupObjects.v1`. A group object stores:
+
+- Group object id and user-visible name.
+- Tags.
+- Created and updated timestamps.
+- A cloned layer list from the selected group.
+- Referenced image assets needed by image layers inside that group.
+
+Registering is only enabled while one selected editable group is active. Reusing a group object creates new layer ids, assigns one fresh shared `groupId`/`groupName`, offsets the layers slightly, merges any missing referenced image assets into the current asset list, and selects the newly inserted group for immediate placement.
+
 ## Text Layers
 
 Text layers include:
@@ -244,7 +260,7 @@ The right inspector is grouped by task:
 
 The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a vertical resize handle while preserving the default expanded height.
 
-The Layers, Colors, and Browser templates lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
+The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
 
 Controls that cannot affect the current edit target are disabled instead of accepting inert input. Examples include single-line text line height, outline or stroke colors when stroke width is `0`, image asset switching when there is only one asset, and palette application when no selected text or shape layer can receive the color.
 
@@ -359,7 +375,9 @@ The first successful image response is converted to a data URL image asset and i
 
 ## Preview Zoom And Pan
 
-The canvas preview keeps a user-controlled zoom value. Preset or output size changes do not automatically recompute zoom. Users can select Fit canvas to calculate a one-time fit zoom from the visible canvas stage and the document aspect ratio, or pan the scrollable preview manually with the Pan button, Space-drag, or Alt-drag.
+The canvas preview keeps a user-controlled zoom value. Preset or output size changes do not automatically recompute zoom. Users can select Fit canvas to calculate a one-time fit zoom from the visible canvas stage and the document aspect ratio, or pan the preview manually with the Pan button, Space-drag, Alt-drag, or right-button drag.
+
+Mouse-wheel movement over the preview zooms in and out around the pointer location and can exceed 100% up to the editor maximum. The preview workbench hides browser scrollbars and uses internal pan offsets so oversized canvases remain navigable without visible scrollbars, matching the canvas workspace behavior of tools such as Photoshop and Illustrator.
 
 The edit preview includes dynamic padding around the document. Padding expands to include visible off-canvas layer bounds and selection handles. Export rendering does not use this edit padding, so downloaded PNG/JPEG/WebP files remain clipped to the configured output width and height.
 
@@ -371,9 +389,9 @@ The app supports English and Japanese UI labels. Initial language is detected fr
 
 The app supports `system`, `light`, and `dark` theme modes from the top-right toolbar. The selected mode is stored in browser `localStorage` under `thumbnail-generator.theme.v1`. `system` follows `prefers-color-scheme`; `light` and `dark` force the corresponding app theme. The resolved theme is applied to the document and app shell through `data-theme` so static GitHub Pages output remains browser-only.
 
-## Browser Templates
+## Registered Templates
 
-Templates are saved in browser `localStorage` under a repository-specific key. A template stores:
+Registered templates are saved in browser `localStorage` under a repository-specific key. A template stores:
 
 - Template id and user-provided name.
 - Saved timestamp.
@@ -453,6 +471,8 @@ The Image Lab modal workspace opens from an imported asset row in the Assets tab
 - Polygon/free cutout by placing three or more points.
 - Rectangular and circular/elliptical cutout selections can be moved or resized after creation by dragging preview handles.
 - Polygon/free cutout points can be dragged after placement and Alt-clicked to delete a point.
+- Image Lab preview zooms with the mouse wheel and pans with right-button drag. Right-click does not add polygon/free-selection points.
+- Rectangular and circular/elliptical selections expose corner and side handles. Corner handles preserve the selected range aspect ratio while resizing; side handles resize that side freely.
 
 Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.
 

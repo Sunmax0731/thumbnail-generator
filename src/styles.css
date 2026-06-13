@@ -609,8 +609,9 @@ button:disabled {
 
 .asset-list {
   display: grid;
+  align-content: start;
   gap: 6px;
-  max-height: 520px;
+  min-height: 120px;
   overflow: auto;
 }
 
@@ -625,6 +626,71 @@ button:disabled {
   background: var(--panel-soft);
   font-size: 12px;
   font-weight: 700;
+}
+
+.asset-import-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+}
+
+.asset-row .tag-editor {
+  grid-column: 1 / -1;
+}
+
+.tag-editor {
+  display: grid;
+  gap: 6px;
+}
+
+.tag-chip-row,
+.tag-input-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 5px;
+  min-width: 0;
+}
+
+.tag-input-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+}
+
+.tag-input-row input {
+  min-width: 0;
+}
+
+.tag-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 22px;
+  padding: 0 7px;
+  border: 1px solid rgba(16, 182, 215, 0.24);
+  border-radius: 999px;
+  background: rgba(16, 182, 215, 0.1);
+  color: var(--accent-strong);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.tag-empty {
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 800;
+}
+
+.group-object-list {
+  display: grid;
+  align-content: start;
+  gap: 6px;
+  min-height: 120px;
+  overflow: auto;
+}
+
+.group-object-row {
+  display: grid;
 }
 
 .asset-row.selected {
@@ -1069,9 +1135,10 @@ button:disabled {
 }
 
 .canvas-scroll {
+  position: relative;
   display: grid;
   min-height: 0;
-  overflow: auto;
+  overflow: hidden;
   flex: 1;
   padding: 22px;
   place-items: center;
@@ -1103,6 +1170,8 @@ button:disabled {
   border-radius: 8px;
   background: #111827;
   box-shadow: var(--shadow);
+  transform-origin: center;
+  will-change: transform;
 }
 
 .thumbnail-canvas {

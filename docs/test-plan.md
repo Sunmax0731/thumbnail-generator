@@ -1050,3 +1050,34 @@ Completed on 2026-06-12.
   - `output/runtime-20260612-motion-ui/obs-preview-controls.png`
   - `output/runtime-20260612-motion-ui/mobile.png`
 - CSV/HTML compatibility: no dedicated visible CSV/HTML control panel in this build; compatibility is covered by unit tests for CSV import, HTML import, and CSV/HTML export of `animationText`, `animationEffect`, and `animationEffectIntensity`.
+
+## Assets, Preview Pan/Zoom, And ImageLab Runtime Gate (2026-06-13)
+
+Completed on 2026-06-13.
+
+- Scope: default unselected state, Preview wheel zoom/right-drag pan/no scrollbars, folder image import, asset tags and filtering, group-object assets, registered-template label update, resizable/collapsible asset sections, and ImageLab wheel zoom/right-drag pan/free-selection behavior.
+- `npm test`: pass. 33 test files, 128 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback was used.
+- Runtime gate URL: `http://127.0.0.1:4351/thumbnail-generator/?runtime=assets-preview-1781348714215`.
+- Desktop viewport: `1440x980`.
+- Mobile viewport: `390x844`.
+- Runtime checks:
+  - Nonblank initial canvas: pass.
+  - Initial page load and creative generator output both left the editor in the unselected state.
+  - Registered templates label visible: pass.
+  - Preview wheel zoom exceeded 100% (`53 -> 114`) and the preview container kept `overflow-x/y: hidden`.
+  - Preview right-drag pan changed the frame transform (`matrix(..., 0, 1) -> matrix(..., 95, 56)`) without scrollbars.
+  - Folder input exposed `webkitdirectory`; folder import registered the two supported image files and ignored the text file.
+  - Import-time tags were applied before list registration; asset tag filtering narrowed the list; registered asset tags were editable.
+  - Asset image list resize changed height (`260 -> 332`), and the group-object section collapsed/expanded.
+  - Group-object registration was disabled before grouping, enabled for a selected group, saved with tags, appeared in Assets, and was reusable on the canvas (`layers=13`).
+  - ImageLab wheel zoom and right-drag pan changed the preview; free selection ignored right-click point placement and still accepted left-click points.
+  - Export path was exercised and downloaded a non-empty thumbnail file.
+  - Mobile canvas nonblank and horizontal overflow `0`.
+  - Console health: no page errors or app console warnings/errors.
+- Evidence:
+  - `output/runtime-20260613-assets-preview/runtime-result.json`
+  - `output/runtime-20260613-assets-preview/desktop-final.png`
+  - `output/runtime-20260613-assets-preview/mobile-final.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.

@@ -2,6 +2,8 @@
 import type { CSSProperties } from "react";
 import {
   CalendarDays,
+  ChevronDown,
+  ChevronRight,
   FolderOpen,
   GripHorizontal,
   ImagePlus,
@@ -31,7 +33,7 @@ import {
 } from "../lib/scheduleBuilder";
 import { normalizeColor, type PaletteColor, type SavedColorPalette } from "../lib/colorPalette";
 import type { SavedTemplate } from "../lib/templates";
-import type { ImageAsset, OutputSettings, TextLayer } from "../lib/types";
+import type { GroupObjectAsset, ImageAsset, OutputSettings, TextLayer } from "../lib/types";
 import { renderThumbnailToCanvas } from "../lib/renderCanvas";
 
 type LeftPanelSection = "templates" | "layers" | "assets";
@@ -48,10 +50,14 @@ interface LeftPanelProps {
   language: Language;
   paletteColors: PaletteColor[];
   savedColorPalettes: SavedColorPalette[];
-  onImageFiles: (files: FileList | null) => void;
+  groupObjects: GroupObjectAsset[];
+  registeredTags: string[];
+  onImageFiles: (files: FileList | File[] | null, tags?: string[]) => void;
   onSelectAsset: (key: string) => void;
   onAddImageAssetLayer: (key: string) => void;
   onDeleteAsset: (key: string) => void;
+  onUpdateAssetTags: (key: string, tags: string[]) => void;
+  onAddGroupObject: (id: string) => void;
   onGenerateScheduleTemplate: (request: ScheduleBuilderRequest) => void;
   onGenerateCreativeTemplate: (request: CreativeGeneratorRequest) => void;
   onTemplateNameChange: (value: string) => void;
@@ -73,10 +79,14 @@ export function LeftPanel({
   language,
   paletteColors,
   savedColorPalettes,
+  groupObjects,
+  registeredTags,
   onImageFiles,
   onSelectAsset,
   onAddImageAssetLayer,
   onDeleteAsset,
+  onUpdateAssetTags,
+  onAddGroupObject,
   onGenerateScheduleTemplate,
   onGenerateCreativeTemplate,
   onTemplateNameChange,
@@ -87,6 +97,12 @@ export function LeftPanel({
   t,
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("templates");
+  const [imageListHeight, setImageListHeight] = useState(260);
+  const [groupObjectListHeight, setGroupObjectListHeight] = useState(180);
+  const [isImageSectionExpanded, setIsImageSectionExpanded] = useState(true);
+  const [isGroupObjectSectionExpanded, setIsGroupObjectSectionExpanded] = useState(true);
+  const [pendingImageFiles, setPendingImageFiles] = useState<File[] | null>(null);
+  const [assetFilterTag, setAssetFilterTag] = useState("");
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
   const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
@@ -114,6 +130,14 @@ export function LeftPanel({
     const tags = templates.flatMap((template) => template.tags ?? []);
     return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
   }, [templates]);
+  const visibleAssets = useMemo(
+    () => (assetFilterTag ? assets.filter((asset) => asset.tags?.includes(assetFilterTag)) : assets),
+    [assetFilterTag, assets],
+  );
+  const visibleGroupObjects = useMemo(
+    () => (assetFilterTag ? groupObjects.filter((groupObject) => groupObject.tags.includes(assetFilterTag)) : groupObjects),
+    [assetFilterTag, groupObjects],
+  );
   const visibleTemplates = useMemo(
     () => (templateFilterTag ? templates.filter((template) => template.tags?.includes(templateFilterTag)) : templates),
     [templateFilterTag, templates],
@@ -153,62 +177,150 @@ export function LeftPanel({
 
       {activeSection === "assets" ? (
         <>
-          <section className="panel-section">
-            <div className="section-heading">
-              <ImagePlus size={16} />
-              <h2>{t("left.images")}</h2>
+          <section className="panel-section asset-image-section">
+            <button
+              type="button"
+              className="collapsible-heading"
+              aria-expanded={isImageSectionExpanded}
+              onClick={() => setIsImageSectionExpanded((current) => !current)}
+            >
+              {isImageSectionExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <span>{t("left.images")}</span>
               <span className="section-count">{assets.length}</span>
-            </div>
-            <label className="file-drop">
-              <ImagePlus size={19} />
-              <span>{t("left.importImages")}</span>
-              <input
-                type="file"
-                accept="image/*"
-                multiple
-                onChange={(event) => {
-                  onImageFiles(event.currentTarget.files);
-                  event.currentTarget.value = "";
-                }}
-              />
-            </label>
-            <div className="asset-list" aria-label={t("left.assetsList")}>
-              {assets.map((asset) => (
-                <div className={`asset-row ${asset.key === selectedAssetKey ? "selected" : ""}`} key={asset.key}>
-                  <button type="button" className="asset-select" onClick={() => onSelectAsset(asset.key)}>
-                    <img src={asset.src} alt="" />
-                    <span>{asset.name}</span>
-                  </button>
-                  <button
-                    type="button"
-                    className="mini-icon-button"
-                    title={t("left.addAssetLayer")}
-                    onClick={() => onAddImageAssetLayer(asset.key)}
-                  >
-                    <ImagePlus size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    className="mini-icon-button"
-                    title={t("left.openAssetInImageLab")}
-                    onClick={() => {
-                      onSelectAsset(asset.key);
-                      onOpenImageLab(asset.key);
-                    }}
-                  >
-                    <Scissors size={14} />
-                  </button>
-                  <button
-                    type="button"
-                    className="mini-icon-button danger"
-                    title={t("left.deleteAsset", { name: asset.name })}
-                    onClick={() => onDeleteAsset(asset.key)}
-                  >
-                    <Trash2 size={14} />
-                  </button>
+            </button>
+            {isImageSectionExpanded ? (
+              <>
+                <div className="asset-import-grid">
+                  <label className="file-drop compact-drop">
+                    <ImagePlus size={18} />
+                    <span>{t("left.importImages")}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={(event) => {
+                        setPendingImageFiles(Array.from(event.currentTarget.files ?? []));
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
+                  <label className="file-drop compact-drop">
+                    <FolderOpen size={18} />
+                    <span>{t("left.importImageFolder")}</span>
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      {...{ webkitdirectory: "" }}
+                      onChange={(event) => {
+                        setPendingImageFiles(Array.from(event.currentTarget.files ?? []));
+                        event.currentTarget.value = "";
+                      }}
+                    />
+                  </label>
                 </div>
-              ))}
-            </div>
+                <label className="field">
+                  <span>{t("left.assetTagFilter")}</span>
+                  <select value={assetFilterTag} onChange={(event) => setAssetFilterTag(event.currentTarget.value)}>
+                    <option value="">{t("left.templateTagAll")}</option>
+                    {registeredTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </label>
+                <div className="asset-list" aria-label={t("left.assetsList")} style={{ height: imageListHeight }}>
+                  {visibleAssets.length === 0 ? (
+                    <p className="empty-note">{t("left.noAssets")}</p>
+                  ) : (
+                    visibleAssets.map((asset) => (
+                      <div className={`asset-row ${asset.key === selectedAssetKey ? "selected" : ""}`} key={asset.key}>
+                        <button type="button" className="asset-select" onClick={() => onSelectAsset(asset.key)}>
+                          <img src={asset.src} alt="" />
+                          <span>{asset.name}</span>
+                        </button>
+                        <button
+                          type="button"
+                          className="mini-icon-button"
+                          title={t("left.addAssetLayer")}
+                          onClick={() => onAddImageAssetLayer(asset.key)}
+                        >
+                          <ImagePlus size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          className="mini-icon-button"
+                          title={t("left.openAssetInImageLab")}
+                          onClick={() => {
+                            onSelectAsset(asset.key);
+                            onOpenImageLab(asset.key);
+                          }}
+                        >
+                          <Scissors size={14} />
+                        </button>
+                        <button
+                          type="button"
+                          className="mini-icon-button danger"
+                          title={t("left.deleteAsset", { name: asset.name })}
+                          onClick={() => onDeleteAsset(asset.key)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                        <TagEditor
+                          tags={asset.tags ?? []}
+                          suggestions={registeredTags}
+                          datalistId={`asset-tag-options-${asset.key}`}
+                          onChange={(tags) => onUpdateAssetTags(asset.key, tags)}
+                          t={t}
+                        />
+                      </div>
+                    ))
+                  )}
+                </div>
+                <TemplateResizeHandle
+                  label={t("left.resizeAssets")}
+                  onResize={(delta) => setImageListHeight((height) => clampTemplateListHeight(height + delta))}
+                />
+              </>
+            ) : null}
+          </section>
+          <section className="panel-section group-object-section">
+            <button
+              type="button"
+              className="collapsible-heading"
+              aria-expanded={isGroupObjectSectionExpanded}
+              onClick={() => setIsGroupObjectSectionExpanded((current) => !current)}
+            >
+              {isGroupObjectSectionExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
+              <span>{t("left.groupObjects")}</span>
+              <span className="section-count">{groupObjects.length}</span>
+            </button>
+            {isGroupObjectSectionExpanded ? (
+              <>
+                <div className="group-object-list" aria-label={t("left.groupObjects")} style={{ height: groupObjectListHeight }}>
+                  {visibleGroupObjects.length === 0 ? (
+                    <p className="empty-note">{t("left.noGroupObjects")}</p>
+                  ) : (
+                    visibleGroupObjects.map((groupObject) => (
+                      <div className="group-object-row" key={groupObject.id}>
+                        <button type="button" className="template-load" onClick={() => onAddGroupObject(groupObject.id)}>
+                          <Layers size={15} />
+                          <span>
+                            <span>{groupObject.name}</span>
+                            {groupObject.tags[0] ? <small className="template-tag-pill">{groupObject.tags[0]}</small> : null}
+                          </span>
+                        </button>
+                      </div>
+                    ))
+                  )}
+                </div>
+                <TemplateResizeHandle
+                  label={t("left.resizeGroupObjects")}
+                  onResize={(delta) => setGroupObjectListHeight((height) => clampTemplateListHeight(height + delta))}
+                />
+              </>
+            ) : null}
           </section>
         </>
       ) : null}
@@ -367,6 +479,18 @@ export function LeftPanel({
           t={t}
         />
       ) : null}
+      {pendingImageFiles ? (
+        <ImportImageTagDialog
+          files={pendingImageFiles}
+          suggestions={registeredTags}
+          onCancel={() => setPendingImageFiles(null)}
+          onConfirm={(tags) => {
+            onImageFiles(pendingImageFiles, tags);
+            setPendingImageFiles(null);
+          }}
+          t={t}
+        />
+      ) : null}
       {isScheduleBuilderOpen ? (
         <ScheduleBuilderDialog
           draft={scheduleDraft}
@@ -405,6 +529,110 @@ export function LeftPanel({
         />
       ) : null}
     </aside>
+  );
+}
+
+function ImportImageTagDialog({
+  files,
+  suggestions,
+  onCancel,
+  onConfirm,
+  t,
+}: {
+  files: File[];
+  suggestions: string[];
+  onCancel: () => void;
+  onConfirm: (tags: string[]) => void;
+  t: Translator;
+}) {
+  const [tags, setTags] = useState<string[]>([]);
+  return (
+    <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
+      <section className="confirm-dialog import-tag-dialog" role="dialog" aria-modal="true" aria-labelledby="import-tag-title">
+        <div className="modal-title-block">
+          <h2 id="import-tag-title">{t("left.importTagsTitle")}</h2>
+          <p>{t("left.importTagsCopy", { count: files.length })}</p>
+        </div>
+        <TagEditor
+          tags={tags}
+          suggestions={suggestions}
+          datalistId="pending-image-tag-options"
+          onChange={setTags}
+          t={t}
+        />
+        <div className="confirm-actions">
+          <button type="button" className="secondary-button" onClick={onCancel}>
+            {t("inspector.cancel")}
+          </button>
+          <button type="button" className="primary-button" onClick={() => onConfirm(tags)}>
+            {t("left.registerAssets")}
+          </button>
+        </div>
+      </section>
+    </div>
+  );
+}
+
+function TagEditor({
+  tags,
+  suggestions,
+  datalistId,
+  onChange,
+  t,
+}: {
+  tags: string[];
+  suggestions: string[];
+  datalistId: string;
+  onChange: (tags: string[]) => void;
+  t: Translator;
+}) {
+  const [draft, setDraft] = useState("");
+  const addDraftTags = () => {
+    const nextTags = [...tags, ...splitTagDraft(draft)];
+    onChange(dedupeTags(nextTags));
+    setDraft("");
+  };
+  return (
+    <div className="tag-editor">
+      <div className="tag-chip-row">
+        {tags.length === 0 ? <span className="tag-empty">{t("left.noTags")}</span> : null}
+        {tags.map((tag) => (
+          <button
+            key={tag}
+            type="button"
+            className="tag-chip"
+            title={t("left.removeTag", { tag })}
+            onClick={() => onChange(tags.filter((candidate) => candidate !== tag))}
+          >
+            {tag}
+            <span aria-hidden="true">x</span>
+          </button>
+        ))}
+      </div>
+      <div className="tag-input-row">
+        <input
+          type="text"
+          list={datalistId}
+          value={draft}
+          placeholder={t("left.tagPlaceholder")}
+          onChange={(event) => setDraft(event.currentTarget.value)}
+          onKeyDown={(event) => {
+            if (event.key === "Enter") {
+              event.preventDefault();
+              addDraftTags();
+            }
+          }}
+        />
+        <button type="button" className="secondary-button" onClick={addDraftTags} disabled={splitTagDraft(draft).length === 0}>
+          {t("left.addTag")}
+        </button>
+        <datalist id={datalistId}>
+          {suggestions.map((tag) => (
+            <option key={tag} value={tag} />
+          ))}
+        </datalist>
+      </div>
+    </div>
   );
 }
 
@@ -448,6 +676,25 @@ function TemplateResizeHandle({ label, onResize }: { label: string; onResize: (d
 
 function clampTemplateListHeight(value: number): number {
   return Math.min(720, Math.max(120, Math.round(value)));
+}
+
+function splitTagDraft(value: string): string[] {
+  return value
+    .split(",")
+    .map((tag) => tag.trim().replace(/\s+/g, " "))
+    .filter(Boolean);
+}
+
+function dedupeTags(tags: string[]): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const tag of tags) {
+    const key = tag.toLocaleLowerCase();
+    if (seen.has(key)) continue;
+    seen.add(key);
+    result.push(tag);
+  }
+  return result.slice(0, 8);
 }
 
 function createDefaultScheduleDraft(): ScheduleBuilderRequest {

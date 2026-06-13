@@ -67,12 +67,46 @@ export function CanvasStage({
   t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
-  const panDrag = useRef<{ target: HTMLElement; clientX: number; clientY: number; scrollLeft: number; scrollTop: number } | null>(null);
+  const panDrag = useRef<{ target: HTMLElement; clientX: number; clientY: number; panX: number; panY: number } | null>(null);
   const [isPanMode, setIsPanMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
   const [isSpacePanning, setIsSpacePanning] = useState(false);
   const [isOutputMenuOpen, setIsOutputMenuOpen] = useState(false);
+  const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const lastAutoFitRevision = useRef(0);
+  const setZoomWithAnchor = useCallback(
+    (nextZoom: number, clientX?: number, clientY?: number) => {
+      const clampedZoom = clampZoom(nextZoom);
+      if (clientX !== undefined && clientY !== undefined && scrollRef.current) {
+        const rect = scrollRef.current.getBoundingClientRect();
+        const centerX = rect.left + rect.width / 2;
+        const centerY = rect.top + rect.height / 2;
+        setPanOffset((current) => {
+          const ratio = clampedZoom / zoom;
+          return {
+            x: clientX - centerX - (clientX - centerX - current.x) * ratio,
+            y: clientY - centerY - (clientY - centerY - current.y) * ratio,
+          };
+        });
+      }
+      onZoomChange(clampedZoom);
+    },
+    [onZoomChange, zoom],
+  );
+
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return undefined;
+    const handleWheel = (event: WheelEvent) => {
+      event.preventDefault();
+      const direction = event.deltaY > 0 ? -1 : 1;
+      const multiplier = event.ctrlKey || event.metaKey ? 0.18 : 0.1;
+      setZoomWithAnchor(zoom * (1 + direction * multiplier), event.clientX, event.clientY);
+    };
+    container.addEventListener("wheel", handleWheel, { passive: false });
+    return () => container.removeEventListener("wheel", handleWheel);
+  }, [setZoomWithAnchor, zoom]);
+
   const fitCanvas = useCallback(() => {
     const container = scrollRef.current;
     if (!container) return;
@@ -88,6 +122,7 @@ export function CanvasStage({
         previewPadding,
       }),
     );
+    setPanOffset({ x: 0, y: 0 });
   }, [onZoomChange, previewPadding, settings.height, settings.width]);
 
   useEffect(() => {
@@ -121,8 +156,8 @@ export function CanvasStage({
       target: event.currentTarget,
       clientX: event.clientX,
       clientY: event.clientY,
-      scrollLeft: container.scrollLeft,
-      scrollTop: container.scrollTop,
+      panX: panOffset.x,
+      panY: panOffset.y,
     };
     setIsPanning(true);
   };
@@ -132,8 +167,10 @@ export function CanvasStage({
     const container = scrollRef.current;
     if (!active || !container) return false;
     event.preventDefault();
-    container.scrollLeft = active.scrollLeft - (event.clientX - active.clientX);
-    container.scrollTop = active.scrollTop - (event.clientY - active.clientY);
+    setPanOffset({
+      x: active.panX + event.clientX - active.clientX,
+      y: active.panY + event.clientY - active.clientY,
+    });
     return true;
   };
 
@@ -146,7 +183,8 @@ export function CanvasStage({
     return true;
   };
 
-  const shouldPan = (event: React.PointerEvent<HTMLElement>) => isPanMode || isSpacePanning || event.altKey;
+  const shouldPan = (event: React.PointerEvent<HTMLElement>) =>
+    isPanMode || isSpacePanning || event.altKey || event.button === 2 || (event.buttons & 2) === 2;
   const frameWidth = settings.width + previewPadding * 2;
   const frameHeight = settings.height + previewPadding * 2;
 
@@ -259,7 +297,7 @@ export function CanvasStage({
             type="button"
             className="icon-button"
             title={t("stage.zoomOut")}
-            onClick={() => onZoomChange(Math.max(0.1, zoom - 0.08))}
+            onClick={() => setZoomWithAnchor(zoom - 0.08)}
           >
             <ZoomOut size={16} />
           </button>
@@ -268,7 +306,7 @@ export function CanvasStage({
             type="button"
             className="icon-button"
             title={t("stage.zoomIn")}
-            onClick={() => onZoomChange(Math.min(1, zoom + 0.08))}
+            onClick={() => setZoomWithAnchor(zoom + 0.08)}
           >
             <ZoomIn size={16} />
           </button>
@@ -280,12 +318,19 @@ export function CanvasStage({
       <div
         className={`canvas-scroll ${isPanMode || isSpacePanning ? "pan-ready" : ""} ${isPanning ? "panning" : ""}`}
         ref={scrollRef}
+        onContextMenu={(event) => event.preventDefault()}
+        onPointerDownCapture={(event) => {
+          if (!shouldPan(event)) return;
+          beginPan(event);
+          event.stopPropagation();
+        }}
         onPointerDown={(event) => {
-          if (event.target !== event.currentTarget) return;
+          if (panDrag.current) return;
           if (shouldPan(event)) {
             beginPan(event);
             return;
           }
+          if (event.target !== event.currentTarget) return;
           event.preventDefault();
           onClearSelection();
         }}
@@ -304,6 +349,7 @@ export function CanvasStage({
           style={{
             aspectRatio: `${frameWidth} / ${frameHeight}`,
             width: `${Math.max(1, Math.round(frameWidth * zoom))}px`,
+            transform: `translate(${Math.round(panOffset.x)}px, ${Math.round(panOffset.y)}px)`,
           }}
         >
           <canvas
@@ -311,6 +357,7 @@ export function CanvasStage({
             className="thumbnail-canvas"
             aria-label={t("stage.canvasLabel")}
             style={{ cursor: isPanning ? "grabbing" : isPanMode || isSpacePanning ? "grab" : cursor }}
+            onContextMenu={(event) => event.preventDefault()}
             onPointerDown={(event) => {
               if (shouldPan(event)) {
                 beginPan(event);
@@ -353,6 +400,10 @@ function isKeyboardInputTarget(target: EventTarget | null): boolean {
 function cssPixels(value: string): number {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clampZoom(value: number): number {
+  return Math.min(4, Math.max(0.1, Number.isFinite(value) ? value : 1));
 }
 
 function MotionTimeline({

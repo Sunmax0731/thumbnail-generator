@@ -7,8 +7,12 @@ Create a static web service named サムネいる？ for making video thumbnails
 ## Functional Requirements
 
 - Import local image files from the Assets tab and use them as editable thumbnail layers.
+- Import either individual image files or all supported image files directly under a selected folder from the Assets tab.
+- Assign zero or more tags before registering imported image assets, offer existing tags as suggestions, and allow image asset tags to be added or removed later.
+- Filter the Assets image list by registered tags.
 - Keep browser-only YouTube video thumbnail import helpers available, while the current GUI hides the YouTube URL import controls.
 - Select imported image assets, add the selected asset as a layer, and open the selected asset in Image Lab from its asset row.
+- Register the currently selected layer group as a reusable browser-local group object asset with tags, then add that group object back to the canvas from Assets.
 - Configure image size, position, rotation, opacity, and simple effects.
 - Add text layers with string content, font size, font family, fill color, rotation, and outline stroke.
 - Select expanded hosted Google Fonts options from the font dropdown for text layers.
@@ -59,9 +63,14 @@ Create a static web service named サムネいる？ for making video thumbnails
 - Provide common presets and custom output dimensions from the preview header.
 - Confirm before applying a template that replaces the current layer state, and apply the template's canvas aspect ratio automatically.
 - Keep preview zoom user-controlled when presets or output sizes change, and provide manual Fit canvas plus pan controls for navigating large or tall canvases.
-- Resize the Layers, Colors, and Browser templates list areas while preserving core editor controls.
+- Support preview mouse-wheel zoom beyond 100%, suppress preview scrollbars while zoomed, and allow right-drag panning even without scrollbars.
+- Resize the Layers, Colors, Registered templates, Assets image, and Assets group object list areas while preserving core editor controls.
+- Rename the browser-local template list label to Registered templates.
 - Delete the final remaining layer when requested, leaving the canvas with zero layer objects.
 - Delete registered/imported image assets from Assets, and remove any image layers that reference the deleted asset.
+- Let Image Lab zoom with the mouse wheel and pan with right-drag like the main preview.
+- Prevent right-click from adding Image Lab polygon/free-selection points.
+- Show eight handles for Image Lab rectangle and circle selections; corner handles resize with aspect ratio preserved, while side handles resize freely.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees from the Adjust tab.
 - Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.

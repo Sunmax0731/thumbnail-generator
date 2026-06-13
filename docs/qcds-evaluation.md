@@ -465,3 +465,17 @@ Completed on 2026-06-12.
 - Runtime checks: nonblank render, primary UI visible, old Output/Edit state sections removed, Output menu items present, WebP export downloaded, edit-state icons had tooltip titles, autosave text visible, 6 motion presets, timeline row after applying a preset, OBS controls visible/hidden/restored, OBS canvas nonblank, mobile overflow `0`, and no page/app console errors.
 - Evidence: screenshots and WebP export are under `output/runtime-20260612-motion-ui/`.
 - CSV/HTML note: visible panel controls remain absent in this build; parser/export compatibility is covered by focused unit tests for new animation text/effect fields.
+
+## Assets, Preview Pan/Zoom, And ImageLab Evidence
+
+Completed on 2026-06-13.
+
+- Scope: default unselected state, Photoshop/Illustrator-style Preview wheel zoom and right-drag pan without scrollbars, folder image import, image tags and tag filtering/editing, group-object asset registration/reuse, registered-template label change, resizable/collapsible asset sections, and ImageLab pan/zoom/selection refinements.
+- Quality: A+. `npm test` passed with 33 test files and 128 tests, `npm run build` passed, and the runtime gate caught and fixed ImageLab wheel handling plus Preview right-drag pan ordering before completion.
+- Cost: A+. The changes stay within the existing static React/Vite app, localStorage asset/template model, and canvas rendering paths. No new services, paid dependencies, or backend storage were added.
+- Delivery: A+. Implementation, docs, runtime evidence, and QCDS records were updated in the same work unit.
+- Satisfaction: A+. The editor now starts and generates in a neutral unselected state, Preview navigation behaves closer to Adobe canvas tools, asset intake supports practical folder/tag workflows, and reusable group objects turn selected compositions into repeatable materials.
+- Browser runtime evidence: Browser plugin was attempted first and failed with `Browser is not available: iab`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4351/thumbnail-generator/?runtime=assets-preview-1781348714215`.
+- Runtime checks: nonblank render, default unselected state, generator unselected state, registered-template label, Preview zoom to `114%`, hidden scrollbars, right-drag pan transform change, folder input `webkitdirectory`, image-only folder import, import-time tags, tag filtering/editing, asset list resize, group-object collapse, group-object tag/register/reuse flow, ImageLab wheel zoom/right pan/free-selection right-click guard, export download, mobile nonblank canvas, mobile overflow `0`, and no page/app console errors.
+- Evidence: `output/runtime-20260613-assets-preview/runtime-result.json`, `output/runtime-20260613-assets-preview/desktop-final.png`, and `output/runtime-20260613-assets-preview/mobile-final.png`.
+- CSV/HTML note: visible panel controls remain absent in this build; parser/model compatibility is covered by `npm test`.

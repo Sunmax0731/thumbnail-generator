@@ -23,6 +23,7 @@ This page is the quick feature index for users and reviewers.
 - Use Match angle to first selected to copy the first selected editable layer's rotation to the other selected editable layers.
 - Group selected layers from Layers, rename the group, ungroup it, and select grouped rows or grouped preview objects as a multi-selection.
 - Edit one grouped layer individually from the Layers row without ungrouping.
+- Register a selected group as a reusable tagged group object and add it back from Assets.
 - Fit selected image or shape layers to the canvas from Adjust.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y when focus is outside text fields and modals.
 
@@ -37,8 +38,8 @@ This page is the quick feature index for users and reviewers.
 - Generate beta monthly or weekly schedule templates from the Templates tab with calendar date input, pre-generation preview, per-day or uniform action counts, weekday language, date format, canvas orientation, grid style, the same font choices as Adjust, separate title/weekday/date/plan size sliders, color, corner radius, line width, generated-layer grouping settings, month-aware badge labels, and reload-persistent settings. Schedule landscape previews are wider on desktop, and portrait previews keep the generated portrait ratio.
 - Generate standard thumbnails, vertical thumbnails, and stream waiting screens from Templates. Each image generator has five placement patterns plus content, grouped Grid / text controls, color, preview, Generate layers, and Save settings controls. Standard and stream waiting previews are wider on desktop, vertical previews keep the generated 9:16 aspect ratio, letter spacing accepts `0`, common corner radius lives in Common controls, preview action buttons stay within the preview pane, and animation controls appear only for stream waiting screens.
 - Use Save settings in generator modals to persist settings without generating; Generate layers also saves settings before replacing the current layers.
-- Resize the Browser templates list area from the Templates tab.
-- Use Templates to save named browser-local templates with optional tags, choose existing tags from suggestions while typing, and filter saved templates by tag from a dropdown.
+- Resize the Registered templates list area from the Templates tab.
+- Use Templates to save named browser-local Registered templates with optional tags, choose existing tags from suggestions while typing, and filter saved templates by tag from a dropdown.
 - Use the top-right edit-state icon cluster to save the current work-in-progress state without creating a named template.
 - Export, import, or delete edit-state JSON for backup and recovery.
 - Enable Autosave current edit state to save the active editor state after changes.
@@ -54,12 +55,13 @@ This page is the quick feature index for users and reviewers.
 
 ## Image And Text Tools
 
-- Import local image files from the Assets tab.
-- Use the Assets tab as the imported-image list, with per-image add, Image Lab, and delete actions.
+- Import local image files or a folder of image files from the Assets tab.
+- Assign multiple tags before images are registered, edit tags later, and filter image assets by tag.
+- Use the Assets tab as the imported-image and group-object list, with per-image add, Image Lab, and delete actions.
 - YouTube thumbnail import helpers remain browser-only, while the current GUI hides the YouTube URL controls.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.
-- Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts.
-- Re-edit Image Lab rectangle/circle selections with preview handles and drag polygon points after placement.
+- Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts, with mouse-wheel zoom and right-drag pan.
+- Re-edit Image Lab rectangle/circle selections with eight preview handles, preserving aspect ratio from corner handles and allowing free side-handle resizing; drag polygon points after placement without right-click adding new points.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from the collapsible Quick Add section in Layers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer. Wave lines render as smooth visible waves in preview and export.
 - Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.

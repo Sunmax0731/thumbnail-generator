@@ -64,6 +64,13 @@ import {
   writeSavedEditState,
 } from "./lib/editState";
 import { installExtensionBridge } from "./lib/extensionBridge";
+import {
+  addGroupObjectAsset,
+  createGroupObjectAsset,
+  instantiateGroupObject,
+  readGroupObjects,
+  writeGroupObjects,
+} from "./lib/groupObjects";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
 import { parseCsvLayout } from "./lib/csv";
 import { downloadThumbnail } from "./lib/exportThumbnail";
@@ -76,7 +83,6 @@ import {
   selectIndividualLayerId,
   selectLayerIdsAfterDelete,
   selectLayerIdsForLayer,
-  selectTopSelectableLayerIds,
 } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
@@ -87,13 +93,14 @@ import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib
 import {
   createTemplateSnapshot,
   readSavedTemplates,
+  sanitizeTemplateTags,
   type SavedTemplate,
   upsertTemplate,
   writeSavedTemplates,
 } from "./lib/templates";
 import { readThemeMode, resolveThemeMode, writeThemeMode, type ThemeMode } from "./lib/theme";
 import { createCanvasTextMeasurer, fitTextLayerToBounds } from "./lib/textFit";
-import type { BrandKit, ExportFormat, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
+import type { BrandKit, ExportFormat, GroupObjectAsset, ImageAsset, OutputSettings, ThumbnailLayer } from "./lib/types";
 import { createYouTubeThumbnailAsset } from "./lib/youtubeThumbnail";
 
 type ImagePalettePreviewHoverState = {
@@ -148,7 +155,7 @@ function App() {
   const historyFuture = useRef<ThumbnailLayer[][]>([]);
   const lastLayerSnapshot = useRef<ThumbnailLayer[] | null>(null);
   const skipHistoryRecord = useRef(false);
-  const didInitializeSelection = useRef(false);
+  const imageLabBackdropLeftDown = useRef(false);
   const didMountAutoSave = useRef(false);
   const initialLanguage = useMemo(() => detectInitialLanguage(), []);
   const initialSavedEditState = useMemo(() => (typeof window === "undefined" ? null : readSavedEditState()), []);
@@ -179,6 +186,9 @@ function App() {
   const [templateName, setTemplateName] = useState(initialSavedEditState?.templateName ?? "My thumbnail template");
   const [templates, setTemplates] = useState<SavedTemplate[]>(() =>
     typeof window === "undefined" ? [] : readSavedTemplates(),
+  );
+  const [groupObjects, setGroupObjects] = useState<GroupObjectAsset[]>(() =>
+    typeof window === "undefined" ? [] : readGroupObjects(),
   );
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(initialEditStatePreferences.autoSaveEnabled);
   const [savedEditStateUpdatedAt, setSavedEditStateUpdatedAt] = useState<string | null>(
@@ -254,6 +264,14 @@ function App() {
     () => evaluateThumbnailWarnings({ layers, assets, settings, estimatedStorageBytes }),
     [assets, estimatedStorageBytes, layers, settings],
   );
+  const registeredTags = useMemo(() => {
+    const tags = [
+      ...assets.flatMap((asset) => asset.tags ?? []),
+      ...templates.flatMap((template) => template.tags ?? []),
+      ...groupObjects.flatMap((groupObject) => groupObject.tags ?? []),
+    ];
+    return Array.from(new Set(sanitizeTemplateTags(tags))).sort((a, b) => a.localeCompare(b));
+  }, [assets, groupObjects, templates]);
 
   useEffect(() => {
     if (typeof window === "undefined" || typeof window.matchMedia !== "function") return undefined;
@@ -277,11 +295,6 @@ function App() {
   useEffect(() => {
     setSelectedIds((current) => {
       const valid = current.filter((id) => layers.some((layer) => layer.id === id && layer.selectable));
-      if (!didInitializeSelection.current && current.length === 0) {
-        didInitializeSelection.current = true;
-        return selectTopSelectableLayerIds(layers);
-      }
-      didInitializeSelection.current = true;
       return valid.length === current.length ? current : valid;
     });
   }, [layers]);
@@ -432,7 +445,7 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedIds(selectTopSelectableLayerIds(result.layers));
+      setSelectedIds([]);
       setStatus(`CSV applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`CSV not applied. ${result.warnings.join(" ")}`);
@@ -447,16 +460,22 @@ function App() {
     });
     if (result.layers.length > 0) {
       setLayers(result.layers);
-      setSelectedIds(selectTopSelectableLayerIds(result.layers));
+      setSelectedIds([]);
       setStatus(`HTML applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`HTML not applied. ${result.warnings.join(" ")}`);
     }
   }, [assets, htmlText, settings.height, settings.width]);
 
-  const importImageAssets = useCallback(async (files: FileList | null): Promise<ImageAsset[]> => {
+  const importImageAssets = useCallback(async (files: FileList | File[] | null, tags: string[] = []): Promise<ImageAsset[]> => {
     if (!files || files.length === 0) return [];
-    const loaded = await Promise.all(Array.from(files).map(readImageFile));
+    const imageFiles = Array.from(files).filter(isSupportedImageFile);
+    if (imageFiles.length === 0) {
+      setStatus("No supported image files were found.");
+      return [];
+    }
+    const normalizedTags = sanitizeTemplateTags(tags);
+    const loaded = await Promise.all(imageFiles.map((file) => readImageFile(file, normalizedTags)));
     setAssets((current) => [...current, ...loaded]);
     setSelectedAssetKey(loaded[0]?.key ?? "");
     setStatus(`Imported ${loaded.length} image asset${loaded.length === 1 ? "" : "s"}.`);
@@ -464,8 +483,8 @@ function App() {
   }, []);
 
   const handleImageFiles = useCallback(
-    async (files: FileList | null) => {
-      const loaded = await importImageAssets(files);
+    async (files: FileList | File[] | null, tags: string[] = []) => {
+      const loaded = await importImageAssets(files, tags);
       if (loaded.length === 0) return;
       const newLayers = loaded.map((asset, index) =>
         makeImageLayer({
@@ -480,7 +499,7 @@ function App() {
         }),
       );
       setLayers((current) => [...current, ...newLayers]);
-      setSelectedIds(selectTopSelectableLayerIds(newLayers));
+      setSelectedIds([]);
       setStatus(`Imported ${loaded.length} image file${loaded.length === 1 ? "" : "s"}.`);
     },
     [importImageAssets, settings.height, settings.width],
@@ -691,7 +710,7 @@ function App() {
   const resetTemplate = useCallback(() => {
     const next = createInitialLayers();
     setLayers(next);
-    setSelectedIds(selectTopSelectableLayerIds(next));
+    setSelectedIds([]);
     setCsvText(sampleCsv);
     setHtmlText(sampleHtml);
     setStatus("Sample creator template restored.");
@@ -702,7 +721,7 @@ function App() {
       const schedule = buildScheduleTemplate(request, settings, language);
       setSettings(schedule.settings);
       setLayers(schedule.layers);
-      setSelectedIds(selectTopSelectableLayerIds(schedule.layers));
+      setSelectedIds([]);
       setCsvText(layersToCsv(schedule.layers));
       setHtmlText(layersToHtml(schedule.layers));
       setTemplateName(schedule.name);
@@ -717,7 +736,7 @@ function App() {
       const template = buildCreativeTemplate(request, settings);
       setSettings(template.settings);
       setLayers(template.layers);
-      setSelectedIds(selectTopSelectableLayerIds(template.layers));
+      setSelectedIds([]);
       setCsvText(layersToCsv(template.layers));
       setHtmlText(layersToHtml(template.layers));
       setTemplateName(template.name);
@@ -756,7 +775,7 @@ function App() {
       setSettings(snapshot.settings);
       setAssets(snapshot.assets.length > 0 ? snapshot.assets : initialAssets(import.meta.env.BASE_URL));
       setLayers(snapshot.layers);
-      setSelectedIds(selectTopSelectableLayerIds(snapshot.layers));
+      setSelectedIds([]);
       setCsvText(snapshot.csv || layersToCsv(snapshot.layers));
       setHtmlText(snapshot.html || layersToHtml(snapshot.layers));
       setTemplateName(snapshot.templateName);
@@ -915,6 +934,14 @@ function App() {
     setStatus(target ? `Deleted image asset "${target.name}" and related image layers.` : "Image asset deleted.");
   }, [assets]);
 
+  const updateAssetTags = useCallback((key: string, tags: string[]) => {
+    const normalizedTags = sanitizeTemplateTags(tags);
+    setAssets((current) =>
+      current.map((asset) => (asset.key === key ? { ...asset, tags: normalizedTags } : asset)),
+    );
+    setStatus(normalizedTags.length > 0 ? `Updated asset tags: ${normalizedTags.join(", ")}.` : "Asset tags cleared.");
+  }, []);
+
   const copySelectedLayers = useCallback(() => {
     const copies = selectedIds
       .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
@@ -965,7 +992,7 @@ function App() {
     clipboardLayers.current = targets.map((layer) => structuredClone(layer));
     setLayers((current) => {
       const next = current.filter((layer) => !targetIds.has(layer.id));
-      setSelectedIds(selectTopSelectableLayerIds(next));
+      setSelectedIds([]);
       return next;
     });
     setStatus(`Cut ${targets.length} layer${targets.length === 1 ? "" : "s"}.`);
@@ -1109,6 +1136,52 @@ function App() {
     );
     setStatus("Layer group removed.");
   }, []);
+
+  const registerSelectedGroupObject = useCallback(
+    (tags: string[] = []) => {
+      const selectedEditableLayers = selectedLayers.filter((layer) => layer.selectable);
+      const selectedGroupIds = Array.from(new Set(selectedEditableLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
+      if (selectedGroupIds.length !== 1) {
+        setStatus("Select one layer group before registering a group object.");
+        return;
+      }
+      const groupId = selectedGroupIds[0];
+      const groupLayers = layers.filter((layer) => layer.groupId === groupId && layer.selectable);
+      if (groupLayers.length < 2) {
+        setStatus("Select a group with at least two editable layers before registering.");
+        return;
+      }
+      const imageKeys = new Set(groupLayers.filter((layer) => layer.type === "image").map((layer) => layer.imageKey));
+      const referencedAssets = assets.filter((asset) => imageKeys.has(asset.key) || imageKeys.has(asset.name));
+      const groupName = groupLayers.find((layer) => layer.groupName)?.groupName ?? "Group object";
+      const groupObject = createGroupObjectAsset(groupName, groupLayers, referencedAssets, new Date(), tags);
+      const next = addGroupObjectAsset(groupObjects, groupObject);
+      try {
+        writeGroupObjects(next);
+        setGroupObjects(next);
+        setStatus(`Registered group object "${groupObject.name}".`);
+      } catch (error) {
+        setStatus(`Group object registration failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [assets, groupObjects, layers, selectedLayers],
+  );
+
+  const addGroupObjectToCanvas = useCallback(
+    (id: string) => {
+      const groupObject = groupObjects.find((candidate) => candidate.id === id);
+      if (!groupObject) return;
+      const instance = instantiateGroupObject(groupObject);
+      setAssets((current) => {
+        const existingKeys = new Set(current.map((asset) => asset.key));
+        return [...current, ...instance.assets.filter((asset) => !existingKeys.has(asset.key))];
+      });
+      setLayers((current) => [...current, ...instance.layers]);
+      setSelectedIds(instance.selectedIds);
+      setStatus(`Added group object "${groupObject.name}" to the canvas.`);
+    },
+    [groupObjects],
+  );
 
   const fitSelectedLayersToCanvas = useCallback(() => {
     const targetIds = new Set(
@@ -1466,6 +1539,7 @@ function App() {
 
   const handleCanvasPointerDown = useCallback(
     (event: React.PointerEvent<HTMLCanvasElement>) => {
+      if (event.button === 2 || (event.buttons & 2) === 2) return;
       const canvas = event.currentTarget;
       const point = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
       const additive = event.ctrlKey || event.metaKey || event.shiftKey;
@@ -1613,7 +1687,7 @@ function App() {
       setAssets(template.assets.length > 0 ? template.assets : initialAssets(import.meta.env.BASE_URL));
       const nextLayers = template.layers.map((layer) => ({ ...layer, selectable: layer.selectable !== false }));
       setLayers(nextLayers);
-      setSelectedIds(selectTopSelectableLayerIds(nextLayers));
+      setSelectedIds([]);
       setCsvText(template.csv || layersToCsv(template.layers));
       setHtmlText(template.html || layersToHtml(template.layers));
       setTemplateName(template.name);
@@ -1930,6 +2004,7 @@ function App() {
             layers,
             selectedIds,
             selectedAssetKey,
+            registeredTags,
             onSelect: selectLayer,
             onSelectIndividual: selectIndividualLayer,
             onDelete: deleteLayer,
@@ -1945,12 +2020,17 @@ function App() {
             onCreateGroup: createLayerGroup,
             onRenameGroup: renameLayerGroup,
             onUngroup: ungroupLayerGroup,
+            onRegisterGroupObject: registerSelectedGroupObject,
           }}
           onImageFiles={handleImageFiles}
           onSelectAsset={setSelectedAssetKey}
           onAddImageAssetLayer={addImageLayerFromAsset}
           onDeleteAsset={deleteAsset}
-              fontOptions={fontOptions}
+          onUpdateAssetTags={updateAssetTags}
+          groupObjects={groupObjects}
+          registeredTags={registeredTags}
+          onAddGroupObject={addGroupObjectToCanvas}
+          fontOptions={fontOptions}
               language={language}
               settings={settings}
               paletteColors={paletteColors}
@@ -2063,17 +2143,25 @@ function App() {
       </main>
       {isImageLabOpen ? (
         <div
-          className="modal-backdrop image-lab-backdrop"
-          onMouseDown={(event) => {
-            if (event.target === event.currentTarget) setIsImageLabOpen(false);
-          }}
-        >
+            className="modal-backdrop image-lab-backdrop"
+            onPointerDown={(event) => {
+            imageLabBackdropLeftDown.current = event.buttons === 1 && event.target === event.currentTarget;
+            }}
+            onClick={(event) => {
+            if (imageLabBackdropLeftDown.current && event.target === event.currentTarget) setIsImageLabOpen(false);
+            imageLabBackdropLeftDown.current = false;
+            }}
+            onWheel={(event) => event.stopPropagation()}
+          >
           <section
             className="image-lab-modal"
             role="dialog"
             aria-modal="true"
             aria-labelledby="image-lab-title"
             onMouseDown={(event) => event.stopPropagation()}
+            onPointerDown={(event) => event.stopPropagation()}
+            onClick={(event) => event.stopPropagation()}
+            onWheel={(event) => event.stopPropagation()}
           >
             <ImageLabPanel
               assets={assets}
@@ -2433,7 +2521,7 @@ function isShortcutSuppressed(target: EventTarget | null): boolean {
   return target.isContentEditable;
 }
 
-function readImageFile(file: File): Promise<ImageAsset> {
+function readImageFile(file: File, tags: string[] = []): Promise<ImageAsset> {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();
     reader.onload = () => {
@@ -2448,13 +2536,19 @@ function readImageFile(file: File): Promise<ImageAsset> {
           src,
           width: image.naturalWidth || image.width,
           height: image.naturalHeight || image.height,
+          tags,
         });
-      image.onerror = () => resolve({ key, name: baseName, src });
+      image.onerror = () => resolve({ key, name: baseName, src, tags });
       image.src = src;
     };
     reader.onerror = () => reject(reader.error);
     reader.readAsDataURL(file);
   });
+}
+
+function isSupportedImageFile(file: File): boolean {
+  if (file.type.startsWith("image/")) return true;
+  return /\.(png|jpe?g|webp|gif|bmp|svg|avif)$/i.test(file.name);
 }
 
 function slug(value: string): string {

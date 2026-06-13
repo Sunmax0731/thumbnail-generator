@@ -30,6 +30,7 @@ export interface LayerPanelProps {
   layers: ThumbnailLayer[];
   selectedIds: string[];
   selectedAssetKey: string;
+  registeredTags: string[];
   onSelect: (id: string, additive?: boolean) => void;
   onSelectIndividual: (id: string) => void;
   onDelete: (id: string) => void;
@@ -45,6 +46,7 @@ export interface LayerPanelProps {
   onCreateGroup: (name: string) => void;
   onRenameGroup: (groupId: string, name: string) => void;
   onUngroup: (groupId: string) => void;
+  onRegisterGroupObject: (tags: string[]) => void;
   t: Translator;
 }
 
@@ -52,6 +54,7 @@ export function LayerPanel({
   layers,
   selectedIds,
   selectedAssetKey,
+  registeredTags,
   onSelect,
   onSelectIndividual,
   onDelete,
@@ -67,6 +70,7 @@ export function LayerPanel({
   onCreateGroup,
   onRenameGroup,
   onUngroup,
+  onRegisterGroupObject,
   t,
 }: LayerPanelProps) {
   const selectedLayers = layers.filter((layer) => selectedIds.includes(layer.id) && layer.selectable);
@@ -263,9 +267,11 @@ export function LayerPanel({
         selectedCount={selectedLayers.length}
         activeGroupId={activeGroupId}
         activeGroupName={activeGroupName}
+        registeredTags={registeredTags}
         onCreateGroup={onCreateGroup}
         onRenameGroup={onRenameGroup}
         onUngroup={onUngroup}
+        onRegisterGroupObject={onRegisterGroupObject}
         t={t}
       />
 
@@ -397,20 +403,25 @@ function LayerGroupControls({
   selectedCount,
   activeGroupId,
   activeGroupName,
+  registeredTags,
   onCreateGroup,
   onRenameGroup,
   onUngroup,
+  onRegisterGroupObject,
   t,
 }: {
   selectedCount: number;
   activeGroupId?: string;
   activeGroupName: string;
+  registeredTags: string[];
   onCreateGroup: (name: string) => void;
   onRenameGroup: (groupId: string, name: string) => void;
   onUngroup: (groupId: string) => void;
+  onRegisterGroupObject: (tags: string[]) => void;
   t: Translator;
 }) {
   const [draft, setDraft] = useState(activeGroupName || "Layer group");
+  const [tagDraft, setTagDraft] = useState("");
 
   useEffect(() => {
     setDraft(activeGroupName || "Layer group");
@@ -448,8 +459,43 @@ function LayerGroupControls({
       >
         {t("inspector.ungroup")}
       </button>
+      <label className="field">
+        <span>{t("inspector.groupObjectTags")}</span>
+        <input
+          type="text"
+          list="group-object-tag-options"
+          value={tagDraft}
+          onChange={(event) => setTagDraft(event.currentTarget.value)}
+          placeholder={t("left.tagPlaceholder")}
+        />
+        <datalist id="group-object-tag-options">
+          {registeredTags.map((tag) => (
+            <option key={tag} value={tag} />
+          ))}
+        </datalist>
+      </label>
+      <button
+        type="button"
+        className="primary-button wide-button"
+        disabled={!activeGroupId}
+        onClick={() => onRegisterGroupObject(splitTags(tagDraft))}
+      >
+        {t("inspector.registerGroupObject")}
+      </button>
     </section>
   );
+}
+
+function splitTags(value: string): string[] {
+  const seen = new Set<string>();
+  const result: string[] = [];
+  for (const tag of value.split(",").map((part) => part.trim().replace(/\s+/g, " "))) {
+    const key = tag.toLocaleLowerCase();
+    if (!tag || seen.has(key)) continue;
+    seen.add(key);
+    result.push(tag);
+  }
+  return result.slice(0, 8);
 }
 
 function DeleteLayerDialog({
