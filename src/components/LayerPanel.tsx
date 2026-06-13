@@ -247,6 +247,10 @@ export function LayerPanel({
                     title={t("inspector.deleteLayerTitle")}
                     onClick={(event) => {
                       event.stopPropagation();
+                      if (event.ctrlKey || event.metaKey) {
+                        onDelete(layer.id);
+                        return;
+                      }
                       setDeleteCandidateId(layer.id);
                     }}
                   >

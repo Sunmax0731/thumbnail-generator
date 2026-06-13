@@ -23,7 +23,7 @@ This page is the quick feature index for users and reviewers.
 - Use Match angle to first selected to copy the first selected editable layer's rotation to the other selected editable layers.
 - Group selected layers from Layers, rename the group, ungroup it, and select grouped rows or grouped preview objects as a multi-selection.
 - Edit one grouped layer individually from the Layers row without ungrouping.
-- Register a selected group as a reusable tagged group object and add it back from Assets.
+- Register a selected group as a reusable tagged group object, edit its tags, delete it, and add it back from Assets.
 - Fit selected image or shape layers to the canvas from Adjust.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y when focus is outside text fields and modals.
 
@@ -57,7 +57,7 @@ This page is the quick feature index for users and reviewers.
 
 - Import local image files or a folder of image files from the Assets tab.
 - Assign multiple tags before images are registered, edit tags later, and filter image assets by tag.
-- Use the Assets tab as the imported-image and group-object list, with per-image add, Image Lab, and delete actions.
+- Use the Assets tab as the imported-image and group-object list, with per-image add, Image Lab, tag edit, and delete actions, plus group-object tag edit and delete actions.
 - YouTube thumbnail import helpers remain browser-only, while the current GUI hides the YouTube URL controls.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts, with mouse-wheel zoom and right-drag pan.

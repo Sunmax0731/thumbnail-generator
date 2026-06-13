@@ -49,6 +49,22 @@ export function addGroupObjectAsset(
   return [groupObject, ...groupObjects];
 }
 
+export function updateGroupObjectAssetTags(
+  groupObjects: GroupObjectAsset[],
+  id: string,
+  tags: string[],
+  now = new Date(),
+): GroupObjectAsset[] {
+  const normalizedTags = sanitizeTemplateTags(tags);
+  return groupObjects.map((groupObject) =>
+    groupObject.id === id ? { ...groupObject, tags: normalizedTags, updatedAt: now.toISOString() } : groupObject,
+  );
+}
+
+export function removeGroupObjectAsset(groupObjects: GroupObjectAsset[], id: string): GroupObjectAsset[] {
+  return groupObjects.filter((groupObject) => groupObject.id !== id);
+}
+
 export function instantiateGroupObject(
   groupObject: GroupObjectAsset,
   offsetX = 32,

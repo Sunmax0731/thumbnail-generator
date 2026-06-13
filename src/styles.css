@@ -617,15 +617,21 @@ button:disabled {
 
 .asset-row {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 26px 26px 26px;
-  min-height: 38px;
+  grid-template-columns: minmax(0, 1fr) 30px 30px 30px;
+  align-items: start;
+  min-height: 94px;
   gap: 8px;
-  padding: 5px;
+  padding: 7px;
   border: 1px solid var(--line);
   border-radius: 6px;
   background: var(--panel-soft);
   font-size: 12px;
   font-weight: 700;
+}
+
+.asset-row > .mini-icon-button {
+  width: 30px;
+  height: 30px;
 }
 
 .asset-import-grid {
@@ -691,6 +697,14 @@ button:disabled {
 
 .group-object-row {
   display: grid;
+  grid-template-columns: minmax(0, 1fr) 32px;
+  align-items: start;
+  min-height: 86px;
+  gap: 6px;
+}
+
+.group-object-row .tag-editor {
+  grid-column: 1 / -1;
 }
 
 .asset-row.selected {
@@ -974,6 +988,7 @@ button:disabled {
   display: grid;
   grid-template-columns: minmax(0, 1fr) 32px;
   align-items: center;
+  min-height: 40px;
   gap: 6px;
 }
 
@@ -981,7 +996,7 @@ button:disabled {
   display: flex;
   align-items: center;
   min-width: 0;
-  min-height: 34px;
+  min-height: 38px;
   gap: 7px;
   padding: 0 9px;
   border: 1px solid var(--line);
@@ -1487,7 +1502,7 @@ button:disabled {
   grid-template-columns: 15px 52px minmax(0, 1fr) 28px 28px 28px 28px;
   align-items: center;
   gap: 7px;
-  min-height: 38px;
+  min-height: 44px;
   padding: 5px 7px;
   border-color: var(--line);
   background: var(--panel);

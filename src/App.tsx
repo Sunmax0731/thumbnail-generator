@@ -1,5 +1,6 @@
 ﻿import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { CanvasStage } from "./components/CanvasStage";
+import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel, type InspectorSection } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
@@ -69,6 +70,8 @@ import {
   createGroupObjectAsset,
   instantiateGroupObject,
   readGroupObjects,
+  removeGroupObjectAsset,
+  updateGroupObjectAssetTags,
   writeGroupObjects,
 } from "./lib/groupObjects";
 import { cloneLayer, makeImageLayer, makeShapeLayer, makeTextLayer } from "./lib/layerFactory";
@@ -156,6 +159,8 @@ function App() {
   const lastLayerSnapshot = useRef<ThumbnailLayer[] | null>(null);
   const skipHistoryRecord = useRef(false);
   const imageLabBackdropLeftDown = useRef(false);
+  const pendingCanvasTransformPoint = useRef<CanvasPoint | null>(null);
+  const canvasTransformFrame = useRef<number | null>(null);
   const didMountAutoSave = useRef(false);
   const initialLanguage = useMemo(() => detectInitialLanguage(), []);
   const initialSavedEditState = useMemo(() => (typeof window === "undefined" ? null : readSavedEditState()), []);
@@ -942,6 +947,36 @@ function App() {
     setStatus(normalizedTags.length > 0 ? `Updated asset tags: ${normalizedTags.join(", ")}.` : "Asset tags cleared.");
   }, []);
 
+  const updateGroupObjectTags = useCallback(
+    (id: string, tags: string[]) => {
+      const normalizedTags = sanitizeTemplateTags(tags);
+      const next = updateGroupObjectAssetTags(groupObjects, id, normalizedTags);
+      try {
+        writeGroupObjects(next);
+        setGroupObjects(next);
+        setStatus(normalizedTags.length > 0 ? `Updated group object tags: ${normalizedTags.join(", ")}.` : "Group object tags cleared.");
+      } catch (error) {
+        setStatus(`Group object tag update failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [groupObjects],
+  );
+
+  const deleteGroupObject = useCallback(
+    (id: string) => {
+      const target = groupObjects.find((groupObject) => groupObject.id === id);
+      const next = removeGroupObjectAsset(groupObjects, id);
+      try {
+        writeGroupObjects(next);
+        setGroupObjects(next);
+        setStatus(target ? `Deleted group object "${target.name}".` : "Group object deleted.");
+      } catch (error) {
+        setStatus(`Group object delete failed: ${error instanceof Error ? error.message : String(error)}`);
+      }
+    },
+    [groupObjects],
+  );
+
   const copySelectedLayers = useCallback(() => {
     const copies = selectedIds
       .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
@@ -1607,15 +1642,17 @@ function App() {
 
       if (active) {
         event.preventDefault();
-        const nextLayers = transformLayersFromPointer(active, point);
-        const nextById = new Map(nextLayers.map((layer) => [layer.id, layer]));
-        skipHistoryRecord.current = true;
-        active.didTransform = true;
-        setLayers((current) => {
-          const next = current.map((layer) => nextById.get(layer.id) ?? layer);
-          active.latestLayers = next;
-          return next;
-        });
+        pendingCanvasTransformPoint.current = point;
+        if (canvasTransformFrame.current === null) {
+          canvasTransformFrame.current = window.requestAnimationFrame(() => {
+            canvasTransformFrame.current = null;
+            const currentActive = activeCanvasInteraction.current;
+            const currentPoint = pendingCanvasTransformPoint.current;
+            if (!currentActive || !currentPoint) return;
+            pendingCanvasTransformPoint.current = null;
+            applyCanvasTransform(currentActive, currentPoint, setLayers, skipHistoryRecord);
+          });
+        }
         return;
       }
 
@@ -1639,6 +1676,14 @@ function App() {
   const handleCanvasPointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
     const active = activeCanvasInteraction.current;
     if (!active) return;
+    if (canvasTransformFrame.current !== null) {
+      window.cancelAnimationFrame(canvasTransformFrame.current);
+      canvasTransformFrame.current = null;
+    }
+    if (pendingCanvasTransformPoint.current) {
+      applyCanvasTransform(active, pendingCanvasTransformPoint.current, setLayers, skipHistoryRecord);
+      pendingCanvasTransformPoint.current = null;
+    }
     if (event.currentTarget.hasPointerCapture(event.pointerId)) {
       event.currentTarget.releasePointerCapture(event.pointerId);
     }
@@ -2030,6 +2075,8 @@ function App() {
           groupObjects={groupObjects}
           registeredTags={registeredTags}
           onAddGroupObject={addGroupObjectToCanvas}
+          onUpdateGroupObjectTags={updateGroupObjectTags}
+          onDeleteGroupObject={deleteGroupObject}
           fontOptions={fontOptions}
               language={language}
               settings={settings}
@@ -2309,6 +2356,23 @@ function transformLayersFromPointer(active: ActiveCanvasInteraction, point: Canv
   if (!active.layer) return active.layers;
   if (active.mode === "rotate") return [rotateLayer(active.layer, active.start, point)];
   return [resizeLayer(active.layer, active.mode, point)];
+}
+
+function applyCanvasTransform(
+  active: ActiveCanvasInteraction,
+  point: CanvasPoint,
+  setLayers: Dispatch<SetStateAction<ThumbnailLayer[]>>,
+  skipHistoryRecord: MutableRefObject<boolean>,
+): void {
+  const nextLayers = transformLayersFromPointer(active, point);
+  const nextById = new Map(nextLayers.map((layer) => [layer.id, layer]));
+  skipHistoryRecord.current = true;
+  active.didTransform = true;
+  setLayers((current) => {
+    const next = current.map((layer) => nextById.get(layer.id) ?? layer);
+    active.latestLayers = next;
+    return next;
+  });
 }
 
 function areLayerSnapshotsEqual(left: ThumbnailLayer[], right: ThumbnailLayer[]): boolean {

@@ -58,6 +58,8 @@ interface LeftPanelProps {
   onDeleteAsset: (key: string) => void;
   onUpdateAssetTags: (key: string, tags: string[]) => void;
   onAddGroupObject: (id: string) => void;
+  onUpdateGroupObjectTags: (id: string, tags: string[]) => void;
+  onDeleteGroupObject: (id: string) => void;
   onGenerateScheduleTemplate: (request: ScheduleBuilderRequest) => void;
   onGenerateCreativeTemplate: (request: CreativeGeneratorRequest) => void;
   onTemplateNameChange: (value: string) => void;
@@ -87,6 +89,8 @@ export function LeftPanel({
   onDeleteAsset,
   onUpdateAssetTags,
   onAddGroupObject,
+  onUpdateGroupObjectTags,
+  onDeleteGroupObject,
   onGenerateScheduleTemplate,
   onGenerateCreativeTemplate,
   onTemplateNameChange,
@@ -311,6 +315,21 @@ export function LeftPanel({
                             {groupObject.tags[0] ? <small className="template-tag-pill">{groupObject.tags[0]}</small> : null}
                           </span>
                         </button>
+                        <button
+                          type="button"
+                          className="icon-button danger"
+                          title={t("left.deleteGroupObject", { name: groupObject.name })}
+                          onClick={() => onDeleteGroupObject(groupObject.id)}
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                        <TagEditor
+                          tags={groupObject.tags ?? []}
+                          suggestions={registeredTags}
+                          datalistId={`group-object-tag-options-${groupObject.id}`}
+                          onChange={(tags) => onUpdateGroupObjectTags(groupObject.id, tags)}
+                          t={t}
+                        />
                       </div>
                     ))
                   )}
@@ -434,7 +453,13 @@ export function LeftPanel({
                       type="button"
                       className="icon-button danger"
                       title={t("left.deleteTemplate", { name: template.name })}
-                      onClick={() => setTemplateDeleteCandidate({ id: template.id, name: template.name })}
+                      onClick={(event) => {
+                        if (event.ctrlKey || event.metaKey) {
+                          onDeleteTemplate(template.id);
+                          return;
+                        }
+                        setTemplateDeleteCandidate({ id: template.id, name: template.name });
+                      }}
                     >
                       <Trash2 size={14} />
                     </button>

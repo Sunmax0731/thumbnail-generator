@@ -469,6 +469,10 @@ export function InspectorPanel({
                     title={t("inspector.deleteLayerTitle")}
                     onClick={(event) => {
                       event.stopPropagation();
+                      if (event.ctrlKey || event.metaKey) {
+                        onDelete(layer.id);
+                        return;
+                      }
                       setDeleteCandidateId(layer.id);
                     }}
                   >
@@ -616,7 +620,13 @@ export function InspectorPanel({
                 className="icon-button danger"
                 type="button"
                 title={t("inspector.deleteLayerTitle")}
-                onClick={() => setDeleteCandidateId(selected.id)}
+                onClick={(event) => {
+                  if (event.ctrlKey || event.metaKey) {
+                    onDelete(selected.id);
+                    return;
+                  }
+                  setDeleteCandidateId(selected.id);
+                }}
               >
                 <Trash2 size={16} />
               </button>

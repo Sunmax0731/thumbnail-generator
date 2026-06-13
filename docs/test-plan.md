@@ -1081,3 +1081,26 @@ Completed on 2026-06-13.
   - `output/runtime-20260613-assets-preview/desktop-final.png`
   - `output/runtime-20260613-assets-preview/mobile-final.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
+
+## Asset Row Density And Group Object Management Runtime Gate (2026-06-13)
+
+Completed on 2026-06-13.
+
+- Scope: minimum row heights for dense asset lists, group-object tag editing and deletion, Ctrl-click delete confirmation bypass, and lighter group-object canvas dragging.
+- `npm test`: pass. 33 test files, 129 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4353/thumbnail-generator/?runtime=followup-1781355528797`.
+- Desktop viewport: `1440x980`.
+- Runtime checks:
+  - Bulk folder import registered 10 supported image files plus the sample row and ignored a text file (`rows=11`).
+  - Imported asset rows kept a minimum usable height (`[94,94,94,94,94,94,94,94,94,94,94]`).
+  - Group-object row kept a minimum usable height (`108` px).
+  - Group-object tags were editable after registration.
+  - Group-object canvas drag remained responsive (`457ms` in the gate).
+  - Group object deletion removed the row from Assets.
+  - Ctrl-click browser-template delete skipped the confirmation dialog.
+  - Ctrl-click layer delete skipped the confirmation dialog.
+  - Console health: no page errors or app console warnings/errors.
+- Evidence:
+  - `output/runtime-20260613-followup/runtime-result.json`
+  - `output/runtime-20260613-followup/desktop-followup.png`

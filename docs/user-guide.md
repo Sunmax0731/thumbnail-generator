@@ -20,7 +20,7 @@ npm run preview
 - Window settings: use the upper-right Language selector to switch between Japanese and English, and use the adjacent Theme selector to choose System, Light, or Dark. System follows the browser or OS color-scheme preference. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Templates: generate schedule layouts, standard thumbnails, vertical thumbnails, or stream waiting screens, and save/load/delete browser-local Registered templates.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
-- Assets: import files or a folder, assign and edit image tags, review imported assets, add a selected asset as an image layer, reuse group objects, open Image Lab from an imported asset row, or delete an imported asset.
+- Assets: import files or a folder, assign and edit image tags, review imported assets, add a selected asset as an image layer, reuse group objects, edit group object tags, open Image Lab from an imported asset row, or delete imported assets and group objects.
 - Output: use the preview-header Output button to choose JPG, PNG, WebP, or OBS preview.
 - Edit state: use the top-right icon cluster to save/restore the current edit state, export/import JSON, and delete the saved work-in-progress slot. Autosave remains text-labeled beside those icons.
 - The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while アニメ is open.
@@ -47,6 +47,7 @@ CSV and HTML-like layout text remain in browser edit states and saved templates 
 - With three or more layers selected, use Distribute H or Distribute V in Layers to space layer centers evenly.
 - Use Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y for copy, paste, cut, duplicate, undo, and redo when focus is outside text fields and modals.
 - Press Delete or Backspace while a layer is selected to open the layer delete confirmation dialog.
+- Hold Ctrl while pressing a delete button to skip delete confirmation where that delete action normally asks for confirmation.
 - Open Layers to group multiple selected layers, rename the group, or ungroup it. Selecting one grouped row or one grouped preview object selects the editable members of that group.
 - For a grouped row, use the small pointer button to select only that layer. Adjust then edits that one grouped object while the group metadata remains intact.
 - While one group is selected, use the group section's asset registration button to save that group as a tagged group object. Reuse it later from Assets.
@@ -64,9 +65,9 @@ Use Quick Add at the top of Layers to add common starter layers quickly:
 - Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
 - Import image files or an image folder from Assets. Before imported images appear in the list, assign zero or more tags. Tags can be typed freely, entered as comma-separated values, or chosen from existing tag suggestions.
-- Edit tags later from each asset row. Use the tag filter to narrow the image and group object sections.
+- Edit tags later from each image or group object row. Use the tag filter to narrow the image and group object sections.
 - Select an imported asset row in Assets, then use its add button or the selected-image button in Layers Quick Add to place that image as a layer.
-- Delete an imported asset from Assets when it is no longer needed. Any image layer that uses that asset is removed at the same time.
+- Delete an imported asset from Assets when it is no longer needed. Any image layer that uses that asset is removed at the same time. Delete group objects from Assets when the reusable preset is no longer needed.
 - YouTube thumbnail import remains browser-only internally, but the current GUI hides the YouTube URL controls.
 - Use the scissors button on an asset row to open that image directly in Image Lab.
 

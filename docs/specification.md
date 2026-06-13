@@ -95,7 +95,7 @@ Group object assets are browser-local reusable layer groups stored under `thumbn
 - A cloned layer list from the selected group.
 - Referenced image assets needed by image layers inside that group.
 
-Registering is only enabled while one selected editable group is active. Reusing a group object creates new layer ids, assigns one fresh shared `groupId`/`groupName`, offsets the layers slightly, merges any missing referenced image assets into the current asset list, and selects the newly inserted group for immediate placement.
+Registering is only enabled while one selected editable group is active. Reusing a group object creates new layer ids, assigns one fresh shared `groupId`/`groupName`, offsets the layers slightly, merges any missing referenced image assets into the current asset list, and selects the newly inserted group for immediate placement. Group object rows in Assets support later tag edits and deletion from browser-local storage.
 
 ## Text Layers
 
@@ -210,6 +210,7 @@ The selected layer can be edited directly on the canvas:
 Global editor shortcuts are active when focus is outside text fields, select controls, and modals:
 
 - Delete or Backspace opens the same layer delete confirmation flow used by layer-row delete buttons.
+- Ctrl-clicking a delete button skips confirmation for delete actions that normally ask for confirmation, such as layer and browser-template deletion.
 - Ctrl+C copies selected editable layers to the internal editor clipboard.
 - Ctrl+V pastes copied layers as offset independent copies.
 - Ctrl+X cuts selected editable layers when at least one layer remains.
@@ -248,7 +249,7 @@ The left sidebar is grouped by task in this order:
 
 - Templates: generator entry buttons plus browser-local template naming, optional tag entry, tag-filter dropdown, saving, loading, deletion, and independent list resizing. Existing template tags appear as input suggestions and as filter options; free-form tag input is allowed. Applying a browser-local template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
 - Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Assets: local image import, imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, and asset deletion. Deleting an asset also removes image layers that reference it.
+- Assets: local image import, imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, asset deletion, group-object reuse, group-object tag editing, and group-object deletion. Deleting an image asset also removes image layers that reference it.
 - The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
 - The previous guided creation strip is removed from the left panel.
 
@@ -260,7 +261,7 @@ The right inspector is grouped by task:
 
 The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a vertical resize handle while preserving the default expanded height.
 
-The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps.
+The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps. List rows keep minimum usable heights so dense image imports or group-object rows do not collapse their action controls.
 
 Controls that cannot affect the current edit target are disabled instead of accepting inert input. Examples include single-line text line height, outline or stroke colors when stroke width is `0`, image asset switching when there is only one asset, and palette application when no selected text or shape layer can receive the color.
 

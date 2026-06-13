@@ -1,5 +1,10 @@
 import { describe, expect, it } from "vitest";
-import { createGroupObjectAsset, instantiateGroupObject } from "./groupObjects";
+import {
+  createGroupObjectAsset,
+  instantiateGroupObject,
+  removeGroupObjectAsset,
+  updateGroupObjectAssetTags,
+} from "./groupObjects";
 import { makeShapeLayer, makeTextLayer } from "./layerFactory";
 
 describe("groupObjects", () => {
@@ -35,5 +40,26 @@ describe("groupObjects", () => {
       [38, 52],
     ]);
     expect(instance.selectedIds).toEqual(instance.layers.map((layer) => layer.id));
+  });
+
+  it("updates and removes stored group object assets", () => {
+    const groupObject = createGroupObjectAsset(
+      "Bug badge",
+      [makeShapeLayer({ id: "shape-1" }), makeTextLayer({ id: "text-1" })],
+      [],
+      new Date("2026-06-13T00:00:00.000Z"),
+      ["old"],
+    );
+
+    const updated = updateGroupObjectAssetTags(
+      [groupObject],
+      groupObject.id,
+      [" edited ", "edited", "bundle"],
+      new Date("2026-06-13T01:00:00.000Z"),
+    );
+
+    expect(updated[0].tags).toEqual(["edited", "bundle"]);
+    expect(updated[0].updatedAt).toBe("2026-06-13T01:00:00.000Z");
+    expect(removeGroupObjectAsset(updated, groupObject.id)).toEqual([]);
   });
 });

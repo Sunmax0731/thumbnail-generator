@@ -479,3 +479,16 @@ Completed on 2026-06-13.
 - Runtime checks: nonblank render, default unselected state, generator unselected state, registered-template label, Preview zoom to `114%`, hidden scrollbars, right-drag pan transform change, folder input `webkitdirectory`, image-only folder import, import-time tags, tag filtering/editing, asset list resize, group-object collapse, group-object tag/register/reuse flow, ImageLab wheel zoom/right pan/free-selection right-click guard, export download, mobile nonblank canvas, mobile overflow `0`, and no page/app console errors.
 - Evidence: `output/runtime-20260613-assets-preview/runtime-result.json`, `output/runtime-20260613-assets-preview/desktop-final.png`, and `output/runtime-20260613-assets-preview/mobile-final.png`.
 - CSV/HTML note: visible panel controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Asset Row Density And Group Object Follow-Up Evidence
+
+Completed on 2026-06-13.
+
+- Scope: dense asset-list row sizing, group-object tag editing and deletion, Ctrl-click delete confirmation bypass, and lighter canvas dragging for reused group objects.
+- Quality: A+. `npm test` passed with 33 test files and 129 tests, `npm run build` passed, and Playwright verified the requested follow-up workflows.
+- Cost: A+. The changes remain small React/CSS/localStorage updates and one animation-frame batching improvement; no new dependency or service was introduced.
+- Delivery: A+. Runtime evidence, docs, and unit coverage were updated with the implementation.
+- Satisfaction: A+. Large image imports keep their row controls usable, group objects now have parity with image asset tag/delete management, confirmation bypass is available for power users, and grouped canvas moves avoid excessive pointermove updates.
+- Runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4353/thumbnail-generator/?runtime=followup-1781355528797`.
+- Runtime checks: 10-image folder import plus sample row, asset row minimum heights `94px`, group-object row height `108px`, group-object tag edit, group-object delete, group-object drag responsiveness `457ms`, Ctrl-click browser-template delete confirmation bypass, Ctrl-click layer delete confirmation bypass, and no page/app console errors.
+- Evidence: `output/runtime-20260613-followup/runtime-result.json` and `output/runtime-20260613-followup/desktop-followup.png`.
