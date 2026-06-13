@@ -400,28 +400,23 @@ function drawPreview(
   const y = (canvas.height - height) / 2 + pan.y;
   previewRef.current = { x, y, width, height, scale };
   context.drawImage(image, x, y, width, height);
-  context.strokeStyle = "#10b6d7";
-  context.lineWidth = 3;
-  context.setLineDash([8, 6]);
 
   if (mode === "none") return;
 
   if (mode === "polygon" && polygonPoints.length > 0) {
-    context.beginPath();
-    polygonPoints.forEach((point, index) => {
-      const px = x + point.x * scale;
-      const py = y + point.y * scale;
-      if (index === 0) context.moveTo(px, py);
-      else context.lineTo(px, py);
-    });
-    if (polygonPoints.length >= 3) context.closePath();
-    context.stroke();
-    context.setLineDash([]);
-    context.fillStyle = "#10b6d7";
-    polygonPoints.forEach((point) => {
+    const drawPolygonPath = () => {
       context.beginPath();
-      context.arc(x + point.x * scale, y + point.y * scale, 4, 0, Math.PI * 2);
-      context.fill();
+      polygonPoints.forEach((point, index) => {
+        const px = x + point.x * scale;
+        const py = y + point.y * scale;
+        if (index === 0) context.moveTo(px, py);
+        else context.lineTo(px, py);
+      });
+      if (polygonPoints.length >= 3) context.closePath();
+    };
+    drawSelectionStroke(context, drawPolygonPath);
+    polygonPoints.forEach((point) => {
+      drawPointHandle(context, x + point.x * scale, y + point.y * scale);
     });
     return;
   }
@@ -432,13 +427,16 @@ function drawPreview(
   const rw = rect.width * scale;
   const rh = rect.height * scale;
   if (mode === "ellipse") {
-    context.beginPath();
-    context.ellipse(rx + rw / 2, ry + rh / 2, rw / 2, rh / 2, 0, 0, Math.PI * 2);
-    context.stroke();
+    drawSelectionStroke(context, () => {
+      context.beginPath();
+      context.ellipse(rx + rw / 2, ry + rh / 2, rw / 2, rh / 2, 0, 0, Math.PI * 2);
+    });
   } else {
-    context.strokeRect(rx, ry, rw, rh);
+    drawSelectionStroke(context, () => {
+      context.beginPath();
+      context.rect(rx, ry, rw, rh);
+    });
   }
-  context.setLineDash([]);
   drawRectHandles(context, [
     [rx, ry],
     [rx + rw / 2, ry],
@@ -451,15 +449,63 @@ function drawPreview(
   ]);
 }
 
-function drawRectHandles(context: CanvasRenderingContext2D, points: Array<[number, number]>): void {
-  context.fillStyle = "#ffffff";
+function drawSelectionStroke(context: CanvasRenderingContext2D, drawPath: () => void): void {
+  context.save();
+  context.lineJoin = "round";
+  context.lineCap = "round";
+  context.setLineDash([8, 6]);
+  context.strokeStyle = "rgba(0, 0, 0, 0.82)";
+  context.lineWidth = 7;
+  drawPath();
+  context.stroke();
+  context.strokeStyle = "#ffffff";
+  context.lineWidth = 4;
+  drawPath();
+  context.stroke();
   context.strokeStyle = "#10b6d7";
-  context.lineWidth = 3;
+  context.lineWidth = 2;
+  drawPath();
+  context.stroke();
+  context.restore();
+}
+
+function drawPointHandle(context: CanvasRenderingContext2D, x: number, y: number): void {
+  context.save();
+  context.setLineDash([]);
+  context.shadowColor = "rgba(0, 0, 0, 0.72)";
+  context.shadowBlur = 5;
+  context.fillStyle = "#000000";
+  context.beginPath();
+  context.arc(x, y, 7, 0, Math.PI * 2);
+  context.fill();
+  context.shadowBlur = 0;
+  context.fillStyle = "#ffffff";
+  context.beginPath();
+  context.arc(x, y, 5, 0, Math.PI * 2);
+  context.fill();
+  context.strokeStyle = "#10b6d7";
+  context.lineWidth = 2;
+  context.beginPath();
+  context.arc(x, y, 5, 0, Math.PI * 2);
+  context.stroke();
+  context.restore();
+}
+
+function drawRectHandles(context: CanvasRenderingContext2D, points: Array<[number, number]>): void {
   points.forEach(([x, y]) => {
-    context.beginPath();
-    context.rect(x - 5, y - 5, 10, 10);
-    context.fill();
-    context.stroke();
+    context.save();
+    context.setLineDash([]);
+    context.shadowColor = "rgba(0, 0, 0, 0.72)";
+    context.shadowBlur = 5;
+    context.fillStyle = "#000000";
+    context.fillRect(x - 7, y - 7, 14, 14);
+    context.shadowBlur = 0;
+    context.fillStyle = "#ffffff";
+    context.fillRect(x - 5, y - 5, 10, 10);
+    context.strokeStyle = "#10b6d7";
+    context.lineWidth = 2;
+    context.strokeRect(x - 5, y - 5, 10, 10);
+    context.restore();
   });
 }
 

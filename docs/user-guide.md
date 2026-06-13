@@ -20,7 +20,7 @@ npm run preview
 - Window settings: use the upper-right Language selector to switch between Japanese and English, and use the adjacent Theme selector to choose System, Light, or Dark. System follows the browser or OS color-scheme preference. On first load, the app uses Japanese or English when the browser/OS language matches those languages; unsupported languages fall back to English.
 - Templates: generate schedule layouts, standard thumbnails, vertical thumbnails, or stream waiting screens, and save/load/delete browser-local Registered templates.
 - Layers: use collapsible Quick Add, reorder, lock, hide/show, select, align, evenly distribute, duplicate, delete, group layers, and resize the list area with the handle below the list.
-- Assets: import files or a folder, assign and edit image tags, review imported assets, add a selected asset as an image layer, reuse group objects, edit group object tags, open Image Lab from an imported asset row, or delete imported assets and group objects.
+- Assets: import files or a folder, assign and edit image tags, filter images and group objects separately by tag, review imported assets, add a selected asset as an image layer, reuse group objects, edit group object tags, open Image Lab from an imported asset row, or delete imported assets and group objects.
 - Output: use the preview-header Output button to choose JPG, PNG, WebP, or OBS preview.
 - Edit state: use the top-right icon cluster to save/restore the current edit state, export/import JSON, and delete the saved work-in-progress slot. Autosave remains text-labeled beside those icons.
 - The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while アニメ is open.
@@ -64,8 +64,8 @@ Use Quick Add at the top of Layers to add common starter layers quickly:
 - Text and Shape add basic editable layers.
 - Line adds an editable line layer; select it and open Adjust to choose solid, dotted, dashed, or wave.
 - Headline, Subtitle, Badge, and Divider add pre-sized thumbnail components.
-- Import image files or an image folder from Assets. Before imported images appear in the list, assign zero or more tags. Tags can be typed freely, entered as comma-separated values, or chosen from existing tag suggestions.
-- Edit tags later from each image or group object row. Use the tag filter to narrow the image and group object sections.
+- Import image files or an image folder from Assets. Before imported images appear in the list, assign zero or more tags. Tags can be typed freely, entered as comma-separated values, or chosen from existing tag suggestions. If text remains in the tag input when you press Register assets, that text is also saved as a tag.
+- Edit tags later from each image or group object row. Use the image tag filter and group-object tag filter independently to narrow those sections.
 - Select an imported asset row in Assets, then use its add button or the selected-image button in Layers Quick Add to place that image as a layer.
 - Delete an imported asset from Assets when it is no longer needed. Any image layer that uses that asset is removed at the same time. Delete group objects from Assets when the reusable preset is no longer needed.
 - YouTube thumbnail import remains browser-only internally, but the current GUI hides the YouTube URL controls.
@@ -148,14 +148,14 @@ The status bar can show quality warning chips while you work. Check these before
 7. Tune Effect intensity for Glow pulse, Blur in, or Shine. The intensity control is greyed out for choices that cannot use it.
 8. Add additional motion sets when one object needs multiple animation behaviors.
 9. Use the selected-object preview and the easing graph toggle while checking motion.
-10. Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
+10. Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height.
 11. Select OBS preview from the Output menu.
 
 The OBS preview opens a popup-style browser window that contains only the animated canvas plus a small operation overlay. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. Use Play/Pause and Reset while checking motion, or press `P` for Play/Pause and `R` for Reset. Click Hide to remove the overlay for capture, and press `H` in the OBS preview window to show or hide it again. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS/browser chrome is capturable. Static PNG/JPG/WebP export still renders the base layer state, not an animation frame.
 
 ## Image Lab
 
-Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Use the mouse wheel to zoom and right-drag to pan the Image Lab preview. Rectangle and circle selections can be moved or resized by dragging the eight preview handles after selection; corner handles preserve aspect ratio and side handles resize freely. Polygon points can be dragged after placement, Alt-clicking a point removes it, and right-click does not add a point. Import images from the Assets tab before opening Image Lab; the modal focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
+Open Image Lab from the scissors button on an imported asset row. The modal starts with no selected cutout range. Choose rectangle, circle, or polygon only when you want to crop; chroma key can also process the whole selected asset. Use the mouse wheel to zoom and right-drag to pan the Image Lab preview. Rectangle and circle selections can be moved or resized by dragging the eight high-contrast preview handles after selection; corner handles preserve aspect ratio and side handles resize freely. Polygon points can be dragged after placement, Alt-clicking a point removes it, and right-click does not add a point. Import images from the Assets tab before opening Image Lab; the modal focuses on processing the selected asset. The processed-layer creation button is in the modal header, and chroma-key settings sit beside the position and size controls. Processed results are added as image assets and inserted as editable image layers.
 
 ## Color Palette
 

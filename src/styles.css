@@ -1198,11 +1198,12 @@ button:disabled {
 }
 
 .stage-timeline {
+  position: relative;
   display: grid;
-  grid-template-rows: auto auto minmax(0, 1fr) 8px;
+  grid-template-rows: auto auto minmax(0, 1fr);
   flex: 0 0 auto;
   gap: 7px;
-  padding: 10px 12px;
+  padding: 14px 12px 10px;
   border-top: 1px solid var(--line);
   background: var(--panel);
   min-height: 120px;
@@ -1211,6 +1212,7 @@ button:disabled {
 
 .stage-timeline.collapsed {
   grid-template-rows: auto;
+  padding: 10px 12px;
   min-height: auto;
   height: auto;
 }
@@ -1354,12 +1356,17 @@ button:disabled {
 }
 
 .timeline-resize-handle {
-  height: 8px;
-  border-radius: 999px;
+  position: absolute;
+  top: 0;
+  right: 10px;
+  left: 10px;
+  height: 10px;
+  border-radius: 0 0 999px 999px;
   background:
-    linear-gradient(90deg, transparent, rgba(100, 114, 134, 0.34), transparent),
+    linear-gradient(90deg, transparent, rgba(100, 114, 134, 0.42), transparent),
     var(--panel-soft);
   cursor: ns-resize;
+  touch-action: none;
 }
 
 .timeline-resize-handle:focus-visible {

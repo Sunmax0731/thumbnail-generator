@@ -43,7 +43,7 @@ Create a static web service named サムネいる？ for making video thumbnails
 - Provide image generators for standard thumbnails, vertical thumbnails, and stream waiting screens with five placement patterns, editable text, shared font choices, grouped common/title/subtitle/label text controls, color, image-slot, grouping, live preview, Generate layers, and Save settings controls. Stream waiting screens include optional animation metadata.
 - Keep generator modal text sliders compact, allow letter spacing to be set to `0`, keep corner radius in common generator controls, use wider landscape previews for standard thumbnail, schedule, and stream waiting generators, preserve portrait preview aspect ratios, place generator action buttons at the preview/modal lower edge, and keep portrait generator preview columns free of excessive right-side whitespace.
 - Configure one or more per-layer animation sets from the アニメ tab with easings.net-style easing choices, motion presets, selected-object preview, toggleable easing graph, disabled direction controls when an animation type does not use movement, a bottom timeline of animated layers, text-only motion controls only for selected text layers, movement and non-moving/effect dropdowns in common parameters, greyed-out effect intensity when the selected non-moving effect cannot use intensity, and a popup-style OBS preview window without editor controls or selection handles.
-- Show the bottom motion timeline only while the アニメ tab is active, and let users collapse the timeline, edit animation start/end visually with segment handles, move a segment by dragging the bar, and resize the timeline section height by dragging its handle.
+- Show the bottom motion timeline only while the アニメ tab is active, and let users collapse the timeline, edit animation start/end visually with segment handles, move a segment by dragging the bar, and resize the timeline section height by dragging its top-edge handle.
 - Provide OBS preview-window controls for Play/Pause, Reset, and hiding/showing the control overlay for clean capture, with `P`, `R`, and `H` keyboard shortcuts.
 - Keep the left panel focused on Templates, Layers, and Assets by hiding the Layouts tab, removing the guided creation strip, and hiding the preview-pane Generated layout section while retaining CSV/HTML text for edit-state and template compatibility.
 - Keep browser-local brand kit data compatible with saved states while hiding Brand kit setup controls from Templates and hiding Colors-side Brand kit registration buttons.
@@ -68,9 +68,10 @@ Create a static web service named サムネいる？ for making video thumbnails
 - Rename the browser-local template list label to Registered templates.
 - Delete the final remaining layer when requested, leaving the canvas with zero layer objects.
 - Delete registered/imported image assets from Assets, and remove any image layers that reference the deleted asset.
+- Let image assets and group objects use independent tag filters in Assets, and commit typed import-tag draft text when registering imported images.
 - Let Image Lab zoom with the mouse wheel and pan with right-drag like the main preview.
 - Prevent right-click from adding Image Lab polygon/free-selection points.
-- Show eight handles for Image Lab rectangle and circle selections; corner handles resize with aspect ratio preserved, while side handles resize freely.
+- Show eight high-contrast handles for Image Lab rectangle and circle selections; corner handles resize with aspect ratio preserved, while side handles resize freely.
 - Disable controls that do not affect the current selected layer or selected state.
 - Reset selected layer rotation to `0` degrees from the Adjust tab.
 - Evenly distribute three or more selected layers horizontally or vertically from the Layers alignment controls.

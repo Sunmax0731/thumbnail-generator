@@ -41,7 +41,7 @@ Layer animation is optional metadata on existing image, text, and shape layers. 
 
 Rendering applies each animation entry in order as a temporary draw-time transform. Text-only and effect motion can run even when the common `type` is `none`. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
-The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically, and supports direct segment start/end and whole-segment dragging.
+The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically from its top edge, and supports direct segment start/end and whole-segment dragging.
 
 ## PWA Shell
 
@@ -81,7 +81,7 @@ Image layers include:
 - `effects.contrast`: percent, where `100` is unchanged.
 - `effects.mosaic`: pixel block size. `0` disables mosaic.
 
-Imported image assets may also store `tags`: an ordered list of browser-local free-form labels. Tags are assigned before imported images are registered, can be edited later from the Assets tab, are preserved in edit-state and template snapshots, and are used by the Assets tag filter.
+Imported image assets may also store `tags`: an ordered list of browser-local free-form labels. Tags are assigned before imported images are registered, including any typed draft tag text that has not been added as a chip yet, can be edited later from the Assets tab, are preserved in edit-state and template snapshots, and are used by the image asset tag filter.
 
 Folder import uses the browser file picker directory capability when available. Only files returned by the picker with supported image MIME types or common image extensions are registered; no backend or server scan is used.
 
@@ -95,7 +95,7 @@ Group object assets are browser-local reusable layer groups stored under `thumbn
 - A cloned layer list from the selected group.
 - Referenced image assets needed by image layers inside that group.
 
-Registering is only enabled while one selected editable group is active. Reusing a group object creates new layer ids, assigns one fresh shared `groupId`/`groupName`, offsets the layers slightly, merges any missing referenced image assets into the current asset list, and selects the newly inserted group for immediate placement. Group object rows in Assets support later tag edits and deletion from browser-local storage.
+Registering is only enabled while one selected editable group is active. Reusing a group object creates new layer ids, assigns one fresh shared `groupId`/`groupName`, offsets the layers slightly, merges any missing referenced image assets into the current asset list, and selects the newly inserted group for immediate placement. Group object rows in Assets support later tag edits, their own tag filter, and deletion from browser-local storage.
 
 ## Text Layers
 
@@ -259,7 +259,7 @@ The right inspector is grouped by task:
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
 - アニメ: ordered motion sets for the selected layer, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text layers, a movement Motion dropdown, a non-moving/effect dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a vertical resize handle while preserving the default expanded height.
+The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a top-edge vertical resize handle while preserving the default expanded height.
 
 The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps. List rows keep minimum usable heights so dense image imports or group-object rows do not collapse their action controls.
 
@@ -472,7 +472,7 @@ The Image Lab modal workspace opens from an imported asset row in the Assets tab
 - Polygon/free cutout by placing three or more points.
 - Rectangular and circular/elliptical cutout selections can be moved or resized after creation by dragging preview handles.
 - Polygon/free cutout points can be dragged after placement and Alt-clicked to delete a point.
-- Image Lab preview zooms with the mouse wheel and pans with right-button drag. Right-click does not add polygon/free-selection points.
+- Image Lab preview zooms with the mouse wheel and pans with right-button drag. Right-click does not add polygon/free-selection points. Selection outlines and handles are drawn with layered dark, light, and accent strokes so they remain visible across bright, dark, and saturated image areas.
 - Rectangular and circular/elliptical selections expose corner and side handles. Corner handles preserve the selected range aspect ratio while resizing; side handles resize that side freely.
 
 Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.

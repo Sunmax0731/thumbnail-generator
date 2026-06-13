@@ -82,11 +82,7 @@ import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
 import { createTranslator, detectInitialLanguage, type Language, type Translator } from "./lib/i18n";
 import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeLayerTransform } from "./lib/layerTransform";
-import {
-  selectIndividualLayerId,
-  selectLayerIdsAfterDelete,
-  selectLayerIdsForLayer,
-} from "./lib/layerOperations";
+import { selectIndividualLayerId, selectLayerIdsForLayer } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
@@ -911,12 +907,18 @@ function App() {
     setLayers((current) => {
       const target = current.find((layer) => layer.id === id);
       if (!target) return current;
-      const next = current.filter((layer) => layer.id !== id);
-      setSelectedIds((selected) => selectLayerIdsAfterDelete(next, selected, id));
-      setStatus(`Deleted ${target.name}.`);
+      const selectedIdSet = new Set(selectedIds);
+      const groupIds = target.groupId
+        ? current.filter((layer) => layer.selectable && layer.groupId === target.groupId).map((layer) => layer.id)
+        : [];
+      const shouldDeleteGroup = groupIds.length > 1 && groupIds.every((groupLayerId) => selectedIdSet.has(groupLayerId));
+      const deletedIds = new Set(shouldDeleteGroup ? groupIds : [id]);
+      const next = current.filter((layer) => !deletedIds.has(layer.id));
+      setSelectedIds((selected) => selected.filter((selectedId) => !deletedIds.has(selectedId) && next.some((layer) => layer.id === selectedId)));
+      setStatus(shouldDeleteGroup ? `Deleted group "${target.groupName ?? target.name}".` : `Deleted ${target.name}.`);
       return next;
     });
-  }, []);
+  }, [selectedIds]);
 
   const deleteAsset = useCallback((key: string) => {
     const target = assets.find((asset) => asset.key === key);

@@ -56,12 +56,12 @@ This page is the quick feature index for users and reviewers.
 ## Image And Text Tools
 
 - Import local image files or a folder of image files from the Assets tab.
-- Assign multiple tags before images are registered, edit tags later, and filter image assets by tag.
-- Use the Assets tab as the imported-image and group-object list, with per-image add, Image Lab, tag edit, and delete actions, plus group-object tag edit and delete actions.
+- Assign multiple tags before images are registered, including a typed draft tag when Register assets is pressed, edit tags later, and filter image assets by tag.
+- Use the Assets tab as the imported-image and group-object list, with per-image add, Image Lab, tag edit, and delete actions, plus separate group-object tag filtering, tag edit, and delete actions.
 - YouTube thumbnail import helpers remain browser-only, while the current GUI hides the YouTube URL controls.
 - Select an imported asset, add it directly as an image layer, or open it in Image Lab from the asset row.
 - Use Image Lab for chroma key, rectangle, circle, polygon, and drag-range cutouts, with mouse-wheel zoom and right-drag pan.
-- Re-edit Image Lab rectangle/circle selections with eight preview handles, preserving aspect ratio from corner handles and allowing free side-handle resizing; drag polygon points after placement without right-click adding new points.
+- Re-edit Image Lab rectangle/circle selections with eight high-contrast preview handles, preserving aspect ratio from corner handles and allowing free side-handle resizing; drag polygon points after placement without right-click adding new points.
 - Add text, line, headline, subtitle, shape, badge, divider, and selected image layers from the collapsible Quick Add section in Layers.
 - Choose solid, dotted, dashed, or wave line styles from Adjust after selecting a line layer. Wave lines render as smooth visible waves in preview and export.
 - Choose Rect, Ellipse, Triangle, Diamond, Pentagon, Hexagon, Star, or Line for shape layers.
@@ -84,7 +84,7 @@ This page is the quick feature index for users and reviewers.
 - Adjust effect intensity for Glow pulse, Blur in, or Shine; the control is greyed out for choices that cannot use intensity.
 - Review the selected-object Motion preview and show or hide the easing graph before opening the OBS preview.
 - Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
-- Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline resize handle to change its height.
+- Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height.
 - Open OBS preview from the Output menu to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
 - Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, provides Play/Pause and Reset controls, uses `P` for Play/Pause, `R` for Reset, hides the control overlay from its Hide button, toggles it again with `H`, and browser/OBS settings still decide whether OS/browser chrome is capturable.
 

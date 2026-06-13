@@ -11,6 +11,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Compose thumbnails with image, text, and shape layers, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
 - Add line layers from Quick Add with solid, dotted, dashed, or smooth wave strokes.
 - Import local images from the Assets tab and edit their position, size, rotation, opacity, and simple effects.
+- Tag imported images and reusable group objects, then filter image assets and group objects independently from the Assets tab.
 - Keep browser-only YouTube thumbnail import support in code while the current Assets UI hides the YouTube URL controls.
 - Adjust layer blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, shadow, pseudo-3D rotation, bevel, fill/stroke color alpha, and text kerning.
 - Select imported assets to add them as image layers, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image layers that reference it.

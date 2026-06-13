@@ -98,11 +98,13 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Multiple saved templates with the same display name are preserved.
 - Current edit state can be manually saved, restored after reload, and autosaved when the autosave toggle is on.
 - Image Lab opens from imported asset rows in a modal workspace and supports chroma key, rectangle/circle cutout, and polygon/free cutout.
-- Image Lab Rect and Circle modes support direct drag selection on the preview, then preview-handle move/resize.
+- Image Lab Rect and Circle modes support direct drag selection on the preview, then high-contrast preview-handle move/resize.
 - Image Lab Polygon mode supports point dragging and point deletion.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
 - Image import accepts a local image and creates an image layer.
+- Image import registers typed tag draft text when Register assets is pressed without first adding a tag chip.
+- Image and group-object tag filters operate independently.
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
 - Image Lab does not duplicate image import or asset-selection controls; source changes stay in Assets before opening the modal.
 - Expanded quick add in Layers inserts text, shape, line, headline, subtitle, badge, divider, and selected-image starters.
@@ -113,7 +115,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - アニメ tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
 - アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
 - アニメ tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
-- The bottom timeline shows animated layers only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, and supports height resizing.
+- The bottom timeline shows animated layers only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, and supports top-edge height resizing.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
 - OBS preview Play/Pause, Reset, and Hide controls are visible by default; `P`, `R`, and `H` trigger Play/Pause, Reset, and Hide/show.
 - Guided start is not visible in the left panel.
@@ -137,7 +139,37 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 ## Current Results
 
-Latest completed on 2026-06-12.
+Latest completed on 2026-06-13.
+
+### Asset Tag Filter, Group Delete, ImageLab Handle, And Timeline Follow-Up
+
+Completed on 2026-06-13 for independent asset/group-object tag filters, import-tag draft registration, grouped-selection deletion, ImageLab handle contrast, and top-edge timeline resizing.
+
+- Scope: split image and group-object tag filters, committed typed import-tag drafts when Register assets is pressed, deleted all selected group members when deleting a selected group, redrew ImageLab selection outlines/handles with layered dark/light/accent strokes, and moved the timeline height handle to the top edge.
+- `npm test`: pass. 33 test files, 129 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4354/thumbnail-generator/?runtime=tag-group-followup-1781357219396`.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright headless Chromium fallback used.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Initial canvas rendered nonblank with 980 sampled color values.
+  - Import-time typed draft tag `image-draft-tag` was saved on the imported `runtime-color` asset without pressing Add.
+  - Image tag filtering showed the imported image while keeping the seeded group object visible.
+  - Group-object tag filtering showed the seeded group object while keeping the image asset filter unchanged.
+  - ImageLab rectangle handles rendered high-contrast white and accent pixels on a saturated test image (`white=1384`, `accent=1788`).
+  - Deleting a selected two-layer group removed the whole group (`8` rows before, `6` after).
+  - Timeline resize handle was positioned at the top edge (`handleTop=777.0625`, `timelineTop=776.0625`), and upward drag increased height from `170px` to `245px`.
+  - PNG export succeeded with size `1137407` bytes.
+  - Mobile Assets viewport rendered with horizontal overflow `0`.
+  - Console health: no page/app runtime errors were reported.
+- Evidence:
+  - `output/runtime-20260613-tag-group-followup/runtime-result.json`
+  - `output/runtime-20260613-tag-group-followup/imagelab-handles.png`
+  - `output/runtime-20260613-tag-group-followup/desktop-final.png`
+  - `output/runtime-20260613-tag-group-followup/mobile-assets.png`
+  - `output/runtime-20260613-tag-group-followup/thumbnail-1280x720-2026-06-13T13-27-03-316Z.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
 
 ### PWA, Extension Bridge, And Anime Label Follow-Up
 

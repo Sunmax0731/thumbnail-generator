@@ -458,7 +458,7 @@ function MotionTimeline({
     const startY = event.clientY;
     const startHeight = sectionRef.current?.getBoundingClientRect().height ?? timelineHeight;
     const handlePointerMove = (moveEvent: PointerEvent) => {
-      setTimelineHeight(Math.min(320, Math.max(120, startHeight + moveEvent.clientY - startY)));
+      setTimelineHeight(Math.min(320, Math.max(120, startHeight + startY - moveEvent.clientY)));
     };
     const handlePointerUp = () => {
       window.removeEventListener("pointermove", handlePointerMove);
@@ -475,6 +475,25 @@ function MotionTimeline({
       ref={sectionRef}
       style={isCollapsed ? undefined : { height: timelineHeight }}
     >
+      {isCollapsed ? null : (
+        <div
+          className="timeline-resize-handle"
+          role="separator"
+          aria-label={t("timeline.resize")}
+          tabIndex={0}
+          onPointerDown={beginTimelineResize}
+          onKeyDown={(event) => {
+            if (event.key === "ArrowUp") {
+              event.preventDefault();
+              setTimelineHeight((height) => Math.min(320, height + 20));
+            }
+            if (event.key === "ArrowDown") {
+              event.preventDefault();
+              setTimelineHeight((height) => Math.max(120, height - 20));
+            }
+          }}
+        />
+      )}
       <div className="stage-timeline-header">
         <strong>{t("timeline.title")}</strong>
         <div className="timeline-header-actions">
@@ -542,23 +561,6 @@ function MotionTimeline({
               })
             )}
           </div>
-          <div
-            className="timeline-resize-handle"
-            role="separator"
-            aria-label={t("timeline.resize")}
-            tabIndex={0}
-            onPointerDown={beginTimelineResize}
-            onKeyDown={(event) => {
-              if (event.key === "ArrowDown") {
-                event.preventDefault();
-                setTimelineHeight((height) => Math.min(320, height + 20));
-              }
-              if (event.key === "ArrowUp") {
-                event.preventDefault();
-                setTimelineHeight((height) => Math.max(120, height - 20));
-              }
-            }}
-          />
         </>
       )}
     </section>

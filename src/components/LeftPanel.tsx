@@ -106,7 +106,8 @@ export function LeftPanel({
   const [isImageSectionExpanded, setIsImageSectionExpanded] = useState(true);
   const [isGroupObjectSectionExpanded, setIsGroupObjectSectionExpanded] = useState(true);
   const [pendingImageFiles, setPendingImageFiles] = useState<File[] | null>(null);
-  const [assetFilterTag, setAssetFilterTag] = useState("");
+  const [imageAssetFilterTag, setImageAssetFilterTag] = useState("");
+  const [groupObjectFilterTag, setGroupObjectFilterTag] = useState("");
   const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
   const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
@@ -134,13 +135,21 @@ export function LeftPanel({
     const tags = templates.flatMap((template) => template.tags ?? []);
     return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
   }, [templates]);
+  const imageAssetTags = useMemo(() => {
+    const tags = assets.flatMap((asset) => asset.tags ?? []);
+    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
+  }, [assets]);
+  const groupObjectTags = useMemo(() => {
+    const tags = groupObjects.flatMap((groupObject) => groupObject.tags ?? []);
+    return Array.from(new Set(tags)).sort((a, b) => a.localeCompare(b));
+  }, [groupObjects]);
   const visibleAssets = useMemo(
-    () => (assetFilterTag ? assets.filter((asset) => asset.tags?.includes(assetFilterTag)) : assets),
-    [assetFilterTag, assets],
+    () => (imageAssetFilterTag ? assets.filter((asset) => asset.tags?.includes(imageAssetFilterTag)) : assets),
+    [imageAssetFilterTag, assets],
   );
   const visibleGroupObjects = useMemo(
-    () => (assetFilterTag ? groupObjects.filter((groupObject) => groupObject.tags.includes(assetFilterTag)) : groupObjects),
-    [assetFilterTag, groupObjects],
+    () => (groupObjectFilterTag ? groupObjects.filter((groupObject) => groupObject.tags.includes(groupObjectFilterTag)) : groupObjects),
+    [groupObjectFilterTag, groupObjects],
   );
   const visibleTemplates = useMemo(
     () => (templateFilterTag ? templates.filter((template) => template.tags?.includes(templateFilterTag)) : templates),
@@ -225,9 +234,9 @@ export function LeftPanel({
                 </div>
                 <label className="field">
                   <span>{t("left.assetTagFilter")}</span>
-                  <select value={assetFilterTag} onChange={(event) => setAssetFilterTag(event.currentTarget.value)}>
+                  <select value={imageAssetFilterTag} onChange={(event) => setImageAssetFilterTag(event.currentTarget.value)}>
                     <option value="">{t("left.templateTagAll")}</option>
-                    {registeredTags.map((tag) => (
+                    {imageAssetTags.map((tag) => (
                       <option key={tag} value={tag}>
                         {tag}
                       </option>
@@ -302,6 +311,17 @@ export function LeftPanel({
             </button>
             {isGroupObjectSectionExpanded ? (
               <>
+                <label className="field">
+                  <span>{t("left.groupObjectTagFilter")}</span>
+                  <select value={groupObjectFilterTag} onChange={(event) => setGroupObjectFilterTag(event.currentTarget.value)}>
+                    <option value="">{t("left.templateTagAll")}</option>
+                    {groupObjectTags.map((tag) => (
+                      <option key={tag} value={tag}>
+                        {tag}
+                      </option>
+                    ))}
+                  </select>
+                </label>
                 <div className="group-object-list" aria-label={t("left.groupObjects")} style={{ height: groupObjectListHeight }}>
                   {visibleGroupObjects.length === 0 ? (
                     <p className="empty-note">{t("left.noGroupObjects")}</p>
@@ -571,6 +591,7 @@ function ImportImageTagDialog({
   t: Translator;
 }) {
   const [tags, setTags] = useState<string[]>([]);
+  const [draft, setDraft] = useState("");
   return (
     <div className="modal-backdrop confirm-backdrop" onMouseDown={(event) => event.target === event.currentTarget && onCancel()}>
       <section className="confirm-dialog import-tag-dialog" role="dialog" aria-modal="true" aria-labelledby="import-tag-title">
@@ -583,13 +604,14 @@ function ImportImageTagDialog({
           suggestions={suggestions}
           datalistId="pending-image-tag-options"
           onChange={setTags}
+          onDraftChange={setDraft}
           t={t}
         />
         <div className="confirm-actions">
           <button type="button" className="secondary-button" onClick={onCancel}>
             {t("inspector.cancel")}
           </button>
-          <button type="button" className="primary-button" onClick={() => onConfirm(tags)}>
+          <button type="button" className="primary-button" onClick={() => onConfirm(dedupeTags([...tags, ...splitTagDraft(draft)]))}>
             {t("left.registerAssets")}
           </button>
         </div>
@@ -603,19 +625,25 @@ function TagEditor({
   suggestions,
   datalistId,
   onChange,
+  onDraftChange,
   t,
 }: {
   tags: string[];
   suggestions: string[];
   datalistId: string;
   onChange: (tags: string[]) => void;
+  onDraftChange?: (draft: string) => void;
   t: Translator;
 }) {
   const [draft, setDraft] = useState("");
+  const updateDraft = (value: string) => {
+    setDraft(value);
+    onDraftChange?.(value);
+  };
   const addDraftTags = () => {
     const nextTags = [...tags, ...splitTagDraft(draft)];
     onChange(dedupeTags(nextTags));
-    setDraft("");
+    updateDraft("");
   };
   return (
     <div className="tag-editor">
@@ -640,7 +668,7 @@ function TagEditor({
           list={datalistId}
           value={draft}
           placeholder={t("left.tagPlaceholder")}
-          onChange={(event) => setDraft(event.currentTarget.value)}
+          onChange={(event) => updateDraft(event.currentTarget.value)}
           onKeyDown={(event) => {
             if (event.key === "Enter") {
               event.preventDefault();
