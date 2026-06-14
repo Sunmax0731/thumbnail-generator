@@ -2999,6 +2999,105 @@ button:disabled {
   font-weight: 900;
 }
 
+.manual-visuals {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin: 12px 0;
+}
+
+.manual-visual-card {
+  min-width: 0;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid rgba(216, 224, 231, 0.78);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel-soft) 74%, var(--panel));
+}
+
+.manual-shortcut-card {
+  grid-column: 1 / -1;
+}
+
+.manual-visual-card figcaption {
+  margin-top: 6px;
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 850;
+  line-height: 1.35;
+}
+
+.manual-gui-svg,
+.manual-shortcut-svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  color: var(--text);
+}
+
+.manual-svg-window {
+  fill: var(--panel);
+  stroke: rgba(148, 163, 184, 0.62);
+  stroke-width: 1.5;
+}
+
+.manual-svg-header {
+  fill: color-mix(in srgb, var(--panel-soft) 82%, var(--text) 8%);
+}
+
+.manual-svg-dot {
+  fill: var(--accent);
+}
+
+.manual-svg-dot.muted,
+.manual-svg-muted {
+  fill: rgba(148, 163, 184, 0.32);
+}
+
+.manual-svg-focus {
+  fill: rgba(16, 182, 215, 0.22);
+  stroke: rgba(16, 182, 215, 0.86);
+  stroke-width: 1.5;
+}
+
+.manual-svg-control,
+.manual-svg-key {
+  fill: color-mix(in srgb, var(--panel-soft) 72%, var(--text) 9%);
+  stroke: rgba(148, 163, 184, 0.46);
+  stroke-width: 1;
+}
+
+.manual-svg-canvas {
+  fill: rgba(248, 250, 252, 0.9);
+  stroke: rgba(15, 23, 42, 0.2);
+  stroke-width: 1.5;
+}
+
+.manual-svg-handle {
+  fill: var(--accent-strong);
+}
+
+.manual-svg-arrow,
+.manual-svg-line {
+  fill: none;
+  stroke: var(--accent-strong);
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 3;
+}
+
+.manual-svg-title {
+  fill: var(--text);
+  font-size: 10px;
+  font-weight: 850;
+}
+
+.manual-svg-key-text {
+  fill: var(--text);
+  font-size: 8px;
+  font-weight: 950;
+}
+
 .manual-entry ul {
   display: grid;
   gap: 6px;
@@ -4140,6 +4239,14 @@ button:disabled {
     flex: 0 0 auto;
     min-width: 88px;
     text-align: center;
+  }
+
+  .manual-visuals {
+    grid-template-columns: 1fr;
+  }
+
+  .manual-shortcut-card {
+    grid-column: auto;
   }
 }
 

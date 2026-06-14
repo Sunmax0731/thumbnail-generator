@@ -1499,4 +1499,29 @@ Completed on 2026-06-14.
   - `output/runtime-20260614-footer-x-nowrap/runtime-result.json`
   - `output/runtime-20260614-footer-x-nowrap/01-desktop-footer-x.png`
   - `output/runtime-20260614-footer-x-nowrap/02-mobile-footer-x.png`
-- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Manual Overview And Visual Guides Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14 for the expanded in-app Manual overview, per-feature GUI visuals, and shortcut/mouse SVG diagrams.
+
+- Scope: added the topmost Manual Overview category with `What it does`, `Feature list`, and `Workflow` top tabs; added access and operation GUI SVG visuals to manual feature entries; added dedicated SVG diagrams for keyboard shortcuts and preview mouse operations.
+- Automated validation: `npm test` passed with 35 files and 141 tests.
+- Production build: `npm run build` passed.
+- Runtime gate URL: `http://127.0.0.1:4398/thumbnail-generator/?runtime=manual-overview-visuals-20260614`.
+- Browser path: Browser plugin connection was unavailable for `iab`, so Playwright local Chrome was used.
+- Runtime checks:
+  - Page identity, primary UI visibility, nonblank canvas render, and console health passed.
+  - Manual opened from the footer with `Overview` as the first left tab and `What it does`, `Feature list`, and `Workflow` as the Overview top tabs.
+  - Overview content showed access/operation GUI visuals with 6 `.manual-gui-svg` elements in the active section.
+  - Shortcut section showed 2 dedicated `.manual-shortcut-svg` diagrams and retained `Ctrl+C` and `Middle-drag` content.
+  - Visible CSV/HTML import controls remain hidden in the current GUI; parser/model coverage is covered by `npm test`.
+  - Layer editing changed the selected text layer name to `Runtime manual overview layer`.
+  - WebP export downloaded `729144` bytes.
+  - Mobile manual layout had horizontal overflow `0px`.
+- Evidence:
+  - `output/runtime-20260614-manual-overview-visuals/runtime-result.json`
+  - `output/runtime-20260614-manual-overview-visuals/01-initial.png`
+  - `output/runtime-20260614-manual-overview-visuals/02-manual-overview.png`
+  - `output/runtime-20260614-manual-overview-visuals/03-manual-shortcuts.png`
+  - `output/runtime-20260614-manual-overview-visuals/04-layer-edit.png`
+  - `output/runtime-20260614-manual-overview-visuals/05-mobile-manual.png`

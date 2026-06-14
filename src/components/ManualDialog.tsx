@@ -4,6 +4,7 @@ import { BookOpen, X } from "lucide-react";
 import { createTranslator, type Language, type TranslationKey } from "../lib/i18n";
 
 export type ManualCategoryId =
+  | "overview"
   | "templates"
   | "layers"
   | "assets"
@@ -55,6 +56,10 @@ interface ManualCopy {
   title: string;
   subtitle: string;
   useCaseLabel: string;
+  visualIntroLabel: string;
+  accessVisualLabel: string;
+  operationVisualLabel: string;
+  shortcutVisualLabel: string;
   closeLabel: string;
   categoryTabsLabel: string;
   sectionTabsLabel: (categoryLabel: string) => string;
@@ -64,8 +69,8 @@ interface ManualCopy {
 }
 
 export const defaultManualDialogState: ManualDialogState = {
-  categoryId: "preview",
-  sectionId: "selection",
+  categoryId: "overview",
+  sectionId: "what",
   scrollTop: 0,
 };
 
@@ -163,6 +168,7 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                     >
                       <h4>{entry.title}</h4>
                       <p>{entry.body}</p>
+                      <ManualEntryVisuals entry={entry} copy={copy} />
                       <p className="manual-use-case">
                         <strong>{copy.useCaseLabel}</strong>
                         <span>{entry.useCase}</span>
@@ -221,6 +227,106 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
   );
 }
 
+function ManualEntryVisuals({ entry, copy }: { entry: ManualEntry; copy: ManualCopy }) {
+  return (
+    <div className="manual-visuals" aria-label={`${entry.title}: ${copy.visualIntroLabel}`}>
+      <figure className="manual-visual-card">
+        <ManualGuiSvg title={entry.title} mode="access" ariaLabel={`${entry.title}: ${copy.accessVisualLabel}`} />
+        <figcaption>{copy.accessVisualLabel}</figcaption>
+      </figure>
+      <figure className="manual-visual-card">
+        <ManualGuiSvg title={entry.title} mode="operation" ariaLabel={`${entry.title}: ${copy.operationVisualLabel}`} />
+        <figcaption>{copy.operationVisualLabel}</figcaption>
+      </figure>
+      <ManualShortcutVisuals entryId={entry.id} copy={copy} />
+    </div>
+  );
+}
+
+function ManualGuiSvg({ title, mode, ariaLabel }: { title: string; mode: "access" | "operation"; ariaLabel: string }) {
+  const shortTitle = title.length > 18 ? `${title.slice(0, 17)}...` : title;
+  const isAccess = mode === "access";
+  return (
+    <svg className="manual-gui-svg" viewBox="0 0 260 128" role="img" aria-label={ariaLabel}>
+      <title>{ariaLabel}</title>
+      <rect x="8" y="8" width="244" height="112" rx="8" className="manual-svg-window" />
+      <rect x="8" y="8" width="244" height="20" rx="8" className="manual-svg-header" />
+      <circle cx="22" cy="18" r="4" className="manual-svg-dot" />
+      <circle cx="36" cy="18" r="4" className="manual-svg-dot muted" />
+      <circle cx="50" cy="18" r="4" className="manual-svg-dot muted" />
+      {isAccess ? (
+        <>
+          <rect x="20" y="40" width="62" height="14" rx="4" className="manual-svg-muted" />
+          <rect x="20" y="60" width="62" height="20" rx="4" className="manual-svg-focus" />
+          <rect x="20" y="88" width="62" height="14" rx="4" className="manual-svg-muted" />
+          <path d="M92 70h44" className="manual-svg-arrow" />
+          <path d="m128 62 10 8-10 8" className="manual-svg-arrow" />
+          <rect x="148" y="42" width="84" height="14" rx="4" className="manual-svg-control" />
+          <rect x="148" y="64" width="70" height="14" rx="4" className="manual-svg-focus" />
+          <rect x="148" y="86" width="92" height="14" rx="4" className="manual-svg-control" />
+        </>
+      ) : (
+        <>
+          <rect x="22" y="42" width="92" height="58" rx="6" className="manual-svg-canvas" />
+          <rect x="46" y="58" width="42" height="24" rx="3" className="manual-svg-focus" />
+          <circle cx="91" cy="55" r="5" className="manual-svg-handle" />
+          <rect x="132" y="44" width="92" height="12" rx="4" className="manual-svg-control" />
+          <rect x="132" y="66" width="72" height="12" rx="4" className="manual-svg-control" />
+          <rect x="132" y="88" width="100" height="12" rx="4" className="manual-svg-focus" />
+          <path d="M114 72h16" className="manual-svg-arrow" />
+        </>
+      )}
+      <text x="130" y="116" textAnchor="middle" className="manual-svg-title">
+        {shortTitle}
+      </text>
+    </svg>
+  );
+}
+
+function ManualShortcutVisuals({ entryId, copy }: { entryId: string; copy: ManualCopy }) {
+  if (entryId === "keyboard") {
+    return (
+      <figure className="manual-visual-card manual-shortcut-card">
+        <svg className="manual-shortcut-svg" viewBox="0 0 260 128" role="img" aria-label={copy.shortcutVisualLabel}>
+          <title>{copy.shortcutVisualLabel}</title>
+          {["Del", "Ctrl", "C", "V", "X", "D", "Z", "Y"].map((key, index) => (
+            <g key={key} transform={`translate(${16 + index * 29} 42)`}>
+              <rect width={24} height={22} rx={5} className={key === "Ctrl" ? "manual-svg-focus" : "manual-svg-key"} />
+              <text x={12} y={14} textAnchor="middle" className="manual-svg-key-text">
+                {key}
+              </text>
+            </g>
+          ))}
+          <path d="M78 82h96" className="manual-svg-arrow" />
+          <path d="m166 74 10 8-10 8" className="manual-svg-arrow" />
+          <rect x="186" y="68" width="46" height="28" rx="6" className="manual-svg-canvas" />
+        </svg>
+        <figcaption>{copy.shortcutVisualLabel}</figcaption>
+      </figure>
+    );
+  }
+  if (entryId === "mouse-preview") {
+    return (
+      <figure className="manual-visual-card manual-shortcut-card">
+        <svg className="manual-shortcut-svg" viewBox="0 0 260 128" role="img" aria-label={copy.shortcutVisualLabel}>
+          <title>{copy.shortcutVisualLabel}</title>
+          <rect x="30" y="34" width="54" height="76" rx="25" className="manual-svg-window" />
+          <path d="M57 34v34" className="manual-svg-line" />
+          <path d="M30 68h54" className="manual-svg-line" />
+          <circle cx="57" cy="52" r="6" className="manual-svg-focus" />
+          <path d="M108 52h78" className="manual-svg-arrow" />
+          <path d="m178 44 10 8-10 8" className="manual-svg-arrow" />
+          <rect x="152" y="76" width="56" height="26" rx="5" className="manual-svg-focus" />
+          <path d="M140 88h-24v-24" className="manual-svg-arrow" />
+          <path d="m116 74 0-12 12 0" className="manual-svg-arrow" />
+        </svg>
+        <figcaption>{copy.shortcutVisualLabel}</figcaption>
+      </figure>
+    );
+  }
+  return null;
+}
+
 function buildManualCopy(language: Language): ManualCopy {
   const ja = language === "ja";
   const tx = (japanese: string, english: string) => (ja ? japanese : english);
@@ -252,6 +358,54 @@ function buildManualCopy(language: Language): ManualCopy {
   });
 
   const categories: ManualCategory[] = [
+    {
+      id: "overview",
+      label: tx("概要", "Overview"),
+      sections: [
+        section("what", tx("できること", "What it does"), tx("このアプリでできること", "What this app can do"), tx("動画・配信向けサムネイルを、素材登録からレイヤー編集、アニメ確認、画像書き出しまでブラウザ内で完結できます。", "Create video and stream thumbnails in the browser, from asset registration to layer editing, animation preview, and image export."), [
+          entry("overview-compose", tx("サムネイルを組み立てる", "Compose thumbnails"), tx("画像、テキスト、図形、線、保存済みグループをキャンバス上で組み合わせます。", "Combine images, text, shapes, lines, and saved groups on the canvas."), [
+            tx("素材はブラウザ内だけで扱い、サーバーへアップロードしません。", "Assets stay in the browser and are not uploaded to a server."),
+            tx("選択、移動、回転、リサイズ、整列、グループ化を直接編集できます。", "Selection, movement, rotation, resize, alignment, and grouping are edited directly."),
+          ]),
+          entry("overview-export", tx("用途に合わせて出力する", "Export for each destination"), tx("YouTube、Full HD、Twitch、正方形、縦型ショート、カスタムサイズ向けに書き出します。", "Export for YouTube, Full HD, Twitch, square, vertical short, and custom sizes."), [
+            tx("出力メニューから JPG / PNG / WebP と OBS プレビューを選べます。", "Use the Output menu for JPG, PNG, WebP, and OBS preview."),
+            tx("編集時にキャンバス外が見えても、書き出しは出力キャンバス内にクリップされます。", "Export is clipped to the output canvas even when off-canvas objects are visible while editing."),
+          ]),
+          entry("overview-save", tx("作業を再利用する", "Reuse work"), tx("編集状態、登録テンプレート、タグ、色、フォントをブラウザ保存や JSON バックアップで再利用します。", "Reuse edit states, registered templates, tags, colors, and fonts through browser storage or JSON backup."), [
+            tx("テンプレートはタグで分類し、次の制作の開始点として読み込めます。", "Templates can be tagged and loaded as the starting point for the next thumbnail."),
+            tx("自動保存と手動 JSON バックアップを併用できます。", "Autosave and manual JSON backup can be used together."),
+          ]),
+        ]),
+        section("features", tx("機能一覧", "Feature list"), tx("主な機能一覧", "Primary feature list"), tx("左ペイン、右ペイン、プレビュー、下部タイムライン、フッターから使う主な機能です。", "The main features are distributed across the left panel, right panel, preview, bottom timeline, and footer."), [
+          entry("overview-templates", tx("テンプレート・素材・Image Lab", "Templates, assets, and Image Lab"), tx("テンプレート生成、登録済みテンプレート、画像素材、グループ素材、切り抜きやクロマキーを扱います。", "Use generators, registered templates, image assets, group assets, cutouts, and chroma key."), [
+            tx("左ペインの Templates / Assets から制作開始と素材管理を行います。", "Use the left-panel Templates / Assets tabs for starting layouts and asset management."),
+            tx("Image Lab は素材行から開き、処理結果を新しい素材として追加します。", "Open Image Lab from an asset row and add the processed result as a new asset."),
+          ]),
+          entry("overview-editing", tx("レイヤー編集・調整・色", "Layers, Adjust, and Colors"), tx("配置済みオブジェクトの順序、名前、表示、ロック、数値調整、装飾、保存色を編集します。", "Edit object order, names, visibility, locks, numeric settings, decoration, and saved colors."), [
+            tx("右ペインの Layers / Adjust / Colors で配置後の編集を集約します。", "Use the right-panel Layers / Adjust / Colors tabs for post-placement editing."),
+            tx("複数選択時は整列、分布、相対移動、角度合わせを使えます。", "Multi-selection enables alignment, distribution, relative movement, and angle matching."),
+          ]),
+          entry("overview-motion", tx("アニメ・プレビュー・ショートカット", "Animation, preview, and shortcuts"), tx("アニメーション設定、タイムライン再生、パン/ズーム、直接編集、キーボード/マウス操作を扱います。", "Use animation settings, timeline playback, pan/zoom, direct editing, and keyboard/mouse operations."), [
+            tx("アニメタブを開くと下部タイムラインで開始位置や長さを調整できます。", "Open the Animation tab to edit start and duration on the bottom timeline."),
+            tx("プレビュー上で選択、範囲選択、移動、回転、リサイズ、パン、ズームを行います。", "Use the preview for selection, range selection, movement, rotation, resize, pan, and zoom."),
+          ]),
+        ]),
+        section("steps", tx("手順", "Workflow"), tx("基本的な制作手順", "Basic production workflow"), tx("最短では、テンプレートを選び、素材と文字を差し替え、プレビューで整え、出力メニューから書き出します。", "The shortest path is to choose a template, replace assets and text, refine in the preview, then export from the Output menu."), [
+          entry("overview-step-start", tx("1. 土台を作る", "1. Start the layout"), tx("Templates で生成するか、Layers の Quick Add からテキスト・図形・線を置きます。", "Generate a layout from Templates or place text, shapes, and lines from Layers Quick Add."), [
+            tx("既存テンプレートを読み込む前に、現在のキャンバスを置き換える確認が入ります。", "Loading a template asks for confirmation before replacing the current canvas."),
+            tx("出力サイズはプレビュー上部のプリセットや幅/高さで決めます。", "Set output size with the preview-header preset or width/height controls."),
+          ]),
+          entry("overview-step-edit", tx("2. 素材とレイヤーを整える", "2. Refine assets and layers"), tx("Assets で画像を登録し、プレビューまたは右ペインで位置、サイズ、色、効果を調整します。", "Register images in Assets, then adjust position, size, color, and effects from the preview or right panel."), [
+            tx("選択中オブジェクトの種類に応じて Adjust の専用コントロールが切り替わります。", "Adjust switches type-specific controls for the selected object."),
+            tx("必要なら Image Lab で切り抜きや背景透過を行ってから配置します。", "Use Image Lab for cutouts or transparent backgrounds before placement when needed."),
+          ]),
+          entry("overview-step-export", tx("3. 確認して書き出す", "3. Check and export"), tx("Fit canvas、再生、OBS プレビュー、出力形式を確認して画像を書き出します。", "Check Fit canvas, playback, OBS preview, and export format before downloading the image."), [
+            tx("PNG は透明保持、JPG は写真向け、WebP は品質と容量のバランスに向きます。", "PNG preserves transparency, JPG is photo-oriented, and WebP balances quality and size."),
+            tx("作業途中は編集状態保存や JSON 書き出しでバックアップできます。", "Back up work in progress with edit-state save or JSON export."),
+          ]),
+        ]),
+      ],
+    },
     {
       id: "templates",
       label: tx("テンプレート", "Templates"),
@@ -641,6 +795,10 @@ function buildManualCopy(language: Language): ManualCopy {
       "",
     ),
     useCaseLabel: tx("ユースケース: ", "Use case: "),
+    visualIntroLabel: tx("機能へのアクセスと操作画面のイメージ", "access and operation visuals"),
+    accessVisualLabel: tx("アクセスするGUI", "Access GUI"),
+    operationVisualLabel: tx("操作するGUI", "Operation GUI"),
+    shortcutVisualLabel: tx("ショートカット/マウス操作のSVG図解", "Shortcut and mouse operation SVG"),
     closeLabel: tx("マニュアルを閉じる", "Close manual"),
     categoryTabsLabel: tx("マニュアル機能タブ", "Manual feature tabs"),
     sectionTabsLabel: (categoryLabel) => tx(`${categoryLabel} セクション`, `${categoryLabel} sections`),
