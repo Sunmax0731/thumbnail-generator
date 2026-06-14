@@ -75,7 +75,7 @@ const enPrivacyCopy: LegalCopy = {
   sections: [
     {
       heading: "Operator",
-      body: "This web app is operated by Sunmax Engineering. Contact is available through X / Twitter: https://x.com/Sunmax0731.",
+      body: "This web app is operated by Sunmax Engineering. Contact is available through X: https://x.com/Sunmax0731.",
     },
     {
       heading: "Information handled by the app",
@@ -87,7 +87,7 @@ const enPrivacyCopy: LegalCopy = {
     },
     {
       heading: "Analytics and external services",
-      body: "The published GitHub Pages app may use Google Analytics to understand usage trends. GitHub Pages, GitHub Issues, Google Fonts, and X / Twitter may process data under their own policies when their services are loaded or opened.",
+      body: "The published GitHub Pages app may use Google Analytics to understand usage trends. GitHub Pages, GitHub Issues, Google Fonts, and X may process data under their own policies when their services are loaded or opened.",
     },
     {
       heading: "Purpose of use",
@@ -115,7 +115,7 @@ const jaPrivacyCopy: LegalCopy = {
   sections: [
     {
       heading: "運営者",
-      body: "本ウェブアプリは Sunmax Engineering が運営します。問い合わせ先は X / Twitter（https://x.com/Sunmax0731）です。",
+      body: "本ウェブアプリは Sunmax Engineering が運営します。問い合わせ先は X（https://x.com/Sunmax0731）です。",
     },
     {
       heading: "アプリが扱う情報",
@@ -127,7 +127,7 @@ const jaPrivacyCopy: LegalCopy = {
     },
     {
       heading: "アクセス解析と外部サービス",
-      body: "公開版 GitHub Pages では利用傾向の把握のため Google Analytics を使用する場合があります。GitHub Pages、GitHub Issues、Google Fonts、X / Twitter を読み込む、または開く場合、それぞれのサービスのポリシーに従って情報が処理されることがあります。",
+      body: "公開版 GitHub Pages では利用傾向の把握のため Google Analytics を使用する場合があります。GitHub Pages、GitHub Issues、Google Fonts、X を読み込む、または開く場合、それぞれのサービスのポリシーに従って情報が処理されることがあります。",
     },
     {
       heading: "利用目的",
@@ -182,7 +182,7 @@ const enTermsCopy: LegalCopy = {
     },
     {
       heading: "Contact and changes",
-      body: "Questions may be sent through X / Twitter: https://x.com/Sunmax0731. These terms may be updated when app features, operating needs, or legal requirements change.",
+      body: "Questions may be sent through X: https://x.com/Sunmax0731. These terms may be updated when app features, operating needs, or legal requirements change.",
     },
   ],
 };
@@ -221,7 +221,7 @@ const jaTermsCopy: LegalCopy = {
     },
     {
       heading: "問い合わせと改定",
-      body: "問い合わせは X / Twitter（https://x.com/Sunmax0731）から行えます。本規約は機能、運営上の必要、法令要件の変更に応じて改定されることがあります。",
+      body: "問い合わせは X（https://x.com/Sunmax0731）から行えます。本規約は機能、運営上の必要、法令要件の変更に応じて改定されることがあります。",
     },
   ],
 };

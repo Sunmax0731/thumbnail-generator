@@ -54,7 +54,7 @@ This page is the quick feature index for users and reviewers.
 - Keep browser-local brand kit data compatible with existing saved state.
 - Keep Brand kit setup and Colors-side Brand kit registration buttons hidden.
 - Keep rule-based quality checks covered by automated validation while the visible bottom footer focuses on service and legal links.
-- Link to GitHub Issues from the footer with a GitHub icon for bug reports and feature requests, and use the bottom footer for Manual, taller localized privacy policy and terms modals, X / Twitter contact with the official X logo, and centered copyright.
+- Link to GitHub Issues from the footer with a GitHub icon for bug reports and feature requests, and use the bottom footer for Manual, taller localized privacy policy and terms modals, X contact with the official X logo, and centered copyright.
 - Open the fixed-size in-app manual from the footer, then use left category tabs, top section tabs, and the right-side contents. The manual highlights the matching entry when a contents item is focused or hovered, preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, adds use cases to each feature entry, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
 
 ## Image And Text Tools

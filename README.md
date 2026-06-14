@@ -41,7 +41,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Fit canvas also recenters the output canvas in the preview. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
 - The app title shows `サムネいる？` in Japanese mode and `ThumbNailed It?` in English mode, with the tagline `Need it quick? ThumbNailed It!` underneath.
 - Open the in-app manual from the bottom service footer; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, adds a use case to each feature entry, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
-- Use the bottom service footer for Manual, taller localized privacy policy and terms modals, X / Twitter contact with the official X logo, GitHub Issues with an icon, and the centered copyright notice.
+- Use the bottom service footer for Manual, taller localized privacy policy and terms modals, X contact with the official X logo, GitHub Issues with an icon, and the centered copyright notice.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
@@ -52,7 +52,7 @@ See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide
 
 Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data. Browsers that support PWA installation can install サムネいる？ from the address-bar install action or browser menu.
 
-Use the footer GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data. The published app opens the privacy policy and terms as localized footer modals and links to the X / Twitter contact.
+Use the footer GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data. The published app opens the privacy policy and terms as localized footer modals and links to the X contact.
 
 ## Run Locally
 

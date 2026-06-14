@@ -143,7 +143,7 @@ Select an object and open Adjust. Shadow controls set color, opacity, blur, dist
 
 Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use the Output menu in the preview header to download JPG, PNG, or WebP at maximum quality, or to open the OBS preview.
 
-The bottom footer provides service information: Manual, taller localized privacy policy and terms modals, X / Twitter contact with the X logo, GitHub Issues, and the centered `© Sunmax Engineering` copyright notice.
+The bottom footer provides service information: Manual, taller localized privacy policy and terms modals, X contact with the X logo, GitHub Issues, and the centered `© Sunmax Engineering` copyright notice.
 
 ## Animation / アニメ And OBS Preview
 
@@ -200,4 +200,4 @@ Use the GitHub Issues link in the app footer to open GitHub Issues:
 
 <https://github.com/Sunmax0731/thumbnail-generator/issues>
 
-Use the footer buttons for the privacy policy and terms modals, and the footer links for X / Twitter contact and GitHub Issues. The privacy policy and terms text switches with the current display language. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.
+Use the footer buttons for the privacy policy and terms modals, and the footer links for X contact and GitHub Issues. The privacy policy and terms text switches with the current display language. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.

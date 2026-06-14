@@ -143,7 +143,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Export path creates a data URL/download for the selected format.
 - Preview header exposes one Output menu with JPG, PNG, WebP, and OBS preview choices.
 - Desktop and mobile viewports have no incoherent overlap.
-- Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy policy link, terms link, X / Twitter contact, storage warning, and edit-state JSON export/import/delete are visible without blocking primary editing.
+- Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy policy link, terms link, X contact, storage warning, and edit-state JSON export/import/delete are visible without blocking primary editing.
 - The Manual button opens a fixed-size modal, supports left feature tabs and top section tabs, and preserves the last tab pair plus scroll position after close/reopen.
 - Manual table-of-contents focus and hover highlight the matching manual content entry.
 
@@ -155,7 +155,7 @@ Latest completed on 2026-06-14.
 
 Completed on 2026-06-14 for the top-right toolbar layout, English Animation label, Manual contents highlighting, privacy/terms pages, contact links, and standard service footer.
 
-- Scope: bottom-aligned the edit-state control group with the tag/language/theme control group, changed the English right-inspector tab label from `アニメ` to `Animation`, updated the Manual to use the active-language tab label, added table-of-contents focus/hover highlighting for the matching Manual entry, replaced the bottom status footer with service/legal links, added static privacy policy and terms pages, and added X / Twitter contact linking to `https://x.com/Sunmax0731`.
+- Scope: bottom-aligned the edit-state control group with the tag/language/theme control group, changed the English right-inspector tab label from `アニメ` to `Animation`, updated the Manual to use the active-language tab label, added table-of-contents focus/hover highlighting for the matching Manual entry, replaced the bottom status footer with service/legal links, added static privacy policy and terms pages, and added X contact linking to `https://x.com/Sunmax0731`.
 - `npm test`: pass. 34 test files, 138 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
 - Runtime gate URL: `http://127.0.0.1:4380/thumbnail-generator/?runtime=legal-footer-20260614`.
@@ -165,7 +165,7 @@ Completed on 2026-06-14 for the top-right toolbar layout, English Animation labe
   - Top-right edit-state group, Language selector, and Theme selector shared the same bottom edge (`64.9375px`).
   - English right-inspector tabs rendered `Adjust`, `Colors`, and `Animation`; stale English `Motion`/`Anime` tab labels were absent.
   - English Manual side category rendered `Animation`, and focusing the first table-of-contents item highlighted the matching Manual entry `Motion / Glow / effects items`.
-  - Footer rendered `Privacy Policy`, `Terms`, `Contact: X / Twitter`, `GitHub Issues`, and `© Sunmax Engineering`.
+  - Footer rendered `Privacy Policy`, `Terms`, `Contact: X`, `GitHub Issues`, and `© Sunmax Engineering`.
   - `privacy-policy.html` and `terms.html` returned HTTP 200 and rendered their expected headings.
   - Layer editing was exercised by changing the selected group name from `Object group` to `Runtime legal footer layer`.
   - WebP export downloaded `thumbnail-1280x720-2026-06-14T06-33-09-438Z.webp` with `714072` bytes.
@@ -1396,7 +1396,7 @@ Completed on 2026-06-14.
 - Runtime checks:
   - Page title and header were `ThumbNailed It?` in English mode, and the visible tagline was `Need it quick? ThumbNailed It!`.
   - Header Issue reporting and header Manual access were absent.
-  - Footer Manual, Privacy Policy, Terms, X / Twitter contact, centered `© Sunmax Engineering`, and GitHub Issues were visible; GitHub Issues included an SVG GitHub icon.
+  - Footer Manual, Privacy Policy, Terms, X contact, centered `© Sunmax Engineering`, and GitHub Issues were visible; GitHub Issues included an SVG GitHub icon.
   - The footer did not contain `Browser-only static app` or `ブラウザ内完結の静的アプリ`.
   - Copyright center delta was `0.0078125px` from the viewport center.
   - Manual opened from the footer.
@@ -1420,7 +1420,7 @@ Completed on 2026-06-14.
 
 Completed on 2026-06-14.
 
-- Scope: enlarged Privacy Policy and Terms modal layout so desktop viewports avoid internal legal-content scrollbars, replaced the footer X / Twitter contact with the official X logo SVG path from the X Brand toolkit asset, added a use-case line to every Manual feature entry, and removed the Manual header subtitle text.
+- Scope: enlarged Privacy Policy and Terms modal layout so desktop viewports avoid internal legal-content scrollbars, replaced the footer X contact with the official X logo SVG path from the X Brand toolkit asset, added a use-case line to every Manual feature entry, and removed the Manual header subtitle text.
 - Source check: the X logo source was checked against X's official Brand toolkit page and downloaded official `logo.svg` asset under `output/x-brand-assets/` for implementation comparison; the committed app uses the matching local SVG path and does not load the asset from the network.
 - `npm test`: pass. 34 test files, 139 tests.
 - `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
@@ -1429,7 +1429,7 @@ Completed on 2026-06-14.
 - Desktop viewport: `2048x1152`; mobile viewport: `390x760`.
 - Runtime checks:
   - Canvas rendered nonblank (`1516x956`, sampled nonblank pixels `90581`).
-  - Footer X / Twitter contact rendered one `svg.x-logo-icon`, and its path matched the official X logo asset prefix.
+  - Footer X contact rendered one `svg.x-logo-icon`, and its path matched the official X logo asset prefix.
   - Terms modal desktop metrics: dialog height `718.765625px`, legal-content client/scroll height `632/632`, overflow `visible`, no vertical overflow.
   - Privacy modal desktop metrics: dialog height `770.265625px`, legal-content client/scroll height `684/684`, overflow `visible`, no vertical overflow.
   - Manual header no longer contained the removed subtitle text.
@@ -1446,4 +1446,32 @@ Completed on 2026-06-14.
   - `output/runtime-20260614-legal-x-manual-use-cases/04-manual-use-case.png`
   - `output/runtime-20260614-legal-x-manual-use-cases/05-layer-edit.png`
   - `output/runtime-20260614-legal-x-manual-use-cases/06-mobile.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Footer X Contact No-Wrap Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: changed the footer contact label from legacy X co-brand wording to X-only wording across the app, legal modals, static fallback pages, README, and docs; fixed the footer contact link so the official X icon and contact text remain horizontally aligned as one no-wrap item.
+- `npm test`: pass. 34 test files, 139 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright with the local Chrome channel was used.
+- Runtime gate URL: `http://127.0.0.1:4386/thumbnail-generator/?runtime=footer-x-nowrap-20260614-rerun`.
+- Desktop viewport: `1440x960`; mobile viewport: `390x760`.
+- Runtime checks:
+  - Canvas rendered nonblank (`1516x956`, sampled nonblank pixels `46036`).
+  - Japanese footer contact rendered as `問い合わせ: X`; English footer contact rendered as `Contact: X`.
+  - No visible app text contained legacy X co-brand text in Japanese, English, or mobile checks.
+  - Footer contact link displayed as `flex`, used `white-space: nowrap`, and had one `svg.x-logo-icon`.
+  - Desktop Japanese contact metrics: icon before text `true`, icon/text same line `true`, center delta `0px`, contact height `15.9375px`.
+  - Desktop English contact metrics: icon before text `true`, icon/text same line `true`, center delta `0px`, contact height `15.9375px`.
+  - Static fallback Privacy Policy and Terms pages returned HTTP 200, contained `X: @Sunmax0731`, and contained no legacy X co-brand text.
+  - Layer/group editing changed the group name to `Runtime footer x nowrap group`.
+  - WebP export downloaded `728640` bytes.
+  - Mobile horizontal overflow was `0px`, and the X icon/text remained horizontally aligned.
+  - Console health: no page errors or app console errors.
+- Evidence:
+  - `output/runtime-20260614-footer-x-nowrap/runtime-result.json`
+  - `output/runtime-20260614-footer-x-nowrap/01-desktop-footer-x.png`
+  - `output/runtime-20260614-footer-x-nowrap/02-mobile-footer-x.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.

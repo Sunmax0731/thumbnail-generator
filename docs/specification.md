@@ -269,7 +269,7 @@ The visible app title is localized: Japanese mode shows `サムネいる？`, En
 
 ## Legal And Service Footer
 
-The bottom footer is a service-information surface rather than an editor status bar. It uses a three-part layout: Manual, Privacy Policy, Terms, and X / Twitter contact with the official X logo on the left; centered `© Sunmax Engineering`; and GitHub Issues with a GitHub icon on the right. Privacy Policy and Terms open in taller modals and switch their body text with the current display language. Static fallback pages remain served from `public/privacy-policy.html` and `public/terms.html` under the GitHub Pages base path without adding a backend.
+The bottom footer is a service-information surface rather than an editor status bar. It uses a three-part layout: Manual, Privacy Policy, Terms, and X contact with the official X logo on the left; centered `© Sunmax Engineering`; and GitHub Issues with a GitHub icon on the right. Privacy Policy and Terms open in taller modals and switch their body text with the current display language. Static fallback pages remain served from `public/privacy-policy.html` and `public/terms.html` under the GitHub Pages base path without adding a backend.
 
 The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps. List rows keep minimum usable heights so dense image imports or group-object rows do not collapse their action controls.
 

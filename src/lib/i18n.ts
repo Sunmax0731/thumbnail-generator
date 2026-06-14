@@ -566,7 +566,7 @@ const en = {
   "footer.copyright": "© Sunmax Engineering",
   "footer.privacy": "Privacy Policy",
   "footer.terms": "Terms",
-  "footer.contact": "Contact: X / Twitter",
+  "footer.contact": "Contact: X",
   "footer.issues": "GitHub Issues",
 } as const;
 
@@ -1080,7 +1080,7 @@ const ja: Partial<Record<TranslationKey, string>> = {
   "footer.copyright": "© Sunmax Engineering",
   "footer.privacy": "プライバシーポリシー",
   "footer.terms": "利用規約",
-  "footer.contact": "問い合わせ: X / Twitter",
+  "footer.contact": "問い合わせ: X",
   "footer.issues": "GitHub Issues",
 };
 

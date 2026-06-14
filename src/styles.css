@@ -3846,12 +3846,18 @@ button:disabled {
 }
 
 .footer-links,
+.footer-links a,
 .footer-issues a,
 .footer-link-button {
   display: flex;
   align-items: center;
-  min-width: 0;
   gap: 7px;
+  white-space: nowrap;
+}
+
+.footer-links a,
+.footer-link-button {
+  flex: 0 0 auto;
 }
 
 .x-logo-icon {
