@@ -2964,6 +2964,21 @@ button:disabled {
   line-height: 1.75;
 }
 
+.manual-entry ul {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding-left: 18px;
+  color: var(--text);
+  font-size: 12px;
+  font-weight: 650;
+  line-height: 1.65;
+}
+
+.manual-entry li::marker {
+  color: var(--accent-strong);
+}
+
 .manual-toc {
   display: grid;
   align-content: start;

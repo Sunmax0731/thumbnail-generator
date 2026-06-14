@@ -49,7 +49,7 @@ The status bar can show compact warning chips for long text, low contrast, hidde
 
 The editor playback state is explicit in the bottom timeline. The Play/Pause and Reset controls live beside the timeline duration, the playhead appears over the ruler and track rows, loop echoes make repeated cycles visible, and the surrounding editor dims object and inspector panels while interactions are locked. Playback is a preview mode, not an edit mode: selecting, dragging, resizing, rotating, timeline timing edits, and middle-button range selection are inactive until playback is paused.
 
-The Manual modal is designed as a stable reference surface rather than a transient tooltip. It opens from the top-left Manual button beside Issue reporting, uses vertical feature tabs plus top section tabs, keeps a large fixed size across tab choices, scrolls only the content pane, shows per-feature headings with a right-side table of contents, and preserves the last tab pair and scroll position after closing.
+The Manual modal is designed as a stable reference surface rather than a transient tooltip. It opens from the top-left Manual button beside Issue reporting, uses the current Japanese/English language setting, uses vertical feature tabs plus top section tabs, keeps a large fixed size across tab choices, scrolls only the content pane, shows feature and parameter headings with detail bullets, provides a right-side table of contents, and preserves the last tab pair and scroll position after closing.
 
 Off-canvas content remains spatially visible around the fixed output frame so users can recover or adjust objects placed beyond the export bounds. The outside-frame portions are dimmed against the workbench while the portion inside the output frame renders at normal opacity.
 
@@ -90,7 +90,7 @@ The PWA shell keeps install metadata and same-origin caching outside the React t
 - Left and right task tabs remain visible at the top of their panels and collapse without horizontal overflow on mobile.
 - Canvas preserves aspect ratio and never overlaps controls.
 - The preview frame stays fixed to the output document instead of stretching around off-canvas layers.
-- Preset changes keep the current user zoom. Users can choose Fit canvas explicitly, wheel zoom beyond 100%, or pan the preview with Pan, Space-drag, Alt-drag, or right-drag. Zoomed previews hide scrollbars and use internal pan offsets so the workbench behaves like Photoshop or Illustrator rather than a document scroller. When a layer is dragged outside the document, the zoom scale and output frame remain stable instead of auto-shrinking to fit the new overflow.
+- Preset changes keep the current user zoom. Users can choose Fit canvas explicitly, wheel zoom beyond 100%, or pan the preview with Pan, Space-drag, Alt-drag, or right-drag. Fit canvas resets both scale and view position so the canvas center returns to the preview center. Zoomed previews hide scrollbars and use internal pan offsets so the workbench behaves like Photoshop or Illustrator rather than a document scroller. When a layer is dragged outside the document, the zoom scale and output frame remain stable instead of auto-shrinking to fit the new overflow.
 - Text and controls must not overflow their containers.
 
 ## Concept Fidelity Ledger

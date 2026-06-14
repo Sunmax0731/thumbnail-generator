@@ -96,6 +96,7 @@ export function CanvasStage({
   t,
 }: CanvasStageProps) {
   const scrollRef = useRef<HTMLDivElement | null>(null);
+  const frameRef = useRef<HTMLDivElement | null>(null);
   const panDrag = useRef<{ target: HTMLElement; clientX: number; clientY: number; panX: number; panY: number } | null>(null);
   const [isPanMode, setIsPanMode] = useState(false);
   const [isPanning, setIsPanning] = useState(false);
@@ -104,6 +105,23 @@ export function CanvasStage({
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
   const [rangeSelectionDrag, setRangeSelectionDrag] = useState<RangeSelectionDrag | null>(null);
   const lastAutoFitRevision = useRef(0);
+  const centerCanvasView = useCallback(() => {
+    const container = scrollRef.current;
+    const frame = frameRef.current;
+    if (!container || !frame) {
+      setPanOffset({ x: 0, y: 0 });
+      return;
+    }
+    const containerRect = container.getBoundingClientRect();
+    const frameRect = frame.getBoundingClientRect();
+    const deltaX = frameRect.left + frameRect.width / 2 - (containerRect.left + containerRect.width / 2);
+    const deltaY = frameRect.top + frameRect.height / 2 - (containerRect.top + containerRect.height / 2);
+    setPanOffset((current) => ({
+      x: current.x - deltaX,
+      y: current.y - deltaY,
+    }));
+  }, []);
+
   const setZoomWithAnchor = useCallback(
     (nextZoom: number, clientX?: number, clientY?: number) => {
       const clampedZoom = clampZoom(nextZoom);
@@ -144,17 +162,17 @@ export function CanvasStage({
     const styles = window.getComputedStyle(container);
     const horizontalPadding = cssPixels(styles.paddingLeft) + cssPixels(styles.paddingRight);
     const verticalPadding = cssPixels(styles.paddingTop) + cssPixels(styles.paddingBottom);
-    onZoomChange(
-      calculateCanvasFitZoom({
-        containerWidth: container.clientWidth - horizontalPadding,
-        containerHeight: container.clientHeight - verticalPadding,
-        documentWidth: settings.width,
-        documentHeight: settings.height,
-        previewPadding,
-      }),
-    );
+    const nextZoom = calculateCanvasFitZoom({
+      containerWidth: container.clientWidth - horizontalPadding,
+      containerHeight: container.clientHeight - verticalPadding,
+      documentWidth: settings.width,
+      documentHeight: settings.height,
+      previewPadding,
+    });
+    onZoomChange(nextZoom);
     setPanOffset({ x: 0, y: 0 });
-  }, [onZoomChange, previewPadding, settings.height, settings.width]);
+    window.requestAnimationFrame(() => window.requestAnimationFrame(centerCanvasView));
+  }, [centerCanvasView, onZoomChange, previewPadding, settings.height, settings.width]);
 
   useEffect(() => {
     if (autoFitRevision <= 0 || lastAutoFitRevision.current === autoFitRevision) return;
@@ -248,13 +266,16 @@ export function CanvasStage({
   const continueRangeSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!rangeSelectionDrag || event.pointerId !== rangeSelectionDrag.pointerId) return false;
     event.preventDefault();
-    const currentCanvas = pointToCanvas(event.currentTarget, event.clientX, event.clientY, previewPadding);
+    event.stopPropagation();
+    const canvas = event.currentTarget;
+    const currentCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
+    const currentView = clientPointToElementPoint(canvas, event.clientX, event.clientY);
     setRangeSelectionDrag((current) =>
       current
         ? {
             ...current,
             currentCanvas,
-            currentView: clientPointToElementPoint(event.currentTarget, event.clientX, event.clientY),
+            currentView,
           }
         : current,
     );
@@ -264,6 +285,7 @@ export function CanvasStage({
   const endRangeSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
     if (!rangeSelectionDrag || event.pointerId !== rangeSelectionDrag.pointerId) return false;
     event.preventDefault();
+    event.stopPropagation();
     const canvas = event.currentTarget;
     const currentCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
     const currentView = clientPointToElementPoint(canvas, event.clientX, event.clientY);
@@ -464,6 +486,7 @@ export function CanvasStage({
       >
         <div
           className="canvas-frame"
+          ref={frameRef}
           style={{
             aspectRatio: `${frameWidth} / ${frameHeight}`,
             width: `${Math.max(1, Math.round(frameWidth * zoom))}px`,

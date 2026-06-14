@@ -38,8 +38,8 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
-- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
-- Open the in-app manual from the top-left Manual button beside Issue reporting; the larger manual uses feature headings plus a right-side table of contents and remembers the last category, section, and scroll position after closing.
+- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Fit canvas also recenters the output canvas in the preview. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
+- Open the in-app manual from the top-left Manual button beside Issue reporting; the larger manual follows the current Japanese/English language setting, uses feature and parameter headings plus a right-side table of contents, and remembers the last category, section, and scroll position after closing.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.

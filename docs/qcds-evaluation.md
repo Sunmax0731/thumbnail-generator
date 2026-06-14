@@ -547,3 +547,15 @@ Completed on 2026-06-13.
 - Runtime evidence: Playwright headless Chromium passed at `http://127.0.0.1:4353/thumbnail-generator/?runtime=followup-1781355528797`.
 - Runtime checks: 10-image folder import plus sample row, asset row minimum heights `94px`, group-object row height `108px`, group-object tag edit, group-object delete, group-object drag responsiveness `457ms`, Ctrl-click browser-template delete confirmation bypass, Ctrl-click layer delete confirmation bypass, and no page/app console errors.
 - Evidence: `output/runtime-20260613-followup/runtime-result.json` and `output/runtime-20260613-followup/desktop-followup.png`.
+
+## Preview Range Selection, Fit Centering, And Manual Localization Evidence
+
+Completed on 2026-06-14.
+
+- Scope: fixed the middle-button range-selection render crash, made Fit canvas center both scale and position, expanded manual entries with parameter-level detail, and localized manual content between Japanese and English.
+- Quality: A. `npm test` passed with 34 test files and 137 tests, `npm run build` passed, and Playwright verified the crash path, centering, and manual language switching.
+- Cost: A+. The change stays within existing React state, canvas preview, CSS, and i18n concepts without adding dependencies or backend services.
+- Delivery: A. Implementation, docs, and runtime evidence were updated in the same work unit.
+- Satisfaction: A. Preview range selection no longer drops the renderer, Fit canvas behaves like a deliberate recenter command, and the manual now covers more practical parameters in the selected UI language.
+- Browser runtime evidence: Browser plugin client script was missing at `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4368/thumbnail-generator/`.
+- Runtime checks: middle-button range rectangle visible with app still rendered, no `getBoundingClientRect` page error, right-drag pan followed by Fit canvas centered the frame (`afterDelta x=0.5`, `y=0`), English manual Preview/Other details visible, Japanese manual text updated after language switch, and no page/app console errors.

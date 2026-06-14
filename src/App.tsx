@@ -2551,6 +2551,7 @@ function App() {
       ) : null}
       {isManualOpen ? (
         <ManualDialog
+          language={language}
           state={manualDialogState}
           onStateChange={setManualDialogState}
           onClose={() => setIsManualOpen(false)}

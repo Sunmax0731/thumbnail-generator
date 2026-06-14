@@ -1257,3 +1257,22 @@ Completed on 2026-06-13.
 - Evidence:
   - `output/runtime-20260613-followup/runtime-result.json`
   - `output/runtime-20260613-followup/desktop-followup.png`
+
+## Preview Range Selection, Fit Centering, And Manual Localization Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: middle-button preview range-selection crash fix, Fit canvas position centering, and expanded localized manual content.
+- `npm test`: pass. 34 test files, 137 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright headless Chromium fallback was used.
+- Runtime gate URL: `http://127.0.0.1:4368/thumbnail-generator/`.
+- Desktop viewport: `1440x960`.
+- Runtime checks:
+  - Middle-button range drag displayed the range rectangle and kept the app/canvas rendered with no `getBoundingClientRect` page error.
+  - Real right-drag pan changed the preview frame offset, then Fit canvas returned the frame center to the preview center (`afterDelta x=0.5`, `y=0`).
+  - Manual opened in English with Preview range-selection detail and right-side Contents.
+  - Manual Other tab exposed Language and theme, Tag settings modal, and GUI detail entries.
+  - Switching the top-toolbar language to Japanese while the manual was open updated the manual text, category labels, headings, and table of contents.
+  - Console health: no page errors or app console errors in the final Playwright gate.
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
