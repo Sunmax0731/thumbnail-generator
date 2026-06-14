@@ -7,7 +7,8 @@
 - Export presets resolve to expected width/height/format settings.
 - Canvas fit calculation shrinks tall or wide presets by visible width/height, preserves preferred fit only when both axes allow it, and rounds down so the fitted frame does not spill past the container.
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
-- Hit testing can find all visible selectable objects intersecting a canvas range-selection rectangle.
+- Hit testing can find visible selectable objects fully contained by a canvas range-selection rectangle, while excluding partial overlaps.
+- Hit testing only range-selects grouped objects when the full visible selectable group bounds are contained by the range.
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers retain other selected layers but leave no fallback selection after deleting the only selected layer.
 - Layer selection helpers select all editable grouped members from one grouped layer and toggle whole groups additively.
@@ -120,7 +121,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - アニメ tab hides text-only motion controls unless a text object is selected, and disables effect intensity for choices that cannot use intensity.
 - The bottom timeline shows animated objects only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, supports top-edge height resizing, and displays faint later-cycle hints for loop-enabled animations.
 - The bottom timeline Play/Pause control previews animation in the editor, defaults to paused/editable, shows a moving playhead bar, has a Reset button that returns playback to the beginning, and locks object list, inspector, timeline, and preview editing while playing.
-- Middle-button drag on the preview range-selects objects. Shift+middle drag adds objects in the range, and Ctrl+middle drag removes objects in the range from the current selection.
+- Middle-button drag on the preview range-selects fully contained objects. Shift+middle drag adds objects in the range, Ctrl+middle drag removes objects in the range from the current selection, and partially contained objects or partially contained groups are excluded.
 - Objects outside the output frame remain visible in the editor preview with dimmed outside-frame portions, while export stays clipped to the output canvas.
 - Schedule generator landscape action buttons match the standard thumbnail generator modal action width; schedule portrait action width remains unchanged.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
@@ -148,6 +149,34 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 ## Current Results
 
 Latest completed on 2026-06-14.
+
+### Preview Range Containment, Stable Off-Canvas Drag, And Expanded Manual
+
+Completed on 2026-06-14 for middle-button range containment rules, grouped range-selection containment, off-canvas drag display stability, and expanded manual coverage.
+
+- Scope: changed preview range selection from intersection to full-containment hit testing, made grouped range selection require the full visible selectable group bounds, fixed range rectangle display coordinates inside the transformed canvas frame, froze preview edit padding during active canvas drag to prevent display-size oscillation while objects move off canvas, expanded the Manual modal, added per-feature headings, added a right-side table of contents, and documented language/theme/tag settings, preview presets/output size, GUI resizing/collapse controls, shortcuts, and mouse operations.
+- `npm test`: pass. 34 test files, 137 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4366/thumbnail-generator/?runtime=preview-manual-20260614-final3`.
+- Browser runtime tool: Playwright local Chrome channel with service workers blocked for current-source rendering.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Initial seeded workspace canvas rendered nonblank (`1376x816` editor canvas).
+  - Off-canvas drag kept the canvas frame width stable through active movement (`1293px` for all sampled drag frames), addressing the display-range oscillation/glitch path.
+  - Manual modal opened at `1360x880`, showed right-side table of contents, 10 side categories, 3 preview top tabs including the size section, and 5 item headings in the active section.
+  - Manual table-of-contents button click completed without runtime errors.
+  - WebP export succeeded with a non-empty download (`75834` bytes).
+  - Mobile viewport rendered a nonblank canvas with horizontal overflow `0`.
+  - Console health: no page/app runtime errors were reported.
+- Range-selection note: headless Chrome in this environment did not emit middle-button PointerEvents through Playwright or CDP, so the rendered-browser gate could not directly perform the middle-button drag. The full-containment object and group behavior is covered by `src/lib/hitTest.test.ts`.
+- Evidence:
+  - `output/runtime-20260614-preview-manual/runtime-result.json`
+  - `output/runtime-20260614-preview-manual/01-offcanvas-drag.png`
+  - `output/runtime-20260614-preview-manual/02-manual-toc.png`
+  - `output/runtime-20260614-preview-manual/03-mobile.png`
+  - `output/runtime-20260614-preview-manual/thumbnail-1280x720-2026-06-14T03-01-32-051Z.webp`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
 
 ### Manual Modal, Range Selection, Timeline Reset, Loop Echo, And Terminology
 

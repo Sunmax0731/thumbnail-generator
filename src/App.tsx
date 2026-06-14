@@ -219,6 +219,7 @@ function App() {
   );
   const [isExporting, setIsExporting] = useState(false);
   const [zoom, setZoom] = useState(0.94);
+  const [frozenPreviewPadding, setFrozenPreviewPadding] = useState<number | null>(null);
   const [autoFitRevision, setAutoFitRevision] = useState(0);
   const [canvasCursor, setCanvasCursor] = useState("default");
   const [hoverInteractionMode, setHoverInteractionMode] = useState<CanvasInteractionMode | null>(null);
@@ -269,10 +270,11 @@ function App() {
     () => [...defaultFontOptions, ...customFonts.map((font) => customFontToOption(font))],
     [customFonts],
   );
-  const previewPadding = useMemo(
+  const calculatedPreviewPadding = useMemo(
     () => calculatePreviewPadding(layers, settings, { minimum: 0, margin: 48 }),
     [layers, settings],
   );
+  const previewPadding = frozenPreviewPadding ?? calculatedPreviewPadding;
   const previewPlaybackDurationMs = useMemo(() => calculateMotionTimelineDuration(layers), [layers]);
   const selectionLabel =
     selectedLayers.length === 0
@@ -343,6 +345,7 @@ function App() {
     setSelectedIds([]);
     activeCanvasInteraction.current = null;
     pendingCanvasTransformPoint.current = null;
+    setFrozenPreviewPadding(null);
     if (canvasTransformFrame.current !== null) {
       window.cancelAnimationFrame(canvasTransformFrame.current);
       canvasTransformFrame.current = null;
@@ -1753,6 +1756,7 @@ function App() {
           start: point,
           historyStart: structuredClone(layers),
         };
+        setFrozenPreviewPadding(previewPadding);
         setActiveInteractionMode(interaction.mode);
         setHoverInteractionMode(interaction.mode);
         setCanvasCursor(cursorForMode(interaction.mode, true));
@@ -1782,6 +1786,7 @@ function App() {
           start: point,
           historyStart: structuredClone(layers),
         };
+        setFrozenPreviewPadding(previewPadding);
         setActiveInteractionMode("move");
         setHoverInteractionMode("move");
         setCanvasCursor("grabbing");
@@ -1794,7 +1799,7 @@ function App() {
         setStatus("Selection cleared.");
       }
     },
-    [isPreviewPlaying, layers, selectLayer, selectedIds, selectedLayer, selectedLayers],
+    [isPreviewPlaying, layers, previewPadding, selectLayer, selectedIds, selectedLayer, selectedLayers],
   );
 
   const handleCanvasPointerMove = useCallback(
@@ -1837,7 +1842,7 @@ function App() {
       setHoverInteractionMode(null);
       setCanvasCursor("default");
     },
-    [isPreviewPlaying, layers, selectedLayer],
+    [isPreviewPlaying, layers, previewPadding, selectedLayer],
   );
 
   const handleCanvasPointerUp = useCallback((event: React.PointerEvent<HTMLCanvasElement>) => {
@@ -1869,6 +1874,7 @@ function App() {
       lastLayerSnapshot.current = structuredClone(active.latestLayers);
     }
     activeCanvasInteraction.current = null;
+    setFrozenPreviewPadding(null);
     setActiveInteractionMode(null);
     setCanvasCursor("default");
     setStatus(`${labelForMode(active.mode)} complete.`);

@@ -50,7 +50,7 @@ describe("hit testing", () => {
     expect(pickLayerAt([vertical], 90, 160)).toBeUndefined();
   });
 
-  it("picks visible selectable layers intersecting a dragged selection rectangle", () => {
+  it("picks visible selectable layers fully contained in a dragged selection rectangle", () => {
     const inside = makeShapeLayer({ id: "inside", x: 20, y: 20, width: 80, height: 60 });
     const crossing = makeShapeLayer({ id: "crossing", x: 140, y: 40, width: 80, height: 80 });
     const outside = makeShapeLayer({ id: "outside", x: 320, y: 40, width: 80, height: 80 });
@@ -63,6 +63,30 @@ describe("hit testing", () => {
         right: 180,
         bottom: 110,
       }).map((layer) => layer.id),
-    ).toEqual(["inside", "crossing"]);
+    ).toEqual(["inside"]);
+  });
+
+  it("only picks grouped layers when the whole visible group is contained", () => {
+    const groupA = makeShapeLayer({ id: "group-a", groupId: "g1", x: 20, y: 20, width: 80, height: 60 });
+    const groupB = makeShapeLayer({ id: "group-b", groupId: "g1", x: 170, y: 20, width: 80, height: 60 });
+    const single = makeShapeLayer({ id: "single", x: 80, y: 120, width: 70, height: 50 });
+
+    expect(
+      pickLayersInRect([groupA, groupB, single], {
+        left: 10,
+        top: 10,
+        right: 160,
+        bottom: 190,
+      }).map((layer) => layer.id),
+    ).toEqual(["single"]);
+
+    expect(
+      pickLayersInRect([groupA, groupB, single], {
+        left: 10,
+        top: 10,
+        right: 260,
+        bottom: 190,
+      }).map((layer) => layer.id),
+    ).toEqual(["group-a", "group-b", "single"]);
   });
 });

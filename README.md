@@ -17,7 +17,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Select imported assets to add them as image objects, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image objects that reference it.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
 - Edit objects directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
-- Select multiple objects by Shift/Ctrl/Meta click or by middle-button range drag on the preview; Shift+middle drag adds range objects and Ctrl+middle drag removes range objects from the current selection.
+- Select multiple objects by Shift/Ctrl/Meta click or by middle-button range drag on the preview; range drag selects only fully enclosed objects, Shift+middle drag adds range objects, and Ctrl+middle drag removes range objects from the current selection.
 - Move or rotate selected objects together, align or evenly distribute them, or match angles to the first selected object.
 - Group selected objects, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped object individually from Layers, and fit selected image/shape objects to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
@@ -39,7 +39,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
-- Open the in-app manual from the top-left Manual button beside Issue reporting; the manual remembers the last category, section, and scroll position after closing.
+- Open the in-app manual from the top-left Manual button beside Issue reporting; the larger manual uses feature headings plus a right-side table of contents and remembers the last category, section, and scroll position after closing.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.

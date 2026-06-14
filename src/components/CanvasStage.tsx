@@ -30,8 +30,8 @@ interface RangeSelectionDrag {
   mode: RangeSelectionMode;
   startCanvas: { x: number; y: number };
   currentCanvas: { x: number; y: number };
-  startClient: { x: number; y: number };
-  currentClient: { x: number; y: number };
+  startView: { x: number; y: number };
+  currentView: { x: number; y: number };
 }
 
 interface CanvasStageProps {
@@ -233,14 +233,14 @@ export function CanvasStage({
     const canvas = event.currentTarget;
     safelySetPointerCapture(canvas, event.pointerId);
     const startCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
-    const startClient = { x: event.clientX, y: event.clientY };
+    const startView = clientPointToElementPoint(canvas, event.clientX, event.clientY);
     setRangeSelectionDrag({
       pointerId: event.pointerId,
       mode: event.ctrlKey || event.metaKey ? "subtract" : event.shiftKey ? "add" : "replace",
       startCanvas,
       currentCanvas: startCanvas,
-      startClient,
-      currentClient: startClient,
+      startView,
+      currentView: startView,
     });
     return true;
   };
@@ -254,7 +254,7 @@ export function CanvasStage({
         ? {
             ...current,
             currentCanvas,
-            currentClient: { x: event.clientX, y: event.clientY },
+            currentView: clientPointToElementPoint(event.currentTarget, event.clientX, event.clientY),
           }
         : current,
     );
@@ -266,8 +266,9 @@ export function CanvasStage({
     event.preventDefault();
     const canvas = event.currentTarget;
     const currentCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
-    const dx = event.clientX - rangeSelectionDrag.startClient.x;
-    const dy = event.clientY - rangeSelectionDrag.startClient.y;
+    const currentView = clientPointToElementPoint(canvas, event.clientX, event.clientY);
+    const dx = currentView.x - rangeSelectionDrag.startView.x;
+    const dy = currentView.y - rangeSelectionDrag.startView.y;
     const pickedLayers =
       Math.hypot(dx, dy) < 4
         ? []
@@ -283,7 +284,7 @@ export function CanvasStage({
     return true;
   };
 
-  const rangeSelectionBox = rangeSelectionDrag ? createSelectionBox(rangeSelectionDrag.startClient, rangeSelectionDrag.currentClient) : null;
+  const rangeSelectionBox = rangeSelectionDrag ? createSelectionBox(rangeSelectionDrag.startView, rangeSelectionDrag.currentView) : null;
   const frameWidth = settings.width + previewPadding * 2;
   const frameHeight = settings.height + previewPadding * 2;
 
@@ -542,6 +543,14 @@ function isKeyboardInputTarget(target: EventTarget | null): boolean {
 function cssPixels(value: string): number {
   const parsed = Number.parseFloat(value);
   return Number.isFinite(parsed) ? parsed : 0;
+}
+
+function clientPointToElementPoint(element: HTMLElement, clientX: number, clientY: number): { x: number; y: number } {
+  const rect = element.getBoundingClientRect();
+  return {
+    x: clientX - rect.left,
+    y: clientY - rect.top,
+  };
 }
 
 function clampZoom(value: number): number {

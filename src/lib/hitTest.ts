@@ -39,7 +39,25 @@ export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): Thu
 
 export function pickLayersInRect(layers: ThumbnailLayer[], rect: SelectionRect): ThumbnailLayer[] {
   const normalized = normalizeRect(rect);
-  return layers.filter((layer) => layer.visible && layer.selectable && rectsIntersect(getLayerWorldBounds(layer), normalized));
+  const selectedGroupIds = new Set<string>();
+  const picked: ThumbnailLayer[] = [];
+
+  for (const layer of layers) {
+    if (!layer.visible || !layer.selectable) continue;
+    if (layer.groupId) {
+      if (selectedGroupIds.has(layer.groupId)) continue;
+      const groupLayers = layers.filter((candidate) => candidate.visible && candidate.selectable && candidate.groupId === layer.groupId);
+      const groupBounds = mergeRects(groupLayers.map(getLayerWorldBounds));
+      if (groupBounds && rectContainsRect(normalized, groupBounds)) {
+        selectedGroupIds.add(layer.groupId);
+        picked.push(...groupLayers);
+      }
+      continue;
+    }
+    if (rectContainsRect(normalized, getLayerWorldBounds(layer))) picked.push(layer);
+  }
+
+  return picked;
 }
 
 export function pickLayerInteractionAt(
@@ -95,6 +113,16 @@ function getLayerWorldBounds(layer: ThumbnailLayer): SelectionRect {
   };
 }
 
-function rectsIntersect(left: SelectionRect, right: SelectionRect): boolean {
-  return left.left <= right.right && left.right >= right.left && left.top <= right.bottom && left.bottom >= right.top;
+function mergeRects(rects: SelectionRect[]): SelectionRect | null {
+  if (rects.length === 0) return null;
+  return {
+    left: Math.min(...rects.map((rect) => rect.left)),
+    top: Math.min(...rects.map((rect) => rect.top)),
+    right: Math.max(...rects.map((rect) => rect.right)),
+    bottom: Math.max(...rects.map((rect) => rect.bottom)),
+  };
+}
+
+function rectContainsRect(outer: SelectionRect, inner: SelectionRect): boolean {
+  return outer.left <= inner.left && outer.top <= inner.top && outer.right >= inner.right && outer.bottom >= inner.bottom;
 }
