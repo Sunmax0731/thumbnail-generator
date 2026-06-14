@@ -1303,3 +1303,30 @@ Completed on 2026-06-14.
   - `output/runtime-20260614-manual-detail-final/manual-animation-ja.png`
   - `output/runtime-20260614-manual-detail-final/layer-edit.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Manual Active-Language GUI Label Sync Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: updated Manual copy so Japanese mode references Japanese GUI labels and English mode references English GUI labels across Adjust, Canvas, Assets, アニメ, Preview, Edit state, tag settings, theme/language settings, and timeline controls.
+- `npm test`: pass. 34 test files, 137 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright headless Chromium fallback was used.
+- Runtime gate URL: `http://127.0.0.1:4371/thumbnail-generator/`.
+- Desktop viewport: `1440x960`.
+- Runtime checks:
+  - Initial canvas rendered nonblank.
+  - Manual traversal covered 10 side categories and 21 top-tab sections in both Japanese and English.
+  - Japanese manual contained required GUI labels including `調整`, `共通設定`, `文字設定`, `図形設定`, `画像設定`, `キャンバス`, `発光 / エフェクト`, `エフェクト強度`, `全体表示`, `出力メニュー`, `表示言語`, and `現在の編集状態を自動保存`.
+  - Japanese manual did not contain stale English GUI labels such as `Adjust`, `Common settings`, `Text settings`, `Shape settings`, `Image settings`, `Canvas object list`, `Effect intensity`, `Fit canvas`, `Output menu`, `Language:`, `Registered templates`, `Motion:`, `Glow / effects:`, `Save settings:`, or `Generate objects:`.
+  - English manual retained required English GUI labels including `Adjust`, `Common settings`, `Text settings`, `Shape settings`, `Image settings`, `Canvas`, `Glow / effects`, `Effect intensity`, `Fit canvas`, `Output menu`, `Language`, and `Autosave current edit state`.
+  - Manual content contained no known mojibake marker or Unicode replacement character.
+  - Layer editing was exercised by changing the selected group name from `Object group` to `Runtime label sync group`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T05-05-31-474Z.webp` with `714072` bytes.
+  - Console health: no page errors or app console errors.
+- Evidence:
+  - `output/runtime-20260614-manual-label-sync/runtime-result.json`
+  - `output/runtime-20260614-manual-label-sync/initial.png`
+  - `output/runtime-20260614-manual-label-sync/manual-label-sync-ja.png`
+  - `output/runtime-20260614-manual-label-sync/layer-edit.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.

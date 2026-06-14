@@ -572,3 +572,16 @@ Completed on 2026-06-14.
 - Browser runtime evidence: Browser plugin client script was missing at `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4370/thumbnail-generator/`.
 - Runtime checks: nonblank initial render, Manual/Output/canvas/inspector visible, 10 manual side categories including `アニメ`, アニメ top tabs `オブジェクト` and `文字効果`, English text for `Fade`, `Glow pulse`, and `Text wave`, Japanese text for `フェード`, `発光パルス`, and `文字ウェーブ`, right-side table of contents, 12 manual bullet rows in the active section, no mojibake or replacement characters, selected group-name edit, WebP export `714072` bytes, and no page/app console errors.
 - Evidence: `output/runtime-20260614-manual-detail-final/runtime-result.json`, `output/runtime-20260614-manual-detail-final/initial-render.png`, `output/runtime-20260614-manual-detail-final/manual-animation-ja.png`, and `output/runtime-20260614-manual-detail-final/layer-edit.png`.
+
+## Manual Active-Language GUI Label Sync Evidence
+
+Completed on 2026-06-14.
+
+- Scope: changed Manual copy to reference Japanese GUI labels while the app is in Japanese and English GUI labels while the app is in English, covering Adjust/Canvas/Assets/アニメ/Preview/Edit state/Other sections.
+- Quality: A. `npm test` passed with 34 test files and 137 tests, `npm run build` passed, and Playwright traversed all Manual side categories and top tabs in both languages to check label consistency.
+- Cost: A+. The implementation reuses the existing i18n dictionary and Manual modal model without new dependencies or storage changes.
+- Delivery: A. Implementation, docs, runtime evidence, export proof, and docs packaging were kept in the same work unit.
+- Satisfaction: A. Japanese Manual text no longer mixes stale English GUI labels such as `Adjust`, `Common settings`, `Effect intensity`, `Fit canvas`, or `Output menu`, while English Manual text still uses the English GUI labels.
+- Browser runtime evidence: Browser plugin client script was missing at `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4371/thumbnail-generator/`.
+- Runtime checks: nonblank initial render, 10 Manual side categories, 21 top-tab sections in Japanese and English, required Japanese labels present, forbidden stale English GUI labels absent from Japanese Manual text, required English labels present, no mojibake or replacement characters, selected group-name edit, WebP export `714072` bytes, and no page/app console errors.
+- Evidence: `output/runtime-20260614-manual-label-sync/runtime-result.json`, `output/runtime-20260614-manual-label-sync/initial.png`, `output/runtime-20260614-manual-label-sync/manual-label-sync-ja.png`, and `output/runtime-20260614-manual-label-sync/layer-edit.png`.
