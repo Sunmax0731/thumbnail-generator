@@ -53,12 +53,14 @@ interface ManualCategory {
 }
 
 interface ManualCopy {
+  language: Language;
   title: string;
   subtitle: string;
   useCaseLabel: string;
   visualIntroLabel: string;
-  accessVisualLabel: string;
-  operationVisualLabel: string;
+  captureAltLabel: string;
+  openCaptureLabel: string;
+  closeImageLabel: string;
   shortcutVisualLabel: string;
   closeLabel: string;
   categoryTabsLabel: string;
@@ -66,6 +68,11 @@ interface ManualCopy {
   relatedHeading: string;
   tocHeading: string;
   categories: ManualCategory[];
+}
+
+interface ExpandedManualCapture {
+  src: string;
+  alt: string;
 }
 
 export const defaultManualDialogState: ManualDialogState = {
@@ -77,6 +84,7 @@ export const defaultManualDialogState: ManualDialogState = {
 export function ManualDialog({ language, state, onStateChange, onClose }: ManualDialogProps) {
   const contentRef = useRef<HTMLElement | null>(null);
   const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
+  const [expandedCapture, setExpandedCapture] = useState<ExpandedManualCapture | null>(null);
   const copy = useMemo(() => buildManualCopy(language), [language]);
   const activeCategory = copy.categories.find((category) => category.id === state.categoryId) ?? copy.categories[0];
   const activeSection = activeCategory.sections.find((section) => section.id === state.sectionId) ?? activeCategory.sections[0];
@@ -84,6 +92,15 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
   useEffect(() => {
     if (contentRef.current) contentRef.current.scrollTop = state.scrollTop;
   }, [state.categoryId, state.sectionId]);
+
+  useEffect(() => {
+    if (!expandedCapture) return undefined;
+    const closeOnEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setExpandedCapture(null);
+    };
+    window.addEventListener("keydown", closeOnEscape);
+    return () => window.removeEventListener("keydown", closeOnEscape);
+  }, [expandedCapture]);
 
   const selectCategory = (categoryId: ManualCategoryId) => {
     const category = copy.categories.find((candidate) => candidate.id === categoryId) ?? copy.categories[0];
@@ -105,7 +122,10 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
     const content = contentRef.current;
     const target = content?.querySelector<HTMLElement>(`#manual-entry-${entryId}`);
     if (!content || !target) return;
-    content.scrollTo({ top: Math.max(0, target.offsetTop - 10), behavior: "smooth" });
+    const nextScrollTop = Math.max(0, content.scrollTop + target.getBoundingClientRect().top - content.getBoundingClientRect().top);
+    content.scrollTo({ top: nextScrollTop, behavior: "smooth" });
+    target.focus({ preventScroll: true });
+    onStateChange({ ...state, scrollTop: nextScrollTop });
   };
 
   return (
@@ -164,11 +184,12 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                     <section
                       key={entry.id}
                       id={`manual-entry-${entry.id}`}
+                      tabIndex={-1}
                       className={`manual-entry${focusedEntryId === entry.id ? " toc-highlighted" : ""}`}
                     >
                       <h4>{entry.title}</h4>
                       <p>{entry.body}</p>
-                      <ManualEntryVisuals entry={entry} copy={copy} />
+                      <ManualEntryVisuals entry={entry} copy={copy} onOpenCapture={setExpandedCapture} />
                       <p className="manual-use-case">
                         <strong>{copy.useCaseLabel}</strong>
                         <span>{entry.useCase}</span>
@@ -207,8 +228,8 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                     type="button"
                     aria-describedby={`manual-entry-${entry.id}`}
                     onClick={() => {
-                      setFocusedEntryId(entry.id);
                       jumpToEntry(entry.id);
+                      setFocusedEntryId(entry.id);
                     }}
                     onFocus={() => setFocusedEntryId(entry.id)}
                     onBlur={() => setFocusedEntryId(null)}
@@ -222,12 +243,42 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
             </div>
           </div>
         </div>
+        {expandedCapture ? <ManualImageLightbox capture={expandedCapture} copy={copy} onClose={() => setExpandedCapture(null)} /> : null}
       </section>
     </div>
   );
 }
 
-function ManualEntryVisuals({ entry, copy }: { entry: ManualEntry; copy: ManualCopy }) {
+function ManualImageLightbox({
+  capture,
+  copy,
+  onClose,
+}: {
+  capture: ExpandedManualCapture;
+  copy: ManualCopy;
+  onClose: () => void;
+}) {
+  return (
+    <div className="manual-image-lightbox" role="dialog" aria-modal="true" aria-label={capture.alt} onMouseDown={onClose}>
+      <div className="manual-image-lightbox-frame" onMouseDown={(event) => event.stopPropagation()}>
+        <img src={capture.src} alt={capture.alt} />
+        <button type="button" className="icon-button manual-image-lightbox-close" aria-label={copy.closeImageLabel} onClick={onClose}>
+          <X size={18} />
+        </button>
+      </div>
+    </div>
+  );
+}
+
+function ManualEntryVisuals({
+  entry,
+  copy,
+  onOpenCapture,
+}: {
+  entry: ManualEntry;
+  copy: ManualCopy;
+  onOpenCapture: (capture: ExpandedManualCapture) => void;
+}) {
   if (isShortcutVisualEntry(entry.id)) {
     return (
       <div className="manual-visuals manual-shortcut-visuals" aria-label={`${entry.title}: ${copy.shortcutVisualLabel}`}>
@@ -236,78 +287,242 @@ function ManualEntryVisuals({ entry, copy }: { entry: ManualEntry; copy: ManualC
     );
   }
   const capture = manualCaptureForEntry(entry.id);
+  const accessSrc = manualCaptureUrl(capture[0]);
+  const operationSrc = manualCaptureUrl(capture[1]);
+  const accessAlt = `${entry.title}: ${copy.captureAltLabel} 1`;
+  const operationAlt = `${entry.title}: ${copy.captureAltLabel} 2`;
   return (
     <div className="manual-visuals" aria-label={`${entry.title}: ${copy.visualIntroLabel}`}>
       <figure className="manual-visual-card">
-        <img
-          className="manual-capture-image"
-          src={manualCaptureUrl(capture[0])}
-          alt={`${entry.title}: ${copy.accessVisualLabel}`}
-          loading="lazy"
-          decoding="async"
-        />
-        <figcaption>{copy.accessVisualLabel}</figcaption>
+        <button
+          type="button"
+          className="manual-capture-button"
+          aria-label={`${copy.openCaptureLabel}: ${entry.title}`}
+          onClick={() => onOpenCapture({ src: accessSrc, alt: accessAlt })}
+        >
+          <img className="manual-capture-image" src={accessSrc} alt={accessAlt} loading="lazy" decoding="async" />
+        </button>
       </figure>
       <figure className="manual-visual-card">
-        <img
-          className="manual-capture-image"
-          src={manualCaptureUrl(capture[1])}
-          alt={`${entry.title}: ${copy.operationVisualLabel}`}
-          loading="lazy"
-          decoding="async"
-        />
-        <figcaption>{copy.operationVisualLabel}</figcaption>
+        <button
+          type="button"
+          className="manual-capture-button"
+          aria-label={`${copy.openCaptureLabel}: ${entry.title}`}
+          onClick={() => onOpenCapture({ src: operationSrc, alt: operationAlt })}
+        >
+          <img className="manual-capture-image" src={operationSrc} alt={operationAlt} loading="lazy" decoding="async" />
+        </button>
       </figure>
     </div>
   );
 }
 
 function ManualShortcutVisuals({ entryId, copy }: { entryId: string; copy: ManualCopy }) {
-  if (entryId === "keyboard") {
-    return (
-      <figure className="manual-visual-card manual-shortcut-card">
-        <svg className="manual-shortcut-svg" viewBox="0 0 260 128" role="img" aria-label={copy.shortcutVisualLabel}>
-          <title>{copy.shortcutVisualLabel}</title>
-          {["Del", "Ctrl", "C", "V", "X", "D", "Z", "Y"].map((key, index) => (
-            <g key={key} transform={`translate(${16 + index * 29} 42)`}>
-              <rect width={24} height={22} rx={5} className={key === "Ctrl" ? "manual-svg-focus" : "manual-svg-key"} />
-              <text x={12} y={14} textAnchor="middle" className="manual-svg-key-text">
-                {key}
-              </text>
-            </g>
-          ))}
-          <path d="M78 82h96" className="manual-svg-arrow" />
-          <path d="m166 74 10 8-10 8" className="manual-svg-arrow" />
-          <rect x="186" y="68" width="46" height="28" rx="6" className="manual-svg-canvas" />
-        </svg>
-        <figcaption>{copy.shortcutVisualLabel}</figcaption>
-      </figure>
-    );
-  }
-  if (entryId === "mouse-preview") {
-    return (
-      <figure className="manual-visual-card manual-shortcut-card">
-        <svg className="manual-shortcut-svg" viewBox="0 0 260 128" role="img" aria-label={copy.shortcutVisualLabel}>
-          <title>{copy.shortcutVisualLabel}</title>
-          <rect x="30" y="34" width="54" height="76" rx="25" className="manual-svg-window" />
-          <path d="M57 34v34" className="manual-svg-line" />
-          <path d="M30 68h54" className="manual-svg-line" />
-          <circle cx="57" cy="52" r="6" className="manual-svg-focus" />
-          <path d="M108 52h78" className="manual-svg-arrow" />
-          <path d="m178 44 10 8-10 8" className="manual-svg-arrow" />
-          <rect x="152" y="76" width="56" height="26" rx="5" className="manual-svg-focus" />
-          <path d="M140 88h-24v-24" className="manual-svg-arrow" />
-          <path d="m116 74 0-12 12 0" className="manual-svg-arrow" />
-        </svg>
-        <figcaption>{copy.shortcutVisualLabel}</figcaption>
-      </figure>
-    );
-  }
-  return null;
+  const diagrams = entryId === "keyboard" ? keyboardShortcutDiagrams(copy) : entryId === "mouse-preview" ? mouseShortcutDiagrams(copy) : [];
+  return (
+    <>
+      {diagrams.map((diagram) => (
+        <figure key={diagram.id} className="manual-visual-card manual-shortcut-card">
+          <ManualShortcutDiagramSvg diagram={diagram} />
+          <figcaption>{diagram.label}</figcaption>
+        </figure>
+      ))}
+    </>
+  );
 }
 
 function isShortcutVisualEntry(entryId: string): boolean {
   return entryId === "keyboard" || entryId === "mouse-preview";
+}
+
+type ManualDiagramKind =
+  | "delete"
+  | "copyPasteCut"
+  | "duplicate"
+  | "undoRedo"
+  | "leftDrag"
+  | "resize"
+  | "rotate"
+  | "wheelZoom"
+  | "middleRange"
+  | "pan";
+
+interface ManualShortcutDiagram {
+  id: string;
+  kind: ManualDiagramKind;
+  label: string;
+}
+
+function keyboardShortcutDiagrams(copy: ManualCopy): ManualShortcutDiagram[] {
+  const tx = manualDiagramText(copy);
+  return [
+    { id: "delete", kind: "delete", label: tx("削除: Delete / Backspace", "Delete: Delete / Backspace") },
+    { id: "copy-paste-cut", kind: "copyPasteCut", label: tx("コピー / 貼り付け / 切り取り", "Copy / Paste / Cut") },
+    { id: "duplicate", kind: "duplicate", label: tx("複製: Ctrl+D", "Duplicate: Ctrl+D") },
+    { id: "undo-redo", kind: "undoRedo", label: tx("元に戻す / やり直し", "Undo / Redo") },
+  ];
+}
+
+function mouseShortcutDiagrams(copy: ManualCopy): ManualShortcutDiagram[] {
+  const tx = manualDiagramText(copy);
+  return [
+    { id: "left-drag", kind: "leftDrag", label: tx("移動: 左ドラッグ", "Move: left-drag") },
+    { id: "resize", kind: "resize", label: tx("リサイズ: 角ハンドル", "Resize: corner handle") },
+    { id: "rotate", kind: "rotate", label: tx("回転: 上の丸ハンドル", "Rotate: top round handle") },
+    { id: "wheel-zoom", kind: "wheelZoom", label: tx("ズーム: ホイール", "Zoom: wheel") },
+    { id: "middle-range", kind: "middleRange", label: tx("範囲選択: 中ボタンドラッグ", "Range select: middle-drag") },
+    { id: "pan", kind: "pan", label: tx("パン: Space / Alt / 右ドラッグ", "Pan: Space / Alt / right-drag") },
+  ];
+}
+
+function manualDiagramText(copy: ManualCopy) {
+  return (japanese: string, english: string) => (copy.language === "ja" ? japanese : english);
+}
+
+function ManualShortcutDiagramSvg({ diagram }: { diagram: ManualShortcutDiagram }) {
+  return (
+    <svg className="manual-shortcut-svg" viewBox="0 0 260 128" role="img" aria-label={diagram.label}>
+      <title>{diagram.label}</title>
+      <rect x="18" y="24" width="96" height="72" rx="8" className="manual-svg-canvas" />
+      {renderManualDiagram(diagram.kind)}
+    </svg>
+  );
+}
+
+function ManualKey({ x, y, label, wide = false }: { x: number; y: number; label: string; wide?: boolean }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect width={wide ? 48 : 32} height="24" rx="6" className="manual-svg-key" />
+      <text x={wide ? 24 : 16} y="16" textAnchor="middle" className="manual-svg-key-text">
+        {label}
+      </text>
+    </g>
+  );
+}
+
+function ManualMouse({ x, y, active = "left" }: { x: number; y: number; active?: "left" | "middle" | "right" | "wheel" }) {
+  return (
+    <g transform={`translate(${x} ${y})`}>
+      <rect width="44" height="62" rx="21" className="manual-svg-window" />
+      <path d="M22 0v28" className="manual-svg-line" />
+      <path d="M0 31h44" className="manual-svg-line" />
+      <circle cx={active === "right" ? 32 : active === "middle" || active === "wheel" ? 22 : 12} cy={active === "wheel" ? 14 : 18} r="6" className="manual-svg-focus" />
+    </g>
+  );
+}
+
+function renderManualDiagram(kind: ManualDiagramKind) {
+  switch (kind) {
+    case "delete":
+      return (
+        <>
+          <ManualKey x={132} y={34} label="Del" />
+          <ManualKey x={168} y={34} label="Back" wide />
+          <path d="M84 60h48" className="manual-svg-arrow" />
+          <path d="m124 52 10 8-10 8" className="manual-svg-arrow" />
+          <path d="M46 48h40v34H46zM52 42h28M58 42l3-7h10l3 7" className="manual-svg-line" />
+        </>
+      );
+    case "copyPasteCut":
+      return (
+        <>
+          <ManualKey x={128} y={24} label="Ctrl" wide />
+          <ManualKey x={180} y={24} label="C" />
+          <ManualKey x={128} y={54} label="Ctrl" wide />
+          <ManualKey x={180} y={54} label="V" />
+          <ManualKey x={128} y={84} label="Ctrl" wide />
+          <ManualKey x={180} y={84} label="X" />
+          <rect x="44" y="46" width="38" height="28" rx="4" className="manual-svg-focus" />
+          <rect x="56" y="58" width="38" height="28" rx="4" className="manual-svg-control" />
+          <path d="M100 64h24" className="manual-svg-arrow" />
+        </>
+      );
+    case "duplicate":
+      return (
+        <>
+          <ManualKey x={142} y={42} label="Ctrl" wide />
+          <ManualKey x={194} y={42} label="D" />
+          <rect x="44" y="46" width="36" height="28" rx="4" className="manual-svg-control" />
+          <rect x="58" y="58" width="36" height="28" rx="4" className="manual-svg-focus" />
+          <path d="M102 66h34" className="manual-svg-arrow" />
+          <path d="m128 58 10 8-10 8" className="manual-svg-arrow" />
+        </>
+      );
+    case "undoRedo":
+      return (
+        <>
+          <ManualKey x={128} y={34} label="Ctrl" wide />
+          <ManualKey x={180} y={34} label="Z" />
+          <ManualKey x={128} y={72} label="Ctrl" wide />
+          <ManualKey x={180} y={72} label="Y" />
+          <path d="M78 50c-24 0-32 24-10 36" className="manual-svg-arrow" />
+          <path d="m70 44 10 6-8 9" className="manual-svg-arrow" />
+          <path d="M44 82c24 0 32-24 10-36" className="manual-svg-arrow" />
+          <path d="m52 88-10-6 8-9" className="manual-svg-arrow" />
+        </>
+      );
+    case "leftDrag":
+      return (
+        <>
+          <ManualMouse x={132} y={32} active="left" />
+          <rect x="42" y="50" width="38" height="24" rx="4" className="manual-svg-focus" />
+          <path d="M84 62h64" className="manual-svg-arrow" />
+          <path d="m140 54 10 8-10 8" className="manual-svg-arrow" />
+        </>
+      );
+    case "resize":
+      return (
+        <>
+          <ManualMouse x={154} y={32} active="left" />
+          <rect x="42" y="44" width="46" height="34" rx="4" className="manual-svg-control" />
+          <circle cx="88" cy="78" r="6" className="manual-svg-focus" />
+          <path d="M98 86l38 22" className="manual-svg-arrow" />
+          <path d="m126 108 12 2-4-12" className="manual-svg-arrow" />
+        </>
+      );
+    case "rotate":
+      return (
+        <>
+          <ManualMouse x={154} y={32} active="left" />
+          <rect x="50" y="50" width="42" height="26" rx="4" className="manual-svg-control" />
+          <circle cx="71" cy="36" r="6" className="manual-svg-focus" />
+          <path d="M70 46v-8" className="manual-svg-line" />
+          <path d="M96 48c20 10 21 34 2 46" className="manual-svg-arrow" />
+          <path d="m98 82 1 12 10-6" className="manual-svg-arrow" />
+        </>
+      );
+    case "wheelZoom":
+      return (
+        <>
+          <ManualMouse x={142} y={34} active="wheel" />
+          <path d="M70 64m-24 0a24 24 0 1 0 48 0a24 24 0 1 0-48 0" className="manual-svg-line" />
+          <path d="M70 50v28M56 64h28" className="manual-svg-line" />
+          <path d="M104 64h32" className="manual-svg-arrow" />
+        </>
+      );
+    case "middleRange":
+      return (
+        <>
+          <ManualMouse x={152} y={32} active="middle" />
+          <rect x="42" y="42" width="54" height="42" rx="2" className="manual-svg-focus" />
+          <rect x="54" y="52" width="16" height="12" rx="2" className="manual-svg-control" />
+          <rect x="74" y="66" width="14" height="10" rx="2" className="manual-svg-control" />
+          <path d="M104 64h40" className="manual-svg-arrow" />
+        </>
+      );
+    case "pan":
+      return (
+        <>
+          <ManualMouse x={154} y={32} active="right" />
+          <ManualKey x={42} y={32} label="Space" wide />
+          <ManualKey x={50} y={66} label="Alt" />
+          <path d="M126 62h22M137 51v22" className="manual-svg-arrow" />
+          <path d="m146 54 8 8-8 8M128 54l-8 8 8 8M129 50l8-8 8 8M129 74l8 8 8-8" className="manual-svg-arrow" />
+        </>
+      );
+    default:
+      return null;
+  }
 }
 
 type ManualCapturePair = readonly [access: string, operation: string];
@@ -841,16 +1056,18 @@ function buildManualCopy(language: Language): ManualCopy {
   ];
 
   return {
+    language,
     title: tx("マニュアル", "Manual"),
     subtitle: tx(
       "",
       "",
     ),
     useCaseLabel: tx("ユースケース: ", "Use case: "),
-    visualIntroLabel: tx("実キャプチャによる機能へのアクセスと操作画面のイメージ", "real captures for access and operation visuals"),
-    accessVisualLabel: tx("アクセスするGUIの実キャプチャ", "Access GUI capture"),
-    operationVisualLabel: tx("操作するGUIの実キャプチャ", "Operation GUI capture"),
-    shortcutVisualLabel: tx("ショートカット/マウス操作のSVG図解", "Shortcut and mouse operation SVG"),
+    visualIntroLabel: tx("機能画面", "feature captures"),
+    captureAltLabel: tx("GUIキャプチャ", "GUI capture"),
+    openCaptureLabel: tx("画像を拡大表示", "Open larger image"),
+    closeImageLabel: tx("拡大画像を閉じる", "Close enlarged image"),
+    shortcutVisualLabel: tx("ショートカットとマウス操作の図解", "Shortcut and mouse operation diagrams"),
     closeLabel: tx("マニュアルを閉じる", "Close manual"),
     categoryTabsLabel: tx("マニュアル機能タブ", "Manual feature tabs"),
     sectionTabsLabel: (categoryLabel) => tx(`${categoryLabel} セクション`, `${categoryLabel} sections`),

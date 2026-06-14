@@ -1526,3 +1526,33 @@ Completed on 2026-06-14 for the expanded in-app Manual overview, per-feature rea
   - `output/runtime-20260614-manual-real-captures/03-shortcut-svg-only.png`
   - `output/runtime-20260614-manual-real-captures/04-layer-edit.png`
   - `output/runtime-20260614-manual-real-captures/05-mobile-manual-captures.png`
+
+## Manual Image Lightbox, Operation Diagrams, And Contents Jump Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14 for the follow-up Manual image and navigation refinements.
+
+- Scope: removed the visible access/operation captions from Manual feature images, added click-to-enlarge image-only viewing for Manual captures, split the keyboard and mouse SVG guide into operation-specific diagrams, and changed Contents clicks to scroll the selected entry to the top of the Manual content pane.
+- `npm test`: pass. 35 test files, 141 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright local Chrome was used.
+- Runtime gate URL: `http://127.0.0.1:4403/thumbnail-generator/?runtime=manual-lightbox-toc-20260614`.
+- Runtime checks:
+  - Page title, primary UI visibility, and nonblank canvas render passed (`1516x956`, sampled colored pixels `141596`).
+  - Manual opened from the footer, and the removed captions were absent in Japanese and English target text checks.
+  - The active feature section rendered 6 `.manual-capture-button` / `.manual-capture-image` items.
+  - Clicking a capture opened `.manual-image-lightbox`; the tested image expanded from `395x56.0625` to `1200x166.8125`.
+  - The shortcut section rendered 10 operation-specific `.manual-shortcut-svg` diagrams: delete, copy/paste/cut, duplicate, undo/redo, move, resize, rotate, zoom, range select, and pan.
+  - The shortcut section rendered no `.manual-capture-image` feature captures.
+  - Clicking the second Contents item scrolled `#manual-entry-mouse-preview` to the content-pane top with a `1px` target-top delta and focused the entry.
+  - Layer editing changed the selected name to `Runtime manual lightbox toc layer`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T14-55-54-611Z.webp` with `728640` bytes.
+  - Mobile manual viewport had horizontal overflow `0px`.
+  - Console health: no page/app runtime errors; the only warning was Playwright service-worker blocking.
+- Evidence:
+  - `output/runtime-20260614-manual-lightbox-toc/runtime-result.json`
+  - `output/runtime-20260614-manual-lightbox-toc/01-initial.png`
+  - `output/runtime-20260614-manual-lightbox-toc/02-lightbox.png`
+  - `output/runtime-20260614-manual-lightbox-toc/03-shortcuts-by-operation.png`
+  - `output/runtime-20260614-manual-lightbox-toc/04-toc-jump.png`
+  - `output/runtime-20260614-manual-lightbox-toc/05-mobile-manual.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.

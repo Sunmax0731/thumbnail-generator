@@ -41,6 +41,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms nonblank canvas (`1516x956`, sampled nonblank pixels `90581`), footer X icon path matching the official X logo asset prefix, Terms legal-content `632/632` client/scroll height with no vertical overflow, Privacy legal-content `684/684` client/scroll height with no vertical overflow, Manual subtitle removal, visible Manual use-case rows and label, layer-name edit to `Runtime legal x manual layer`, WebP export `728640` bytes, mobile overflow `0px`, and no page/app runtime errors. Browser plugin automation was unavailable because its bundled `browser-client.mjs` script was missing; Playwright with the local Chrome channel and blocked service workers was used. Evidence files are under `output/runtime-20260614-legal-x-manual-use-cases/`.
 
+## 2026-06-14 Manual Image Lightbox, Operation Diagrams, And Contents Jump
+
+All QCDS axes remain A+.
+
+- Quality: A+. Manual feature images now omit the repetitive access/operation captions, real GUI captures open in a larger image-only lightbox, keyboard and mouse guidance is split into operation-specific SVG diagrams, and Contents clicks align the selected entry to the top of the Manual content pane.
+- Cost: A+. The change stays in existing React/CSS/docs and committed static captures, adds no dependency, backend, external asset service, or runtime network request.
+- Delivery: A+. `npm test` passed with 35 files and 141 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4403/thumbnail-generator/?runtime=manual-lightbox-toc-20260614`.
+- Satisfaction: A+. The reported Manual wording, too-small image previews, generic shortcut SVGs, and Contents click behavior were corrected and verified in the rendered app.
+
+Runtime evidence confirms page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled colored pixels `141596`), removed Manual captions absent, 6 feature capture buttons in the active section, click-to-enlarge image lightbox expansion from `395x56.0625` to `1200x166.8125`, 10 operation-specific shortcut/mouse SVG diagrams with no feature captures in the shortcut section, Contents jump target-top delta `1px`, layer-name edit to `Runtime manual lightbox toc layer`, WebP export `728640` bytes, mobile overflow `0px`, and no page/app console errors. Browser plugin automation was unavailable for `iab`; Playwright with the local Chrome channel was used. Evidence files are under `output/runtime-20260614-manual-lightbox-toc/`.
+
 ## 2026-06-14 Manual Overview And Visual Guides
 
 All QCDS axes remain A+.
