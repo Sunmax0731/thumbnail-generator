@@ -1276,3 +1276,30 @@ Completed on 2026-06-14.
   - Switching the top-toolbar language to Japanese while the manual was open updated the manual text, category labels, headings, and table of contents.
   - Console health: no page errors or app console errors in the final Playwright gate.
 - CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Manual Dropdown Detail And Anime Label Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: expanded the Manual modal's parameter/dropdown explanations into itemized bullets, aligned the manual's motion wording with the visible `アニメ` tab, and matched Japanese manual labels to the visible Japanese editor labels such as `モーション`, `発光 / エフェクト`, `フェード`, `発光パルス`, `ぼかしイン`, `シャイン`, `モーションプリセット`, and `テキスト専用モーション`.
+- `npm test`: pass. 34 test files, 137 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright headless Chromium fallback was used.
+- Runtime gate URL: `http://127.0.0.1:4370/thumbnail-generator/`.
+- Desktop viewport: `1440x960`.
+- Runtime checks:
+  - Initial canvas rendered nonblank and the Manual button, Output menu, canvas, and inspector were visible.
+  - Manual side categories retained 10 items including `アニメ`; the アニメ category exposed `オブジェクト` and `文字効果` top tabs.
+  - English manual content contained the `アニメ tab`, `Motion / Glow / effects`, `Fade appears from transparent`, `Glow pulse pulses brightness`, and `Text wave adds a wave motion` explanations.
+  - Japanese manual content contained `マニュアル`, `アニメタブ`, `モーション / 発光 / エフェクト`, `フェードは透明から表示`, `発光パルスは発光を脈動`, and `文字ウェーブは文字に波の動き` explanations.
+  - The active manual section showed a right-side table of contents and 12 itemized bullet rows.
+  - Manual content contained no known mojibake marker or Unicode replacement character.
+  - Layer editing was exercised by changing the selected group name from `Object group` to `Runtime manual detail group`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T04-25-06-319Z.webp` with `714072` bytes.
+  - Console health: no page errors or app console errors.
+- Evidence:
+  - `output/runtime-20260614-manual-detail-final/runtime-result.json`
+  - `output/runtime-20260614-manual-detail-final/initial-render.png`
+  - `output/runtime-20260614-manual-detail-final/manual-animation-ja.png`
+  - `output/runtime-20260614-manual-detail-final/layer-edit.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.

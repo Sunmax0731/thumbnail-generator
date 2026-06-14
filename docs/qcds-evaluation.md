@@ -559,3 +559,16 @@ Completed on 2026-06-14.
 - Satisfaction: A. Preview range selection no longer drops the renderer, Fit canvas behaves like a deliberate recenter command, and the manual now covers more practical parameters in the selected UI language.
 - Browser runtime evidence: Browser plugin client script was missing at `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4368/thumbnail-generator/`.
 - Runtime checks: middle-button range rectangle visible with app still rendered, no `getBoundingClientRect` page error, right-drag pan followed by Fit canvas centered the frame (`afterDelta x=0.5`, `y=0`), English manual Preview/Other details visible, Japanese manual text updated after language switch, and no page/app console errors.
+
+## Manual Dropdown Detail And Anime Label Evidence
+
+Completed on 2026-06-14.
+
+- Scope: expanded manual entries so dropdown choices and parameters explain their visual effect in bullets, aligned manual terminology with the visible `アニメ` tab, and localized Japanese labels for motion/effect/text-motion controls.
+- Quality: A. `npm test` passed with 34 test files and 137 tests, `npm run build` passed, and Playwright verified Japanese/English manual switching, itemized アニメ parameter detail, layer editing, and WebP export.
+- Cost: A+. The change is confined to manual copy and documentation, reusing the existing modal, i18n, and static export paths with no dependency or backend changes.
+- Delivery: A. Implementation, docs, runtime screenshots, export evidence, and docs packaging were kept in the same work unit.
+- Satisfaction: A. The manual now explains what each animation dropdown item does, uses `アニメ` consistently with the screen, and presents Japanese manual labels that match the Japanese UI instead of mixing old Motion wording.
+- Browser runtime evidence: Browser plugin client script was missing at `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs`; Playwright headless Chromium fallback passed at `http://127.0.0.1:4370/thumbnail-generator/`.
+- Runtime checks: nonblank initial render, Manual/Output/canvas/inspector visible, 10 manual side categories including `アニメ`, アニメ top tabs `オブジェクト` and `文字効果`, English text for `Fade`, `Glow pulse`, and `Text wave`, Japanese text for `フェード`, `発光パルス`, and `文字ウェーブ`, right-side table of contents, 12 manual bullet rows in the active section, no mojibake or replacement characters, selected group-name edit, WebP export `714072` bytes, and no page/app console errors.
+- Evidence: `output/runtime-20260614-manual-detail-final/runtime-result.json`, `output/runtime-20260614-manual-detail-final/initial-render.png`, `output/runtime-20260614-manual-detail-final/manual-animation-ja.png`, and `output/runtime-20260614-manual-detail-final/layer-edit.png`.

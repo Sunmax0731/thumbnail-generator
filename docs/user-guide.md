@@ -146,7 +146,7 @@ The status bar can show quality warning chips while you work. Check these before
 1. Select an object.
 2. Open アニメ.
 3. Choose a preset, or use the Motion dropdown for movement choices such as Slide, Drift, or Shake.
-4. Use the Effect dropdown for non-moving/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, or Shine.
+4. Use the Glow / effects dropdown for non-moving/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, or Shine.
 5. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
 6. Use Text-only motion for Typewriter, Line reveal, or Text wave only when a text object is selected.
 7. Tune Effect intensity for Glow pulse, Blur in, or Shine. The intensity control is greyed out for choices that cannot use it.

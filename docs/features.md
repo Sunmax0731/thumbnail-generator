@@ -81,7 +81,7 @@ This page is the quick feature index for users and reviewers.
 
 - Open アニメ to assign one or more motion sets to the selected object.
 - Apply motion presets for common entrance, ticker, neon, pop, type-on, and background-breathe behaviors.
-- Use the Motion dropdown for movement presets such as Slide, Drift, and Shake, and the Effect dropdown for non-moving animation/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, and Shine.
+- Use the Motion dropdown for movement presets such as Slide, Drift, and Shake, and the Glow / effects dropdown for non-moving animation/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, and Shine.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
 - Use text-only Typewriter, Line reveal, or Text wave motion only when a text object is selected.
 - Adjust effect intensity for Glow pulse, Blur in, or Shine; the control is greyed out for choices that cannot use intensity.
