@@ -325,7 +325,7 @@ export function CanvasStage({
             <select value={settings.presetId} disabled={isPlaybackPlaying} onChange={(event) => onPresetChange(event.target.value)}>
               {outputPresets.map((preset) => (
                 <option key={preset.id} value={preset.id}>
-                  {preset.label}
+                  {t(preset.labelKey)}
                 </option>
               ))}
             </select>

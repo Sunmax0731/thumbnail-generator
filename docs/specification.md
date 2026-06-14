@@ -186,6 +186,8 @@ Presets:
 - Portrait short: `1080x1920`
 - Custom width and height
 
+Preset option labels are localized in the preview header. Japanese mode displays user-facing names such as `YouTube 向け横長 16:9 1280x720`, `フルHD 16:9 1920x1080`, `Twitch 向け横長 16:9 1280x720`, `正方形 1080x1080`, `縦型ショート 1080x1920`, and `カスタム`; saved state continues to store stable preset ids.
+
 ## Direct Canvas Editing
 
 The selected layer can be edited directly on the canvas:

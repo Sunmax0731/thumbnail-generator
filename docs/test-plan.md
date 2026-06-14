@@ -150,6 +150,32 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-14.
 
+### Manual Dropdown Item Localization And OBS Detail
+
+Completed on 2026-06-14 for active-language dropdown item wording, preview preset localization, and deeper Manual coverage.
+
+- Scope: localized preview preset option labels in Japanese mode, removed stale English dropdown item names from Japanese Manual copy for Templates, Layers/Canvas grouping, Assets image import, Image Lab mouse operations, Adjust shape choices, and Preview size presets, added Manual detail for OBS preview including its Output-menu call path, controls, shortcuts, and OBS capture notes, and added missing Manual detail for image palette extraction and multi-selection relative editing call paths.
+- `npm test`: pass. 34 test files, 137 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4372/thumbnail-generator/?runtime=manual-dropdown-detail-20260614`.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright local Chrome was used with service workers blocked for current-source rendering.
+- Desktop viewport: `1440x960`.
+- Checks:
+  - Primary UI and initial canvas rendered nonblank (`1516x956`, sampled nonblank pixels `90581`).
+  - Japanese preset dropdown options rendered as `YouTube 向け横長 16:9 1280x720`, `フルHD 16:9 1920x1080`, `Twitch 向け横長 16:9 1280x720`, `正方形 1080x1080`, `縦型ショート 1080x1920`, and `カスタム`.
+  - Manual traversal covered 10 side categories and 21 top-tab sections; Japanese Manual had no hits for stale dropdown/item terms such as `monthly は`, `landscape は`, `Bold は`, `groupId`, `MIME`, `Wheel / right-drag`, `rectangle は`, `ellipse は`, `Twitch panel`, or `Portrait short`.
+  - Japanese Manual contained required localized detail for schedule type/orientation, generator tone, group identifiers, general image formats, Image Lab mouse wheel/right-drag operations, Japanese shape names, localized preview presets, OBS preview, call-source wording, image extraction, and multi-selection relative editing.
+  - OBS preview opened from the Output menu, used Japanese controls (`一時停止`, `リセット`, `非表示`), rendered a nonblank `1280x720` canvas, and the `H` shortcut hid and restored the overlay.
+  - Layer editing changed an inspector number from `890` to `897`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T05-35-06-208Z.webp` with `728312` bytes.
+  - Console health: no page/app runtime errors were reported. The only warning was Playwright service-worker blocking.
+- Evidence:
+  - `output/runtime-20260614-manual-dropdown-detail/runtime-result.json`
+  - `output/runtime-20260614-manual-dropdown-detail/manual-dropdown-detail.png`
+  - `output/runtime-20260614-manual-dropdown-detail/obs-preview-ja.png`
+  - `output/runtime-20260614-manual-dropdown-detail/thumbnail-1280x720-2026-06-14T05-35-06-208Z.webp`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
+
 ### Preview Range Containment, Stable Off-Canvas Drag, And Expanded Manual
 
 Completed on 2026-06-14 for middle-button range containment rules, grouped range-selection containment, off-canvas drag display stability, and expanded manual coverage.

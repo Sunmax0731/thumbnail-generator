@@ -1952,6 +1952,11 @@ function App() {
     }
 
     obsWindowRef.current = previewWindow;
+    const obsPlayLabel = t("timeline.play");
+    const obsPauseLabel = t("timeline.pause");
+    const obsResetLabel = t("timeline.reset");
+    const obsHideControlsLabel = t("stage.obsHideControls");
+    const obsShowControlsTitle = t("stage.obsShowControlsTitle");
     (window as ObsPreviewHostWindow).__thumbnailObsPreviewRender = async (canvas, timeMs) => {
       const state = obsPreviewStateRef.current;
       await loadCustomFonts(state.customFonts, canvas.ownerDocument);
@@ -2036,6 +2041,8 @@ function App() {
         const playPauseButton = document.getElementById("obs-play-pause");
         const resetButton = document.getElementById("obs-reset");
         const hideButton = document.getElementById("obs-hide-controls");
+        const labelPlay = ${JSON.stringify(obsPlayLabel)};
+        const labelPause = ${JSON.stringify(obsPauseLabel)};
         const start = performance.now();
         let timeOffset = 0;
         let pausedAt = 0;
@@ -2057,7 +2064,7 @@ function App() {
             timeOffset = performance.now() - start - pausedAt;
           }
           paused = nextPaused;
-          playPauseButton.textContent = paused ? "Play" : "Pause";
+          playPauseButton.textContent = paused ? labelPlay : labelPause;
         }
         function resetPlayback() {
           timeOffset = performance.now() - start;
@@ -2109,9 +2116,9 @@ function App() {
   <body>
     <canvas id="obs-canvas" aria-label="OBS preview canvas"></canvas>
     <div id="obs-controls" class="obs-controls" aria-label="OBS preview controls">
-      <button id="obs-play-pause" type="button">Pause</button>
-      <button id="obs-reset" type="button">Reset</button>
-      <button id="obs-hide-controls" type="button" title="Press H to show controls again">Hide</button>
+      <button id="obs-play-pause" type="button">${obsPauseLabel}</button>
+      <button id="obs-reset" type="button">${obsResetLabel}</button>
+      <button id="obs-hide-controls" type="button" title="${obsShowControlsTitle}">${obsHideControlsLabel}</button>
     </div>
   </body>
 </html>`);
@@ -2125,7 +2132,7 @@ function App() {
     }
     previewWindow.focus();
     setStatus("OBS preview opened. If browser chrome remains, click the preview or press F to enter fullscreen.");
-  }, [isPreviewPlaying]);
+  }, [t]);
 
   const handleExport = useCallback(
     async (format?: ExportFormat) => {

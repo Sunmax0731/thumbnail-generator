@@ -1,12 +1,12 @@
 import type { ExportFormat, OutputPreset, OutputSettings } from "./types";
 
 export const outputPresets: OutputPreset[] = [
-  { id: "youtube-720", label: "YouTube 16:9 1280x720", width: 1280, height: 720 },
-  { id: "full-hd", label: "Full HD 16:9 1920x1080", width: 1920, height: 1080 },
-  { id: "twitch-720", label: "Twitch 16:9 1280x720", width: 1280, height: 720 },
-  { id: "square", label: "Square 1080x1080", width: 1080, height: 1080 },
-  { id: "portrait", label: "Shorts 1080x1920", width: 1080, height: 1920 },
-  { id: "custom", label: "Custom", width: 1280, height: 720 },
+  { id: "youtube-720", label: "YouTube 16:9 1280x720", labelKey: "preset.youtube720", width: 1280, height: 720 },
+  { id: "full-hd", label: "Full HD 16:9 1920x1080", labelKey: "preset.fullHd", width: 1920, height: 1080 },
+  { id: "twitch-720", label: "Twitch 16:9 1280x720", labelKey: "preset.twitch720", width: 1280, height: 720 },
+  { id: "square", label: "Square 1080x1080", labelKey: "preset.square", width: 1080, height: 1080 },
+  { id: "portrait", label: "Shorts 1080x1920", labelKey: "preset.shorts", width: 1080, height: 1920 },
+  { id: "custom", label: "Custom", labelKey: "preset.custom", width: 1280, height: 720 },
 ];
 
 export const defaultOutputSettings: OutputSettings = {

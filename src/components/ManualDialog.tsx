@@ -200,6 +200,10 @@ function buildManualCopy(language: Language): ManualCopy {
   const tx = (japanese: string, english: string) => (ja ? japanese : english);
   const t = createTranslator(language);
   const label = (key: TranslationKey, values?: Record<string, string | number>) => t(key, values);
+  const presetLabels = tx(
+    `${label("preset.youtube720")}、${label("preset.fullHd")}、${label("preset.twitch720")}、${label("preset.square")}、${label("preset.shorts")}、${label("preset.custom")}`,
+    `${label("preset.youtube720")}, ${label("preset.fullHd")}, ${label("preset.twitch720")}, ${label("preset.square")}, ${label("preset.shorts")}, and ${label("preset.custom")}`,
+  );
   const entry = (id: string, title: string, body: string, details: string[] = []): ManualEntry => ({ id, title, body, details });
   const related = [
     { categoryId: "preview" as const, sectionId: "selection", label: tx("プレビュー選択", "Preview selection") },
@@ -222,15 +226,17 @@ function buildManualCopy(language: Language): ManualCopy {
       sections: [
         section("generators", tx("生成", "Generators"), tx("テンプレート生成", "Template generators"), tx(`${label("left.templates")}タブの生成機能で、用途別の初期レイアウトを作成します。`, `Use generator actions in the ${label("left.templates")} tab to create starter layouts for each use case.`), [
           entry("schedule", tx("スケジュール生成", "Schedule generator"), tx("月間または週間の予定表を編集可能なテキスト/図形レイヤーとして生成します。", "Generates a monthly or weekly schedule as editable text and shape layers."), [
-            tx("表示形式: monthly は月全体、weekly は指定週だけを表示します。", "Schedule type: monthly shows the full month; weekly shows only the selected week."),
-            tx("キャンバス方向: landscape は 16:9、portrait は 9:16、current は現在のキャンバスサイズを使います。", "Canvas orientation: landscape uses 16:9, portrait uses 9:16, and current keeps the current canvas size."),
+            tx(`${label("scheduleBuilder.kind")}: ${label("scheduleBuilder.kind.month")} は月全体、${label("scheduleBuilder.kind.week")} は指定週だけを表示します。`, `${label("scheduleBuilder.kind")}: ${label("scheduleBuilder.kind.month")} shows the full month; ${label("scheduleBuilder.kind.week")} shows only the selected week.`),
+            tx(`${label("scheduleBuilder.orientation")}: ${label("scheduleBuilder.orientation.landscape")} は 16:9、${label("scheduleBuilder.orientation.portrait")} は 9:16、${label("scheduleBuilder.orientation.current")} は現在のキャンバスサイズを使います。`, `${label("scheduleBuilder.orientation")}: ${label("scheduleBuilder.orientation.landscape")} uses 16:9, ${label("scheduleBuilder.orientation.portrait")} uses 9:16, and ${label("scheduleBuilder.orientation.current")} keeps the current canvas size.`),
             tx("週始まり / 曜日言語 / 日付形式: 曜日順、曜日表記、日付の見せ方を変えます。", "Week starts on / weekday language / date format: changes weekday order, weekday labels, and date display."),
             tx("グリッド / 角丸 / 線幅: 予定表の枠線、カードの丸み、罫線の強さを調整します。", "Grid / corner radius / stroke width: controls calendar frames, card rounding, and line strength."),
+            tx(`${label("scheduleBuilder.groupLayers")}: 生成した予定表をまとめて選択・移動しやすいグループとして作成します。`, `${label("scheduleBuilder.groupLayers")}: creates generated schedule objects as a group that is easier to select and move together.`),
           ]),
           entry("thumbnail", tx("通常・縦型・待機画面", "Standard, vertical, and stream waiting"), tx("動画サムネイル、縦型サムネイル、配信待機画面の初期構成を作ります。", "Creates initial layouts for video thumbnails, portrait thumbnails, and stream waiting screens."), [
             tx(`${label("generator.layoutPattern")}: 画像枠、タイトル、ラベルの配置パターンを切り替えます。`, `${label("generator.layoutPattern")}: switches image frame, title, and label placement.`),
-            tx(`${label("generator.tone")}: Bold は強いコントラスト、Clean は整理された余白、Neon は発光色を重視します。`, `${label("generator.tone")}: Bold emphasizes contrast, Clean emphasizes spacing, and Neon emphasizes glowing color accents.`),
-            tx(`${label("generator.includeImageSlot")}: ON で画像差し替え用の枠を生成します。`, `${label("generator.includeImageSlot")}: ON creates a replaceable image frame.`),
+            tx(`${label("generator.layoutPattern")}: ${label("generator.layoutPattern.pattern-1")} から ${label("generator.layoutPattern.pattern-5")} まで、画像枠、タイトル、ラベル、余白の位置関係を切り替えます。`, `${label("generator.layoutPattern")}: ${label("generator.layoutPattern.pattern-1")} through ${label("generator.layoutPattern.pattern-5")} switch image frame, title, label, and spacing placement.`),
+            tx(`${label("generator.tone")}: ${label("generator.tone.bold")} は強いコントラスト、${label("generator.tone.clean")} は整理された余白、${label("generator.tone.neon")} は発光色を重視します。`, `${label("generator.tone")}: ${label("generator.tone.bold")} emphasizes contrast, ${label("generator.tone.clean")} emphasizes spacing, and ${label("generator.tone.neon")} emphasizes glowing color accents.`),
+            tx(`${label("generator.includeImageSlot")}: オンで画像差し替え用の枠を生成します。`, `${label("generator.includeImageSlot")}: ON creates a replaceable image frame.`),
             tx(`${label("generator.animated")}: 配信待機で待機画面向けのアニメーション初期値を付与します。`, `${label("generator.animated")}: adds starter animation metadata for stream waiting screens.`),
           ]),
           entry("save-settings", tx("オブジェクト生成 / 設定を保存", "Generate objects / Save settings"), tx("生成と設定保存の違いを理解して使い分けます。", "Use generation and setting persistence intentionally."), [
@@ -265,18 +271,18 @@ function buildManualCopy(language: Language): ManualCopy {
           ]),
           entry("asset-image", tx("選択中画像・グループ素材", "Selected images and group assets"), tx(`${label("left.assets")}で選択中の画像やグループオブジェクトをキャンバスに配置します。`, `Places the selected image or group object from ${label("left.assets")} onto the canvas.`), [
             tx("選択中画像: 選択中の画像素材を画像レイヤーとして追加します。", "Selected image: inserts the selected image asset as an image layer."),
-            tx("グループオブジェクト: 登録済みの複数レイヤー構成を新しい ID で複製して配置します。", "Group object: duplicates a registered multi-layer composition with new ids."),
+            tx("グループオブジェクト: 登録済みの複数レイヤー構成を新しい識別子で複製して配置します。", "Group object: duplicates a registered multi-layer composition with new ids."),
             tx(`配置後は${label("inspector.canvas")}一覧、${label("inspector.adjust")}、プレビュー操作で通常のオブジェクトとして編集できます。`, `After placement, edit it from ${label("inspector.canvas")}, ${label("inspector.adjust")}, or direct preview operations like any other object.`),
           ]),
         ]),
         section("canvas", label("inspector.canvas"), label("inspector.layerList"), tx("配置済みオブジェクトの順序、表示、ロック、グループ、整列を管理します。", "Manages order, visibility, lock state, grouping, and alignment for placed objects."), [
           entry("order-visibility-lock", tx("重なり順・表示・ロック", "Order, visibility, and lock"), tx(`${label("inspector.canvas")} 一覧は上の行ほど前面に表示されます。`, `Rows near the top of ${label("inspector.canvas")} render in front.`), [
-            tx("表示: OFF のオブジェクトはプレビュー、範囲選択、書き出しに出ません。", "Visibility: OFF excludes the object from preview, range selection, and export."),
-            tx("ロック: ON のオブジェクトは表示されたままですが、選択や移動の対象外になります。", "Lock: ON keeps the object visible but prevents selection and movement."),
+            tx("表示: オフのオブジェクトはプレビュー、範囲選択、書き出しに出ません。", "Visibility: OFF excludes the object from preview, range selection, and export."),
+            tx("ロック: オンのオブジェクトは表示されたままですが、選択や移動の対象外になります。", "Lock: ON keeps the object visible but prevents selection and movement."),
             tx("削除: 確認後に対象を削除します。Ctrl+削除は確認省略の高速操作です。", "Delete: removes the target after confirmation. Ctrl+delete is the fast path where available."),
           ]),
           entry("groups", tx("グループ", "Groups"), tx("複数オブジェクトを一まとまりとして扱います。", "Treats multiple objects as one composition."), [
-            tx("グループ化: 選択中の複数オブジェクトに共通 groupId を付けます。", "Group selected objects: assigns a shared groupId to selected objects."),
+            tx("グループ化: 選択中の複数オブジェクトに共通のグループ識別子を付け、まとめて選択・移動できる状態にします。", "Group selected objects: assigns a shared groupId to selected objects."),
             tx(`個別編集: グループを解除せず、1 メンバーだけを ${label("inspector.adjust")} で編集します。`, `Individual edit: edits one member in ${label("inspector.adjust")} without ungrouping.`),
             tx(`${label("inspector.registerGroupObject")}: よく使うグループを ${label("left.assets")} の再利用素材として保存します。`, `${label("inspector.registerGroupObject")}: saves a frequent group as a reusable asset in ${label("left.assets")}.`),
           ]),
@@ -294,7 +300,7 @@ function buildManualCopy(language: Language): ManualCopy {
       sections: [
         section("images", tx("画像", "Images"), tx("画像素材", "Image assets"), tx("ローカル画像を登録し、タグ、配置、削除を管理します。", "Register local images and manage tags, placement, and deletion."), [
           entry("register-tags", tx("ファイル・フォルダ登録とタグ", "File or folder import and tags"), tx("画像ファイルまたは対応ブラウザのフォルダ選択から素材を追加します。", "Adds assets from image files or supported browser folder selection."), [
-            tx("画像ファイル: 対応 MIME/拡張子の画像だけを読み込みます。", "Image files: imports only supported image MIME types or extensions."),
+            tx("画像ファイル: PNG、JPG、WebP、GIF、SVG など、一般的な画像形式だけを読み込みます。", "Image files: imports only supported image MIME types or extensions."),
             tx("フォルダ登録: 選択フォルダ直下の対応画像をまとめて登録し、画像以外は無視します。", "Folder import: registers supported images directly under the selected folder and ignores non-images."),
             tx("読み込みタグ: 登録前に付けるタグです。チップにしていない入力中テキストも登録時に反映されます。", "Import tags: tags added before registration. Draft text not yet chipped is also committed on register."),
           ]),
@@ -310,7 +316,7 @@ function buildManualCopy(language: Language): ManualCopy {
             tx(`${label("imageLab.rect")}: ドラッグで矩形を作り、角/辺ハンドルでサイズ変更します。`, `${label("imageLab.rect")}: drag to create a rectangle, then resize with corner or side handles.`),
             tx(`${label("imageLab.circle")}: 楕円範囲を作ります。角ハンドルは比率を保ち、辺ハンドルは片側だけを動かします。`, `${label("imageLab.circle")}: creates an ellipse. Corner handles preserve ratio; side handles move one side.`),
             tx("自由選択: 左クリックで点を追加、ドラッグで点移動、Alt+クリックで点削除します。", "Polygon: left-click adds points, dragging moves points, and Alt+click deletes points."),
-            tx(`Wheel / right-drag: ${label("imageLab.title")} プレビューのズームとパンです。`, `Wheel / right-drag: zooms and pans the ${label("imageLab.title")} preview.`),
+            tx(`マウスホイール / 右ドラッグ: ${label("imageLab.title")} プレビューの拡大縮小と表示位置移動です。`, `Wheel / right-drag: zooms and pans the ${label("imageLab.title")} preview.`),
           ]),
           entry("chroma-add", tx("クロマキーと素材追加", "Chroma key and add asset"), tx("指定色に近い背景を透明化し、処理結果を追加します。", "Keys out colors near the selected background color and adds the processed result."), [
             tx(`${label("imageLab.keyColor")}: 透明化の基準色です。スポイトや色入力で背景に近い色を指定します。`, `${label("imageLab.keyColor")}: the reference color to remove. Pick or enter a color close to the background.`),
@@ -342,6 +348,12 @@ function buildManualCopy(language: Language): ManualCopy {
             tx(`${label("inspector.bevelSize")}: 正負でハイライトと影の向きを反転できます。`, `${label("inspector.bevelSize")}: positive and negative values flip highlight and shadow direction.`),
             tx(`${label("inspector.bevelOpacity")}: 面取りの強さです。高すぎると文字や細線が濁って見えます。`, `${label("inspector.bevelOpacity")}: controls bevel strength. High values can muddy text or thin lines.`),
           ]),
+          entry("relative-edit", tx("複数選択時の相対編集", "Relative multi-selection edit"), tx("複数オブジェクトを選んだ時に、選択全体へ移動量や回転量を加えます。", "When multiple objects are selected, applies movement and rotation deltas to the selected set."), [
+            tx(`呼び出し元: プレビューの Shift/Ctrl/Meta クリック、ホイールボタン範囲選択、または ${label("inspector.canvas")} のグループ選択で複数選択します。`, `Opened from: multi-select through Shift/Ctrl/Meta click in preview, middle-button range selection, or group selection in ${label("inspector.canvas")}.`),
+            tx("移動量: 選択中の各オブジェクトへ同じ X/Y 差分を加えます。絶対位置を同じ値に揃える操作ではありません。", "Move delta: adds the same X/Y delta to each selected object. It does not set every object to one absolute position."),
+            tx("回転量: 各オブジェクトの現在角度へ同じ差分を加えます。", "Rotation delta: adds the same angle delta to each selected object's current rotation."),
+            tx("最初の選択に角度を合わせる: 選択順の先頭オブジェクトを基準に、他の選択オブジェクトの角度を揃えます。", "Match angle to first: uses the first selected object as the reference and matches the other selected objects to it."),
+          ]),
         ]),
         section("text", tx("テキスト", "Text"), label("inspector.textControls"), tx("テキストレイヤー専用の文字内容、組版、塗り、縁取りを編集します。", "Edits text-layer content, typography, fill, and stroke."), [
           entry("typography", tx("本文・フォント・サイズ・行間・字間", "Content, font, size, line height, and letter spacing"), tx("文字の読みやすさと収まりを決める設定です。", "Controls text readability and fit."), [
@@ -360,7 +372,7 @@ function buildManualCopy(language: Language): ManualCopy {
         ]),
         section("shape-image", tx("図形・画像", "Shape and image"), tx(`${label("inspector.shapeControls")} / ${label("inspector.imageControls")}`, `${label("inspector.shapeControls")} / ${label("inspector.imageControls")}`), tx("図形と画像に固有の設定を編集します。", "Edits settings specific to shapes and images."), [
           entry("shape", tx("塗り・線・角丸・線種", "Fill, stroke, radius, and line style"), tx("図形の面、輪郭、角、線の表現を設定します。", "Controls shape fill, outline, corners, and line rendering."), [
-            tx("図形ドロップダウン: rectangle は矩形、ellipse は楕円、triangle/diamond/pentagon/hexagon/star は多角形です。", "Shape dropdown: rectangle is a box, ellipse is an oval, and triangle/diamond/pentagon/hexagon/star are polygon shapes."),
+            tx(`図形ドロップダウン: ${label("inspector.rect")} は四角、${label("inspector.ellipse")} は楕円、${label("inspector.triangle")} / ${label("inspector.diamond")} / ${label("inspector.pentagon")} / ${label("inspector.hexagon")} / ${label("inspector.star")} は多角形や星形です。`, "Shape dropdown: rectangle is a box, ellipse is an oval, and triangle/diamond/pentagon/hexagon/star are polygon shapes."),
             tx(`${label("inspector.fill")} / ${label("inspector.stroke")}: 図形の面色と輪郭色です。${label("inspector.fill")} / ${label("inspector.stroke")} ボタンや色表示から変更します。`, `${label("inspector.fill")} / ${label("inspector.stroke")}: shape face and outline colors, edited from ${label("inspector.fill")} / ${label("inspector.stroke")} controls or color displays.`),
             tx(`${label("inspector.cornerRadius")}: 矩形や対応多角形の角を丸めます。`, `${label("inspector.cornerRadius")}: rounds rectangle or supported polygon corners.`),
             tx(`${label("inspector.lineStyle")}: ${label("inspector.lineSolid")} は実線、${label("inspector.lineDotted")} は点線、${label("inspector.lineDashed")} は破線、${label("inspector.lineWave")} は滑らかな波線です。`, `${label("inspector.lineStyle")}: ${label("inspector.lineSolid")} is a continuous line, ${label("inspector.lineDotted")} is dots, ${label("inspector.lineDashed")} is broken strokes, and ${label("inspector.lineWave")} is a smooth wave.`),
@@ -386,6 +398,7 @@ function buildManualCopy(language: Language): ManualCopy {
             tx(`${label("inspector.registeredColors")}: 名前付き単色として保存し、${label("inspector.fill")} または ${label("inspector.stroke")} に直接適用できます。`, `${label("inspector.registeredColors")}: saved named single colors can be applied directly as ${label("inspector.fill")} or ${label("inspector.stroke")}.`),
             tx(`${label("inspector.savedPalettes")}: 複数色の配色セットです。各色を ${label("inspector.fill")} / ${label("inspector.stroke")} として適用できます。`, `${label("inspector.savedPalettes")}: multi-color schemes where each color can be applied as ${label("inspector.fill")} or ${label("inspector.stroke")}.`),
             tx(`${label("inspector.palettePattern")}: アナロジーは近い色、オポーネントは補色、トライアド/テトラードは均等配置色、トーン・オン・トーンは同系色の濃淡を作ります。`, `${label("inspector.palettePattern")}: analogous uses nearby hues, opponent uses complements, triad/tetrad use evenly spaced hues, and tone-on-tone creates related tonal colors.`),
+            tx(`${label("inspector.extractPaletteFromImage")}: 呼び出し元は ${label("inspector.colors")} タブです。画像オブジェクト選択時に、画像内の代表色を配色作成の起点として取り込みます。`, `${label("inspector.extractPaletteFromImage")}: opened from the ${label("inspector.colors")} tab. When an image object is selected, it extracts representative colors as a palette starting point.`),
           ]),
           entry("background", tx("背景色と透明背景", "Background and transparent output"), tx("キャンバス背景と書き出し形式の関係を確認します。", "Checks how canvas background and export format interact."), [
             tx("背景色: 出力キャンバスの背景色です。透明背景でない場合は書き出しにも反映されます。", "Background: output canvas background color, included in export unless transparency is used."),
@@ -492,15 +505,23 @@ function buildManualCopy(language: Language): ManualCopy {
         ]),
         section("output-size", tx("サイズ", "Size"), tx("プリセットとキャンバスサイズ", "Presets and canvas size"), tx("プレビュー上部で出力サイズと書き出しを管理します。", "Manage output size and export actions in the preview header."), [
           entry("preset-width-height", tx("プリセット / 幅 / 高さ", "Preset / width / height"), tx("出力キャンバスのピクセルサイズを決めます。", "Defines output canvas pixel size."), [
-            tx(`${label("toolbar.preset")}: YouTube 16:9、Full HD、Twitch panel、Square、Portrait short などの定型サイズです。`, `${label("toolbar.preset")}: fixed sizes such as YouTube 16:9, Full HD, Twitch panel, Square, and Portrait short.`),
+            tx(`${label("toolbar.preset")}: ${presetLabels} から選ぶ定型サイズです。`, `${label("toolbar.preset")}: fixed sizes such as ${presetLabels}.`),
             tx(`${label("inspector.width")} / ${label("inspector.height")}: 20 から 4096 の範囲で直接入力できます。`, `${label("inspector.width")} / ${label("inspector.height")}: direct values from 20 to 4096.`),
             tx("プリセット変更: 既存レイヤーは削除せず、キャンバスサイズだけを変更します。", "Preset change: changes canvas size without deleting existing layers."),
+            tx(`${label("preset.custom")}: ${label("inspector.width")} / ${label("inspector.height")} を直接変更した時の自由設定です。`, `${label("preset.custom")}: free sizing used when ${label("inspector.width")} / ${label("inspector.height")} are edited directly.`),
           ]),
           entry("output-menu", tx(`${label("toolbar.output")}メニュー`, `${label("toolbar.output")} menu`), tx("静止画書き出しと OBS プレビューを 1 つのメニューにまとめています。", "Groups static exports and OBS preview in one menu."), [
             tx("JPG: 透明なしの写真向け形式です。背景色へ合成されます。", "JPG: photo-oriented format without transparency; transparency is flattened to the background."),
             tx("PNG: 透明保持と高品質に向く形式です。ファイルサイズは大きくなりやすいです。", "PNG: high-quality format that preserves transparency, often larger."),
             tx("WebP: 透明保持と容量削減のバランスが良い形式です。", "WebP: balances transparency support and smaller file size."),
             tx(`${label("stage.openObsPreview")}: アニメーション付きプレビューを別ウィンドウで開きます。`, `${label("stage.openObsPreview")}: opens animated preview in a separate window.`),
+          ]),
+          entry("obs-preview", label("stage.openObsPreview"), tx(`${label("toolbar.output")}メニューから呼び出す、配信取り込み向けの別ウィンドウプレビューです。`, `A separate preview window opened from the ${label("toolbar.output")} menu for streaming capture.`), [
+            tx(`呼び出し元: プレビュー上部の ${label("toolbar.output")} メニュー内にある ${label("stage.openObsPreview")} です。`, `Opened from: ${label("stage.openObsPreview")} inside the preview-header ${label("toolbar.output")} menu.`),
+            tx("表示内容: エディタの選択枠、ハンドル、パネルを出さず、現在のキャンバスだけをアニメーション付きで描画します。", "Content: renders only the current canvas with animation, without editor selection boxes, handles, or panels."),
+            tx(`再生操作: 別ウィンドウ内の ${label("timeline.play")} / ${label("timeline.pause")}、${label("timeline.reset")}、${label("stage.obsHideControls")} で再生、先頭戻し、操作表示の非表示を切り替えます。`, `Playback controls: ${label("timeline.play")} / ${label("timeline.pause")}, ${label("timeline.reset")}, and ${label("stage.obsHideControls")} in the child window control playback, reset, and overlay visibility.`),
+            tx("キー操作: P は再生/一時停止、R は先頭戻し、H は操作表示の表示/非表示、F または Enter は全画面化の再試行です。", "Keyboard: P toggles play/pause, R resets, H shows/hides controls, and F or Enter retries fullscreen."),
+            tx("OBS での利用: ブラウザウィンドウまたは全画面をキャプチャします。ブラウザ枠を完全に消せるかはブラウザと OBS 側の取り込み設定に依存します。", "OBS use: capture the browser window or fullscreen view. Whether browser chrome disappears depends on browser and OBS capture settings."),
           ]),
         ]),
       ],

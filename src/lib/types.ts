@@ -1,3 +1,5 @@
+import type { TranslationKey } from "./i18n";
+
 export type LayerType = "image" | "text" | "shape";
 export type ShapeKind = "rect" | "ellipse" | "triangle" | "diamond" | "pentagon" | "hexagon" | "star" | "line";
 export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
@@ -163,6 +165,7 @@ export interface GroupObjectAsset {
 export interface OutputPreset {
   id: string;
   label: string;
+  labelKey: TranslationKey;
   width: number;
   height: number;
 }

@@ -33,7 +33,8 @@ This page is the quick feature index for users and reviewers.
 
 - CSV and HTML layout text remain part of browser edit-state and template compatibility.
 - Export the rendered thumbnail as PNG, JPEG, or WebP from the preview-header Output menu at maximum quality.
-- Use the same Output menu to open OBS preview.
+- Use localized preview-header presets for common output sizes, including Japanese labels for horizontal YouTube, Full HD, Twitch, square, portrait short, and custom sizes.
+- Use the same Output menu to open OBS preview. The separate OBS window renders the animated canvas without editor panels or handles, and its Play/Pause, Reset, and Hide controls follow the active language.
 
 ## Browser Storage
 
@@ -54,7 +55,7 @@ This page is the quick feature index for users and reviewers.
 - Keep Brand kit setup and Colors-side Brand kit registration buttons hidden.
 - Show advisory warning chips for long text, low contrast, hidden important objects, safe-area edges, many objects, large image assets, large storage estimates, and 4K export.
 - Link to GitHub Issues from the app for bug reports and feature requests.
-- Open the fixed-size in-app manual from the Manual button beside Issue reporting, then use left category tabs and top section tabs. The manual preserves the last viewed tabs and scroll position after closing.
+- Open the fixed-size in-app manual from the Manual button beside Issue reporting, then use left category tabs, top section tabs, and the right-side contents. The manual preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
 
 ## Image And Text Tools
 
