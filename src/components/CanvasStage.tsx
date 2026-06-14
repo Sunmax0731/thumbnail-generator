@@ -9,16 +9,30 @@ import {
   Pause,
   Play,
   MousePointer2,
+  RotateCcw,
   ZoomIn,
   ZoomOut,
 } from "lucide-react";
 import { calculateCanvasFitZoom } from "../lib/canvasFit";
+import { pointToCanvas } from "../lib/canvasInteraction";
+import { pickLayersInRect } from "../lib/hitTest";
 import type { Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
 import type { ExportFormat, LayerAnimation, OutputSettings, ThumbnailLayer } from "../lib/types";
 
 const timelineMinHeight = 120;
 const timelineMaxHeight = 640;
+
+type RangeSelectionMode = "replace" | "add" | "subtract";
+
+interface RangeSelectionDrag {
+  pointerId: number;
+  mode: RangeSelectionMode;
+  startCanvas: { x: number; y: number };
+  currentCanvas: { x: number; y: number };
+  startClient: { x: number; y: number };
+  currentClient: { x: number; y: number };
+}
 
 interface CanvasStageProps {
   canvasRef: React.RefObject<HTMLCanvasElement | null>;
@@ -36,9 +50,11 @@ interface CanvasStageProps {
   playbackTimeMs: number;
   onZoomChange: (zoom: number) => void;
   onTogglePlayback: () => void;
+  onResetPlayback: () => void;
   onPointerDown: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerMove: (event: React.PointerEvent<HTMLCanvasElement>) => void;
   onPointerUp: (event: React.PointerEvent<HTMLCanvasElement>) => void;
+  onRangeSelect: (ids: string[], mode: RangeSelectionMode) => void;
   onExport: (format?: ExportFormat) => void;
   onSettingsChange: (next: Partial<OutputSettings>) => void;
   onPresetChange: (presetId: string) => void;
@@ -65,9 +81,11 @@ export function CanvasStage({
   playbackTimeMs,
   onZoomChange,
   onTogglePlayback,
+  onResetPlayback,
   onPointerDown,
   onPointerMove,
   onPointerUp,
+  onRangeSelect,
   onExport,
   onSettingsChange,
   onPresetChange,
@@ -84,6 +102,7 @@ export function CanvasStage({
   const [isSpacePanning, setIsSpacePanning] = useState(false);
   const [isOutputMenuOpen, setIsOutputMenuOpen] = useState(false);
   const [panOffset, setPanOffset] = useState({ x: 0, y: 0 });
+  const [rangeSelectionDrag, setRangeSelectionDrag] = useState<RangeSelectionDrag | null>(null);
   const lastAutoFitRevision = useRef(0);
   const setZoomWithAnchor = useCallback(
     (nextZoom: number, clientX?: number, clientY?: number) => {
@@ -163,6 +182,7 @@ export function CanvasStage({
   useEffect(() => {
     if (!isPlaybackPlaying) return;
     panDrag.current = null;
+    setRangeSelectionDrag(null);
     setIsPanMode(false);
     setIsPanning(false);
     setIsSpacePanning(false);
@@ -206,6 +226,64 @@ export function CanvasStage({
 
   const shouldPan = (event: React.PointerEvent<HTMLElement>) =>
     !isPlaybackPlaying && (isPanMode || isSpacePanning || event.altKey || event.button === 2 || (event.buttons & 2) === 2);
+  const beginRangeSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (isPlaybackPlaying || event.button !== 1) return false;
+    event.preventDefault();
+    event.stopPropagation();
+    const canvas = event.currentTarget;
+    safelySetPointerCapture(canvas, event.pointerId);
+    const startCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
+    const startClient = { x: event.clientX, y: event.clientY };
+    setRangeSelectionDrag({
+      pointerId: event.pointerId,
+      mode: event.ctrlKey || event.metaKey ? "subtract" : event.shiftKey ? "add" : "replace",
+      startCanvas,
+      currentCanvas: startCanvas,
+      startClient,
+      currentClient: startClient,
+    });
+    return true;
+  };
+
+  const continueRangeSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!rangeSelectionDrag || event.pointerId !== rangeSelectionDrag.pointerId) return false;
+    event.preventDefault();
+    const currentCanvas = pointToCanvas(event.currentTarget, event.clientX, event.clientY, previewPadding);
+    setRangeSelectionDrag((current) =>
+      current
+        ? {
+            ...current,
+            currentCanvas,
+            currentClient: { x: event.clientX, y: event.clientY },
+          }
+        : current,
+    );
+    return true;
+  };
+
+  const endRangeSelection = (event: React.PointerEvent<HTMLCanvasElement>) => {
+    if (!rangeSelectionDrag || event.pointerId !== rangeSelectionDrag.pointerId) return false;
+    event.preventDefault();
+    const canvas = event.currentTarget;
+    const currentCanvas = pointToCanvas(canvas, event.clientX, event.clientY, previewPadding);
+    const dx = event.clientX - rangeSelectionDrag.startClient.x;
+    const dy = event.clientY - rangeSelectionDrag.startClient.y;
+    const pickedLayers =
+      Math.hypot(dx, dy) < 4
+        ? []
+        : pickLayersInRect(layers, {
+            left: rangeSelectionDrag.startCanvas.x,
+            top: rangeSelectionDrag.startCanvas.y,
+            right: currentCanvas.x,
+            bottom: currentCanvas.y,
+          });
+    if (canvas.hasPointerCapture(event.pointerId)) canvas.releasePointerCapture(event.pointerId);
+    onRangeSelect(pickedLayers.map((layer) => layer.id), rangeSelectionDrag.mode);
+    setRangeSelectionDrag(null);
+    return true;
+  };
+
+  const rangeSelectionBox = rangeSelectionDrag ? createSelectionBox(rangeSelectionDrag.startClient, rangeSelectionDrag.currentClient) : null;
   const frameWidth = settings.width + previewPadding * 2;
   const frameHeight = settings.height + previewPadding * 2;
 
@@ -402,6 +480,7 @@ export function CanvasStage({
                 event.preventDefault();
                 return;
               }
+              if (beginRangeSelection(event)) return;
               if (shouldPan(event)) {
                 beginPan(event);
                 return;
@@ -409,18 +488,28 @@ export function CanvasStage({
               onPointerDown(event);
             }}
             onPointerMove={(event) => {
+              if (continueRangeSelection(event)) return;
               if (continuePan(event)) return;
               onPointerMove(event);
             }}
             onPointerUp={(event) => {
+              if (endRangeSelection(event)) return;
               if (endPan(event)) return;
               onPointerUp(event);
             }}
             onPointerCancel={(event) => {
+              if (endRangeSelection(event)) return;
               if (endPan(event)) return;
               onPointerUp(event);
             }}
           />
+          {rangeSelectionBox ? (
+            <div
+              className={`canvas-range-selection ${rangeSelectionDrag?.mode ?? "replace"}`}
+              style={rangeSelectionBox}
+              aria-hidden="true"
+            />
+          ) : null}
         </div>
       </div>
       {showMotionTimeline ? (
@@ -430,6 +519,7 @@ export function CanvasStage({
           isPlaybackPlaying={isPlaybackPlaying}
           playbackTimeMs={playbackTimeMs}
           onTogglePlayback={onTogglePlayback}
+          onResetPlayback={onResetPlayback}
           onSelectLayer={onSelectLayer}
           onUpdateLayer={onUpdateLayer}
           t={t}
@@ -464,6 +554,7 @@ function MotionTimeline({
   isPlaybackPlaying,
   playbackTimeMs,
   onTogglePlayback,
+  onResetPlayback,
   onSelectLayer,
   onUpdateLayer,
   t,
@@ -473,6 +564,7 @@ function MotionTimeline({
   isPlaybackPlaying: boolean;
   playbackTimeMs: number;
   onTogglePlayback: () => void;
+  onResetPlayback: () => void;
   onSelectLayer: (id: string, additive?: boolean) => void;
   onUpdateLayer: (id: string, updater: (layer: ThumbnailLayer) => ThumbnailLayer) => void;
   t: Translator;
@@ -561,6 +653,14 @@ function MotionTimeline({
           <span>{(duration / 1000).toFixed(1)}s</span>
           <button
             type="button"
+            className="secondary-button icon-text timeline-reset-button"
+            onClick={onResetPlayback}
+          >
+            <RotateCcw size={14} />
+            {t("timeline.reset")}
+          </button>
+          <button
+            type="button"
             className={`secondary-button icon-text timeline-playback-button ${isPlaybackPlaying ? "playing" : ""}`}
             aria-pressed={isPlaybackPlaying}
             onClick={onTogglePlayback}
@@ -621,17 +721,26 @@ function MotionTimeline({
                         const left = Math.max(0, (animation.startMs / duration) * 100);
                         const width = Math.min(100 - left, Math.max(3, (Math.max(100, animation.durationMs) / duration) * 100));
                         return (
-                          <TimelineSegment
-                            key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`}
-                            animation={animation}
-                            duration={duration}
-                            left={left}
-                            width={width}
-                            layerId={layer.id}
-                            animationIndex={index}
-                            onUpdateTiming={updateAnimationTiming}
-                            disabled={isPlaybackPlaying}
-                          />
+                          <span key={`${layer.id}-${index}-${animation.type}-${animation.startMs}`} className="timeline-segment-stack">
+                            {getLoopEchoSegments(animation, duration).map((echo, echoIndex) => (
+                              <span
+                                key={`${layer.id}-${index}-echo-${echoIndex}`}
+                                className="timeline-loop-echo"
+                                style={{ left: `${echo.left}%`, width: `${echo.width}%` }}
+                                aria-hidden="true"
+                              />
+                            ))}
+                            <TimelineSegment
+                              animation={animation}
+                              duration={duration}
+                              left={left}
+                              width={width}
+                              layerId={layer.id}
+                              animationIndex={index}
+                              onUpdateTiming={updateAnimationTiming}
+                              disabled={isPlaybackPlaying}
+                            />
+                          </span>
                         );
                       })}
                     </span>
@@ -730,4 +839,36 @@ function animationLabel(type: string, textAnimation?: string, effectAnimation?: 
   if (textAnimation && textAnimation !== "none") return textAnimation;
   if (effectAnimation && effectAnimation !== "none") return effectAnimation;
   return type;
+}
+
+function getLoopEchoSegments(animation: LayerAnimation, duration: number): Array<{ left: number; width: number }> {
+  if (!animation.loop) return [];
+  const segmentDuration = Math.max(100, animation.durationMs);
+  const echoes: Array<{ left: number; width: number }> = [];
+  for (let startMs = animation.startMs + segmentDuration; startMs < duration; startMs += segmentDuration) {
+    const left = Math.max(0, (startMs / duration) * 100);
+    const width = Math.min(100 - left, Math.max(1.5, (segmentDuration / duration) * 100));
+    if (width > 0) echoes.push({ left, width });
+  }
+  return echoes;
+}
+
+function createSelectionBox(
+  start: { x: number; y: number },
+  current: { x: number; y: number },
+): React.CSSProperties {
+  return {
+    left: `${Math.min(start.x, current.x)}px`,
+    top: `${Math.min(start.y, current.y)}px`,
+    width: `${Math.abs(current.x - start.x)}px`,
+    height: `${Math.abs(current.y - start.y)}px`,
+  };
+}
+
+function safelySetPointerCapture(element: HTMLElement, pointerId: number): void {
+  try {
+    element.setPointerCapture(pointerId);
+  } catch {
+    // Some browsers can reject capture when the pointer already ended.
+  }
 }

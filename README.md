@@ -8,36 +8,38 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 
 ## What You Can Do
 
-- Compose thumbnails with image, text, and shape layers, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
-- Add line layers from Quick Add with solid, dotted, dashed, or smooth wave strokes.
+- Compose thumbnails with image, text, and shape objects on the canvas, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
+- Add line objects from Quick Add with solid, dotted, dashed, or smooth wave strokes.
 - Import local images from the Assets tab and edit their position, size, rotation, opacity, and simple effects.
 - Tag imported images and reusable group objects, then filter image assets and group objects independently from the Assets tab.
 - Keep browser-only YouTube thumbnail import support in code while the current Assets UI hides the YouTube URL controls.
-- Adjust layer blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, shadow, pseudo-3D rotation, bevel, fill/stroke color alpha, and text kerning.
-- Select imported assets to add them as image layers, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image layers that reference it.
+- Adjust object blur, signed inner/outer edge blur, stroke/outline blur participation, polygon corner radius, shadow, pseudo-3D rotation, bevel, fill/stroke color alpha, and text kerning.
+- Select imported assets to add them as image objects, open them directly in Image Lab, or delete them from each asset row. Deleting an asset also removes image objects that reference it.
 - Use Image Lab for chroma key, rectangle, circle, and editable polygon cutouts.
-- Edit layers directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
-- Select multiple layers, move or rotate them together, align or evenly distribute them, or match angles to the first selected layer.
-- Group selected layers, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped row individually from Layers, and fit selected image/shape layers to the canvas.
+- Edit objects directly on the preview canvas with drag move, resize handles, and a rotation handle; drag undo/redo returns between confirmed start and end positions.
+- Select multiple objects by Shift/Ctrl/Meta click or by middle-button range drag on the preview; Shift+middle drag adds range objects and Ctrl+middle drag removes range objects from the current selection.
+- Move or rotate selected objects together, align or evenly distribute them, or match angles to the first selected object.
+- Group selected objects, rename groups, ungroup them, select grouped rows or grouped preview objects as a multi-selection, edit one grouped object individually from Layers, and fit selected image/shape objects to the canvas.
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store tagged named templates in `localStorage` with dropdown tag filtering.
 - Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
-- Save generator settings separately from generated layers; settings are saved when layers are generated and can also be saved without generating, then restored after reload.
-- Use the bottom timeline Play/Pause button to preview animations directly in the editor; while playing, layer rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.
-- Add multiple layer animation sets from the アニメ tab, choose presets, split movement motions from non-moving effects, show text-only controls only for text layers, toggle the easing graph, and edit animated layer timing from the アニメ-only bottom timeline.
+- Save generator settings separately from generated objects; settings are saved when objects are generated and can also be saved without generating, then restored after reload.
+- Use the bottom timeline Play/Pause and Reset buttons to preview animations directly in the editor; while playing, object rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.
+- Add multiple object animation sets from the アニメ tab, choose presets, split movement motions from non-moving effects, show text-only controls only for text objects, toggle the easing graph, and edit animated object timing from the アニメ-only bottom timeline. Looping animation rows show faint repeated segments after the first cycle so later loops are visible without moving the original handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
-- See rule-based quality warnings for long text, low contrast, hidden important layers, safe-area edges, large storage snapshots, heavy assets, many layers, and 4K export.
+- See rule-based quality warnings for long text, low contrast, hidden important objects, safe-area edges, large storage snapshots, heavy assets, many objects, and 4K export.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the top-right edit-state icon cluster; autosave remains text-labeled there.
 - Register, edit, reorder, preview, delete, collapse, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, a palette-pattern dropdown beside the wheel, palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, reorderable saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Open a draggable popup single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
-- Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text layers.
-- Switch text layers between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
+- Select expanded bundled Google Fonts options or import WOFF2, WOFF, TTF, or OTF fonts for text objects.
+- Switch text objects between horizontal and vertical writing, with vertical text bounds resized from the preview or Adjust tab like horizontal text.
 - Switch the display language and window theme from the top-right toolbar, including System, Light, and Dark theme modes.
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
-- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Layers outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
+- Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
+- Open the in-app manual from the top-left Manual button beside Issue reporting; the manual remembers the last category, section, and scroll position after closing.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.

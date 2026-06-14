@@ -4,6 +4,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel, type InspectorSection } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
+import { ManualDialog, defaultManualDialogState, type ManualDialogState } from "./components/ManualDialog";
 import { StatusBar } from "./components/StatusBar";
 import { TagSettingsDialog } from "./components/TagSettingsDialog";
 import { TopToolbar } from "./components/TopToolbar";
@@ -84,7 +85,7 @@ import { parseHtmlLayout } from "./lib/htmlLayout";
 import { pickLayerInteractionAt } from "./lib/hitTest";
 import { createTranslator, detectInitialLanguage, type Language, type Translator } from "./lib/i18n";
 import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeLayerTransform } from "./lib/layerTransform";
-import { selectIndividualLayerId, selectLayerIdsForLayer } from "./lib/layerOperations";
+import { mergeLayerIdsForRangeSelection, selectIndividualLayerId, selectLayerIdsForLayer } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
 import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
@@ -205,6 +206,8 @@ function App() {
     typeof window === "undefined" ? { common: [], images: [], groupObjects: [], templates: [] } : readTagRegistry(),
   );
   const [isTagSettingsOpen, setIsTagSettingsOpen] = useState(false);
+  const [isManualOpen, setIsManualOpen] = useState(false);
+  const [manualDialogState, setManualDialogState] = useState<ManualDialogState>(defaultManualDialogState);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(initialEditStatePreferences.autoSaveEnabled);
   const [savedEditStateUpdatedAt, setSavedEditStateUpdatedAt] = useState<string | null>(
     initialSavedEditState?.updatedAt ?? null,
@@ -515,6 +518,24 @@ function App() {
     [layers],
   );
 
+  const selectLayersByRange = useCallback(
+    (rangeLayerIds: string[], mode: "replace" | "add" | "subtract") => {
+      setSelectedIds((current) => {
+        const next = mergeLayerIdsForRangeSelection(layers, current, rangeLayerIds, mode);
+        const pickedCount = next.length;
+        if (mode === "subtract") {
+          setStatus(rangeLayerIds.length > 0 ? `Removed objects from selection. ${pickedCount} object${pickedCount === 1 ? "" : "s"} selected.` : "No objects found in range.");
+        } else if (mode === "add") {
+          setStatus(rangeLayerIds.length > 0 ? `Added objects from range. ${pickedCount} object${pickedCount === 1 ? "" : "s"} selected.` : "No objects found in range.");
+        } else {
+          setStatus(rangeLayerIds.length > 0 ? `Selected ${pickedCount} object${pickedCount === 1 ? "" : "s"} by range.` : "Range selection found no objects.");
+        }
+        return next;
+      });
+    },
+    [layers],
+  );
+
   const applyCsv = useCallback(() => {
     const result = parseCsvLayout(csvText, {
       baseWidth: settings.width,
@@ -524,7 +545,7 @@ function App() {
     if (result.layers.length > 0) {
       setLayers(result.layers);
       setSelectedIds([]);
-      setStatus(`CSV applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
+      setStatus(`CSV applied: ${result.layers.length} objects. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`CSV not applied. ${result.warnings.join(" ")}`);
     }
@@ -539,7 +560,7 @@ function App() {
     if (result.layers.length > 0) {
       setLayers(result.layers);
       setSelectedIds([]);
-      setStatus(`HTML applied: ${result.layers.length} layers. ${result.warnings.join(" ")}`.trim());
+      setStatus(`HTML applied: ${result.layers.length} objects. ${result.warnings.join(" ")}`.trim());
     } else {
       setStatus(`HTML not applied. ${result.warnings.join(" ")}`);
     }
@@ -587,7 +608,7 @@ function App() {
     (assetKey: string) => {
       const asset = assets.find((candidate) => candidate.key === assetKey);
       if (!asset) {
-        setStatus("Select an image asset before adding an image layer.");
+        setStatus("Select an image asset before adding an image object.");
         return;
       }
       const assetRatio = asset.width && asset.height ? asset.height / asset.width : 9 / 16;
@@ -603,7 +624,7 @@ function App() {
       setLayers((current) => [...current, layer]);
       setSelectedIds([layer.id]);
       setSelectedAssetKey(asset.key);
-      setStatus(`Added ${asset.name} as an image layer.`);
+      setStatus(`Added ${asset.name} as an image object.`);
     },
     [assets, settings.height, settings.width],
   );
@@ -689,7 +710,7 @@ function App() {
     });
     setLayers((current) => [...current, layer]);
     setSelectedIds([layer.id]);
-    setStatus("Text layer added.");
+    setStatus("Text object added.");
   }, [settings.height, settings.width]);
 
   const addShapeLayer = useCallback(() => {
@@ -703,7 +724,7 @@ function App() {
     });
     setLayers((current) => [...current, layer]);
     setSelectedIds([layer.id]);
-    setStatus("Shape layer added.");
+    setStatus("Shape object added.");
   }, [settings.height, settings.width]);
 
   const addLineLayer = useCallback(() => {
@@ -723,7 +744,7 @@ function App() {
     });
     setLayers((current) => [...current, layer]);
     setSelectedIds([layer.id]);
-    setStatus("Line layer added.");
+    setStatus("Line object added.");
   }, [settings.height, settings.width]);
 
   const addQuickLayer = useCallback(
@@ -804,7 +825,7 @@ function App() {
       setHtmlText(layersToHtml(schedule.layers));
       setTemplateName(schedule.name);
       setAutoFitRevision((current) => current + 1);
-      setStatus(`Generated schedule template "${schedule.name}" with ${schedule.layers.length} layers and saved generator settings.`);
+      setStatus(`Generated schedule template "${schedule.name}" with ${schedule.layers.length} objects and saved generator settings.`);
     },
     [language, settings],
   );
@@ -819,7 +840,7 @@ function App() {
       setHtmlText(layersToHtml(template.layers));
       setTemplateName(template.name);
       setAutoFitRevision((current) => current + 1);
-      setStatus(`Generated ${template.name} with ${template.layers.length} layers and saved generator settings.`);
+      setStatus(`Generated ${template.name} with ${template.layers.length} objects and saved generator settings.`);
     },
     [settings],
   );
@@ -1015,7 +1036,7 @@ function App() {
       setSelectedIds((selected) => selected.filter((id) => !removedLayerIds.has(id) && next.some((layer) => layer.id === id)));
       return next;
     });
-    setStatus(target ? `Deleted image asset "${target.name}" and related image layers.` : "Image asset deleted.");
+    setStatus(target ? `Deleted image asset "${target.name}" and related image objects.` : "Image asset deleted.");
   }, [assets]);
 
   const updateAssetTags = useCallback((key: string, tags: string[]) => {
@@ -1122,18 +1143,18 @@ function App() {
       .filter((layer): layer is ThumbnailLayer => Boolean(layer))
       .map((layer) => structuredClone(layer));
     clipboardLayers.current = copies;
-    setStatus(copies.length > 0 ? `Copied ${copies.length} layer${copies.length === 1 ? "" : "s"}.` : "No editable layer selected to copy.");
+    setStatus(copies.length > 0 ? `Copied ${copies.length} object${copies.length === 1 ? "" : "s"}.` : "No editable object selected to copy.");
   }, [layers, selectedIds]);
 
   const pasteSelectedLayers = useCallback(() => {
     if (clipboardLayers.current.length === 0) {
-      setStatus("Clipboard has no copied layers.");
+      setStatus("Clipboard has no copied objects.");
       return;
     }
     const pasted = clipboardLayers.current.map((layer) => cloneLayer({ ...layer, x: layer.x + 28, y: layer.y + 28 }));
     setLayers((current) => [...current, ...pasted]);
     setSelectedIds(pasted.map((layer) => layer.id));
-    setStatus(`Pasted ${pasted.length} layer${pasted.length === 1 ? "" : "s"}.`);
+    setStatus(`Pasted ${pasted.length} object${pasted.length === 1 ? "" : "s"}.`);
   }, []);
 
   const duplicateSelectedLayers = useCallback(() => {
@@ -1142,12 +1163,12 @@ function App() {
       .filter((layer): layer is ThumbnailLayer => Boolean(layer))
       .map((layer) => cloneLayer({ ...layer, x: layer.x + 24, y: layer.y + 24 }));
     if (selectedCopies.length === 0) {
-      setStatus("No editable layer selected to duplicate.");
+      setStatus("No editable object selected to duplicate.");
       return;
     }
     setLayers((current) => [...current, ...selectedCopies]);
     setSelectedIds(selectedCopies.map((layer) => layer.id));
-    setStatus(`Duplicated ${selectedCopies.length} selected layer${selectedCopies.length === 1 ? "" : "s"}.`);
+    setStatus(`Duplicated ${selectedCopies.length} selected object${selectedCopies.length === 1 ? "" : "s"}.`);
   }, [layers, selectedIds]);
 
   const cutSelectedLayers = useCallback(() => {
@@ -1155,11 +1176,11 @@ function App() {
       .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
       .filter((layer): layer is ThumbnailLayer => Boolean(layer));
     if (targets.length === 0) {
-      setStatus("No editable layer selected to cut.");
+      setStatus("No editable object selected to cut.");
       return;
     }
     if (layers.length - targets.length < 1) {
-      setStatus("At least one layer is required.");
+      setStatus("At least one object is required.");
       return;
     }
     const targetIds = new Set(targets.map((layer) => layer.id));
@@ -1169,7 +1190,7 @@ function App() {
       setSelectedIds([]);
       return next;
     });
-    setStatus(`Cut ${targets.length} layer${targets.length === 1 ? "" : "s"}.`);
+    setStatus(`Cut ${targets.length} object${targets.length === 1 ? "" : "s"}.`);
   }, [layers, selectedIds]);
 
   const undoLayers = useCallback(() => {
@@ -1207,7 +1228,7 @@ function App() {
       const next = [...current];
       const [layer] = next.splice(index, 1);
       next.splice(nextIndex, 0, layer);
-      setStatus(direction > 0 ? "Layer moved up." : "Layer moved down.");
+      setStatus(direction > 0 ? "Object moved up." : "Object moved down.");
       return next;
     });
   }, []);
@@ -1222,7 +1243,7 @@ function App() {
       const [dragged] = displayOrder.splice(draggedIndex, 1);
       displayOrder.splice(targetIndex, 0, dragged);
       setSelectedIds([draggedId]);
-      setStatus("Layer order updated by drag and drop.");
+      setStatus("Object order updated by drag and drop.");
       return displayOrder.reverse();
     });
   }, []);
@@ -1242,9 +1263,9 @@ function App() {
     (mode: AlignmentMode) => {
       setLayers((current) => alignLayers(current, selectedIds, settings, mode));
       if (mode === "distribute-horizontal" || mode === "distribute-vertical") {
-        setStatus(selectedIds.length >= 3 ? `Distributed ${selectedIds.length} layers evenly.` : "Select at least three editable layers to distribute.");
+        setStatus(selectedIds.length >= 3 ? `Distributed ${selectedIds.length} objects evenly.` : "Select at least three editable objects to distribute.");
       } else {
-        setStatus(selectedIds.length > 1 ? `Aligned ${selectedIds.length} layers.` : "Aligned layer to canvas.");
+        setStatus(selectedIds.length > 1 ? `Aligned ${selectedIds.length} objects.` : "Aligned object to canvas.");
       }
     },
     [selectedIds, settings],
@@ -1255,9 +1276,9 @@ function App() {
       setLayers((current) => applyRelativeLayerTransform(current, selectedIds, transform));
       const selectedCount = selectedLayers.length;
       if (transform.deltaRotation) {
-        setStatus(`Rotated ${selectedCount} selected layers by ${transform.deltaRotation} degrees.`);
+        setStatus(`Rotated ${selectedCount} selected objects by ${transform.deltaRotation} degrees.`);
       } else {
-        setStatus(`Moved ${selectedCount} selected layers by ${transform.deltaX ?? 0}, ${transform.deltaY ?? 0}.`);
+        setStatus(`Moved ${selectedCount} selected objects by ${transform.deltaX ?? 0}, ${transform.deltaY ?? 0}.`);
       }
     },
     [selectedIds, selectedLayers.length],
@@ -1268,34 +1289,34 @@ function App() {
       .map((id) => layers.find((layer) => layer.id === id && layer.selectable))
       .find((layer): layer is ThumbnailLayer => Boolean(layer));
     if (!reference || selectedLayers.length < 2) {
-      setStatus("Select at least two editable layers to match angles.");
+      setStatus("Select at least two editable objects to match angles.");
       return;
     }
     setLayers((current) => matchSelectedLayerRotation(current, selectedIds));
-    setStatus(`Matched ${selectedLayers.length} selected layer angles to ${reference.name}.`);
+    setStatus(`Matched ${selectedLayers.length} selected object angles to ${reference.name}.`);
   }, [layers, selectedIds, selectedLayers.length]);
 
   const createLayerGroup = useCallback(
     (name: string) => {
       const groupTargets = selectedLayers.filter((layer) => layer.selectable);
       if (groupTargets.length < 2) {
-        setStatus("Select at least two editable layers to create a group.");
+        setStatus("Select at least two editable objects to create a group.");
         return;
       }
       const groupId = `group-${Date.now().toString(36)}`;
-      const groupName = name.trim() || "Layer group";
+      const groupName = name.trim() || "Object group";
       const targetIds = new Set(groupTargets.map((layer) => layer.id));
       setLayers((current) =>
         current.map((layer) => (targetIds.has(layer.id) ? { ...layer, groupId, groupName } : layer)),
       );
-      setStatus(`Grouped ${groupTargets.length} layers as "${groupName}".`);
+      setStatus(`Grouped ${groupTargets.length} objects as "${groupName}".`);
     },
     [selectedLayers],
   );
 
   const renameLayerGroup = useCallback(
     (groupId: string, name: string) => {
-      const groupName = name.trim() || "Layer group";
+      const groupName = name.trim() || "Object group";
       setLayers((current) => current.map((layer) => (layer.groupId === groupId ? { ...layer, groupName } : layer)));
       setStatus(`Renamed group to "${groupName}".`);
     },
@@ -1308,7 +1329,7 @@ function App() {
         layer.groupId === groupId ? { ...layer, groupId: undefined, groupName: undefined } : layer,
       ),
     );
-    setStatus("Layer group removed.");
+    setStatus("Object group removed.");
   }, []);
 
   const registerSelectedGroupObject = useCallback(
@@ -1316,13 +1337,13 @@ function App() {
       const selectedEditableLayers = selectedLayers.filter((layer) => layer.selectable);
       const selectedGroupIds = Array.from(new Set(selectedEditableLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
       if (selectedGroupIds.length !== 1) {
-        setStatus("Select one layer group before registering a group object.");
+        setStatus("Select one object group before registering a group object.");
         return;
       }
       const groupId = selectedGroupIds[0];
       const groupLayers = layers.filter((layer) => layer.groupId === groupId && layer.selectable);
       if (groupLayers.length < 2) {
-        setStatus("Select a group with at least two editable layers before registering.");
+        setStatus("Select a group with at least two editable objects before registering.");
         return;
       }
       const imageKeys = new Set(groupLayers.filter((layer) => layer.type === "image").map((layer) => layer.imageKey));
@@ -1362,7 +1383,7 @@ function App() {
       selectedLayers.filter((layer) => layer.type === "image" || layer.type === "shape").map((layer) => layer.id),
     );
     if (targetIds.size === 0) {
-      setStatus("Select an image or shape layer to fit it to the canvas.");
+      setStatus("Select an image or shape object to fit it to the canvas.");
       return;
     }
     setLayers((current) =>
@@ -1370,7 +1391,7 @@ function App() {
         targetIds.has(layer.id) ? { ...layer, x: 0, y: 0, width: settings.width, height: settings.height } : layer,
       ),
     );
-    setStatus(`Fit ${targetIds.size} selected image/shape layer${targetIds.size === 1 ? "" : "s"} to the canvas.`);
+    setStatus(`Fit ${targetIds.size} selected image/shape object${targetIds.size === 1 ? "" : "s"} to the canvas.`);
   }, [selectedLayers, settings.height, settings.width]);
 
   const addPaletteColor = useCallback(() => {
@@ -1544,7 +1565,7 @@ function App() {
   const openImagePaletteExtractor = useCallback(async () => {
     const selectedImageLayer = selectedLayers.find((layer) => layer.type === "image");
     if (!selectedImageLayer) {
-      setStatus("Select an image layer before extracting a palette.");
+      setStatus("Select an image object before extracting a palette.");
       return;
     }
     const selectedAsset = assets.find((asset) => asset.key === selectedImageLayer.imageKey);
@@ -1687,7 +1708,7 @@ function App() {
       });
       setLayers((current) => [...current, layer]);
       setSelectedIds([layer.id]);
-      setStatus(`Created processed image layer "${asset.name}".`);
+      setStatus(`Added processed image object "${asset.name}".`);
     },
     [settings.height, settings.width],
   );
@@ -1764,7 +1785,7 @@ function App() {
         setActiveInteractionMode("move");
         setHoverInteractionMode("move");
         setCanvasCursor("grabbing");
-        setStatus(moveTargets.length > 1 ? `Dragging ${moveTargets.length} layers.` : `Selected ${picked.name}. Dragging to move.`);
+        setStatus(moveTargets.length > 1 ? `Dragging ${moveTargets.length} objects.` : `Selected ${picked.name}. Dragging to move.`);
       } else {
         event.preventDefault();
         setSelectedIds([]);
@@ -2192,6 +2213,7 @@ function App() {
         onImportEditState={importEditState}
         onDeleteEditState={deleteEditState}
         onOpenTagSettings={() => setIsTagSettingsOpen(true)}
+        onOpenManual={() => setIsManualOpen(true)}
         t={t}
       />
       <main className={`workspace ${isPreviewPlaying ? "preview-playback-locked" : ""}`} aria-label="Thumbnail editor workspace">
@@ -2267,10 +2289,12 @@ function App() {
           isPlaybackPlaying={isPreviewPlaying}
           playbackTimeMs={previewPlaybackTimeMs}
           onTogglePlayback={() => setIsPreviewPlaying((current) => !current)}
+          onResetPlayback={() => setPreviewPlaybackTimeMs(0)}
           onZoomChange={setZoom}
           onPointerDown={handleCanvasPointerDown}
           onPointerMove={handleCanvasPointerMove}
           onPointerUp={handleCanvasPointerUp}
+          onRangeSelect={selectLayersByRange}
           onExport={handleExport}
           onSettingsChange={updateSettings}
           onPresetChange={handlePresetChange}
@@ -2518,6 +2542,13 @@ function App() {
             </div>
           </section>
         </div>
+      ) : null}
+      {isManualOpen ? (
+        <ManualDialog
+          state={manualDialogState}
+          onStateChange={setManualDialogState}
+          onClose={() => setIsManualOpen(false)}
+        />
       ) : null}
       <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} warnings={qualityWarnings} t={t} />
     </div>

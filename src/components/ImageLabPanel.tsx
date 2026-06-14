@@ -273,7 +273,7 @@ export function ImageLabPanel({ assets, initialAssetKey, onCreateProcessedAsset,
             onClick={applyProcessing}
             disabled={!selectedAsset || isProcessing || (mode === "polygon" && polygonPoints.length < 3)}
           >
-            <Scissors size={16} /> {isProcessing ? t("imageLab.processing") : t("imageLab.createLayer")}
+            <Scissors size={16} /> {isProcessing ? t("imageLab.processing") : t("imageLab.createLayer", { name: selectedAsset?.name ?? "" })}
           </button>
           <button type="button" className="icon-button modal-close" aria-label={t("imageLab.close")} onClick={onClose}>
             <X size={18} />

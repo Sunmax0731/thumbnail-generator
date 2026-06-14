@@ -77,7 +77,7 @@ export function LayerPanel({
   const selectedGroupIds = Array.from(new Set(selectedLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
   const activeGroupId = selectedGroupIds.length === 1 ? selectedGroupIds[0] : undefined;
   const activeGroupName = activeGroupId
-    ? selectedLayers.find((layer) => layer.groupId === activeGroupId)?.groupName ?? "Layer group"
+    ? selectedLayers.find((layer) => layer.groupId === activeGroupId)?.groupName ?? "Object group"
     : "";
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
@@ -141,7 +141,7 @@ export function LayerPanel({
           onClick={() => setIsLayerListExpanded((current) => !current)}
         >
           {isLayerListExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-          <span>{t("inspector.layers")}</span>
+          <span>{t("inspector.canvas")}</span>
           <span className="section-count">{layers.length}</span>
         </button>
         {isLayerListExpanded ? (
@@ -424,11 +424,11 @@ function LayerGroupControls({
   onRegisterGroupObject: (tags: string[]) => void;
   t: Translator;
 }) {
-  const [draft, setDraft] = useState(activeGroupName || "Layer group");
+  const [draft, setDraft] = useState(activeGroupName || "Object group");
   const [tagDraft, setTagDraft] = useState("");
 
   useEffect(() => {
-    setDraft(activeGroupName || "Layer group");
+    setDraft(activeGroupName || "Object group");
   }, [activeGroupName]);
 
   return (

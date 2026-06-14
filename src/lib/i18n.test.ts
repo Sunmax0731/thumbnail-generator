@@ -14,6 +14,6 @@ describe("i18n", () => {
 
   it("translates keys with simple interpolation", () => {
     const t = createTranslator("ja");
-    expect(t("selection.multiple", { count: 3 })).toBe("3 件選択中");
+    expect(t("selection.multiple", { count: 3 })).toBe("3 件のオブジェクトを選択中");
   });
 });

@@ -7,6 +7,13 @@ export interface LayerInteractionPick {
   mode: CanvasInteractionMode;
 }
 
+export interface SelectionRect {
+  left: number;
+  top: number;
+  right: number;
+  bottom: number;
+}
+
 export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): ThumbnailLayer | undefined {
   for (const layer of [...layers].reverse()) {
     if (!layer.visible || !layer.selectable) continue;
@@ -30,6 +37,11 @@ export function pickLayerAt(layers: ThumbnailLayer[], x: number, y: number): Thu
   return undefined;
 }
 
+export function pickLayersInRect(layers: ThumbnailLayer[], rect: SelectionRect): ThumbnailLayer[] {
+  const normalized = normalizeRect(rect);
+  return layers.filter((layer) => layer.visible && layer.selectable && rectsIntersect(getLayerWorldBounds(layer), normalized));
+}
+
 export function pickLayerInteractionAt(
   layers: ThumbnailLayer[],
   point: CanvasPoint,
@@ -50,4 +62,39 @@ export function pickLayerInteractionAt(
   }
 
   return undefined;
+}
+
+function normalizeRect(rect: SelectionRect): SelectionRect {
+  return {
+    left: Math.min(rect.left, rect.right),
+    top: Math.min(rect.top, rect.bottom),
+    right: Math.max(rect.left, rect.right),
+    bottom: Math.max(rect.top, rect.bottom),
+  };
+}
+
+function getLayerWorldBounds(layer: ThumbnailLayer): SelectionRect {
+  const bounds = getLayerSelectionLocalBounds(layer);
+  const centerX = layer.x + layer.width / 2;
+  const centerY = layer.y + layer.height / 2;
+  const radians = (layer.rotation * Math.PI) / 180;
+  const corners = [
+    { x: bounds.left, y: bounds.top },
+    { x: bounds.right, y: bounds.top },
+    { x: bounds.right, y: bounds.bottom },
+    { x: bounds.left, y: bounds.bottom },
+  ].map((point) => ({
+    x: centerX + point.x * Math.cos(radians) - point.y * Math.sin(radians),
+    y: centerY + point.x * Math.sin(radians) + point.y * Math.cos(radians),
+  }));
+  return {
+    left: Math.min(...corners.map((point) => point.x)),
+    top: Math.min(...corners.map((point) => point.y)),
+    right: Math.max(...corners.map((point) => point.x)),
+    bottom: Math.max(...corners.map((point) => point.y)),
+  };
+}
+
+function rectsIntersect(left: SelectionRect, right: SelectionRect): boolean {
+  return left.left <= right.right && left.right >= right.left && left.top <= right.bottom && left.bottom >= right.top;
 }

@@ -1,4 +1,4 @@
-import { Download, ExternalLink, FolderOpen, Moon, Save, SquareStack, Tags, Trash2, Upload } from "lucide-react";
+import { BookOpen, Download, ExternalLink, FolderOpen, Moon, Save, SquareStack, Tags, Trash2, Upload } from "lucide-react";
 import { languageOptions, type Language, type Translator } from "../lib/i18n";
 import type { ThemeMode } from "../lib/theme";
 
@@ -16,6 +16,7 @@ interface TopToolbarProps {
   onImportEditState: (file: File | null) => void;
   onDeleteEditState: () => void;
   onOpenTagSettings: () => void;
+  onOpenManual: () => void;
   t: Translator;
 }
 
@@ -33,6 +34,7 @@ export function TopToolbar({
   onImportEditState,
   onDeleteEditState,
   onOpenTagSettings,
+  onOpenManual,
   t,
 }: TopToolbarProps) {
   const savedStateLabel = savedEditStateUpdatedAt
@@ -46,9 +48,14 @@ export function TopToolbar({
         </div>
         <div>
           <h1>{t("app.title")}</h1>
-          <a className="brand-issue-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
-            <ExternalLink size={12} /> {t("app.reportIssue")}
-          </a>
+          <div className="brand-links">
+            <a className="brand-issue-link" href="https://github.com/Sunmax0731/thumbnail-generator/issues" target="_blank" rel="noreferrer">
+              <ExternalLink size={12} /> {t("app.reportIssue")}
+            </a>
+            <button type="button" className="brand-manual-button" onClick={onOpenManual}>
+              <BookOpen size={12} /> {t("manual.open")}
+            </button>
+          </div>
         </div>
       </div>
 

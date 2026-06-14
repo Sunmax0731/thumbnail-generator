@@ -232,7 +232,7 @@ export function InspectorPanel({
   const selectedGroupIds = Array.from(new Set(selectedLayers.map((layer) => layer.groupId).filter(Boolean))) as string[];
   const activeGroupId = selectedGroupIds.length === 1 ? selectedGroupIds[0] : undefined;
   const activeGroupName = activeGroupId
-    ? selectedLayers.find((layer) => layer.groupId === activeGroupId)?.groupName ?? "Layer group"
+    ? selectedLayers.find((layer) => layer.groupId === activeGroupId)?.groupName ?? "Object group"
     : "";
   const canvasFitEligibleCount = selectedLayers.filter((layer) => layer.type === "image" || layer.type === "shape").length;
 
@@ -384,7 +384,7 @@ export function InspectorPanel({
               onClick={() => setIsLayerListExpanded((current) => !current)}
             >
               {isLayerListExpanded ? <ChevronDown size={16} /> : <ChevronRight size={16} />}
-              <span>{t("inspector.layers")}</span>
+              <span>{t("inspector.canvas")}</span>
               <span className="section-count">{layers.length}</span>
             </button>
             {isLayerListExpanded ? (
@@ -1051,10 +1051,10 @@ function LayerGroupControls({
   onUngroup: (groupId: string) => void;
   t: Translator;
 }) {
-  const [draft, setDraft] = useState(activeGroupName || "Layer group");
+  const [draft, setDraft] = useState(activeGroupName || "Object group");
 
   useEffect(() => {
-    setDraft(activeGroupName || "Layer group");
+    setDraft(activeGroupName || "Object group");
   }, [activeGroupName]);
 
   return (

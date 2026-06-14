@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { makeShapeLayer, makeTextLayer } from "./layerFactory";
-import { pickLayerAt, pickLayerInteractionAt } from "./hitTest";
+import { pickLayerAt, pickLayerInteractionAt, pickLayersInRect } from "./hitTest";
 
 describe("hit testing", () => {
   it("picks the topmost visible selectable layer in overlapping bounds", () => {
@@ -48,5 +48,21 @@ describe("hit testing", () => {
     expect(pickLayerAt([vertical], 120, 160)?.id).toBe("vertical");
     expect(pickLayerAt([vertical], 300, 160)?.id).toBe("vertical");
     expect(pickLayerAt([vertical], 90, 160)).toBeUndefined();
+  });
+
+  it("picks visible selectable layers intersecting a dragged selection rectangle", () => {
+    const inside = makeShapeLayer({ id: "inside", x: 20, y: 20, width: 80, height: 60 });
+    const crossing = makeShapeLayer({ id: "crossing", x: 140, y: 40, width: 80, height: 80 });
+    const outside = makeShapeLayer({ id: "outside", x: 320, y: 40, width: 80, height: 80 });
+    const locked = makeShapeLayer({ id: "locked", x: 60, y: 80, width: 80, height: 80, selectable: false });
+
+    expect(
+      pickLayersInRect([inside, crossing, outside, locked], {
+        left: 10,
+        top: 10,
+        right: 180,
+        bottom: 110,
+      }).map((layer) => layer.id),
+    ).toEqual(["inside", "crossing"]);
   });
 });

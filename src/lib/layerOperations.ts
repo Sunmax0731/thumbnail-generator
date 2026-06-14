@@ -36,6 +36,27 @@ export function selectLayerIdsForLayer(
   return [...validSelectedIds, ...targetIds.filter((id) => !selected.has(id))];
 }
 
+export function expandLayerIdsForSelection(layers: ThumbnailLayer[], layerIds: string[]): string[] {
+  return layerIds.reduce((selectedIds, layerId) => selectLayerIdsForLayer(layers, selectedIds, layerId, true), [] as string[]);
+}
+
+export function mergeLayerIdsForRangeSelection(
+  layers: ThumbnailLayer[],
+  currentSelectedIds: string[],
+  rangeLayerIds: string[],
+  mode: "replace" | "add" | "subtract",
+): string[] {
+  const validCurrent = currentSelectedIds.filter((id) => layers.some((layer) => layer.id === id && layer.selectable));
+  const rangeIds = expandLayerIdsForSelection(layers, rangeLayerIds);
+  if (mode === "replace") return rangeIds;
+  if (mode === "subtract") {
+    const rangeSet = new Set(rangeIds);
+    return validCurrent.filter((id) => !rangeSet.has(id));
+  }
+  const selected = new Set(validCurrent);
+  return [...validCurrent, ...rangeIds.filter((id) => !selected.has(id))];
+}
+
 export function selectIndividualLayerId(layers: ThumbnailLayer[], layerId: string): string[] {
   return layers.some((layer) => layer.id === layerId && layer.selectable) ? [layerId] : [];
 }

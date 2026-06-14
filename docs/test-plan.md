@@ -7,9 +7,11 @@
 - Export presets resolve to expected width/height/format settings.
 - Canvas fit calculation shrinks tall or wide presets by visible width/height, preserves preferred fit only when both axes allow it, and rounds down so the fitted frame does not spill past the container.
 - Hit testing selects the frontmost overlapping layer while preserving selected resize handles.
+- Hit testing can find all visible selectable objects intersecting a canvas range-selection rectangle.
 - Hit testing supports intentional blank-click deselection.
 - Layer deletion selection helpers retain other selected layers but leave no fallback selection after deleting the only selected layer.
 - Layer selection helpers select all editable grouped members from one grouped layer and toggle whole groups additively.
+- Layer selection helpers merge range-selected ids in replace, add, and subtract modes while preserving group-selection expansion.
 - Relative layer transforms apply common movement and rotation deltas to selected editable layers.
 - Multi-selection angle matching copies the first selected editable layer rotation to the other selected editable layers.
 - Multi-selection distribution spaces three or more selected layers evenly by horizontal or vertical centers.
@@ -51,7 +53,7 @@
 The WebApp runtime gate is passed only when Chrome or a headless browser confirms:
 
 - Nonblank app render.
-- Header, left import panel, canvas, layer list, inspector, Output menu, and edit-state icons are visible; the timeline appears only while アニメ is active.
+- Header, left import panel, canvas, Canvas object list, inspector, Output menu, Manual button, and edit-state icons are visible; the timeline appears only while アニメ is active.
 - Page title, app header, manifest name, and installed-app labels use `サムネいる？`.
 - The PWA manifest and service worker are served from the GitHub Pages base path, and a supported browser registers the service worker without blocking normal rendering.
 - The Chrome extension bridge announces readiness, responds to `ping`, returns a current edit-state snapshot, and can re-apply a valid snapshot.
@@ -62,14 +64,14 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
 - The preview-pane Generated layout section remains hidden from the GUI while edit-state and template compatibility keep CSV/HTML text internally.
 - Right inspector task tabs expose Adjust, Colors, and アニメ without crowding the first viewport.
-- Layers exposes collapsible Quick Add above a collapsible layer list.
+- Layers exposes collapsible Quick Add above a collapsible Canvas object list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
 - The Templates tab exposes generator buttons for schedule, standard thumbnail, vertical thumbnail, and stream waiting screen, while the previous default-template list is not shown.
 - The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly or weekly schedule layers with localized badge text.
 - The image generator modals open from Templates, provide live previews, five placement patterns per generator, grouped common/title/subtitle/label text controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, vertical thumbnail, and stream waiting layer sets.
-- CSV import updates the canvas/layer list.
-- HTML import updates the canvas/layer list.
+- CSV import updates the canvas/object list.
+- HTML import updates the canvas/object list.
 - Preview selection respects layer stacking order when layers overlap.
 - Layer inspector edits position, size, rotation, color, stroke, font, and effects.
 - Canvas direct editing supports drag move, corner resize, and rotation handle drag.
@@ -77,7 +79,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Preset changes keep the current preview zoom until Fit canvas is selected.
 - Preview pan works through the Pan button, Space-drag, or Alt-drag without changing zoom.
 - Dragging a layer outside the document keeps the displayed zoom, effective canvas scale, and output frame stable.
-- Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text layer, and is reflected in export.
+- Custom font import accepts WOFF2/WOFF/TTF/OTF, loads through FontFace, appears in the dropdown, stores in localStorage, applies to a text object, and is reflected in export.
 - Multi-selection supports group selection, group movement, and alignment.
 - Grouped preview objects can be selected as a multi-selection, not only grouped rows in Layers.
 - Multi-selection supports live relative X/Y movement and relative rotation from the Adjust tab without Apply buttons.
@@ -103,7 +105,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Image Lab Polygon mode supports point dragging and point deletion.
 - Image Lab modal supports close button, backdrop click, and Escape-key dismissal.
 - Numeric value controls expose sliders with practical min/max bounds.
-- Image import accepts a local image and creates an image layer.
+- Image import accepts a local image and creates an image object.
 - Image import registers typed tag draft text when Register assets is pressed without first adding a tag chip.
 - Image and group-object tag filters operate independently.
 - Imported asset rows support selected image-layer insertion and opening the selected asset in Image Lab.
@@ -115,10 +117,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
 - アニメ tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
 - アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- アニメ tab hides text-only motion controls unless a text layer is selected, and disables effect intensity for choices that cannot use intensity.
-- The bottom timeline shows animated layers only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, and supports top-edge height resizing.
-- The bottom timeline Play/Pause control previews animation in the editor, defaults to paused/editable, shows a moving playhead bar, and locks layer, inspector, timeline, and preview editing while playing.
-- Middle-button pointer actions on the preview do not select, move, resize, rotate, or pan preview objects.
+- アニメ tab hides text-only motion controls unless a text object is selected, and disables effect intensity for choices that cannot use intensity.
+- The bottom timeline shows animated objects only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, supports top-edge height resizing, and displays faint later-cycle hints for loop-enabled animations.
+- The bottom timeline Play/Pause control previews animation in the editor, defaults to paused/editable, shows a moving playhead bar, has a Reset button that returns playback to the beginning, and locks object list, inspector, timeline, and preview editing while playing.
+- Middle-button drag on the preview range-selects objects. Shift+middle drag adds objects in the range, and Ctrl+middle drag removes objects in the range from the current selection.
 - Objects outside the output frame remain visible in the editor preview with dimmed outside-frame portions, while export stays clipped to the output canvas.
 - Schedule generator landscape action buttons match the standard thumbnail generator modal action width; schedule portrait action width remains unchanged.
 - OBS preview opens from the Output menu in a popup-style separate window and renders a nonblank animated canvas without editor controls or selection handles.
@@ -127,24 +129,55 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Edit state controls are visible as top-right icons and support save, restore, autosave, JSON export/import, and deletion without returning to Templates.
 - Text line height, stroke colors, image asset switching, and palette application disable when they do not affect the current selection.
 - Adjust reset controls return selected-layer rotation to 0 degrees.
-- Layers supports choosing line styles through Adjust, grouping selected layers, renaming/ungrouping groups, and fitting selected image/shape layers to the canvas.
+- Layers supports choosing line styles through Adjust, grouping selected objects, renaming/ungrouping groups, and fitting selected image/shape objects to the canvas.
 - Adjust supports layer blur, edge blur, corner radius, text kerning, expanded shape kinds, and Fill/Stroke color buttons that open a draggable popup compact single-color picker with alpha.
 - Adjust supports shadow color/opacity/blur/distance/angle, pseudo-3D X/Y rotation, bevel size/opacity, and smooth wave line rendering.
 - Adjust supports signed inner/outer edge blur, optional text/shape stroke blur participation, and horizontal/vertical text writing mode.
 - Vertical text display bounds can be changed through Adjust width/height controls and direct preview resize handles without the text moving instead of resizing.
 - Colors supports selecting and updating saved swatches, palette opacity, palette maker preview, saved multi-color palette sets, and direct Fill/Stroke buttons on registered single colors.
 - Colors supports Adobe-style color wheel point selection without base-color changes, linked point dragging that regenerates the other scheme colors, palette-principle and palette-pattern dropdowns to the left of the wheel, explicit base-color controls, large palette bars, embedded `@uiw/react-color` Sketch-style HEX/RGB/alpha input, and recent-color reuse.
-- Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image layer.
+- Assets supports importing a YouTube thumbnail by URL or video id and then editing/exporting it as an image object.
 - Layers supports selecting one grouped row individually for single-layer adjustment without ungrouping.
 - Keyboard shortcuts support Delete confirmation, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y without intercepting text fields or modals.
 - Export path creates a data URL/download for the selected format.
 - Preview header exposes one Output menu with JPG, PNG, WebP, and OBS preview choices.
 - Desktop and mobile viewports have no incoherent overlap.
 - Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
+- The Manual button opens a fixed-size modal, supports left feature tabs and top section tabs, and preserves the last tab pair plus scroll position after close/reopen.
 
 ## Current Results
 
 Latest completed on 2026-06-14.
+
+### Manual Modal, Range Selection, Timeline Reset, Loop Echo, And Terminology
+
+Completed on 2026-06-14 for middle-button preview range selection, object/canvas terminology cleanup, timeline loop-cycle hinting, timeline Reset, Image Lab processed-image wording, and the feature manual modal.
+
+- Scope: added middle-button drag range selection with replace/add/subtract modes, kept grouped-object selection expansion, added loop echo segments behind timeline bars, added editor-preview Reset, changed the Layers tab object-list section label to Canvas, updated Image Lab processed-image add copy with the selected asset name, added the top-left Manual button, and implemented a fixed-size manual modal with left feature tabs, top section tabs, related links, and preserved tab/scroll state.
+- `npm test`: pass. 34 test files, 136 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4364/thumbnail-generator/?runtime=manual-range-timeline-20260614-final3`.
+- Browser plugin attempt: failed because the bundled Browser skill script `scripts/browser-client.mjs` was missing; Playwright with local Chrome channel was used with service workers blocked for a clean current-source render.
+- Desktop viewport: `1440x1000`.
+- Mobile viewport: `390x900`.
+- Checks:
+  - Initial app workspace and canvas rendered nonblank.
+  - Manual modal opened from the header button, showed the Canvas object manual section, and preserved category, section, and scroll position after close/reopen (`180px` before and after).
+  - Middle-button range selection selected seven objects, Ctrl+middle drag subtracted them to zero, and Shift+middle drag added the seven objects back.
+  - Timeline loop echo segments rendered for loop-enabled animations (`7` echo elements in the gate).
+  - Timeline Reset changed the playhead label from `0.7s` back to `0.0s`.
+  - WebP export succeeded.
+  - Mobile viewport rendered nonblank with horizontal overflow `0`.
+  - Console health: no page/app runtime errors were reported. The only warning was Playwright service-worker blocking.
+- Evidence:
+  - `output/runtime-20260614-manual-range-timeline/runtime-result.json`
+  - `output/runtime-20260614-manual-range-timeline/01-loaded.png`
+  - `output/runtime-20260614-manual-range-timeline/02-manual-canvas.png`
+  - `output/runtime-20260614-manual-range-timeline/03-range-selection.png`
+  - `output/runtime-20260614-manual-range-timeline/04-timeline-loop-reset.png`
+  - `output/runtime-20260614-manual-range-timeline/05-mobile.png`
+  - `output/runtime-20260614-manual-range-timeline/thumbnail-1280x720-2026-06-14T00-04-22-832Z.webp`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
 
 ### Preview Playback, Middle Button Lockout, Schedule Button Width, And Off-Canvas Display
 

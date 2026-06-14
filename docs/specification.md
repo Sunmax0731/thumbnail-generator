@@ -41,9 +41,9 @@ Layer animation is optional metadata on existing image, text, and shape layers. 
 
 Rendering applies each animation entry in order as a temporary draw-time transform. Text-only and effect motion can run even when the common `type` is `none`. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
-The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically from its top edge, and supports direct segment start/end and whole-segment dragging.
+The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into a Motion dropdown and non-moving animation/effect choices into an Effect dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected effect choice supports intensity, such as Glow, Blur, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically from its top edge, supports direct segment start/end and whole-segment dragging, and exposes a Reset button that returns editor-preview playback to the beginning.
 
-Editor-preview playback is controlled from the bottom timeline Play/Pause button and starts in the paused/editable state. When playback is running, selected layers are cleared and layer rows, right-inspector controls, timeline timing edits, output-size controls, pan/zoom edit controls, and direct preview canvas interactions are inert until playback is paused. The timeline ruler and each animated row show a playhead bar for the current playback position.
+Editor-preview playback is controlled from the bottom timeline Play/Pause button and starts in the paused/editable state. When playback is running, selected objects are cleared and canvas object rows, right-inspector controls, timeline timing edits, output-size controls, pan/zoom edit controls, and direct preview canvas interactions are inert until playback is paused. The timeline ruler and each animated row show a playhead bar for the current playback position. Loop-enabled animation entries keep their editable start/end handles at the first cycle, while the timeline additionally draws faint repeated segments for later cycles to make ongoing loop playback visible without changing stored timing values.
 
 ## PWA Shell
 
@@ -206,7 +206,7 @@ The selected layer can be edited directly on the canvas:
 - The rotation handle is drawn as a distinct circular control with a rotate glyph. Hover and drag states use stronger contrast, and the cursor changes to a grab/grabbing affordance.
 - Dragging an object outside the document does not change the user-selected zoom scale or expand the output frame.
 - Visible objects outside the output frame are still rendered in the editor preview, but only outside-frame portions are dimmed. Static export remains clipped to the configured output canvas.
-- Middle-button pointer actions on the preview are ignored; they do not select, move, resize, rotate, or pan preview objects.
+- Middle-button drag on the preview starts a range selection rectangle. Without modifiers, the range replaces the current selection. Shift+middle drag adds all visible selectable objects intersecting the range, and Ctrl/Meta+middle drag removes intersecting objects from the current selection. Range selection uses the same group-expansion rule as additive click selection, so selecting any grouped member selects the editable group members.
 - Vertical text selection, hit testing, resize handles, and Adjust width/height edits use the configured layer display bounds so preview resizing behaves like horizontal text. Edit padding still accounts for the rendered vertical columns after text, font size, line height, letter spacing, alignment, or line-break changes.
 
 ## Keyboard Shortcuts
@@ -243,8 +243,8 @@ Layer rows also include:
 
 The Layers tab also includes:
 
-- Group selected layers, rename the selected group, and ungroup it.
-- Alignment and distribution controls. Fit selected image/shape layers to the canvas is exposed from Adjust near position and size editing.
+- Group selected objects, rename the selected group, and ungroup it.
+- Alignment and distribution controls. Fit selected image/shape objects to the canvas is exposed from Adjust near position and size editing.
 - Deleting the final remaining layer is allowed; the editor may intentionally show a zero-layer canvas.
 
 ## Editor Information Architecture
@@ -252,8 +252,8 @@ The Layers tab also includes:
 The left sidebar is grouped by task in this order:
 
 - Templates: generator entry buttons plus browser-local template naming, optional tag entry, tag-filter dropdown, saving, loading, deletion, and independent list resizing. Existing template tags appear as input suggestions and as filter options; free-form tag input is allowed. Applying a browser-local template asks for confirmation, then replaces the current layer state and applies the template output aspect ratio.
-- Layers: collapsible quick add, collapsible layer ordering, visibility, selectable/editable lock, alignment, and even distribution.
-- Assets: local image import, imported asset list, selected asset image-layer insertion, Image Lab launch from imported asset rows, asset deletion, group-object reuse, group-object tag editing, and group-object deletion. Deleting an image asset also removes image layers that reference it.
+- Layers: collapsible quick add, collapsible Canvas object ordering, visibility, selectable/editable lock, alignment, and even distribution.
+- Assets: local image import, imported asset list, selected asset image-object insertion, Image Lab launch from imported asset rows, asset deletion, group-object reuse, group-object tag editing, and group-object deletion. Deleting an image asset also removes image objects that reference it.
 - The previous left-panel Layouts tab and preview-pane Generated layout section are hidden from the GUI. CSV/HTML text remains part of edit-state and template compatibility.
 - The previous guided creation strip is removed from the left panel.
 
@@ -261,9 +261,9 @@ The right inspector is grouped by task:
 
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, shadow, pseudo-3D rotation, signed bevel, text, shape, Fill/Stroke color, and image effects. Common controls are labeled Common settings and can be collapsed or expanded; Text, Shape, and Image-only controls use the same collapsible section behavior below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
-- アニメ: ordered motion sets for the selected layer, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text layers, a movement Motion dropdown, a non-moving/effect dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- アニメ: ordered motion sets for the selected object, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text objects, a movement Motion dropdown, a non-moving/effect dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated layers and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, and includes a top-edge vertical resize handle while preserving the default expanded height.
+The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. A Manual button beside Issue reporting opens a fixed-size feature manual modal with left feature tabs, top section tabs, preserved tab state, and preserved scroll position. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated objects and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, includes a Reset button for playback position, draws faint repeated segments for loop-enabled later cycles, and includes a top-edge vertical resize handle while preserving the default expanded height.
 
 The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps. List rows keep minimum usable heights so dense image imports or group-object rows do not collapse their action controls.
 
@@ -275,16 +275,16 @@ The Adjust tab exposes reset buttons for selected-layer rotation and opacity. Re
 
 Layers includes collapsible quick-add controls for:
 
-- Basic text layer.
-- Basic shape layer.
-- Basic line layer.
-- Headline text layer.
-- Subtitle text layer.
+- Basic text object.
+- Basic shape object.
+- Basic line object.
+- Headline text object.
+- Subtitle text object.
 - Badge shape.
 - Divider bar shape.
-- Selected image asset as an image layer.
+- Selected image asset as an image object.
 
-Each quick add inserts an editable layer, selects it, and keeps the canvas state immediately exportable.
+Each quick add inserts an editable object, selects it, and keeps the canvas state immediately exportable.
 
 ## Generators
 
@@ -297,12 +297,12 @@ The beta schedule generator opens in a modal and accepts:
 - Date inputs: browser calendar-style month/date inputs, weekly start day, Sunday/Monday week start for monthly grids, weekday language, and date format (`day` or `month/day`).
 - Style inputs: title, the same font family choices exposed by Adjust, font weight, separate title/weekday/date/plan font-size sliders, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
 - Schedule density inputs: one uniform action count for every day, or individual counts for all seven days in weekly schedules.
-- Output behavior inputs: whether the generated layers should share group metadata.
-- Persistence inputs: Generate layers saves the generator settings before replacing layers, and Save settings stores the settings without generating.
+- Output behavior inputs: whether the generated objects should share group metadata.
+- Persistence inputs: Generate objects saves the generator settings before replacing objects, and Save settings stores the settings without generating.
 
-The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current layer list with editable text and shape layers, applies the selected output size, selects the top generated layer, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current Canvas object list with editable text and shape objects, applies the selected output size, selects the top generated object, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
 
-The image generators use the same modal tone, layout, color picker, font choices, live preview, Generate layers action, and Save settings action. Each image generator provides five placement patterns. Their Grid / text section groups controls into Common, Title, Subtitle, and Label sections covering shared font family/weight, letter spacing, common corner radius, text sizes, stroke widths, and alignment. Letter spacing accepts `0` through both slider and number input, and number-step increments from negative values move normally toward `0`. Title, Subtitle, and Label slider controls are paired in two columns on desktop to keep the modal height compact. Standard, schedule, and stream waiting landscape previews use wider preview columns; vertical thumbnail and schedule portrait previews preserve the generated portrait aspect ratio while using narrower preview columns to avoid excessive right whitespace. Generator action buttons sit under the preview and align to the preview/modal lower edge. The Tone selector changes generated visual treatment for standard, vertical, and stream waiting layouts. Animation controls are only shown for stream waiting screens because standard and vertical thumbnail exports are static.
+The image generators use the same modal tone, layout, color picker, font choices, live preview, Generate objects action, and Save settings action. Each image generator provides five placement patterns. Their Grid / text section groups controls into Common, Title, Subtitle, and Label sections covering shared font family/weight, letter spacing, common corner radius, text sizes, stroke widths, and alignment. Letter spacing accepts `0` through both slider and number input, and number-step increments from negative values move normally toward `0`. Title, Subtitle, and Label slider controls are paired in two columns on desktop to keep the modal height compact. Standard, schedule, and stream waiting landscape previews use wider preview columns; vertical thumbnail and schedule portrait previews preserve the generated portrait aspect ratio while using narrower preview columns to avoid excessive right whitespace. Generator action buttons sit under the preview and align to the preview/modal lower edge. The Tone selector changes generated visual treatment for standard, vertical, and stream waiting layouts. Animation controls are only shown for stream waiting screens because standard and vertical thumbnail exports are static.
 
 - Standard thumbnail: creates a 1280x720 editable thumbnail layout for general video thumbnails.
 - Vertical thumbnail: creates a 1080x1920 editable portrait thumbnail layout for short-form videos.
@@ -468,7 +468,7 @@ The top-right edit-state icon cluster supports edit-state JSON export, JSON impo
 
 ## Image Lab
 
-The Image Lab modal workspace opens from an imported asset row in the Assets tab. Local image import is handled from the Assets tab, and the modal processes the selected image in the browser to create a processed image asset plus a new image layer. Supported operations:
+The Image Lab modal workspace opens from an imported asset row in the Assets tab. Local image import is handled from the Assets tab, and the modal processes the selected image in the browser to create a processed image asset plus a new image object. Supported operations:
 
 - Chroma-key transparency with key color and tolerance.
 - Rectangular cutout, with the crop rectangle set by dragging on the preview or by sliders.
@@ -481,7 +481,7 @@ The Image Lab modal workspace opens from an imported asset row in the Assets tab
 
 Processing outputs PNG data URLs and remains browser-only. The previous separate Drag mode was removed because Rect drag selection covers the same rectangular workflow without duplicating modes.
 
-The modal workspace provides a larger preview canvas than the sidebar, plus a header-level processed-layer creation button, close button, backdrop dismissal, and Escape-key dismissal. Source changes stay outside the modal so Image Lab does not duplicate import controls. Chroma-key settings sit beside the position and size controls, while the processed-layer creation action stays separated in the modal header. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
+The modal workspace provides a larger preview canvas than the sidebar, plus a header-level processed image add button that includes the selected source name, close button, backdrop dismissal, and Escape-key dismissal. Source changes stay outside the modal so Image Lab does not duplicate import controls. Chroma-key settings sit beside the position and size controls, while the processed image add action stays separated in the modal header. On narrow screens the workspace becomes a single-column modal to avoid horizontal overflow.
 
 ## Slider Controls
 

@@ -1,6 +1,12 @@
 import { describe, expect, it } from "vitest";
 import { makeShapeLayer } from "./layerFactory";
-import { selectIndividualLayerId, selectLayerIdsAfterDelete, selectLayerIdsForLayer, selectTopSelectableLayerIds } from "./layerOperations";
+import {
+  mergeLayerIdsForRangeSelection,
+  selectIndividualLayerId,
+  selectLayerIdsAfterDelete,
+  selectLayerIdsForLayer,
+  selectTopSelectableLayerIds,
+} from "./layerOperations";
 
 describe("layerOperations", () => {
   it("clears selection when the deleted layer was the only selection", () => {
@@ -46,6 +52,27 @@ describe("layerOperations", () => {
 
     expect(selectLayerIdsForLayer(layers, ["outside"], "group-a", true)).toEqual(["outside", "group-a", "group-b"]);
     expect(selectLayerIdsForLayer(layers, ["outside", "group-a", "group-b"], "group-b", true)).toEqual(["outside"]);
+  });
+
+  it("merges range selection with group expansion and subtraction", () => {
+    const layers = [
+      makeShapeLayer({ id: "outside" }),
+      makeShapeLayer({ id: "group-a", groupId: "g1", groupName: "Folder" }),
+      makeShapeLayer({ id: "group-b", groupId: "g1", groupName: "Folder" }),
+      makeShapeLayer({ id: "single" }),
+    ];
+
+    expect(mergeLayerIdsForRangeSelection(layers, ["outside"], ["group-a"], "replace")).toEqual(["group-a", "group-b"]);
+    expect(mergeLayerIdsForRangeSelection(layers, ["outside"], ["group-a", "single"], "add")).toEqual([
+      "outside",
+      "group-a",
+      "group-b",
+      "single",
+    ]);
+    expect(mergeLayerIdsForRangeSelection(layers, ["outside", "group-a", "group-b", "single"], ["group-b"], "subtract")).toEqual([
+      "outside",
+      "single",
+    ]);
   });
 
   it("can select one editable grouped layer without expanding to the whole group", () => {
