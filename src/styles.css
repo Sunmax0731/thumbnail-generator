@@ -2949,6 +2949,30 @@ button:disabled {
   line-height: 1.7;
 }
 
+.manual-maintenance-note {
+  display: grid;
+  gap: 5px;
+  margin: 0 0 16px;
+  padding: 12px 14px;
+  border: 1px solid rgba(16, 182, 215, 0.38);
+  border-left: 4px solid var(--accent);
+  border-radius: 8px;
+  background: color-mix(in srgb, var(--panel) 78%, rgba(16, 182, 215, 0.16));
+  color: var(--text);
+}
+
+.manual-maintenance-note strong {
+  font-size: 14px;
+  font-weight: 950;
+}
+
+.manual-maintenance-note span {
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 750;
+  line-height: 1.65;
+}
+
 .manual-entry-list {
   display: grid;
   gap: 14px;

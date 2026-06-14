@@ -52,6 +52,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled colored pixels `141596`), removed Manual captions absent, 6 feature capture buttons in the active section, click-to-enlarge image lightbox expansion from `395x56.0625` to `1200x166.8125`, 10 operation-specific shortcut/mouse SVG diagrams with no feature captures in the shortcut section, Contents jump target-top delta `1px`, layer-name edit to `Runtime manual lightbox toc layer`, WebP export `728640` bytes, mobile overflow `0px`, and no page/app console errors. Browser plugin automation was unavailable for `iab`; Playwright with the local Chrome channel was used. Evidence files are under `output/runtime-20260614-manual-lightbox-toc/`.
 
+## 2026-06-15 Manual Maintenance Note And Improvement Plan
+
+All QCDS axes remain A+.
+
+- Quality: A+. The Manual Overview now clearly tells users that the operation manual is under revision, and `docs/manual-improvement-plan.md` records the proposed target structure for a more usable manual.
+- Cost: A+. The change is limited to React/CSS/docs with no new package, backend, or external runtime asset.
+- Delivery: A+. `npm test` passed with 35 files and 141 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4405/thumbnail-generator/?runtime=manual-maintenance-20260615`.
+- Satisfaction: A+. Users are no longer left assuming the current Manual is final, and the next manual pass has a concrete direction: quick start, workflow guides, feature reference, shortcut/mouse reference, and troubleshooting.
+
+Runtime evidence confirms page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled colored pixels `141596`), Japanese Overview maintenance note containing `マニュアル整備中`, note placement before the Overview heading (`noteTop 181`, `headingTop 268`), layer-name edit to `Runtime manual maintenance note layer`, WebP export `728640` bytes, mobile overflow `0px`, note visibility on mobile, and no page/app console errors. Browser plugin automation was unavailable for `iab`; Playwright with the local Chrome channel was used. Evidence files are under `output/runtime-20260615-manual-maintenance-note/`.
+
 ## 2026-06-14 Manual Overview And Visual Guides
 
 All QCDS axes remain A+.

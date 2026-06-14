@@ -56,6 +56,8 @@ interface ManualCopy {
   language: Language;
   title: string;
   subtitle: string;
+  maintenanceTitle: string;
+  maintenanceBody: string;
   useCaseLabel: string;
   visualIntroLabel: string;
   captureAltLabel: string;
@@ -177,6 +179,12 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                 ref={contentRef}
                 onScroll={(event) => onStateChange({ ...state, scrollTop: event.currentTarget.scrollTop })}
               >
+                {activeCategory.id === "overview" ? (
+                  <div className="manual-maintenance-note" role="note">
+                    <strong>{copy.maintenanceTitle}</strong>
+                    <span>{copy.maintenanceBody}</span>
+                  </div>
+                ) : null}
                 <h3>{activeSection.title}</h3>
                 <p>{activeSection.summary}</p>
                 <div className="manual-entry-list">
@@ -1061,6 +1069,11 @@ function buildManualCopy(language: Language): ManualCopy {
     subtitle: tx(
       "",
       "",
+    ),
+    maintenanceTitle: tx("マニュアル整備中", "Manual under revision"),
+    maintenanceBody: tx(
+      "現在、操作マニュアルの構成・画像・手順説明を見直しています。内容は順次改善予定のため、最新の操作は実際の画面表示を優先して確認してください。",
+      "The operation manual is currently being reorganized. Structure, images, and step-by-step guidance will be refined over time; for now, use the current on-screen UI as the source of truth.",
     ),
     useCaseLabel: tx("ユースケース: ", "Use case: "),
     visualIntroLabel: tx("機能画面", "feature captures"),

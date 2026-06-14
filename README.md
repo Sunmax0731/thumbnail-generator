@@ -96,6 +96,7 @@ Useful reports include the browser name/version, viewport or device, what you im
 - [docs/design.md](docs/design.md): editor layout, visual tokens, and responsive behavior.
 - [docs/features.md](docs/features.md): user-facing feature overview.
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide.
+- [docs/manual-improvement-plan.md](docs/manual-improvement-plan.md): target structure for improving the in-app operation manual.
 - [docs/privacy-policy.md](docs/privacy-policy.md): privacy policy mirrored by the in-app modal and published static fallback page.
 - [docs/terms.md](docs/terms.md): terms of use mirrored by the in-app modal and published static fallback page.
 - [docs/screenshot-guide.md](docs/screenshot-guide.md): screenshot-based feature guide and use-case walkthroughs.

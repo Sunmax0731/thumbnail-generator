@@ -1556,3 +1556,28 @@ Completed on 2026-06-14 for the follow-up Manual image and navigation refinement
   - `output/runtime-20260614-manual-lightbox-toc/04-toc-jump.png`
   - `output/runtime-20260614-manual-lightbox-toc/05-mobile-manual.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
+
+## Manual Maintenance Note Runtime Gate (2026-06-15)
+
+Completed on 2026-06-15 for the temporary Manual maintenance notice and operation-manual improvement planning note.
+
+- Scope: added a localized maintenance note at the top of the Manual Overview content and added `docs/manual-improvement-plan.md` for the target manual structure.
+- `npm test`: pass. 35 test files, 141 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed with `Browser is not available: iab`; Playwright local Chrome was used.
+- Runtime gate URL: `http://127.0.0.1:4405/thumbnail-generator/?runtime=manual-maintenance-20260615`.
+- Runtime checks:
+  - Page title, primary UI visibility, and nonblank canvas render passed (`1516x956`, sampled colored pixels `141596`).
+  - Manual opened in Japanese from the footer with the Overview category selected.
+  - The maintenance note text included `マニュアル整備中`.
+  - The maintenance note rendered before the Overview heading (`noteTop 181`, `headingTop 268`).
+  - Layer editing changed the selected name to `Runtime manual maintenance note layer`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T15-28-04-382Z.webp` with `728640` bytes.
+  - Mobile manual viewport had horizontal overflow `0px` and kept the maintenance note visible.
+  - Console health: no page/app runtime errors; the only warning was Playwright service-worker blocking.
+- Evidence:
+  - `output/runtime-20260615-manual-maintenance-note/runtime-result.json`
+  - `output/runtime-20260615-manual-maintenance-note/01-initial.png`
+  - `output/runtime-20260615-manual-maintenance-note/02-manual-overview-note.png`
+  - `output/runtime-20260615-manual-maintenance-note/03-mobile-manual-note.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
