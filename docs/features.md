@@ -49,13 +49,13 @@ This page is the quick feature index for users and reviewers.
 - Reloading the app restores the saved edit state when one exists.
 - Browser storage is local to the current browser profile and can be removed by clearing site data.
 
-## Brand Kit And Quality Warnings
+## Brand Kit And Service Links
 
 - Keep browser-local brand kit data compatible with existing saved state.
 - Keep Brand kit setup and Colors-side Brand kit registration buttons hidden.
-- Show advisory warning chips for long text, low contrast, hidden important objects, safe-area edges, many objects, large image assets, large storage estimates, and 4K export.
-- Link to GitHub Issues from the app for bug reports and feature requests.
-- Open the fixed-size in-app manual from the Manual button beside Issue reporting, then use left category tabs, top section tabs, and the right-side contents. The manual preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
+- Keep rule-based quality checks covered by automated validation while the visible bottom footer focuses on service and legal links.
+- Link to GitHub Issues from the app for bug reports and feature requests, and use the bottom footer for privacy policy, terms, X / Twitter contact, and copyright.
+- Open the fixed-size in-app manual from the Manual button beside Issue reporting, then use left category tabs, top section tabs, and the right-side contents. The manual highlights the matching entry when a contents item is focused or hovered, preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
 
 ## Image And Text Tools
 
@@ -78,9 +78,9 @@ This page is the quick feature index for users and reviewers.
 - Use collapsible Adjust sections for Common settings and type-specific settings. Decoration controls include pseudo-3D X/Y rotation, signed bevel, and shadow parameters that appear only when shadow is enabled.
 - Controls that do not affect the current object state are disabled, such as single-line text line height.
 
-## アニメ And OBS Preview
+## Animation / アニメ And OBS Preview
 
-- Open アニメ to assign one or more motion sets to the selected object.
+- Open Animation in English mode or アニメ in Japanese mode to assign one or more motion sets to the selected object.
 - Apply motion presets for common entrance, ticker, neon, pop, type-on, and background-breathe behaviors.
 - Use the Motion dropdown for movement presets such as Slide, Drift, and Shake, and the Glow / effects dropdown for non-moving animation/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, and Shine.
 - Set animation start time, duration, easings.net-style easing, direction, distance, and loop behavior.
@@ -88,7 +88,7 @@ This page is the quick feature index for users and reviewers.
 - Adjust effect intensity for Glow pulse, Blur in, or Shine; the control is greyed out for choices that cannot use intensity.
 - Review the selected-object Motion preview and show or hide the easing graph before opening the OBS preview.
 - Direction is enabled only for Slide, Drift, and Shake. Distance is greyed out when the selected motion does not use direction or direction is None.
-- Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height. Loop-enabled animations also show faint repeated segments after the first loop while preserving the editable handle positions.
+- Open Animation/アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height. Loop-enabled animations also show faint repeated segments after the first loop while preserving the editable handle positions.
 - Use the bottom timeline Play/Pause and Reset buttons for editor-preview playback. Playback defaults to paused/editable; while playing, object rows, inspector controls, timeline edits, canvas edits, and preview selection are locked, and the timeline playhead shows the current playback position.
 - Open OBS preview from the Output menu to show the current animated canvas in a popup-style fullscreen-capable window without editor controls or selection handles.
 - Capture the OBS preview window in OBS with Window Capture for browser-only live display. The preview stretches the canvas to the viewport to avoid black document letterboxing, retries fullscreen on preview click or `F`/`Enter`, provides Play/Pause and Reset controls, uses `P` for Play/Pause, `R` for Reset, hides the control overlay from its Hide button, toggles it again with `H`, and browser/OBS settings still decide whether OS/browser chrome is capturable.

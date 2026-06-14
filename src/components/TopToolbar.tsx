@@ -87,29 +87,31 @@ export function TopToolbar({
             <span>{t("left.autoSaveEditState")}</span>
           </label>
         </div>
-        <button type="button" className="icon-button" title={t("tags.open")} onClick={onOpenTagSettings}>
-          <Tags size={16} />
-        </button>
-        <label className="field language-field">
-          <span>{t("language.label")}</span>
-          <select value={language} onChange={(event) => onLanguageChange(event.target.value as Language)}>
-            {languageOptions.map((option) => (
-              <option key={option.id} value={option.id}>
-                {t(option.labelKey)}
-              </option>
-            ))}
-          </select>
-        </label>
-        <label className="field theme-field">
-          <span>
-            <Moon size={14} /> {t("theme.label")}
-          </span>
-          <select value={themeMode} onChange={(event) => onThemeChange(event.target.value as ThemeMode)}>
-            <option value="system">{t("theme.system")}</option>
-            <option value="light">{t("theme.light")}</option>
-            <option value="dark">{t("theme.dark")}</option>
-          </select>
-        </label>
+        <div className="top-settings-actions" aria-label={t("toolbar.appSettings")}>
+          <button type="button" className="icon-button" title={t("tags.open")} onClick={onOpenTagSettings}>
+            <Tags size={16} />
+          </button>
+          <label className="field language-field">
+            <span>{t("language.label")}</span>
+            <select value={language} onChange={(event) => onLanguageChange(event.target.value as Language)}>
+              {languageOptions.map((option) => (
+                <option key={option.id} value={option.id}>
+                  {t(option.labelKey)}
+                </option>
+              ))}
+            </select>
+          </label>
+          <label className="field theme-field">
+            <span>
+              <Moon size={14} /> {t("theme.label")}
+            </span>
+            <select value={themeMode} onChange={(event) => onThemeChange(event.target.value as ThemeMode)}>
+              <option value="system">{t("theme.system")}</option>
+              <option value="light">{t("theme.light")}</option>
+              <option value="dark">{t("theme.dark")}</option>
+            </select>
+          </label>
+        </div>
       </div>
     </header>
   );

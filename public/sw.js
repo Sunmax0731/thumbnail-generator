@@ -5,6 +5,8 @@ const STATIC_FILES = [
   "./manifest.webmanifest",
   "./favicon.svg",
   "./pwa-icon.svg",
+  "./privacy-policy.html",
+  "./terms.html",
   "./analytics-config.js",
   "./analytics.js"
 ];
@@ -37,14 +39,21 @@ self.addEventListener("fetch", (event) => {
   if (requestUrl.origin !== scopeUrl.origin || !requestUrl.pathname.startsWith(scopeUrl.pathname)) return;
 
   if (request.mode === "navigate") {
+    const scopedPath = requestUrl.pathname.slice(scopeUrl.pathname.length);
+    const navigationCacheKey =
+      scopedPath === "privacy-policy.html"
+        ? "./privacy-policy.html"
+        : scopedPath === "terms.html"
+          ? "./terms.html"
+          : "./index.html";
     event.respondWith(
       fetch(request)
         .then((response) => {
           const copy = response.clone();
-          caches.open(CACHE_VERSION).then((cache) => cache.put("./index.html", copy));
+          caches.open(CACHE_VERSION).then((cache) => cache.put(navigationCacheKey, copy));
           return response;
         })
-        .catch(() => caches.match("./index.html").then((response) => response || caches.match("./")))
+        .catch(() => caches.match(navigationCacheKey).then((response) => response || caches.match("./index.html") || caches.match("./")))
     );
     return;
   }

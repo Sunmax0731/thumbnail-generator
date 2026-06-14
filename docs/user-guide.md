@@ -23,13 +23,13 @@ npm run preview
 - Assets: import files or a folder, assign and edit image tags, filter images and group objects separately by tag, review imported assets, add a selected asset as an image object, reuse group objects, edit group object tags, open Image Lab from an imported asset row, or delete imported assets and group objects.
 - Output: use the preview-header Output button to choose JPG, PNG, WebP, or OBS preview. Preview preset names follow the active language; Japanese mode shows labels such as YouTube 向け横長, フルHD, Twitch 向け横長, 正方形, 縦型ショート, and カスタム.
 - Edit state: use the top-right icon cluster to save/restore the current edit state, export/import JSON, and delete the saved work-in-progress slot. Autosave remains text-labeled beside those icons.
-- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while アニメ is open.
+- The preview header contains the output preset, width, height, Output, pan, and zoom controls. The preview bottom shows the motion timeline only while Animation in English mode / アニメ in Japanese mode is open.
 - Adjust: edit the selected object's collapsible Common settings and type-specific settings, including position, size, rotation, object blur, signed edge blur, stroke/outline blur participation, corner radius, shadow enable/parameters, pseudo-3D X/Y rotation, signed bevel, text, font, text writing mode, text kerning, text alignment, line style, Fill/Stroke color and alpha through a draggable popup single-color picker, shape, and image effects.
 - Colors: register and edit named single colors, explore colors with a drag-capable linked color wheel and generated palette bars below the wheel, choose the palette pattern from the dropdown beside the wheel, use `@uiw/react-color` Sketch-style HEX/RGB/alpha input, reuse recent colors, preview and save multi-color palette patterns, reorder saved palettes and registered colors by dragging rows, collapse saved palettes and registered colors, set opacity, apply registered single colors or saved-palette colors as Fill or Stroke to selected text or shape objects, and resize the color list area with the handle below the list.
-- アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated objects in the アニメ-only bottom timeline for OBS preview playback.
+- Animation / アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated objects in the Animation/アニメ-only bottom timeline for OBS preview playback.
 
 - Timeline Play/Pause previews animation directly in the editor. Reset returns the editor preview position to the beginning. Playback starts paused/editable; while playing, the object list, inspector, timeline timing edits, and preview canvas edits are locked, and the timeline playhead shows the current playback position. Loop-enabled rows show faint repeated timeline segments after the first cycle without moving the editable handles.
-- Manual: use the Manual button beside Issue reporting to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings. The modal follows the active Japanese/English GUI labels, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
+- Manual: use the Manual button beside Issue reporting to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings while highlighting the matching manual entry on focus or hover. The modal follows the active Japanese/English GUI labels, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
 
 ## Layout Compatibility
 
@@ -143,12 +143,12 @@ Select an object and open Adjust. Shadow controls set color, opacity, blur, dist
 
 Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use the Output menu in the preview header to download JPG, PNG, or WebP at maximum quality, or to open the OBS preview.
 
-The status bar can show quality warning chips while you work. Check these before export for long text, low contrast, hidden important objects, edge-safe-area risk, many objects, large image assets, 4K output, or large browser-storage estimates.
+The bottom footer provides service information: privacy policy, terms, X / Twitter contact, GitHub Issues, and the `© Sunmax Engineering` copyright notice.
 
-## アニメ And OBS Preview
+## Animation / アニメ And OBS Preview
 
 1. Select an object.
-2. Open アニメ.
+2. Open Animation in English mode or アニメ in Japanese mode.
 3. Choose a preset, or use the Motion dropdown for movement choices such as Slide, Drift, or Shake.
 4. Use the Glow / effects dropdown for non-moving/effect choices such as Fade, Pop, Pulse, Blink, Zoom, Spin, Sway, Breathe, Glow pulse, Blur in, or Shine.
 5. Adjust start time, duration, easings.net-style easing, direction, distance, and loop behavior. Direction is disabled for animation types that do not use movement.
@@ -156,7 +156,7 @@ The status bar can show quality warning chips while you work. Check these before
 7. Tune Effect intensity for Glow pulse, Blur in, or Shine. The intensity control is greyed out for choices that cannot use it.
 8. Add additional motion sets when one object needs multiple animation behaviors.
 9. Use the selected-object preview and the easing graph toggle while checking motion.
-10. Open アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height. Loop-enabled motions show faint repeated segments after the first cycle while keeping the editable handles in their original positions.
+10. Open Animation/アニメ to show the bottom timeline. Collapse it when you need more preview space, drag a segment's left or right handle to edit start/end, drag the segment body to move both together, and drag the timeline top-edge resize handle to change its height. Loop-enabled motions show faint repeated segments after the first cycle while keeping the editable handles in their original positions.
 11. Select OBS preview from the Output menu.
 
 The OBS preview opens a popup-style browser window that contains only the animated canvas plus a small operation overlay. It does not draw editor controls or selection handles, stretches the canvas to the preview viewport to avoid black document letterboxing, and requests fullscreen where the browser permits it. Use Play/Pause and Reset while checking motion, or press `P` for Play/Pause and `R` for Reset. Click Hide to remove the overlay for capture, and press `H` in the OBS preview window to show or hide it again. If browser chrome remains visible, click the preview window or press `F` or `Enter` to retry fullscreen before capturing it in OBS. Browser and OBS settings still decide whether OS/browser chrome is capturable. Static PNG/JPG/WebP export still renders the base object state, not an animation frame.
@@ -200,4 +200,4 @@ Use the Report issue link in the app header to open GitHub Issues:
 
 <https://github.com/Sunmax0731/thumbnail-generator/issues>
 
-The app is browser-only. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.
+Use the footer links for the privacy policy, terms, X / Twitter contact, and GitHub Issues. The app is browser-only. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.

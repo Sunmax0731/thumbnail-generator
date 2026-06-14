@@ -27,9 +27,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated objects; settings are saved when objects are generated and can also be saved without generating, then restored after reload.
 - Use the bottom timeline Play/Pause and Reset buttons to preview animations directly in the editor; while playing, object rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.
-- Add multiple object animation sets from the アニメ tab, choose presets, split movement motions from non-moving effects, show text-only controls only for text objects, toggle the easing graph, and edit animated object timing from the アニメ-only bottom timeline. Looping animation rows show faint repeated segments after the first cycle so later loops are visible without moving the original handles.
+- Add multiple object animation sets from the right-side Animation tab in English mode / アニメ tab in Japanese mode, choose presets, split movement motions from non-moving effects, show text-only controls only for text objects, toggle the easing graph, and edit animated object timing from the Animation/アニメ-only bottom timeline. Looping animation rows show faint repeated segments after the first cycle so later loops are visible without moving the original handles.
 - Keep browser-local brand color data compatible with saved states while Brand kit setup and Colors-side brand registration buttons stay hidden.
-- See rule-based quality warnings for long text, low contrast, hidden important objects, safe-area edges, large storage snapshots, heavy assets, many objects, and 4K export.
+- Keep browser-local storage and backup guidance visible through edit-state warnings and the privacy/terms footer links.
 - Export, import, or delete the browser-local edit state JSON for backup and recovery from the top-right edit-state icon cluster; autosave remains text-labeled there.
 - Register, edit, reorder, preview, delete, collapse, and apply named browser-local single colors with per-row Fill and Stroke buttons, including opacity, drag-capable Adobe-style linked color wheel handles, a palette-pattern dropdown beside the wheel, palette bars below the wheel, `@uiw/react-color` Sketch-style HEX/RGB/alpha input, recent colors, reorderable saved multi-color palette sets, and palette-level Fill/Stroke application buttons.
 - Open a draggable popup single-color picker from Adjust Fill and Stroke color displays, including alpha selection, instead of using separate fill/stroke opacity sliders.
@@ -40,6 +40,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Fit canvas also recenters the output canvas in the preview. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
 - Open the in-app manual from the top-left Manual button beside Issue reporting; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
+- Use the bottom service footer for the privacy policy, terms, contact link, GitHub Issues, and copyright notice.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
@@ -50,7 +51,7 @@ See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide
 
 Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data. Browsers that support PWA installation can install サムネいる？ from the address-bar install action or browser menu.
 
-Use the in-app GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data.
+Use the in-app GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data. The published app also links to its privacy policy, terms, and X / Twitter contact from the footer.
 
 ## Run Locally
 
@@ -94,6 +95,8 @@ Useful reports include the browser name/version, viewport or device, what you im
 - [docs/design.md](docs/design.md): editor layout, visual tokens, and responsive behavior.
 - [docs/features.md](docs/features.md): user-facing feature overview.
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide.
+- [docs/privacy-policy.md](docs/privacy-policy.md): privacy policy mirrored by the published static page.
+- [docs/terms.md](docs/terms.md): terms of use mirrored by the published static page.
 - [docs/screenshot-guide.md](docs/screenshot-guide.md): screenshot-based feature guide and use-case walkthroughs.
 - [docs/test-plan.md](docs/test-plan.md): automated and browser runtime validation plan and results.
 - [docs/qcds-evaluation.md](docs/qcds-evaluation.md): Quality, Cost, Delivery, and Satisfaction evaluation.

@@ -14,7 +14,7 @@
   ],
   "quality": {
     "rating": "A+",
-    "rationale": "Current app coverage includes the サムネいる？ title, アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, collapsible bottom motion timeline, motion presets, separated common/text-only/glow-effect motion controls, OBS preview Play/Pause/Reset/Hide controls, existing template/generator/layer/color/Image Lab workflows, CSV/HTML animation text/effect compatibility, automated tests, production build, and headless Chromium runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
+    "rationale": "Current app coverage includes the サムネいる？ title, active-language Animation/アニメ tab label, privacy/terms/contact service footer, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, collapsible bottom motion timeline, motion presets, separated common/text-only/glow-effect motion controls, OBS preview Play/Pause/Reset/Hide controls, existing template/generator/layer/color/Image Lab workflows, CSV/HTML animation text/effect compatibility, automated tests, production build, and headless Chromium runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -144,7 +144,7 @@
       "Dark theme DOM state and localStorage persistence",
       "left Templates Layers Assets tabs without the hidden Layouts tab",
       "left tab buttons do not wrap",
-      "right Adjust Colors アニメ tabs",
+      "right Adjust Colors Animation/アニメ tabs",
       "right inspector tabs use three equal-width columns",
       "top toolbar output controls hidden",
       "preview-header Preset Width Height controls",

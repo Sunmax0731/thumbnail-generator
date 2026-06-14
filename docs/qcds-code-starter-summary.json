@@ -59,7 +59,7 @@
       "label": "Satisfaction",
       "rating": "A+",
       "state": "pass",
-      "summary": "Primary editing/export workflows, サムネいる？ title, アニメ tab label, PWA install metadata, extension bridge commands, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, collapsible bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
+      "summary": "Primary editing/export workflows, サムネいる？ title, active-language Animation/アニメ tab label, privacy/terms/contact service footer, PWA install metadata, extension bridge commands, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, collapsible bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
       "evidence": [
         "docs/user-guide.md",
         "docs/features.md",

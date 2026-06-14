@@ -54,7 +54,7 @@
 The WebApp runtime gate is passed only when Chrome or a headless browser confirms:
 
 - Nonblank app render.
-- Header, left import panel, canvas, Canvas object list, inspector, Output menu, Manual button, and edit-state icons are visible; the timeline appears only while アニメ is active.
+- Header, left import panel, canvas, Canvas object list, inspector, Output menu, Manual button, edit-state icons, and service footer are visible; the timeline appears only while Animation in English mode / アニメ in Japanese mode is active.
 - Page title, app header, manifest name, and installed-app labels use `サムネいる？`.
 - The PWA manifest and service worker are served from the GitHub Pages base path, and a supported browser registers the service worker without blocking normal rendering.
 - The Chrome extension bridge announces readiness, responds to `ping`, returns a current edit-state snapshot, and can re-apply a valid snapshot.
@@ -64,7 +64,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Clicking the preview area outside the output frame clears selection when pan mode is not active.
 - Left sidebar task tabs expose Assets and Templates without showing the hidden Layouts tab.
 - The preview-pane Generated layout section remains hidden from the GUI while edit-state and template compatibility keep CSV/HTML text internally.
-- Right inspector task tabs expose Adjust, Colors, and アニメ without crowding the first viewport.
+- Right inspector task tabs expose Adjust, Colors, and Animation/アニメ without crowding the first viewport.
 - Layers exposes collapsible Quick Add above a collapsible Canvas object list.
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
@@ -116,10 +116,10 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Schedule filter shows exactly eight bundled templates and each schedule template renders nonblank.
 - Weekly schedule templates render Sunday-start day labels in both landscape and portrait orientations.
 - Motion filter shows exactly ten animated eyecatch/waiting templates and each motion template renders nonblank.
-- アニメ tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
-- アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
-- アニメ tab hides text-only motion controls unless a text object is selected, and disables effect intensity for choices that cannot use intensity.
-- The bottom timeline shows animated objects only while アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, supports top-edge height resizing, and displays faint later-cycle hints for loop-enabled animations.
+- Animation/アニメ tab can assign a selected-layer animation preset, preview the selected object, and show or hide the easing graph.
+- Animation/アニメ tab exposes movement and non-moving/effect dropdowns, 31 easing choices, direction `None`, and disables distance while direction `None` is selected.
+- Animation/アニメ tab hides text-only motion controls unless a text object is selected, and disables effect intensity for choices that cannot use intensity.
+- The bottom timeline shows animated objects only while Animation/アニメ is active, supports collapse/expand, supports start/end handles, supports segment bar drag, supports top-edge height resizing, and displays faint later-cycle hints for loop-enabled animations.
 - The bottom timeline Play/Pause control previews animation in the editor, defaults to paused/editable, shows a moving playhead bar, has a Reset button that returns playback to the beginning, and locks object list, inspector, timeline, and preview editing while playing.
 - Middle-button drag on the preview range-selects fully contained objects. Shift+middle drag adds objects in the range, Ctrl+middle drag removes objects in the range from the current selection, and partially contained objects or partially contained groups are excluded.
 - Objects outside the output frame remain visible in the editor preview with dimmed outside-frame portions, while export stays clipped to the output canvas.
@@ -143,12 +143,38 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Export path creates a data URL/download for the selected format.
 - Preview header exposes one Output menu with JPG, PNG, WebP, and OBS preview choices.
 - Desktop and mobile viewports have no incoherent overlap.
-- Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy notice, storage warning, edit-state JSON export/import/delete, and status warning chips are visible without blocking primary editing.
+- Template filters, hidden Brand kit setup in Templates, hidden Colors-side Brand kit registration buttons, GitHub Issues link, privacy policy link, terms link, X / Twitter contact, storage warning, and edit-state JSON export/import/delete are visible without blocking primary editing.
 - The Manual button opens a fixed-size modal, supports left feature tabs and top section tabs, and preserves the last tab pair plus scroll position after close/reopen.
+- Manual table-of-contents focus and hover highlight the matching manual content entry.
 
 ## Current Results
 
 Latest completed on 2026-06-14.
+
+### Toolbar Alignment, Animation Label, Manual Highlight, And Legal Footer
+
+Completed on 2026-06-14 for the top-right toolbar layout, English Animation label, Manual contents highlighting, privacy/terms pages, contact links, and standard service footer.
+
+- Scope: bottom-aligned the edit-state control group with the tag/language/theme control group, changed the English right-inspector tab label from `アニメ` to `Animation`, updated the Manual to use the active-language tab label, added table-of-contents focus/hover highlighting for the matching Manual entry, replaced the bottom status footer with service/legal links, added static privacy policy and terms pages, and added X / Twitter contact linking to `https://x.com/Sunmax0731`.
+- `npm test`: pass. 34 test files, 138 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4380/thumbnail-generator/?runtime=legal-footer-20260614`.
+- Desktop viewport: `1440x960`.
+- Runtime checks:
+  - Primary UI and canvas rendered nonblank (`1516x956`, sampled nonblank pixels `118377`).
+  - Top-right edit-state group, Language selector, and Theme selector shared the same bottom edge (`64.9375px`).
+  - English right-inspector tabs rendered `Adjust`, `Colors`, and `Animation`; stale English `Motion`/`Anime` tab labels were absent.
+  - English Manual side category rendered `Animation`, and focusing the first table-of-contents item highlighted the matching Manual entry `Motion / Glow / effects items`.
+  - Footer rendered `Privacy Policy`, `Terms`, `Contact: X / Twitter`, `GitHub Issues`, and `© Sunmax Engineering`.
+  - `privacy-policy.html` and `terms.html` returned HTTP 200 and rendered their expected headings.
+  - Layer editing was exercised by changing the selected group name from `Object group` to `Runtime legal footer layer`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T06-33-09-438Z.webp` with `714072` bytes.
+  - CSV/HTML compatibility note: visible CSV/HTML import controls are hidden in this build; parser/model import compatibility remains covered by `npm test`.
+  - Console health: no page errors or app console errors.
+- Evidence:
+  - `output/runtime-20260614-legal-footer/runtime-result.json`
+  - `output/runtime-20260614-legal-footer/desktop-initial.png`
+  - `output/runtime-20260614-legal-footer/desktop-final.png`
 
 ### Manual Dropdown Item Localization And OBS Detail
 

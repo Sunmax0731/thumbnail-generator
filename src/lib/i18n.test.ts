@@ -16,4 +16,9 @@ describe("i18n", () => {
     const t = createTranslator("ja");
     expect(t("selection.multiple", { count: 3 })).toBe("3 件のオブジェクトを選択中");
   });
+
+  it("uses language-specific animation tab labels", () => {
+    expect(createTranslator("en")("inspector.motion")).toBe("Animation");
+    expect(createTranslator("ja")("inspector.motion")).toBe("アニメ");
+  });
 });

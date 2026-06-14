@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { BookOpen, X } from "lucide-react";
 
 import { createTranslator, type Language, type TranslationKey } from "../lib/i18n";
@@ -69,6 +69,7 @@ export const defaultManualDialogState: ManualDialogState = {
 
 export function ManualDialog({ language, state, onStateChange, onClose }: ManualDialogProps) {
   const contentRef = useRef<HTMLElement | null>(null);
+  const [focusedEntryId, setFocusedEntryId] = useState<string | null>(null);
   const copy = useMemo(() => buildManualCopy(language), [language]);
   const activeCategory = copy.categories.find((category) => category.id === state.categoryId) ?? copy.categories[0];
   const activeSection = activeCategory.sections.find((section) => section.id === state.sectionId) ?? activeCategory.sections[0];
@@ -79,14 +80,17 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
 
   const selectCategory = (categoryId: ManualCategoryId) => {
     const category = copy.categories.find((candidate) => candidate.id === categoryId) ?? copy.categories[0];
+    setFocusedEntryId(null);
     onStateChange({ categoryId: category.id, sectionId: category.sections[0].id, scrollTop: 0 });
   };
 
   const selectSection = (sectionId: string) => {
+    setFocusedEntryId(null);
     onStateChange({ ...state, sectionId, scrollTop: 0 });
   };
 
   const selectRelated = (categoryId: ManualCategoryId, sectionId: string) => {
+    setFocusedEntryId(null);
     onStateChange({ categoryId, sectionId, scrollTop: 0 });
   };
 
@@ -150,7 +154,11 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                 <p>{activeSection.summary}</p>
                 <div className="manual-entry-list">
                   {activeSection.entries.map((entry) => (
-                    <section key={entry.id} id={`manual-entry-${entry.id}`} className="manual-entry">
+                    <section
+                      key={entry.id}
+                      id={`manual-entry-${entry.id}`}
+                      className={`manual-entry${focusedEntryId === entry.id ? " toc-highlighted" : ""}`}
+                    >
                       <h4>{entry.title}</h4>
                       <p>{entry.body}</p>
                       {entry.details.length > 0 ? (
@@ -182,7 +190,19 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
               <aside className="manual-toc" aria-label={copy.tocHeading}>
                 <h4>{copy.tocHeading}</h4>
                 {activeSection.entries.map((entry) => (
-                  <button key={entry.id} type="button" onClick={() => jumpToEntry(entry.id)}>
+                  <button
+                    key={entry.id}
+                    type="button"
+                    aria-describedby={`manual-entry-${entry.id}`}
+                    onClick={() => {
+                      setFocusedEntryId(entry.id);
+                      jumpToEntry(entry.id);
+                    }}
+                    onFocus={() => setFocusedEntryId(entry.id)}
+                    onBlur={() => setFocusedEntryId(null)}
+                    onMouseEnter={() => setFocusedEntryId(entry.id)}
+                    onMouseLeave={() => setFocusedEntryId(null)}
+                  >
                     {entry.title}
                   </button>
                 ))}
@@ -410,9 +430,9 @@ function buildManualCopy(language: Language): ManualCopy {
     },
     {
       id: "motion",
-      label: tx("アニメ", "アニメ"),
+      label: label("inspector.motion"),
       sections: [
-        section("object-motion", tx("オブジェクト", "Object"), tx("アニメタブ: オブジェクト設定", "アニメ tab: object settings"), tx("右パネルのアニメタブで、選択オブジェクトの動き、効果、再生タイミングを設定します。", "Use the right-panel アニメ tab to configure movement, effects, and timing for the selected object."), [
+        section("object-motion", tx("オブジェクト", "Object"), tx(`${label("inspector.motion")}タブ: オブジェクト設定`, `${label("inspector.motion")} tab: object settings`), tx(`右パネルの${label("inspector.motion")}タブで、選択オブジェクトの動き、効果、再生タイミングを設定します。`, `Use the right-panel ${label("inspector.motion")} tab to configure movement, effects, and timing for the selected object.`), [
           entry("effect-parameters", tx(`${label("inspector.motionType")} / ${label("inspector.effectMotion")} の項目`, `${label("inspector.motionType")} / ${label("inspector.effectMotion")} items`), tx(`画面上の ${label("inspector.motionType")} と ${label("inspector.effectMotion")} の各項目が、どの表現になるかを示します。`, `Explains what each ${label("inspector.motionType")} and ${label("inspector.effectMotion")} dropdown item does.`), [
             tx(`${label("inspector.motionType")}: ${label("inspector.animationNone")} は移動なし、${label("inspector.animationSlide")} は指定方向から入場、${label("inspector.animationDrift")} は往復するゆっくり移動、${label("inspector.animationShake")} は短い揺れを作ります。`, `${label("inspector.motionType")}: ${label("inspector.animationNone")} disables movement, ${label("inspector.animationSlide")} enters from the selected direction, ${label("inspector.animationDrift")} slowly oscillates, and ${label("inspector.animationShake")} creates a quick jitter.`),
             tx(`${label("inspector.effectMotion")}: ${label("inspector.effectMotionNone")} は追加効果なし、${label("inspector.animationFade")} は透明から表示、${label("inspector.animationPop")} は小さく始まり拡大、${label("inspector.animationPulse")} は拡大縮小を繰り返します。`, `${label("inspector.effectMotion")}: ${label("inspector.effectMotionNone")} disables extra effects, ${label("inspector.animationFade")} appears from transparent, ${label("inspector.animationPop")} starts small and grows, and ${label("inspector.animationPulse")} repeats subtle scaling.`),
@@ -430,7 +450,7 @@ function buildManualCopy(language: Language): ManualCopy {
             tx(`${label("inspector.animationLoop")}: ON で同じ効果を繰り返します。タイムラインには後続ループが薄く表示されます。`, `${label("inspector.animationLoop")}: ON repeats the effect. Later cycles appear faintly on the timeline.`),
           ]),
         ]),
-        section("text-effects", tx("文字効果", "Text effects"), tx("アニメタブ: テキスト専用モーション", "アニメ tab: text-only motion"), tx("テキストレイヤー選択時だけ表示される文字向け表現です。", "Text-specific controls that appear only when a text layer is selected."), [
+        section("text-effects", tx("文字効果", "Text effects"), tx(`${label("inspector.motion")}タブ: テキスト専用モーション`, `${label("inspector.motion")} tab: text-only motion`), tx("テキストレイヤー選択時だけ表示される文字向け表現です。", "Text-specific controls that appear only when a text layer is selected."), [
           entry("preview-graph", tx("モーションプリセット / テキスト専用モーション / 小プレビュー", "Motion presets / Text-only motion / mini preview"), tx("プリセット、文字効果、プレビュー、イージンググラフの意味を確認します。", "Explains presets, text effects, preview, and the easing graph."), [
             tx(`${label("inspector.motionPresets")}: ${label("inspector.motionPresetSoftEntry")} はフェード入場、${label("inspector.motionPresetNewsTicker")} はテロップ風スライド、${label("inspector.motionPresetNeonPulse")} は発光ループです。`, `${label("inspector.motionPresets")}: ${label("inspector.motionPresetSoftEntry")} fades in, ${label("inspector.motionPresetNewsTicker")} slides like a ticker, and ${label("inspector.motionPresetNeonPulse")} loops glowing emphasis.`),
             tx(`${label("inspector.motionPresets")}: ${label("inspector.motionPresetCountdownPop")} は短いポップ強調、${label("inspector.motionPresetTypeOn")} はタイプ表示、${label("inspector.motionPresetBackgroundBreathe")} は背景向けのゆっくり拡大縮小です。`, `${label("inspector.motionPresets")}: ${label("inspector.motionPresetCountdownPop")} is a short pop emphasis, ${label("inspector.motionPresetTypeOn")} types text on, and ${label("inspector.motionPresetBackgroundBreathe")} is slow background scaling.`),

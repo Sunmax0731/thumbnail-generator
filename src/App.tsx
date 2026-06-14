@@ -88,7 +88,7 @@ import { applyRelativeLayerTransform, matchSelectedLayerRotation, type RelativeL
 import { mergeLayerIdsForRangeSelection, selectIndividualLayerId, selectLayerIdsForLayer } from "./lib/layerOperations";
 import { layersToCsv, layersToHtml } from "./lib/layoutExport";
 import { applyPreset, defaultOutputSettings } from "./lib/presets";
-import { estimateProjectStorageBytes, evaluateThumbnailWarnings } from "./lib/qualityChecks";
+import { estimateProjectStorageBytes } from "./lib/qualityChecks";
 import { renderThumbnailToCanvas } from "./lib/renderCanvas";
 import { buildScheduleTemplate, type ScheduleBuilderRequest } from "./lib/scheduleBuilder";
 import { createInitialLayers, initialAssets, sampleCsv, sampleHtml } from "./lib/sampleData";
@@ -282,14 +282,6 @@ function App() {
       : selectedLayers.length === 1
         ? selectedLayers[0].name
       : t("selection.multiple", { count: selectedLayers.length });
-  const estimatedStorageBytes = useMemo(
-    () => estimateProjectStorageBytes(createEditStateSnapshot(layers, assets, settings, csvText, htmlText, templateName)),
-    [assets, csvText, htmlText, layers, settings, templateName],
-  );
-  const qualityWarnings = useMemo(
-    () => evaluateThumbnailWarnings({ layers, assets, settings, estimatedStorageBytes }),
-    [assets, estimatedStorageBytes, layers, settings],
-  );
   const imageCategoryTags = useMemo(
     () => mergeTags(tagRegistry.images, assets.flatMap((asset) => asset.tags ?? [])),
     [assets, tagRegistry.images],
@@ -2564,7 +2556,7 @@ function App() {
           onClose={() => setIsManualOpen(false)}
         />
       ) : null}
-      <StatusBar status={status} settings={settings} zoom={zoom} layerCount={layers.length} warnings={qualityWarnings} t={t} />
+      <StatusBar t={t} />
     </div>
   );
 }

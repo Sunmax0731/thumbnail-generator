@@ -41,7 +41,7 @@ Layer animation is optional metadata on existing image, text, and shape layers. 
 
 Rendering applies each animation entry in order as a temporary draw-time transform. Text-only and effect motion can run even when the common `type` is `none`. The stored layer position, size, rotation, and opacity are not mutated by playback.
 
-The アニメ tab groups movement presets (`slide`, `drift`, and `shake`) into the Motion dropdown and non-moving animation/effect choices into the Glow / effects dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected Glow / effects choice supports intensity, such as Glow pulse, Blur in, or Shine. The bottom timeline is visible only while the アニメ tab is active, can be collapsed, can resize vertically from its top edge, supports direct segment start/end and whole-segment dragging, and exposes a Reset button that returns editor-preview playback to the beginning.
+The right-panel animation tab is labeled `Animation` in English mode and `アニメ` in Japanese mode. It groups movement presets (`slide`, `drift`, and `shake`) into the Motion dropdown and non-moving animation/effect choices into the Glow / effects dropdown inside Common parameters. Text-only controls render only when the selected layer is a text layer. Effect intensity is disabled unless the selected Glow / effects choice supports intensity, such as Glow pulse, Blur in, or Shine. The bottom timeline is visible only while the Animation/アニメ tab is active, can be collapsed, can resize vertically from its top edge, supports direct segment start/end and whole-segment dragging, and exposes a Reset button that returns editor-preview playback to the beginning.
 
 Editor-preview playback is controlled from the bottom timeline Play/Pause button and starts in the paused/editable state. When playback is running, selected objects are cleared and canvas object rows, right-inspector controls, timeline timing edits, output-size controls, pan/zoom edit controls, and direct preview canvas interactions are inert until playback is paused. The timeline ruler and each animated row show a playhead bar for the current playback position. Loop-enabled animation entries keep their editable start/end handles at the first cycle, while the timeline additionally draws faint repeated segments for later cycles to make ongoing loop playback visible without changing stored timing values.
 
@@ -263,9 +263,13 @@ The right inspector is grouped by task:
 
 - Adjust: selected layer properties such as position, size, rotation, layer blur, edge blur, corner radius, shadow, pseudo-3D rotation, signed bevel, text, shape, Fill/Stroke color, and image effects. Common controls are labeled Common settings and can be collapsed or expanded; Text, Shape, and Image-only controls use the same collapsible section behavior below them. Numeric values are edited in the paired range/number inputs and are not repeated as separate readouts in the labels. Text alignment is edited with direct Left, Center, and Right buttons. Fill and Stroke color displays open a draggable popup Sketch-style single-color picker with alpha, so color editing does not expand the Adjust tab and separate fill/stroke opacity sliders are not duplicated.
 - Colors: browser-local single-color registration, saved multi-color palettes, graphical palette maker preview, and quick application with per-row Fill/Stroke buttons. Saved single colors are displayed in list rows similar to layer rows. Registered single-color Fill buttons display the word `Fill`, legacy `Fill`/`Stroke` prefixes are hidden from row names, and saved multi-color palette rows show HEX values without `Color 1`-style labels. Registered single colors and saved multi-color palettes can both be reordered by dragging rows, and the new order is written back to browser storage.
-- アニメ: ordered motion sets for the selected object, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text objects, a movement Motion dropdown, a Glow / effects dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
+- Animation / アニメ: ordered motion sets for the selected object, preset buttons, selected-object preview, toggleable easing graph, collapsible common parameters, text-only motion controls only for text objects, a movement Motion dropdown, a Glow / effects dropdown, start time, duration, easing, direction, distance, and loop behavior for OBS preview playback.
 
-The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. A Manual button beside Issue reporting opens a fixed-size feature manual modal with left feature tabs, top section tabs, preserved tab state, preserved scroll position, localized Japanese/English content, right-side table-of-contents jump links, active-language GUI-label wording, and bullet explanations for parameter/dropdown item effects. The bottom of the preview pane shows the motion timeline only while the アニメ tab is active. The timeline lists animated objects and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, includes a Reset button for playback position, draws faint repeated segments for loop-enabled later cycles, and includes a top-edge vertical resize handle while preserving the default expanded height.
+The preview header exposes one Output menu for JPG, PNG, WebP, and OBS preview. The previous always-visible preview-pane Output section is removed. Edit-state save/restore/export/import/delete actions live in the top-right toolbar as icon buttons with tooltips; the Autosave current edit state checkbox remains text-labeled. A Manual button beside Issue reporting opens a fixed-size feature manual modal with left feature tabs, top section tabs, preserved tab state, preserved scroll position, localized Japanese/English content, right-side table-of-contents jump links that highlight the matching manual entry on focus/hover, active-language GUI-label wording, and bullet explanations for parameter/dropdown item effects. The bottom of the preview pane shows the motion timeline only while the Animation/アニメ tab is active. The timeline lists animated objects and their start/duration segments, exposes left and right segment handles for start/end edits, lets users drag a segment bar to move start and end together, can collapse for extra preview space, includes a Reset button for playback position, draws faint repeated segments for loop-enabled later cycles, and includes a top-edge vertical resize handle while preserving the default expanded height.
+
+## Legal And Service Footer
+
+The bottom footer is a service-information surface rather than an editor status bar. It shows `© Sunmax Engineering`, a browser-only app note, and links to the static privacy policy, terms of use, X / Twitter contact, and GitHub Issues. The privacy policy and terms are served as static pages from `public/privacy-policy.html` and `public/terms.html`, making them available under the GitHub Pages base path without adding a backend.
 
 The Layers, Colors, Registered templates, Assets image, and Assets group object lists use visible resize handles. Dragging a handle changes the list height, and Arrow Up/Down on the focused handle adjusts the height in keyboard-accessible steps. List rows keep minimum usable heights so dense image imports or group-object rows do not collapse their action controls.
 
@@ -329,9 +333,9 @@ The brand kit is stored in browser `localStorage` under `thumbnail-generator.bra
 
 Brand kit setup controls are hidden from Templates in the current GUI, and Colors-side Brand kit registration buttons are also hidden. The storage model and application helpers remain available for existing saved data and internal compatibility.
 
-## Quality Warnings
+## Quality Checks
 
-The status bar can show rule-based warnings while editing:
+The model layer can evaluate rule-based warnings for validation and future UI use:
 
 - Many layers.
 - 4K-size export.
@@ -342,7 +346,7 @@ The status bar can show rule-based warnings while editing:
 - Hidden important layers such as title, headline, logo, brand, CTA, date, or text.
 - Large image assets that may increase memory or browser storage use.
 
-Warnings are advisory and do not block export.
+Warnings are advisory and do not block export. The visible bottom footer is reserved for service/legal links rather than warning chips.
 
 ## Font Choices
 
@@ -364,7 +368,7 @@ Custom fonts are stored in browser `localStorage` under `thumbnail-generator.cus
 - Format: `woff2`, `woff`, `truetype`, or `opentype`.
 - Created timestamp.
 
-Users can import `.woff2`, `.woff`, `.ttf`, or `.otf` files from the Adjust tab while a text layer is selected. The app loads the file through the browser FontFace API, adds it to the font dropdown, and applies it immediately to the selected text layer. Unsupported formats or load failures are reported in the status bar.
+Users can import `.woff2`, `.woff`, `.ttf`, or `.otf` files from the Adjust tab while a text layer is selected. The app loads the file through the browser FontFace API, adds it to the font dropdown, and applies it immediately to the selected text layer. Unsupported formats or load failures are stored in the editor status state for diagnostics.
 
 Export waits for `document.fonts.ready` before drawing so custom fonts are reflected in PNG, JPEG, and WebP output.
 

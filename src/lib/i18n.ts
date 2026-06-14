@@ -20,6 +20,7 @@ const en = {
   "toolbar.exportActions": "Export actions",
   "toolbar.export": "Export",
   "toolbar.output": "Output",
+  "toolbar.appSettings": "App settings",
   "preset.youtube720": "YouTube 16:9 1280x720",
   "preset.fullHd": "Full HD 16:9 1920x1080",
   "preset.twitch720": "Twitch 16:9 1280x720",
@@ -275,7 +276,7 @@ const en = {
   "inspector.canvas": "Canvas",
   "inspector.adjust": "Adjust",
   "inspector.colors": "Colors",
-  "inspector.motion": "アニメ",
+  "inspector.motion": "Animation",
   "inspector.layerList": "Canvas object list",
   "inspector.resizeLayerList": "Resize canvas object list",
   "inspector.addLine": "Add line",
@@ -561,6 +562,14 @@ const en = {
   "status.layerCount": "{count} objects",
   "status.layerCount.one": "1 object",
   "status.zoom": "{zoom}% zoom",
+  "footer.aria": "Service information",
+  "footer.links": "Legal and support links",
+  "footer.copyright": "© Sunmax Engineering",
+  "footer.browserOnly": "Browser-only static app",
+  "footer.privacy": "Privacy Policy",
+  "footer.terms": "Terms",
+  "footer.contact": "Contact: X / Twitter",
+  "footer.issues": "GitHub Issues",
 } as const;
 
 export type TranslationKey = keyof typeof en;
@@ -589,6 +598,7 @@ const ja: Partial<Record<TranslationKey, string>> = {
   "toolbar.exportActions": "書き出し",
   "toolbar.export": "出力",
   "toolbar.output": "出力",
+  "toolbar.appSettings": "アプリ設定",
   "preset.youtube720": "YouTube 向け横長 16:9 1280x720",
   "preset.fullHd": "フルHD 16:9 1920x1080",
   "preset.twitch720": "Twitch 向け横長 16:9 1280x720",
@@ -1068,6 +1078,14 @@ const ja: Partial<Record<TranslationKey, string>> = {
   "status.layerCount": "{count} オブジェクト",
   "status.layerCount.one": "1 オブジェクト",
   "status.zoom": "{zoom}% 表示",
+  "footer.aria": "サービス情報",
+  "footer.links": "法務とサポートへのリンク",
+  "footer.copyright": "© Sunmax Engineering",
+  "footer.browserOnly": "ブラウザ内完結の静的アプリ",
+  "footer.privacy": "プライバシーポリシー",
+  "footer.terms": "利用規約",
+  "footer.contact": "問い合わせ: X / Twitter",
+  "footer.issues": "GitHub Issues",
 };
 
 const jaOverrides: Partial<Record<TranslationKey, string>> = {
