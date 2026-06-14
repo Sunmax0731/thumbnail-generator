@@ -58,7 +58,7 @@ describe("editState", () => {
     storage.setItem(editStatePreferenceStorageKey, "{bad");
 
     expect(readSavedEditState(storage)).toBeNull();
-    expect(readEditStatePreferences(storage).autoSaveEnabled).toBe(false);
+    expect(readEditStatePreferences(storage).autoSaveEnabled).toBe(true);
   });
 
   it("serializes, parses, and deletes saved edit state JSON", () => {

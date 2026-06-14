@@ -80,12 +80,12 @@ export function readEditStatePreferences(
   storage: Pick<Storage, "getItem"> = window.localStorage,
 ): EditStatePreferences {
   const raw = storage.getItem(editStatePreferenceStorageKey);
-  if (!raw) return { autoSaveEnabled: false };
+  if (!raw) return { autoSaveEnabled: true };
   try {
     const parsed = JSON.parse(raw);
     return { autoSaveEnabled: Boolean(parsed?.autoSaveEnabled) };
   } catch {
-    return { autoSaveEnabled: false };
+    return { autoSaveEnabled: true };
   }
 }
 

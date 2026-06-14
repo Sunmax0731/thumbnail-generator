@@ -151,6 +151,31 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 
 Latest completed on 2026-06-14.
 
+### UI Scrollbar, Collapsible State Persistence, Timeline Grid, And Defaults
+
+Completed on 2026-06-14 for panel scrollbar containment, UI show/hide persistence, 0.5s timeline grid lines, and generator/default state updates.
+
+- Scope: moved left and right panel scrollbars below the tab rows, persisted collapsible UI state across tab switches and reloads for left Assets/Layers, right Adjust/Colors/Animation, and the bottom timeline, added 0.5s dotted timeline grid lines, changed first-run autosave to enabled, and changed schedule generator defaults to weekly, portrait, and one action per day.
+- `npm test`: pass. 35 test files, 141 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; the existing Vite chunk-size warning remained non-blocking.
+- Runtime gate URL: `http://127.0.0.1:4392/thumbnail-generator/?runtime=ui-persistence-20260614-final`.
+- Desktop viewport: `1440x960`.
+- Runtime checks:
+  - Canvas rendered nonblank with `24000` sampled nonblank pixels.
+  - Left/right panels used `overflow-y: hidden`, while `.side-panel-body` used `overflow-y: auto`; tab rows were not inside the scroll body.
+  - Autosave defaulted to enabled in a fresh browser context.
+  - Schedule generator defaults were `kind=week`, `orientation=portrait`, and actions per day `1`.
+  - Layers Quick Add, Assets Images, Adjust Common, Colors palette picker, and the bottom timeline stayed collapsed after tab switches.
+  - The same collapsed states persisted after reload.
+  - Timeline ruler rendered `21` half-second grid lines across a 10.0s default duration.
+  - Layer editing changed `Corner tag` to `Runtime UI persistence layer`.
+  - WebP export downloaded `thumbnail-1280x720-2026-06-14T10-50-31-170Z.webp` with `728640` bytes.
+  - Console health: no page errors or app console warnings/errors.
+- Evidence:
+  - `output/runtime-20260614-ui-persistence/runtime-result.json`
+  - `output/runtime-20260614-ui-persistence/desktop-final.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
 ### Toolbar Alignment, Animation Label, Manual Highlight, And Legal Footer
 
 Completed on 2026-06-14 for the top-right toolbar layout, English Animation label, Manual contents highlighting, privacy/terms pages, contact links, and standard service footer.

@@ -60,6 +60,12 @@ import {
 } from "../lib/colorPalette";
 import type { Translator } from "../lib/i18n";
 import {
+  readUiBooleanPreference,
+  readUiNumberPreference,
+  writeUiBooleanPreference,
+  writeUiNumberPreference,
+} from "../lib/uiPreferences";
+import {
   emptyLiveRelativeTransformState,
   hasLiveRelativeTransformDelta,
   updateLiveRelativeTransformState,
@@ -222,10 +228,18 @@ export function InspectorPanel({
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
   const [relativeTransform, setRelativeTransform] = useState(emptyLiveRelativeTransformState);
-  const [layerListHeight, setLayerListHeight] = useState(360);
-  const [colorListHeight, setColorListHeight] = useState(320);
-  const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(true);
-  const [isLayerListExpanded, setIsLayerListExpanded] = useState(true);
+  const [layerListHeight, setLayerListHeight] = useState(() =>
+    readUiNumberPreference("inspector.layers.canvasListHeight", 360, { min: 220, max: 720 }),
+  );
+  const [colorListHeight, setColorListHeight] = useState(() =>
+    readUiNumberPreference("inspector.colors.registeredListHeight", 320, { min: 220, max: 720 }),
+  );
+  const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(() =>
+    readUiBooleanPreference("inspector.layers.quickAddExpanded", true),
+  );
+  const [isLayerListExpanded, setIsLayerListExpanded] = useState(() =>
+    readUiBooleanPreference("inspector.layers.canvasListExpanded", true),
+  );
   const [layerColorPicker, setLayerColorPicker] = useState<LayerColorPickerState | null>(null);
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
   const selectedIdsKey = selectedIds.join("|");
@@ -239,6 +253,22 @@ export function InspectorPanel({
   useEffect(() => {
     setRelativeTransform(emptyLiveRelativeTransformState);
   }, [selectedIdsKey]);
+
+  useEffect(() => {
+    writeUiNumberPreference("inspector.layers.canvasListHeight", layerListHeight);
+  }, [layerListHeight]);
+
+  useEffect(() => {
+    writeUiNumberPreference("inspector.colors.registeredListHeight", colorListHeight);
+  }, [colorListHeight]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.layers.quickAddExpanded", isQuickAddExpanded);
+  }, [isQuickAddExpanded]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.layers.canvasListExpanded", isLayerListExpanded);
+  }, [isLayerListExpanded]);
 
   useEffect(() => {
     const handleKeyDown = (event: KeyboardEvent) => {
@@ -329,6 +359,7 @@ export function InspectorPanel({
         </button>
       </div>
 
+      <div className="side-panel-body">
       {activeSection === "layers" ? (
         <>
           <section className="panel-section quick-add-section">
@@ -654,7 +685,7 @@ export function InspectorPanel({
             </div>
 
             <div className="field-stack">
-              <CollapsibleControlGroup title={t("inspector.layerControls")}>
+              <CollapsibleControlGroup storageKey="inspector.adjust.commonExpanded" title={t("inspector.layerControls")}>
                 <TextInput
                   label={t("inspector.name")}
                   value={selected.name}
@@ -764,12 +795,12 @@ export function InspectorPanel({
               </CollapsibleControlGroup>
 
               {selected.type === "image" && (
-                <CollapsibleControlGroup title={t("inspector.imageControls")}>
+                <CollapsibleControlGroup storageKey="inspector.adjust.imageExpanded" title={t("inspector.imageControls")}>
                   <ImageControls selected={selected} assets={assets} onUpdateLayer={onUpdateLayer} t={t} />
                 </CollapsibleControlGroup>
               )}
               {selected.type === "text" && (
-                <CollapsibleControlGroup title={t("inspector.textControls")}>
+                <CollapsibleControlGroup storageKey="inspector.adjust.textExpanded" title={t("inspector.textControls")}>
                   <TextControls
                     selected={selected}
                     fontOptions={fontOptions}
@@ -782,7 +813,7 @@ export function InspectorPanel({
                 </CollapsibleControlGroup>
               )}
               {selected.type === "shape" && (
-                <CollapsibleControlGroup title={t("inspector.shapeControls")}>
+                <CollapsibleControlGroup storageKey="inspector.adjust.shapeExpanded" title={t("inspector.shapeControls")}>
                   <ShapeControls selected={selected} onUpdateLayer={onUpdateLayer} onOpenColorPicker={openLayerColorPicker} t={t} />
                 </CollapsibleControlGroup>
               )}
@@ -831,6 +862,7 @@ export function InspectorPanel({
           t={t}
         />
       ) : null}
+      </div>
     </aside>
   );
 }
@@ -1015,8 +1047,20 @@ function ResizeHandle({ label, onResize }: { label: string; onResize: (deltaY: n
   );
 }
 
-function CollapsibleControlGroup({ title, children }: { title: string; children: ReactNode }) {
-  const [expanded, setExpanded] = useState(true);
+function CollapsibleControlGroup({
+  storageKey,
+  title,
+  children,
+}: {
+  storageKey: string;
+  title: string;
+  children: ReactNode;
+}) {
+  const [expanded, setExpanded] = useState(() => readUiBooleanPreference(storageKey, true));
+
+  useEffect(() => {
+    writeUiBooleanPreference(storageKey, expanded);
+  }, [expanded, storageKey]);
 
   return (
     <div className="control-group">
@@ -1153,9 +1197,15 @@ function PaletteControls({
 }) {
   const [activePointIndex, setActivePointIndex] = useState(0);
   const [draggingPointIndex, setDraggingPointIndex] = useState<number | null>(null);
-  const [savedPalettesExpanded, setSavedPalettesExpanded] = useState(true);
-  const [paletteRegisterExpanded, setPaletteRegisterExpanded] = useState(true);
-  const [registeredColorsExpanded, setRegisteredColorsExpanded] = useState(true);
+  const [savedPalettesExpanded, setSavedPalettesExpanded] = useState(() =>
+    readUiBooleanPreference("inspector.colors.savedPalettesExpanded", true),
+  );
+  const [paletteRegisterExpanded, setPaletteRegisterExpanded] = useState(() =>
+    readUiBooleanPreference("inspector.colors.paletteRegisterExpanded", true),
+  );
+  const [registeredColorsExpanded, setRegisteredColorsExpanded] = useState(() =>
+    readUiBooleanPreference("inspector.colors.registeredColorsExpanded", true),
+  );
   const resolvedModeDraft = resolveHarmonyMode(modeDraft);
   const patternModes = paletteModesByPrinciple[principleDraft] ?? paletteModesByPrinciple.order;
   const activeMode = patternModes.includes(modeDraft)
@@ -1174,6 +1224,18 @@ function PaletteControls({
   useEffect(() => {
     if (activeMode !== modeDraft) onModeDraftChange(activeMode);
   }, [activeMode, modeDraft, onModeDraftChange]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.colors.savedPalettesExpanded", savedPalettesExpanded);
+  }, [savedPalettesExpanded]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.colors.paletteRegisterExpanded", paletteRegisterExpanded);
+  }, [paletteRegisterExpanded]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.colors.registeredColorsExpanded", registeredColorsExpanded);
+  }, [registeredColorsExpanded]);
 
   const setBaseDraft = (value: string, options: { preserveActivePoint?: boolean } = {}) => {
     const normalized = normalizeColor(value) ?? parseRgbColorInput(value);
@@ -1860,7 +1922,13 @@ function MotionControls({
   const activeAnimation = editableAnimations[Math.min(activeMotionIndex, editableAnimations.length - 1)] ?? defaultAnimation;
   const previewCanvasRef = useRef<HTMLCanvasElement | null>(null);
   const [previewProgress, setPreviewProgress] = useState(0);
-  const [isEasingGraphVisible, setIsEasingGraphVisible] = useState(true);
+  const [isEasingGraphVisible, setIsEasingGraphVisible] = useState(() =>
+    readUiBooleanPreference("inspector.motion.easingGraphVisible", true),
+  );
+
+  useEffect(() => {
+    writeUiBooleanPreference("inspector.motion.easingGraphVisible", isEasingGraphVisible);
+  }, [isEasingGraphVisible]);
 
   useEffect(() => {
     if (activeMotionIndex >= editableAnimations.length) setActiveMotionIndex(Math.max(0, editableAnimations.length - 1));
@@ -2050,7 +2118,7 @@ function MotionControls({
           <Trash2 size={15} /> {t("inspector.removeMotion")}
         </button>
       </div>
-      <CollapsibleControlGroup title={t("inspector.motionPresets")}>
+      <CollapsibleControlGroup storageKey="inspector.motion.presetsExpanded" title={t("inspector.motionPresets")}>
         <div className="motion-preset-grid">
           {motionPresets.map((preset) => (
             <button key={preset.id} type="button" className="secondary-button" onClick={() => applyPreset(preset.animation)}>
@@ -2059,7 +2127,7 @@ function MotionControls({
           ))}
         </div>
       </CollapsibleControlGroup>
-      <CollapsibleControlGroup title={t("inspector.motionCommon")}>
+      <CollapsibleControlGroup storageKey="inspector.motion.commonExpanded" title={t("inspector.motionCommon")}>
         <label className="field">
           <span>{t("inspector.motionType")}</span>
           <select
@@ -2164,7 +2232,7 @@ function MotionControls({
         </label>
       </CollapsibleControlGroup>
       {selected.type === "text" ? (
-        <CollapsibleControlGroup title={t("inspector.textMotion")}>
+        <CollapsibleControlGroup storageKey="inspector.motion.textExpanded" title={t("inspector.textMotion")}>
           <label className="field">
             <span>{t("inspector.textMotion")}</span>
             <select

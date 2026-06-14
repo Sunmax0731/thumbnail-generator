@@ -174,7 +174,7 @@ function App() {
   const initialSavedEditState = useMemo(() => (typeof window === "undefined" ? null : readSavedEditState()), []);
   const initialBrandKit = useMemo(() => (typeof window === "undefined" ? defaultBrandKit : readBrandKit()), []);
   const initialEditStatePreferences = useMemo(
-    () => (typeof window === "undefined" ? { autoSaveEnabled: false } : readEditStatePreferences()),
+    () => (typeof window === "undefined" ? { autoSaveEnabled: true } : readEditStatePreferences()),
     [],
   );
   const [language, setLanguage] = useState<Language>(initialLanguage);

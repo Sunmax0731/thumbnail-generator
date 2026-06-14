@@ -32,6 +32,12 @@ import {
   type ScheduleBuilderRequest,
 } from "../lib/scheduleBuilder";
 import { normalizeColor, type PaletteColor, type SavedColorPalette } from "../lib/colorPalette";
+import {
+  readUiBooleanPreference,
+  readUiNumberPreference,
+  writeUiBooleanPreference,
+  writeUiNumberPreference,
+} from "../lib/uiPreferences";
 import type { SavedTemplate } from "../lib/templates";
 import type { GroupObjectAsset, ImageAsset, OutputSettings, TextLayer } from "../lib/types";
 import { renderThumbnailToCanvas } from "../lib/renderCanvas";
@@ -107,14 +113,24 @@ export function LeftPanel({
   t,
 }: LeftPanelProps) {
   const [activeSection, setActiveSection] = useState<LeftPanelSection>("templates");
-  const [imageListHeight, setImageListHeight] = useState(260);
-  const [groupObjectListHeight, setGroupObjectListHeight] = useState(180);
-  const [isImageSectionExpanded, setIsImageSectionExpanded] = useState(true);
-  const [isGroupObjectSectionExpanded, setIsGroupObjectSectionExpanded] = useState(true);
+  const [imageListHeight, setImageListHeight] = useState(() =>
+    readUiNumberPreference("left.assets.imageListHeight", 260, { min: 120, max: 720 }),
+  );
+  const [groupObjectListHeight, setGroupObjectListHeight] = useState(() =>
+    readUiNumberPreference("left.assets.groupObjectListHeight", 180, { min: 120, max: 720 }),
+  );
+  const [isImageSectionExpanded, setIsImageSectionExpanded] = useState(() =>
+    readUiBooleanPreference("left.assets.imagesExpanded", true),
+  );
+  const [isGroupObjectSectionExpanded, setIsGroupObjectSectionExpanded] = useState(() =>
+    readUiBooleanPreference("left.assets.groupObjectsExpanded", true),
+  );
   const [pendingImageFiles, setPendingImageFiles] = useState<File[] | null>(null);
   const [imageAssetFilterTag, setImageAssetFilterTag] = useState("");
   const [groupObjectFilterTag, setGroupObjectFilterTag] = useState("");
-  const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(220);
+  const [browserTemplateListHeight, setBrowserTemplateListHeight] = useState(() =>
+    readUiNumberPreference("left.templates.browserTemplateListHeight", 220, { min: 120, max: 720 }),
+  );
   const [templateApplyCandidate, setTemplateApplyCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateDeleteCandidate, setTemplateDeleteCandidate] = useState<{ id: string; name: string } | null>(null);
   const [templateTagDraft, setTemplateTagDraft] = useState("");
@@ -149,6 +165,26 @@ export function LeftPanel({
     () => (templateFilterTag ? templates.filter((template) => template.tags?.includes(templateFilterTag)) : templates),
     [templateFilterTag, templates],
   );
+
+  useEffect(() => {
+    writeUiNumberPreference("left.assets.imageListHeight", imageListHeight);
+  }, [imageListHeight]);
+
+  useEffect(() => {
+    writeUiNumberPreference("left.assets.groupObjectListHeight", groupObjectListHeight);
+  }, [groupObjectListHeight]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("left.assets.imagesExpanded", isImageSectionExpanded);
+  }, [isImageSectionExpanded]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("left.assets.groupObjectsExpanded", isGroupObjectSectionExpanded);
+  }, [isGroupObjectSectionExpanded]);
+
+  useEffect(() => {
+    writeUiNumberPreference("left.templates.browserTemplateListHeight", browserTemplateListHeight);
+  }, [browserTemplateListHeight]);
 
   return (
     <aside
@@ -201,8 +237,9 @@ export function LeftPanel({
         </button>
       </div>
 
-      {activeSection === "assets" ? (
-        <>
+      <div className="side-panel-body">
+        {activeSection === "assets" ? (
+          <>
           <section className="panel-section asset-image-section">
             <button
               type="button"
@@ -374,13 +411,13 @@ export function LeftPanel({
               </>
             ) : null}
           </section>
-        </>
-      ) : null}
+          </>
+        ) : null}
 
-      {activeSection === "layers" ? <LayerPanel {...layerPanelProps} t={t} /> : null}
+        {activeSection === "layers" ? <LayerPanel {...layerPanelProps} t={t} /> : null}
 
-      {activeSection === "templates" ? (
-        <>
+        {activeSection === "templates" ? (
+          <>
           <section className="panel-section generator-section">
             <div className="section-heading">
               <LayoutTemplate size={16} />
@@ -506,86 +543,87 @@ export function LeftPanel({
             />
           </section>
 
-        </>
-      ) : null}
+          </>
+        ) : null}
 
-      {templateApplyCandidate ? (
-        <ConfirmTemplateDialog
-          title={t("left.applyTemplateQuestion")}
-          copy={t("left.applyTemplateCopy", { name: templateApplyCandidate.name })}
-          confirmLabel={t("left.applyTemplate")}
-          confirmClassName="primary-button"
-          onCancel={() => setTemplateApplyCandidate(null)}
-          onConfirm={() => {
-            onLoadTemplate(templateApplyCandidate.id);
-            setTemplateApplyCandidate(null);
-          }}
-          t={t}
-        />
-      ) : null}
-      {templateDeleteCandidate ? (
-        <ConfirmTemplateDialog
-          title={t("left.deleteTemplateQuestion")}
-          copy={t("left.deleteTemplateCopy", { name: templateDeleteCandidate.name })}
-          confirmLabel={t("inspector.delete")}
-          confirmClassName="primary-button danger-button"
-          onCancel={() => setTemplateDeleteCandidate(null)}
-          onConfirm={() => {
-            onDeleteTemplate(templateDeleteCandidate.id);
-            setTemplateDeleteCandidate(null);
-          }}
-          t={t}
-        />
-      ) : null}
-      {pendingImageFiles ? (
-        <ImportImageTagDialog
-          files={pendingImageFiles}
-          suggestions={imageRegisteredTags}
-          onCancel={() => setPendingImageFiles(null)}
-          onConfirm={(tags) => {
-            onImageFiles(pendingImageFiles, tags);
-            setPendingImageFiles(null);
-          }}
-          t={t}
-        />
-      ) : null}
-      {isScheduleBuilderOpen ? (
-        <ScheduleBuilderDialog
-          draft={scheduleDraft}
-          fontOptions={fontOptions}
-          settings={settings}
-          language={language}
-          paletteColors={paletteColors}
-          savedColorPalettes={savedColorPalettes}
-          onDraftChange={setScheduleDraft}
-          onSaveSettings={saveScheduleDraft}
-          onCancel={() => setIsScheduleBuilderOpen(false)}
-          onConfirm={() => {
-            saveScheduleDraft();
-            onGenerateScheduleTemplate(scheduleDraft);
-            setIsScheduleBuilderOpen(false);
-          }}
-          t={t}
-        />
-      ) : null}
-      {activeCreativeBuilder ? (
-        <CreativeBuilderDialog
-          draft={creativeDrafts[activeCreativeBuilder]}
-          fontOptions={fontOptions}
-          settings={settings}
-          paletteColors={paletteColors}
-          savedColorPalettes={savedColorPalettes}
-          onDraftChange={(draft) => updateCreativeDraft(activeCreativeBuilder, draft)}
-          onSaveSettings={() => saveCreativeDraft(activeCreativeBuilder)}
-          onCancel={() => setActiveCreativeBuilder(null)}
-          onConfirm={() => {
-            saveCreativeDraft(activeCreativeBuilder);
-            onGenerateCreativeTemplate(creativeDrafts[activeCreativeBuilder]);
-            setActiveCreativeBuilder(null);
-          }}
-          t={t}
-        />
-      ) : null}
+        {templateApplyCandidate ? (
+          <ConfirmTemplateDialog
+            title={t("left.applyTemplateQuestion")}
+            copy={t("left.applyTemplateCopy", { name: templateApplyCandidate.name })}
+            confirmLabel={t("left.applyTemplate")}
+            confirmClassName="primary-button"
+            onCancel={() => setTemplateApplyCandidate(null)}
+            onConfirm={() => {
+              onLoadTemplate(templateApplyCandidate.id);
+              setTemplateApplyCandidate(null);
+            }}
+            t={t}
+          />
+        ) : null}
+        {templateDeleteCandidate ? (
+          <ConfirmTemplateDialog
+            title={t("left.deleteTemplateQuestion")}
+            copy={t("left.deleteTemplateCopy", { name: templateDeleteCandidate.name })}
+            confirmLabel={t("inspector.delete")}
+            confirmClassName="primary-button danger-button"
+            onCancel={() => setTemplateDeleteCandidate(null)}
+            onConfirm={() => {
+              onDeleteTemplate(templateDeleteCandidate.id);
+              setTemplateDeleteCandidate(null);
+            }}
+            t={t}
+          />
+        ) : null}
+        {pendingImageFiles ? (
+          <ImportImageTagDialog
+            files={pendingImageFiles}
+            suggestions={imageRegisteredTags}
+            onCancel={() => setPendingImageFiles(null)}
+            onConfirm={(tags) => {
+              onImageFiles(pendingImageFiles, tags);
+              setPendingImageFiles(null);
+            }}
+            t={t}
+          />
+        ) : null}
+        {isScheduleBuilderOpen ? (
+          <ScheduleBuilderDialog
+            draft={scheduleDraft}
+            fontOptions={fontOptions}
+            settings={settings}
+            language={language}
+            paletteColors={paletteColors}
+            savedColorPalettes={savedColorPalettes}
+            onDraftChange={setScheduleDraft}
+            onSaveSettings={saveScheduleDraft}
+            onCancel={() => setIsScheduleBuilderOpen(false)}
+            onConfirm={() => {
+              saveScheduleDraft();
+              onGenerateScheduleTemplate(scheduleDraft);
+              setIsScheduleBuilderOpen(false);
+            }}
+            t={t}
+          />
+        ) : null}
+        {activeCreativeBuilder ? (
+          <CreativeBuilderDialog
+            draft={creativeDrafts[activeCreativeBuilder]}
+            fontOptions={fontOptions}
+            settings={settings}
+            paletteColors={paletteColors}
+            savedColorPalettes={savedColorPalettes}
+            onDraftChange={(draft) => updateCreativeDraft(activeCreativeBuilder, draft)}
+            onSaveSettings={() => saveCreativeDraft(activeCreativeBuilder)}
+            onCancel={() => setActiveCreativeBuilder(null)}
+            onConfirm={() => {
+              saveCreativeDraft(activeCreativeBuilder);
+              onGenerateCreativeTemplate(creativeDrafts[activeCreativeBuilder]);
+              setActiveCreativeBuilder(null);
+            }}
+            t={t}
+          />
+        ) : null}
+      </div>
     </aside>
   );
 }
@@ -766,8 +804,8 @@ function dedupeTags(tags: string[]): string[] {
 function createDefaultScheduleDraft(): ScheduleBuilderRequest {
   const now = new Date();
   return {
-    kind: "month",
-    orientation: "landscape",
+    kind: "week",
+    orientation: "portrait",
     year: now.getFullYear(),
     month: now.getMonth() + 1,
     day: now.getDate(),
@@ -789,13 +827,13 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     textColor: "#152033",
     cornerRadius: 8,
     strokeWidth: 3,
-  actionCountMode: "uniform",
-  actionsPerDay: 3,
-  dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
-  showAdjacentDays: false,
-  groupLayers: true,
-  weekendColorMode: "default",
-  showBadge: true,
+    actionCountMode: "uniform",
+    actionsPerDay: 1,
+    dailyActionCounts: [1, 1, 1, 1, 1, 1, 1],
+    showAdjacentDays: false,
+    groupLayers: true,
+    weekendColorMode: "default",
+    showBadge: true,
   };
 }
 

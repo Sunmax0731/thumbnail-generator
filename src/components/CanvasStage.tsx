@@ -19,6 +19,12 @@ import { pickLayersInRect } from "../lib/hitTest";
 import type { Translator } from "../lib/i18n";
 import { outputPresets } from "../lib/presets";
 import type { ExportFormat, LayerAnimation, OutputSettings, ThumbnailLayer } from "../lib/types";
+import {
+  readUiBooleanPreference,
+  readUiNumberPreference,
+  writeUiBooleanPreference,
+  writeUiNumberPreference,
+} from "../lib/uiPreferences";
 
 const timelineMinHeight = 120;
 const timelineMaxHeight = 640;
@@ -602,8 +608,12 @@ function MotionTimeline({
   t: Translator;
 }) {
   const sectionRef = useRef<HTMLElement | null>(null);
-  const [timelineHeight, setTimelineHeight] = useState(170);
-  const [isCollapsed, setIsCollapsed] = useState(false);
+  const [timelineHeight, setTimelineHeight] = useState(() =>
+    readUiNumberPreference("timeline.height", 170, { min: timelineMinHeight, max: timelineMaxHeight }),
+  );
+  const [isCollapsed, setIsCollapsed] = useState(() =>
+    readUiBooleanPreference("timeline.collapsed", false),
+  );
   const motionLayers = layers.filter((layer) => {
     const animations = layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : [];
     return animations.length > 0;
@@ -613,6 +623,17 @@ function MotionTimeline({
     ...motionLayers.flatMap((layer) => (layer.animations?.length ? layer.animations : layer.animation ? [layer.animation] : []).map((animation) => animation.startMs + animation.durationMs)),
   );
   const playbackPercent = Math.min(100, Math.max(0, (playbackTimeMs / duration) * 100));
+  const halfSecondMarks = Array.from({ length: Math.floor(duration / 500) + 1 }, (_, index) => index * 500).filter(
+    (timeMs) => timeMs <= duration,
+  );
+
+  useEffect(() => {
+    writeUiNumberPreference("timeline.height", timelineHeight);
+  }, [timelineHeight]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("timeline.collapsed", isCollapsed);
+  }, [isCollapsed]);
 
   const updateAnimationTiming = (layerId: string, animationIndex: number, next: Partial<Pick<LayerAnimation, "startMs" | "durationMs">>) => {
     if (isPlaybackPlaying) return;
@@ -713,6 +734,13 @@ function MotionTimeline({
       {isCollapsed ? null : (
         <>
           <div className="timeline-ruler" aria-hidden="true">
+            {halfSecondMarks.map((timeMs) => (
+              <span
+                key={`grid-${timeMs}`}
+                className="timeline-grid-line"
+                style={{ left: `${(timeMs / duration) * 100}%` }}
+              />
+            ))}
             <span className="timeline-playhead-label" style={{ left: `${playbackPercent}%` }}>
               {(playbackTimeMs / 1000).toFixed(1)}s
             </span>
@@ -748,6 +776,14 @@ function MotionTimeline({
                   >
                     <span className="timeline-layer-name">{layer.name}</span>
                     <span className="timeline-track">
+                      {halfSecondMarks.map((timeMs) => (
+                        <span
+                          key={`${layer.id}-grid-${timeMs}`}
+                          className="timeline-track-grid-line"
+                          style={{ left: `${(timeMs / duration) * 100}%` }}
+                          aria-hidden="true"
+                        />
+                      ))}
                       <span className="timeline-track-playhead" style={{ left: `${playbackPercent}%` }} aria-hidden="true" />
                       {animations.map((animation, index) => {
                         const left = Math.max(0, (animation.startMs / duration) * 100);

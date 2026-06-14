@@ -90,6 +90,7 @@ The PWA shell keeps install metadata and same-origin caching outside the React t
 - Mobile: place the canvas workbench before the left and right panels so the first scroll position prioritizes the thumbnail being edited.
 - Image Lab modal uses a two-column workspace on desktop and a single-column workspace on mobile.
 - Left and right task tabs remain visible at the top of their panels and collapse without horizontal overflow on mobile.
+- Left and right panel scrollbars are constrained to the panel body below the task tabs so tab widths do not change when a tab's content overflows.
 - Canvas preserves aspect ratio and never overlaps controls.
 - The preview frame stays fixed to the output document instead of stretching around off-canvas layers.
 - Preset changes keep the current user zoom. Users can choose Fit canvas explicitly, wheel zoom beyond 100%, or pan the preview with Pan, Space-drag, Alt-drag, or right-drag. Fit canvas resets both scale and view position so the canvas center returns to the preview center. Zoomed previews hide scrollbars and use internal pan offsets so the workbench behaves like Photoshop or Illustrator rather than a document scroller. When a layer is dragged outside the document, the zoom scale and output frame remain stable instead of auto-shrinking to fit the new overflow.

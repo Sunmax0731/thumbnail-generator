@@ -258,10 +258,21 @@ button:disabled {
 
 .side-panel {
   display: flex;
-  overflow: auto;
+  overflow: hidden;
   flex-direction: column;
   gap: 12px;
   padding: 12px;
+}
+
+.side-panel-body {
+  display: flex;
+  min-height: 0;
+  flex: 1;
+  flex-direction: column;
+  gap: 12px;
+  overflow: auto;
+  padding-right: 2px;
+  scrollbar-gutter: stable;
 }
 
 .panel-section {
@@ -327,9 +338,9 @@ button:disabled {
 
 .source-tabs,
 .inspector-tabs {
-  position: sticky;
+  flex: 0 0 auto;
+  position: relative;
   z-index: 2;
-  top: 0;
   padding-bottom: 6px;
   background: var(--panel);
 }
@@ -1327,6 +1338,26 @@ button:disabled {
   color: #ffffff;
 }
 
+.timeline-grid-line,
+.timeline-track-grid-line {
+  position: absolute;
+  width: 0;
+  border-left: 1px dashed color-mix(in srgb, var(--line-strong) 66%, transparent);
+  transform: none;
+  pointer-events: none;
+}
+
+.timeline-ruler .timeline-grid-line {
+  top: 0;
+  bottom: -1px;
+}
+
+.timeline-track-grid-line {
+  top: 3px;
+  bottom: 3px;
+  z-index: 1;
+}
+
 .timeline-track-list {
   display: grid;
   gap: 5px;
@@ -1378,7 +1409,7 @@ button:disabled {
 
 .timeline-track-playhead {
   position: absolute;
-  z-index: 3;
+  z-index: 4;
   top: -2px;
   bottom: -2px;
   width: 2px;
@@ -4011,6 +4042,17 @@ button:disabled {
     grid-column: 1 / -1;
   }
 
+  .left-panel > .side-panel-body {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .left-panel > .side-panel-body > .panel-section,
+  .left-panel > .side-panel-body > .group-section {
+    min-width: 0;
+  }
+
   .left-panel > .guided-start-section {
     grid-column: 1 / -1;
   }
@@ -4143,6 +4185,10 @@ button:disabled {
   }
 
   .left-panel {
+    display: flex;
+  }
+
+  .left-panel > .side-panel-body {
     display: flex;
   }
 

@@ -25,6 +25,12 @@ import {
 import type { AlignmentMode } from "../lib/alignment";
 import type { Translator } from "../lib/i18n";
 import type { ThumbnailLayer } from "../lib/types";
+import {
+  readUiBooleanPreference,
+  readUiNumberPreference,
+  writeUiBooleanPreference,
+  writeUiNumberPreference,
+} from "../lib/uiPreferences";
 
 export interface LayerPanelProps {
   layers: ThumbnailLayer[];
@@ -81,10 +87,28 @@ export function LayerPanel({
     : "";
   const [draggingId, setDraggingId] = useState<string | null>(null);
   const [deleteCandidateId, setDeleteCandidateId] = useState<string | null>(null);
-  const [layerListHeight, setLayerListHeight] = useState(360);
-  const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(true);
-  const [isLayerListExpanded, setIsLayerListExpanded] = useState(true);
+  const [layerListHeight, setLayerListHeight] = useState(() =>
+    readUiNumberPreference("layers.canvasListHeight", 360, { min: 220, max: 720 }),
+  );
+  const [isQuickAddExpanded, setIsQuickAddExpanded] = useState(() =>
+    readUiBooleanPreference("layers.quickAddExpanded", true),
+  );
+  const [isLayerListExpanded, setIsLayerListExpanded] = useState(() =>
+    readUiBooleanPreference("layers.canvasListExpanded", true),
+  );
   const deleteCandidate = deleteCandidateId ? layers.find((layer) => layer.id === deleteCandidateId) : undefined;
+
+  useEffect(() => {
+    writeUiNumberPreference("layers.canvasListHeight", layerListHeight);
+  }, [layerListHeight]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("layers.quickAddExpanded", isQuickAddExpanded);
+  }, [isQuickAddExpanded]);
+
+  useEffect(() => {
+    writeUiBooleanPreference("layers.canvasListExpanded", isLayerListExpanded);
+  }, [isLayerListExpanded]);
 
   return (
     <>
