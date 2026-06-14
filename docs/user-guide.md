@@ -29,7 +29,7 @@ npm run preview
 - Animation / アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated objects in the Animation/アニメ-only bottom timeline for OBS preview playback.
 
 - Timeline Play/Pause previews animation directly in the editor. Reset returns the editor preview position to the beginning. Playback starts paused/editable; while playing, the object list, inspector, timeline timing edits, and preview canvas edits are locked, and the timeline playhead shows the current playback position. Loop-enabled rows show faint repeated timeline segments after the first cycle without moving the editable handles.
-- Manual: use the Manual button beside Issue reporting to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings while highlighting the matching manual entry on focus or hover. The modal follows the active Japanese/English GUI labels, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
+- Manual: use the footer Manual button to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings while highlighting the matching manual entry on focus or hover. The modal follows the active Japanese/English GUI labels, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
 
 ## Layout Compatibility
 
@@ -143,7 +143,7 @@ Select an object and open Adjust. Shadow controls set color, opacity, blur, dist
 
 Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use the Output menu in the preview header to download JPG, PNG, or WebP at maximum quality, or to open the OBS preview.
 
-The bottom footer provides service information: privacy policy, terms, X / Twitter contact, GitHub Issues, and the `© Sunmax Engineering` copyright notice.
+The bottom footer provides service information: Manual, localized privacy policy and terms modals, X / Twitter contact, GitHub Issues, and the centered `© Sunmax Engineering` copyright notice.
 
 ## Animation / アニメ And OBS Preview
 
@@ -196,8 +196,8 @@ Chrome extensions can integrate through the page bridge channel `thumbnail-gener
 
 ## Service And Privacy
 
-Use the Report issue link in the app header to open GitHub Issues:
+Use the GitHub Issues link in the app footer to open GitHub Issues:
 
 <https://github.com/Sunmax0731/thumbnail-generator/issues>
 
-Use the footer links for the privacy policy, terms, X / Twitter contact, and GitHub Issues. The app is browser-only. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.
+Use the footer buttons for the privacy policy and terms modals, and the footer links for X / Twitter contact and GitHub Issues. The privacy policy and terms text switches with the current display language. Imported images, fonts, edit state, templates, brand kit, colors, and saved palettes stay in the current browser profile unless you export a thumbnail, CSV/HTML layout, edit-state JSON, or clear site data.

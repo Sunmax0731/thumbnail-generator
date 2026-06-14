@@ -1,6 +1,6 @@
 # サムネいる？
 
-サムネいる？ is a static browser app for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms. It runs entirely in the browser, supports Japanese and English UI labels, installs as a PWA, and exports finished thumbnails as PNG, JPEG, or WebP.
+サムネいる？ / ThumbNailed It? is a static browser app for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms. It runs entirely in the browser, supports Japanese and English UI labels, installs as a PWA, and exports finished thumbnails as PNG, JPEG, or WebP.
 
 Published app: <https://sunmax0731.github.io/thumbnail-generator/>
 
@@ -39,8 +39,9 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Export to common video presets or custom output sizes from the preview header at maximum quality, using the single Output menu for JPG, PNG, WebP, and OBS preview.
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Fit canvas also recenters the output canvas in the preview. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
-- Open the in-app manual from the top-left Manual button beside Issue reporting; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
-- Use the bottom service footer for the privacy policy, terms, contact link, GitHub Issues, and copyright notice.
+- The app title shows `サムネいる？` in Japanese mode and `ThumbNailed It?` in English mode, with the tagline `Need it quick? ThumbNailed It!` underneath.
+- Open the in-app manual from the bottom service footer; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
+- Use the bottom service footer for Manual, localized privacy policy and terms modals, X / Twitter contact, GitHub Issues with an icon, and the centered copyright notice.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
@@ -51,7 +52,7 @@ See [docs/features.md](docs/features.md) for the feature index, [docs/user-guide
 
 Open <https://sunmax0731.github.io/thumbnail-generator/> in a modern desktop or mobile browser. No account, server, or upload is required. Images, templates, edit state, brand kit, colors, and imported fonts stay in the current browser profile unless you export a thumbnail, layout, edit-state JSON, or clear site data. Browsers that support PWA installation can install サムネいる？ from the address-bar install action or browser menu.
 
-Use the in-app GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data. The published app also links to its privacy policy, terms, and X / Twitter contact from the footer.
+Use the footer GitHub Issues link to report bugs, usability issues, and feature requests. The app does not upload browser-local image, font, template, palette, brand, or edit-state data. The published app opens the privacy policy and terms as localized footer modals and links to the X / Twitter contact.
 
 ## Run Locally
 
@@ -95,8 +96,8 @@ Useful reports include the browser name/version, viewport or device, what you im
 - [docs/design.md](docs/design.md): editor layout, visual tokens, and responsive behavior.
 - [docs/features.md](docs/features.md): user-facing feature overview.
 - [docs/user-guide.md](docs/user-guide.md): manual usage guide.
-- [docs/privacy-policy.md](docs/privacy-policy.md): privacy policy mirrored by the published static page.
-- [docs/terms.md](docs/terms.md): terms of use mirrored by the published static page.
+- [docs/privacy-policy.md](docs/privacy-policy.md): privacy policy mirrored by the in-app modal and published static fallback page.
+- [docs/terms.md](docs/terms.md): terms of use mirrored by the in-app modal and published static fallback page.
 - [docs/screenshot-guide.md](docs/screenshot-guide.md): screenshot-based feature guide and use-case walkthroughs.
 - [docs/test-plan.md](docs/test-plan.md): automated and browser runtime validation plan and results.
 - [docs/qcds-evaluation.md](docs/qcds-evaluation.md): Quality, Cost, Delivery, and Satisfaction evaluation.

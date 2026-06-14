@@ -4,6 +4,7 @@ import type { Dispatch, MutableRefObject, SetStateAction } from "react";
 import { ImageLabPanel } from "./components/ImageLabPanel";
 import { InspectorPanel, type InspectorSection } from "./components/InspectorPanel";
 import { LeftPanel } from "./components/LeftPanel";
+import { LegalDialog, type LegalDialogKind } from "./components/LegalDialog";
 import { ManualDialog, defaultManualDialogState, type ManualDialogState } from "./components/ManualDialog";
 import { StatusBar } from "./components/StatusBar";
 import { TagSettingsDialog } from "./components/TagSettingsDialog";
@@ -208,6 +209,7 @@ function App() {
   const [isTagSettingsOpen, setIsTagSettingsOpen] = useState(false);
   const [isManualOpen, setIsManualOpen] = useState(false);
   const [manualDialogState, setManualDialogState] = useState<ManualDialogState>(defaultManualDialogState);
+  const [legalDialogKind, setLegalDialogKind] = useState<LegalDialogKind | null>(null);
   const [autoSaveEnabled, setAutoSaveEnabled] = useState(initialEditStatePreferences.autoSaveEnabled);
   const [savedEditStateUpdatedAt, setSavedEditStateUpdatedAt] = useState<string | null>(
     initialSavedEditState?.updatedAt ?? null,
@@ -324,6 +326,11 @@ function App() {
     if (typeof document === "undefined") return;
     document.documentElement.dataset.theme = effectiveTheme;
   }, [effectiveTheme]);
+
+  useEffect(() => {
+    if (typeof document === "undefined") return;
+    document.title = t("app.title");
+  }, [t]);
 
   useEffect(() => {
     setSelectedIds((current) => {
@@ -2218,7 +2225,6 @@ function App() {
         onImportEditState={importEditState}
         onDeleteEditState={deleteEditState}
         onOpenTagSettings={() => setIsTagSettingsOpen(true)}
-        onOpenManual={() => setIsManualOpen(true)}
         t={t}
       />
       <main className={`workspace ${isPreviewPlaying ? "preview-playback-locked" : ""}`} aria-label="Thumbnail editor workspace">
@@ -2556,7 +2562,19 @@ function App() {
           onClose={() => setIsManualOpen(false)}
         />
       ) : null}
-      <StatusBar t={t} />
+      {legalDialogKind ? (
+        <LegalDialog
+          kind={legalDialogKind}
+          language={language}
+          onClose={() => setLegalDialogKind(null)}
+        />
+      ) : null}
+      <StatusBar
+        t={t}
+        onOpenManual={() => setIsManualOpen(true)}
+        onOpenPrivacy={() => setLegalDialogKind("privacy")}
+        onOpenTerms={() => setLegalDialogKind("terms")}
+      />
     </div>
   );
 }

@@ -54,8 +54,8 @@ This page is the quick feature index for users and reviewers.
 - Keep browser-local brand kit data compatible with existing saved state.
 - Keep Brand kit setup and Colors-side Brand kit registration buttons hidden.
 - Keep rule-based quality checks covered by automated validation while the visible bottom footer focuses on service and legal links.
-- Link to GitHub Issues from the app for bug reports and feature requests, and use the bottom footer for privacy policy, terms, X / Twitter contact, and copyright.
-- Open the fixed-size in-app manual from the Manual button beside Issue reporting, then use left category tabs, top section tabs, and the right-side contents. The manual highlights the matching entry when a contents item is focused or hovered, preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
+- Link to GitHub Issues from the footer with a GitHub icon for bug reports and feature requests, and use the bottom footer for Manual, localized privacy policy and terms modals, X / Twitter contact, and centered copyright.
+- Open the fixed-size in-app manual from the footer, then use left category tabs, top section tabs, and the right-side contents. The manual highlights the matching entry when a contents item is focused or hovered, preserves the last viewed tabs and scroll position after closing, follows the active Japanese/English GUI labels, and explains parameter/dropdown item effects plus call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing.
 
 ## Image And Text Tools
 
@@ -113,6 +113,6 @@ This page is the quick feature index for users and reviewers.
 
 ## PWA And Extension Integration
 
-- Install サムネいる？ from browsers that expose a PWA install action for the GitHub Pages app.
+- Install サムネいる？ / ThumbNailed It? from browsers that expose a PWA install action for the GitHub Pages app.
 - Use the service worker app-shell cache for faster repeat loads; the app still runs when service worker registration is unavailable.
 - Chrome extension content scripts can use the `thumbnail-generator.extension.v1` page bridge to `ping`, read the current edit-state snapshot, or apply a valid edit-state snapshot.

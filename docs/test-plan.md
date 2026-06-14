@@ -1382,3 +1382,36 @@ Completed on 2026-06-14.
   - `output/runtime-20260614-manual-label-sync/manual-label-sync-ja.png`
   - `output/runtime-20260614-manual-label-sync/layer-edit.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Footer Manual And Legal Modal Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: moved Manual access from the header to the footer, removed header Issue reporting, added a GitHub icon to footer GitHub Issues, centered `© Sunmax Engineering`, removed the browser-only footer phrase, localized the visible English title to `ThumbNailed It?`, added the `Need it quick? ThumbNailed It!` tagline, and changed Privacy Policy / Terms to localized in-app modals.
+- `npm test`: pass. 34 test files, 139 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright with the local Chrome channel was used.
+- Runtime gate URL: `http://127.0.0.1:4384/thumbnail-generator/?runtime=footer-legal-modal-20260614`.
+- Desktop viewport: `1440x960`; mobile viewport: `390x760`.
+- Runtime checks:
+  - Page title and header were `ThumbNailed It?` in English mode, and the visible tagline was `Need it quick? ThumbNailed It!`.
+  - Header Issue reporting and header Manual access were absent.
+  - Footer Manual, Privacy Policy, Terms, X / Twitter contact, centered `© Sunmax Engineering`, and GitHub Issues were visible; GitHub Issues included an SVG GitHub icon.
+  - The footer did not contain `Browser-only static app` or `ブラウザ内完結の静的アプリ`.
+  - Copyright center delta was `0.0078125px` from the viewport center.
+  - Manual opened from the footer.
+  - Privacy Policy and Terms opened as modals in English; Privacy Policy and Terms opened as Japanese modals after switching the language selector to Japanese.
+  - Japanese mode header changed to `サムネいる？`; English `ThumbNailed It?` no longer appeared as the `h1`.
+  - Canvas rendered nonblank (`1516x956`, sampled nonblank pixels `90581`).
+  - Layer editing changed a selected layer name to `Runtime footer legal layer`.
+  - WebP export downloaded `728640` bytes.
+  - Mobile horizontal overflow was `0px`.
+  - Console health: no page errors or app console errors; the only captured warning was the expected Playwright service worker block.
+- Evidence:
+  - `output/runtime-20260614-footer-legal-modal/runtime-result.json`
+  - `output/runtime-20260614-footer-legal-modal/01-desktop-en.png`
+  - `output/runtime-20260614-footer-legal-modal/02-privacy-en.png`
+  - `output/runtime-20260614-footer-legal-modal/03-privacy-ja.png`
+  - `output/runtime-20260614-footer-legal-modal/04-layer-edit.png`
+  - `output/runtime-20260614-footer-legal-modal/05-mobile.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.

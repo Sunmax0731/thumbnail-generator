@@ -21,4 +21,11 @@ describe("i18n", () => {
     expect(createTranslator("en")("inspector.motion")).toBe("Animation");
     expect(createTranslator("ja")("inspector.motion")).toBe("アニメ");
   });
+
+  it("uses localized app names with the shared tagline", () => {
+    expect(createTranslator("en")("app.title")).toBe("ThumbNailed It?");
+    expect(createTranslator("ja")("app.title")).toBe("サムネいる？");
+    expect(createTranslator("en")("app.subtitle")).toBe("Need it quick? ThumbNailed It!");
+    expect(createTranslator("ja")("app.subtitle")).toBe("Need it quick? ThumbNailed It!");
+  });
 });

@@ -14,7 +14,7 @@
   ],
   "quality": {
     "rating": "A+",
-    "rationale": "Current app coverage includes the サムネいる？ title, active-language Animation/アニメ tab label, privacy/terms/contact service footer, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, collapsible bottom motion timeline, motion presets, separated common/text-only/glow-effect motion controls, OBS preview Play/Pause/Reset/Hide controls, existing template/generator/layer/color/Image Lab workflows, CSV/HTML animation text/effect compatibility, automated tests, production build, and headless Chromium runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
+    "rationale": "Current app coverage includes the Japanese サムネいる？ title, English ThumbNailed It? title, shared Need it quick? ThumbNailed It! tagline, footer Manual access, localized Privacy Policy and Terms modals, GitHub Issues footer link with icon, centered © Sunmax Engineering footer, active-language Animation/アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, motion timeline, existing template/generator/layer/color/Image Lab workflows, CSV/HTML compatibility, automated tests, production build, and Playwright local Chrome runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -26,7 +26,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested UI, PWA, extension, and title changes passed validation: the page title/header are サムネいる？, the right inspector Motion tab is アニメ, the preview bottom timeline can collapse and expand, manifest/service worker load under /thumbnail-generator/, the extension bridge handles ping/getSnapshot/applySnapshot, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
+    "rationale": "Requested footer/manual/legal-modal changes passed validation: header Issue and Manual controls are removed, Manual opens from the footer, Privacy Policy and Terms open as English/Japanese modals, English title is ThumbNailed It?, the tagline is visible, GitHub Issues has a GitHub icon, © Sunmax Engineering is centered, the browser-only footer phrase is absent, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -62,15 +62,20 @@
     "platform": "WebApp",
     "requirement": "Chrome or headless browser confirms nonblank render, primary elements, and primary operations.",
     "status": "passed",
-    "tool": "Playwright headless Chromium",
+    "tool": "Playwright local Chrome",
     "browserPluginStatus": "attempted",
-    "browserPluginFallbackReason": "Browser plugin attempt failed with Browser is not available: iab; Playwright headless Chromium was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
+    "browserPluginFallbackReason": "Browser plugin client file scripts/browser-client.mjs was missing; Playwright with the local Chrome channel was used for the scripted runtime gate.",
+    "url": "http://127.0.0.1:4384/thumbnail-generator/?runtime=footer-legal-modal-20260614",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "passed for pushed codex/thumbnail-generator-static-app branch",
-    "desktopViewport": "1440x1000",
-    "mobileViewport": "390x900",
+    "desktopViewport": "1440x960",
+    "mobileViewport": "390x760",
     "screenshots": [
+      "output/runtime-20260614-footer-legal-modal/01-desktop-en.png",
+      "output/runtime-20260614-footer-legal-modal/02-privacy-en.png",
+      "output/runtime-20260614-footer-legal-modal/03-privacy-ja.png",
+      "output/runtime-20260614-footer-legal-modal/04-layer-edit.png",
+      "output/runtime-20260614-footer-legal-modal/05-mobile.png",
       "output/runtime-20260612-pwa-extension/desktop-initial.png",
       "output/runtime-20260612-pwa-extension/anime-timeline-expanded.png",
       "output/runtime-20260612-pwa-extension/mobile.png",
@@ -91,6 +96,22 @@
       "output/runtime-20260612-motion-ui/mobile.png"
     ],
     "checks": [
+      "English title ThumbNailed It?",
+      "tagline Need it quick? ThumbNailed It! visible",
+      "header Issue reporting absent",
+      "header Manual button absent",
+      "footer Manual button opens Manual modal",
+      "footer Privacy Policy opens English modal",
+      "footer Terms opens English modal",
+      "Japanese Privacy Policy modal after language switch",
+      "Japanese Terms modal after language switch",
+      "footer GitHub Issues includes GitHub SVG icon",
+      "centered © Sunmax Engineering footer",
+      "browser-only footer phrase absent",
+      "nonblank canvas",
+      "layer name edit Runtime footer legal layer",
+      "WebP export download",
+      "mobile no horizontal overflow",
       "document title and app header are サムネいる？",
       "old title text absent",
       "right inspector tab label is アニメ",
@@ -99,7 +120,6 @@
       "extension bridge ping getSnapshot applySnapshot pass",
       "timeline hidden before アニメ and visible inside アニメ",
       "timeline collapse and expand preserve default height",
-      "nonblank canvas",
       "primary UI visible",
       "Standard thumbnail letter spacing increments from -1 to 0",
       "Standard thumbnail letter spacing retains direct 0 input",
@@ -210,10 +230,8 @@
       "Adjust numeric edit",
       "vertical text Adjust width and height edit",
       "vertical text preview handle resize without unexpected movement",
-      "WebP export download",
       "mobile viewport",
       "mobile canvas-first layout",
-      "mobile no horizontal overflow",
       "Output menu JPG PNG WebP OBS choices",
       "Old preview-bottom Output and Edit state sections removed",
       "Top-right edit-state icon tooltips",

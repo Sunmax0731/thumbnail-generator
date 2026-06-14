@@ -2,7 +2,7 @@
 
 ## Goal
 
-Create a static web service named サムネいる？ for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms.
+Create a static web service named サムネいる？ in Japanese mode and ThumbNailed It? in English mode for making video thumbnails for YouTube, NicoNico, Twitch, and similar platforms. The visible title must show the tagline `Need it quick? ThumbNailed It!`.
 
 ## Functional Requirements
 
@@ -50,9 +50,9 @@ Create a static web service named サムネいる？ for making video thumbnails
 - Keep rule-based quality warning helpers available for validation and future UI surfaces, while the bottom footer remains reserved for service/legal links.
 - Export JPG, PNG, WebP, and OBS preview from one Output menu in the preview header.
 - Export, import, and delete browser-local edit-state JSON for backup and recovery from compact top-right icon controls, while keeping Autosave current edit state text visible.
-- Show a GitHub Issues path for bug reports and feature requests.
+- Show a footer GitHub Issues path with a GitHub icon for bug reports and feature requests.
 - Show browser-only privacy/storage guidance inside the app without requiring a Templates service section.
-- Publish a privacy policy and terms of use from the static app, and keep footer links for privacy, terms, contact, issue reporting, and copyright.
+- Publish a privacy policy and terms of use from the static app, and open localized privacy and terms content from footer modals. Keep footer entries for Manual, privacy, terms, X / Twitter contact, issue reporting, and centered copyright.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Keep the preview frame fixed to the output document area while preserving clipped document-only export and user-controlled zoom.
 - Make the direct rotation handle visually recognizable through cursor and handle states.
