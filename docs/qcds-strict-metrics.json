@@ -14,7 +14,7 @@
   ],
   "quality": {
     "rating": "A+",
-    "rationale": "Current app coverage includes the Japanese サムネいる？ title, English ThumbNailed It? title, shared Need it quick? ThumbNailed It! tagline, footer Manual access, localized Privacy Policy and Terms modals, GitHub Issues footer link with icon, centered © Sunmax Engineering footer, active-language Animation/アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, motion timeline, existing template/generator/layer/color/Image Lab workflows, CSV/HTML compatibility, automated tests, production build, and Playwright local Chrome runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
+    "rationale": "Current app coverage includes the Japanese サムネいる？ title, English ThumbNailed It? title, shared Need it quick? ThumbNailed It! tagline, footer Manual access, Manual per-feature use cases, localized Privacy Policy and Terms modals with taller desktop layout, X / Twitter footer contact using the official X logo SVG path, GitHub Issues footer link with icon, centered © Sunmax Engineering footer, active-language Animation/アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, motion timeline, existing template/generator/layer/color/Image Lab workflows, CSV/HTML compatibility, automated tests, production build, and Playwright local Chrome runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -26,7 +26,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested footer/manual/legal-modal changes passed validation: header Issue and Manual controls are removed, Manual opens from the footer, Privacy Policy and Terms open as English/Japanese modals, English title is ThumbNailed It?, the tagline is visible, GitHub Issues has a GitHub icon, © Sunmax Engineering is centered, the browser-only footer phrase is absent, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
+    "rationale": "Requested legal modal height, official X icon, Manual use-case, and Manual header copy changes passed validation: Privacy Policy and Terms legal-content had no desktop overflow, X / Twitter contact uses the official X logo path, Manual feature entries show use-case rows, the removed Manual subtitle is absent, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -65,12 +65,18 @@
     "tool": "Playwright local Chrome",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin client file scripts/browser-client.mjs was missing; Playwright with the local Chrome channel was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4384/thumbnail-generator/?runtime=footer-legal-modal-20260614",
+    "url": "http://127.0.0.1:4385/thumbnail-generator/?runtime=legal-x-manual-use-cases-20260614",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "passed for pushed codex/thumbnail-generator-static-app branch",
-    "desktopViewport": "1440x960",
+    "desktopViewport": "2048x1152",
     "mobileViewport": "390x760",
     "screenshots": [
+      "output/runtime-20260614-legal-x-manual-use-cases/01-desktop-initial.png",
+      "output/runtime-20260614-legal-x-manual-use-cases/02-terms-dialog.png",
+      "output/runtime-20260614-legal-x-manual-use-cases/03-privacy-dialog.png",
+      "output/runtime-20260614-legal-x-manual-use-cases/04-manual-use-case.png",
+      "output/runtime-20260614-legal-x-manual-use-cases/05-layer-edit.png",
+      "output/runtime-20260614-legal-x-manual-use-cases/06-mobile.png",
       "output/runtime-20260614-footer-legal-modal/01-desktop-en.png",
       "output/runtime-20260614-footer-legal-modal/02-privacy-en.png",
       "output/runtime-20260614-footer-legal-modal/03-privacy-ja.png",
@@ -96,6 +102,16 @@
       "output/runtime-20260612-motion-ui/mobile.png"
     ],
     "checks": [
+      "official X logo path on footer contact",
+      "Terms legal modal no desktop content overflow",
+      "Privacy legal modal no desktop content overflow",
+      "Manual header subtitle removed",
+      "Manual per-feature use case row visible",
+      "Manual use case label visible",
+      "nonblank canvas",
+      "layer name edit Runtime legal x manual layer",
+      "WebP export download",
+      "mobile no horizontal overflow",
       "English title ThumbNailed It?",
       "tagline Need it quick? ThumbNailed It! visible",
       "header Issue reporting absent",
@@ -108,10 +124,7 @@
       "footer GitHub Issues includes GitHub SVG icon",
       "centered © Sunmax Engineering footer",
       "browser-only footer phrase absent",
-      "nonblank canvas",
       "layer name edit Runtime footer legal layer",
-      "WebP export download",
-      "mobile no horizontal overflow",
       "document title and app header are サムネいる？",
       "old title text absent",
       "right inspector tab label is アニメ",

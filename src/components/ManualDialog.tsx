@@ -32,6 +32,7 @@ interface ManualEntry {
   id: string;
   title: string;
   body: string;
+  useCase: string;
   details: string[];
 }
 
@@ -53,6 +54,7 @@ interface ManualCategory {
 interface ManualCopy {
   title: string;
   subtitle: string;
+  useCaseLabel: string;
   closeLabel: string;
   categoryTabsLabel: string;
   sectionTabsLabel: (categoryLabel: string) => string;
@@ -109,7 +111,7 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
             <h2 id="manual-title">
               <BookOpen size={18} /> {copy.title}
             </h2>
-            <p>{copy.subtitle}</p>
+            {copy.subtitle ? <p>{copy.subtitle}</p> : null}
           </div>
           <button type="button" className="icon-button modal-close" aria-label={copy.closeLabel} onClick={onClose}>
             <X size={18} />
@@ -161,6 +163,10 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
                     >
                       <h4>{entry.title}</h4>
                       <p>{entry.body}</p>
+                      <p className="manual-use-case">
+                        <strong>{copy.useCaseLabel}</strong>
+                        <span>{entry.useCase}</span>
+                      </p>
                       {entry.details.length > 0 ? (
                         <ul>
                           {entry.details.map((detail) => (
@@ -224,7 +230,13 @@ function buildManualCopy(language: Language): ManualCopy {
     `${label("preset.youtube720")}、${label("preset.fullHd")}、${label("preset.twitch720")}、${label("preset.square")}、${label("preset.shorts")}、${label("preset.custom")}`,
     `${label("preset.youtube720")}, ${label("preset.fullHd")}, ${label("preset.twitch720")}, ${label("preset.square")}, ${label("preset.shorts")}, and ${label("preset.custom")}`,
   );
-  const entry = (id: string, title: string, body: string, details: string[] = []): ManualEntry => ({ id, title, body, details });
+  const entry = (id: string, title: string, body: string, details: string[] = []): ManualEntry => ({
+    id,
+    title,
+    body,
+    useCase: tx(`この機能は「${title}」を使って、${body}`, `Use this when you need ${title.toLowerCase()}: ${body}`),
+    details,
+  });
   const related = [
     { categoryId: "preview" as const, sectionId: "selection", label: tx("プレビュー選択", "Preview selection") },
     { categoryId: "layers" as const, sectionId: "canvas", label: label("inspector.canvas") },
@@ -625,9 +637,10 @@ function buildManualCopy(language: Language): ManualCopy {
   return {
     title: tx("マニュアル", "Manual"),
     subtitle: tx(
-      "画面上の表記に合わせて、機能、パラメータ、ドロップダウン項目、ショートカットを確認できます。",
-      "Review features, parameters, dropdown items, and shortcuts using the same labels shown in the editor.",
+      "",
+      "",
     ),
+    useCaseLabel: tx("ユースケース: ", "Use case: "),
     closeLabel: tx("マニュアルを閉じる", "Close manual"),
     categoryTabsLabel: tx("マニュアル機能タブ", "Manual feature tabs"),
     sectionTabsLabel: (categoryLabel) => tx(`${categoryLabel} セクション`, `${categoryLabel} sections`),

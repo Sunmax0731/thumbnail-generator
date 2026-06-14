@@ -50,9 +50,9 @@ Create a static web service named サムネいる？ in Japanese mode and ThumbN
 - Keep rule-based quality warning helpers available for validation and future UI surfaces, while the bottom footer remains reserved for service/legal links.
 - Export JPG, PNG, WebP, and OBS preview from one Output menu in the preview header.
 - Export, import, and delete browser-local edit-state JSON for backup and recovery from compact top-right icon controls, while keeping Autosave current edit state text visible.
-- Show a footer GitHub Issues path with a GitHub icon for bug reports and feature requests.
+- Show a footer GitHub Issues path with a GitHub icon for bug reports and feature requests, and show the X / Twitter contact with the official X logo.
 - Show browser-only privacy/storage guidance inside the app without requiring a Templates service section.
-- Publish a privacy policy and terms of use from the static app, and open localized privacy and terms content from footer modals. Keep footer entries for Manual, privacy, terms, X / Twitter contact, issue reporting, and centered copyright.
+- Publish a privacy policy and terms of use from the static app, and open localized privacy and terms content from taller footer modals that avoid desktop scrollbars where the viewport allows. Keep footer entries for Manual, privacy, terms, X / Twitter contact, issue reporting, and centered copyright.
 - Select text alignment with direct Left, Center, and Right buttons.
 - Keep the preview frame fixed to the output document area while preserving clipped document-only export and user-controlled zoom.
 - Make the direct rotation handle visually recognizable through cursor and handle states.

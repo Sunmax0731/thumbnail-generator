@@ -29,7 +29,7 @@ npm run preview
 - Animation / アニメ: assign multiple ordered motion sets, apply presets, split movement motions from non-moving effects, preview the selected object, show or hide the easing graph, and edit animated objects in the Animation/アニメ-only bottom timeline for OBS preview playback.
 
 - Timeline Play/Pause previews animation directly in the editor. Reset returns the editor preview position to the beginning. Playback starts paused/editable; while playing, the object list, inspector, timeline timing edits, and preview canvas edits are locked, and the timeline playhead shows the current playback position. Loop-enabled rows show faint repeated timeline segments after the first cycle without moving the editable handles.
-- Manual: use the footer Manual button to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings while highlighting the matching manual entry on focus or hover. The modal follows the active Japanese/English GUI labels, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
+- Manual: use the footer Manual button to open a fixed-size reference modal. The left tabs choose feature areas, the top tabs choose sections, and the right-side contents jump to headings while highlighting the matching manual entry on focus or hover. The modal follows the active Japanese/English GUI labels, adds a use-case line to each feature, explains parameter and dropdown item effects, documents call paths such as Output menu to OBS preview, Colors to image extraction, and multi-selection to relative editing, and remembers the last tabs and scroll position after closing.
 
 ## Layout Compatibility
 
@@ -143,7 +143,7 @@ Select an object and open Adjust. Shadow controls set color, opacity, blur, dist
 
 Select an output preset from the top toolbar. The preview keeps the current zoom when presets or output sizes change. Select Fit canvas when you want a one-time fit calculation, or pan the preview with Pan, Space-drag, or Alt-drag. Use the Output menu in the preview header to download JPG, PNG, or WebP at maximum quality, or to open the OBS preview.
 
-The bottom footer provides service information: Manual, localized privacy policy and terms modals, X / Twitter contact, GitHub Issues, and the centered `© Sunmax Engineering` copyright notice.
+The bottom footer provides service information: Manual, taller localized privacy policy and terms modals, X / Twitter contact with the X logo, GitHub Issues, and the centered `© Sunmax Engineering` copyright notice.
 
 ## Animation / アニメ And OBS Preview
 

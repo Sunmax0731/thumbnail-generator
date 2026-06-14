@@ -1415,3 +1415,35 @@ Completed on 2026-06-14.
   - `output/runtime-20260614-footer-legal-modal/04-layer-edit.png`
   - `output/runtime-20260614-footer-legal-modal/05-mobile.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.
+
+## Legal Modal Height, X Contact Icon, And Manual Use Cases Runtime Gate (2026-06-14)
+
+Completed on 2026-06-14.
+
+- Scope: enlarged Privacy Policy and Terms modal layout so desktop viewports avoid internal legal-content scrollbars, replaced the footer X / Twitter contact with the official X logo SVG path from the X Brand toolkit asset, added a use-case line to every Manual feature entry, and removed the Manual header subtitle text.
+- Source check: the X logo source was checked against X's official Brand toolkit page and downloaded official `logo.svg` asset under `output/x-brand-assets/` for implementation comparison; the committed app uses the matching local SVG path and does not load the asset from the network.
+- `npm test`: pass. 34 test files, 139 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser plugin attempt: failed because `C:\Users\gkkjh\.codex\plugins\cache\openai-bundled\browser\26.609.30741\scripts\browser-client.mjs` was not present; Playwright with the local Chrome channel was used.
+- Runtime gate URL: `http://127.0.0.1:4385/thumbnail-generator/?runtime=legal-x-manual-use-cases-20260614`.
+- Desktop viewport: `2048x1152`; mobile viewport: `390x760`.
+- Runtime checks:
+  - Canvas rendered nonblank (`1516x956`, sampled nonblank pixels `90581`).
+  - Footer X / Twitter contact rendered one `svg.x-logo-icon`, and its path matched the official X logo asset prefix.
+  - Terms modal desktop metrics: dialog height `718.765625px`, legal-content client/scroll height `632/632`, overflow `visible`, no vertical overflow.
+  - Privacy modal desktop metrics: dialog height `770.265625px`, legal-content client/scroll height `684/684`, overflow `visible`, no vertical overflow.
+  - Manual header no longer contained the removed subtitle text.
+  - Manual active section displayed use-case rows; the initial section showed `2` `.manual-use-case` rows, and the `ユースケース` / `Use case` label was present.
+  - Layer editing changed the selected layer name to `Runtime legal x manual layer`.
+  - WebP export downloaded `728640` bytes.
+  - Mobile horizontal overflow was `0px`.
+  - Console health: no page errors or app console errors; the only captured warning was the expected Playwright service worker block.
+- Evidence:
+  - `output/runtime-20260614-legal-x-manual-use-cases/runtime-result.json`
+  - `output/runtime-20260614-legal-x-manual-use-cases/01-desktop-initial.png`
+  - `output/runtime-20260614-legal-x-manual-use-cases/02-terms-dialog.png`
+  - `output/runtime-20260614-legal-x-manual-use-cases/03-privacy-dialog.png`
+  - `output/runtime-20260614-legal-x-manual-use-cases/04-manual-use-case.png`
+  - `output/runtime-20260614-legal-x-manual-use-cases/05-layer-edit.png`
+  - `output/runtime-20260614-legal-x-manual-use-cases/06-mobile.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain absent in this build; parser/model compatibility is covered by `npm test`.

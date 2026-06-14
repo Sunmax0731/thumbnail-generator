@@ -40,8 +40,8 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Open the OBS preview window with lightweight Play/Pause, Reset, and Hide controls; press `P`, `R`, or `H` in the preview window to control playback, reset, or hide/show controls for clean OBS capture.
 - Pan the preview manually with the Pan button, Space-drag, or Alt-drag while zoom remains user-controlled until Fit canvas is selected. Fit canvas also recenters the output canvas in the preview. Objects outside the output frame remain visible while editing with dimmed outside-frame portions, and export stays clipped to the output canvas.
 - The app title shows `サムネいる？` in Japanese mode and `ThumbNailed It?` in English mode, with the tagline `Need it quick? ThumbNailed It!` underneath.
-- Open the in-app manual from the bottom service footer; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
-- Use the bottom service footer for Manual, localized privacy policy and terms modals, X / Twitter contact, GitHub Issues with an icon, and the centered copyright notice.
+- Open the in-app manual from the bottom service footer; the larger manual follows the current Japanese/English language setting, uses the matching GUI labels for that language, adds a use case to each feature entry, explains parameter and dropdown item effects in bullets, and remembers the last category, section, and scroll position after closing.
+- Use the bottom service footer for Manual, taller localized privacy policy and terms modals, X / Twitter contact with the official X logo, GitHub Issues with an icon, and the centered copyright notice.
 - Install the app from supported browsers through the PWA manifest and service worker app-shell cache.
 - Let Chrome extensions integrate through the `thumbnail-generator.extension.v1` page bridge for `ping`, `getSnapshot`, and `applySnapshot` commands.
 - Use the GitHub Pages build with the same Google Analytics tracking setup as the other Sunmax0731 GitHub Pages pages.
