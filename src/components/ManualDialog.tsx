@@ -228,58 +228,37 @@ export function ManualDialog({ language, state, onStateChange, onClose }: Manual
 }
 
 function ManualEntryVisuals({ entry, copy }: { entry: ManualEntry; copy: ManualCopy }) {
+  if (isShortcutVisualEntry(entry.id)) {
+    return (
+      <div className="manual-visuals manual-shortcut-visuals" aria-label={`${entry.title}: ${copy.shortcutVisualLabel}`}>
+        <ManualShortcutVisuals entryId={entry.id} copy={copy} />
+      </div>
+    );
+  }
+  const capture = manualCaptureForEntry(entry.id);
   return (
     <div className="manual-visuals" aria-label={`${entry.title}: ${copy.visualIntroLabel}`}>
       <figure className="manual-visual-card">
-        <ManualGuiSvg title={entry.title} mode="access" ariaLabel={`${entry.title}: ${copy.accessVisualLabel}`} />
+        <img
+          className="manual-capture-image"
+          src={manualCaptureUrl(capture[0])}
+          alt={`${entry.title}: ${copy.accessVisualLabel}`}
+          loading="lazy"
+          decoding="async"
+        />
         <figcaption>{copy.accessVisualLabel}</figcaption>
       </figure>
       <figure className="manual-visual-card">
-        <ManualGuiSvg title={entry.title} mode="operation" ariaLabel={`${entry.title}: ${copy.operationVisualLabel}`} />
+        <img
+          className="manual-capture-image"
+          src={manualCaptureUrl(capture[1])}
+          alt={`${entry.title}: ${copy.operationVisualLabel}`}
+          loading="lazy"
+          decoding="async"
+        />
         <figcaption>{copy.operationVisualLabel}</figcaption>
       </figure>
-      <ManualShortcutVisuals entryId={entry.id} copy={copy} />
     </div>
-  );
-}
-
-function ManualGuiSvg({ title, mode, ariaLabel }: { title: string; mode: "access" | "operation"; ariaLabel: string }) {
-  const shortTitle = title.length > 18 ? `${title.slice(0, 17)}...` : title;
-  const isAccess = mode === "access";
-  return (
-    <svg className="manual-gui-svg" viewBox="0 0 260 128" role="img" aria-label={ariaLabel}>
-      <title>{ariaLabel}</title>
-      <rect x="8" y="8" width="244" height="112" rx="8" className="manual-svg-window" />
-      <rect x="8" y="8" width="244" height="20" rx="8" className="manual-svg-header" />
-      <circle cx="22" cy="18" r="4" className="manual-svg-dot" />
-      <circle cx="36" cy="18" r="4" className="manual-svg-dot muted" />
-      <circle cx="50" cy="18" r="4" className="manual-svg-dot muted" />
-      {isAccess ? (
-        <>
-          <rect x="20" y="40" width="62" height="14" rx="4" className="manual-svg-muted" />
-          <rect x="20" y="60" width="62" height="20" rx="4" className="manual-svg-focus" />
-          <rect x="20" y="88" width="62" height="14" rx="4" className="manual-svg-muted" />
-          <path d="M92 70h44" className="manual-svg-arrow" />
-          <path d="m128 62 10 8-10 8" className="manual-svg-arrow" />
-          <rect x="148" y="42" width="84" height="14" rx="4" className="manual-svg-control" />
-          <rect x="148" y="64" width="70" height="14" rx="4" className="manual-svg-focus" />
-          <rect x="148" y="86" width="92" height="14" rx="4" className="manual-svg-control" />
-        </>
-      ) : (
-        <>
-          <rect x="22" y="42" width="92" height="58" rx="6" className="manual-svg-canvas" />
-          <rect x="46" y="58" width="42" height="24" rx="3" className="manual-svg-focus" />
-          <circle cx="91" cy="55" r="5" className="manual-svg-handle" />
-          <rect x="132" y="44" width="92" height="12" rx="4" className="manual-svg-control" />
-          <rect x="132" y="66" width="72" height="12" rx="4" className="manual-svg-control" />
-          <rect x="132" y="88" width="100" height="12" rx="4" className="manual-svg-focus" />
-          <path d="M114 72h16" className="manual-svg-arrow" />
-        </>
-      )}
-      <text x="130" y="116" textAnchor="middle" className="manual-svg-title">
-        {shortTitle}
-      </text>
-    </svg>
   );
 }
 
@@ -325,6 +304,79 @@ function ManualShortcutVisuals({ entryId, copy }: { entryId: string; copy: Manua
     );
   }
   return null;
+}
+
+function isShortcutVisualEntry(entryId: string): boolean {
+  return entryId === "keyboard" || entryId === "mouse-preview";
+}
+
+type ManualCapturePair = readonly [access: string, operation: string];
+
+const manualCaptures: Record<string, ManualCapturePair> = {
+  "overview-compose": ["manual-access-left-tabs.png", "manual-operation-canvas.png"],
+  "overview-export": ["manual-access-preview-header.png", "screenshot-guide-export-buttons.png"],
+  "overview-save": ["manual-access-top-toolbar.png", "manual-operation-templates-panel.png"],
+  "overview-templates": ["manual-access-left-tabs.png", "manual-operation-templates-panel.png"],
+  "overview-editing": ["manual-access-inspector-tabs.png", "manual-operation-adjust-panel.png"],
+  "overview-motion": ["manual-access-inspector-tabs.png", "manual-operation-animation-panel.png"],
+  "overview-step-start": ["manual-access-left-tabs.png", "runtime-20260610-schedule-builder-desktop.png"],
+  "overview-step-edit": ["manual-operation-assets-panel.png", "manual-operation-adjust-panel.png"],
+  "overview-step-export": ["manual-access-preview-header.png", "screenshot-guide-export-buttons.png"],
+  schedule: ["manual-operation-templates-panel.png", "runtime-20260610-schedule-builder-desktop.png"],
+  thumbnail: ["manual-operation-templates-panel.png", "runtime-20260612-creative-modal-standard-desktop.png"],
+  "save-settings": ["runtime-20260612-creative-modal-standard-desktop.png", "runtime-20260612-creative-modal-waiting-desktop.png"],
+  "save-load-delete": ["manual-operation-templates-panel.png", "manual-operation-templates-panel.png"],
+  "tags-filter": ["manual-operation-templates-panel.png", "manual-operation-assets-panel.png"],
+  "text-shape-line": ["manual-operation-layers-panel.png", "manual-operation-canvas.png"],
+  "asset-image": ["manual-operation-assets-panel.png", "manual-operation-canvas.png"],
+  "order-visibility-lock": ["manual-operation-layers-panel.png", "manual-operation-layers-panel.png"],
+  groups: ["manual-operation-layers-panel.png", "manual-operation-layers-panel.png"],
+  "align-distribute": ["manual-operation-layers-panel.png", "manual-operation-canvas.png"],
+  "register-tags": ["manual-operation-assets-panel.png", "manual-operation-assets-panel.png"],
+  "row-actions-resize": ["manual-operation-assets-panel.png", "manual-operation-assets-panel.png"],
+  crop: ["manual-operation-assets-panel.png", "runtime-image-lab-rect-circle-drag.png"],
+  "chroma-add": ["runtime-image-lab-modal.png", "runtime-image-lab-modal.png"],
+  geometry: ["manual-access-inspector-tabs.png", "screenshot-guide-adjust-text.png"],
+  "opacity-effects": ["manual-access-inspector-tabs.png", "screenshot-guide-adjust-shape.png"],
+  "pseudo-3d-bevel": ["manual-access-inspector-tabs.png", "screenshot-guide-adjust-shape.png"],
+  "relative-edit": ["manual-operation-layers-panel.png", "manual-operation-adjust-panel.png"],
+  typography: ["screenshot-guide-adjust-text.png", "screenshot-guide-canvas.png"],
+  paint: ["screenshot-guide-adjust-text.png", "screenshot-guide-colors-maker.png"],
+  shape: ["screenshot-guide-adjust-shape.png", "screenshot-guide-canvas.png"],
+  image: ["screenshot-guide-adjust-image.png", "screenshot-guide-canvas.png"],
+  picker: ["manual-access-inspector-tabs.png", "manual-operation-colors-panel.png"],
+  background: ["manual-access-preview-header.png", "screenshot-guide-export-buttons.png"],
+  "effect-parameters": ["manual-access-inspector-tabs.png", "manual-operation-animation-panel.png"],
+  "timing-easing": ["manual-access-inspector-tabs.png", "manual-operation-timeline.png"],
+  "preview-graph": ["manual-access-inspector-tabs.png", "runtime-20260609-motion-easing-desktop.png"],
+  "play-reset-lockout": ["manual-access-inspector-tabs.png", "manual-operation-timeline.png"],
+  visibility: ["manual-access-inspector-tabs.png", "manual-operation-timeline.png"],
+  "bar-handles": ["manual-operation-timeline.png", "manual-operation-timeline.png"],
+  "click-modifier": ["manual-operation-canvas.png", "manual-operation-canvas.png"],
+  range: ["manual-operation-canvas.png", "manual-operation-canvas.png"],
+  "wheel-pan": ["manual-operation-canvas.png", "manual-operation-canvas.png"],
+  fit: ["manual-access-preview-header.png", "manual-operation-canvas.png"],
+  "off-canvas": ["manual-operation-canvas.png", "manual-operation-canvas.png"],
+  "preset-width-height": ["manual-access-preview-header.png", "manual-operation-canvas.png"],
+  "output-menu": ["manual-access-preview-header.png", "screenshot-guide-export-buttons.png"],
+  "obs-preview": ["manual-access-preview-header.png", "manual-obs-preview-controls.png"],
+  "manual-autosave": ["manual-access-top-toolbar.png", "manual-access-top-toolbar.png"],
+  json: ["manual-access-top-toolbar.png", "manual-access-top-toolbar.png"],
+  "language-theme": ["manual-access-top-toolbar.png", "manual-access-top-toolbar.png"],
+  "tag-modal": ["manual-operation-assets-panel.png", "manual-operation-templates-panel.png"],
+  "issue-pwa-extension": ["manual-access-footer.png", "manual-access-footer.png"],
+  "collapse-resize": ["manual-operation-layers-panel.png", "manual-operation-assets-panel.png"],
+  "timeline-manual": ["manual-operation-timeline.png", "manual-access-footer.png"],
+};
+
+const defaultManualCapture: ManualCapturePair = ["manual-access-left-tabs.png", "manual-operation-canvas.png"];
+
+function manualCaptureForEntry(entryId: string): ManualCapturePair {
+  return manualCaptures[entryId] ?? defaultManualCapture;
+}
+
+function manualCaptureUrl(fileName: string): string {
+  return `${import.meta.env.BASE_URL}manual-captures/${fileName}`;
 }
 
 function buildManualCopy(language: Language): ManualCopy {
@@ -795,9 +847,9 @@ function buildManualCopy(language: Language): ManualCopy {
       "",
     ),
     useCaseLabel: tx("ユースケース: ", "Use case: "),
-    visualIntroLabel: tx("機能へのアクセスと操作画面のイメージ", "access and operation visuals"),
-    accessVisualLabel: tx("アクセスするGUI", "Access GUI"),
-    operationVisualLabel: tx("操作するGUI", "Operation GUI"),
+    visualIntroLabel: tx("実キャプチャによる機能へのアクセスと操作画面のイメージ", "real captures for access and operation visuals"),
+    accessVisualLabel: tx("アクセスするGUIの実キャプチャ", "Access GUI capture"),
+    operationVisualLabel: tx("操作するGUIの実キャプチャ", "Operation GUI capture"),
     shortcutVisualLabel: tx("ショートカット/マウス操作のSVG図解", "Shortcut and mouse operation SVG"),
     closeLabel: tx("マニュアルを閉じる", "Close manual"),
     categoryTabsLabel: tx("マニュアル機能タブ", "Manual feature tabs"),

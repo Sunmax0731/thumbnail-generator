@@ -3002,6 +3002,7 @@ button:disabled {
 .manual-visuals {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: start;
   gap: 10px;
   margin: 12px 0;
 }
@@ -3019,6 +3020,10 @@ button:disabled {
   grid-column: 1 / -1;
 }
 
+.manual-shortcut-visuals {
+  grid-template-columns: 1fr;
+}
+
 .manual-visual-card figcaption {
   margin-top: 6px;
   color: var(--muted);
@@ -3027,7 +3032,17 @@ button:disabled {
   line-height: 1.35;
 }
 
-.manual-gui-svg,
+.manual-capture-image {
+  display: block;
+  width: 100%;
+  max-height: 220px;
+  object-fit: contain;
+  object-position: center top;
+  border: 1px solid rgba(148, 163, 184, 0.34);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
 .manual-shortcut-svg {
   display: block;
   width: 100%;
@@ -3084,12 +3099,6 @@ button:disabled {
   stroke-linecap: round;
   stroke-linejoin: round;
   stroke-width: 3;
-}
-
-.manual-svg-title {
-  fill: var(--text);
-  font-size: 10px;
-  font-weight: 850;
 }
 
 .manual-svg-key-text {

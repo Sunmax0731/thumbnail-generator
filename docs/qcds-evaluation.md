@@ -45,12 +45,12 @@ Runtime evidence confirms nonblank canvas (`1516x956`, sampled nonblank pixels `
 
 All QCDS axes remain A+.
 
-- Quality: A+. The Manual now starts with an Overview category, top tabs for what the app can do, feature list, and workflow, per-feature access/operation GUI SVG visuals, and dedicated keyboard/mouse SVG diagrams.
-- Cost: A+. The change stays in existing React/CSS/docs, adds no package, backend, external asset service, or runtime network dependency, and uses generated inline SVG visuals.
-- Delivery: A+. `npm test` passed with 35 files and 141 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4398/thumbnail-generator/?runtime=manual-overview-visuals-20260614`.
-- Satisfaction: A+. The requested overview tab, app-capability/function/workflow content, feature GUI imagery, and graphical shortcut/mouse explanations were implemented and verified.
+- Quality: A+. The Manual now starts with an Overview category, top tabs for what the app can do, feature list, and workflow, per-feature real access/operation PNG captures from the actual GUI, and dedicated keyboard/mouse SVG diagrams.
+- Cost: A+. The change stays in existing React/CSS/docs, adds no package, backend, external asset service, or runtime network dependency, and reuses committed real GUI captures for feature entries while keeping inline SVG only for shortcut/mouse diagrams.
+- Delivery: A+. `npm test` passed with 35 files and 141 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4401/thumbnail-generator/?runtime=manual-real-captures-20260614`.
+- Satisfaction: A+. The requested overview tab, app-capability/function/workflow content, real feature GUI imagery, and graphical shortcut/mouse explanations were implemented and verified.
 
-Runtime evidence confirms page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled nonblank pixels `173746`), Manual side tab order beginning with `Overview`, Overview top tabs `What it does`, `Feature list`, and `Workflow`, 6 active-section access/operation GUI SVGs, 2 shortcut/mouse SVG diagrams, layer-name edit to `Runtime manual overview layer`, WebP export `729144` bytes, mobile overflow `0px`, and no page/app console errors. Browser plugin automation was unavailable for `iab`; Playwright with the local Chrome channel was used. Evidence files are under `output/runtime-20260614-manual-overview-visuals/`.
+Runtime evidence confirms page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled colored pixels `74412`), Manual side tab order beginning with `Overview`, Overview top tabs `What it does`, `Feature list`, and `Workflow`, feature sections using actual `.manual-capture-image` PNGs from `public/manual-captures`, no `.manual-gui-svg` placeholder feature diagrams, shortcut/mouse sections using 2 `.manual-shortcut-svg` diagrams and no PNG captures, layer-name edit to `Runtime manual real captures layer`, WebP export `729144` bytes, mobile overflow `0px`, and no page/app console errors. Browser plugin automation was unavailable for `iab`; Playwright with the local Chrome channel was used. Evidence files are under `output/runtime-20260614-manual-real-captures/`.
 
 ## 2026-06-14 Footer X Contact No-Wrap
 

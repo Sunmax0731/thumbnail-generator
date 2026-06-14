@@ -1502,26 +1502,27 @@ Completed on 2026-06-14.
 
 ## Manual Overview And Visual Guides Runtime Gate (2026-06-14)
 
-Completed on 2026-06-14 for the expanded in-app Manual overview, per-feature GUI visuals, and shortcut/mouse SVG diagrams.
+Completed on 2026-06-14 for the expanded in-app Manual overview, per-feature real GUI captures, and shortcut/mouse SVG diagrams.
 
-- Scope: added the topmost Manual Overview category with `What it does`, `Feature list`, and `Workflow` top tabs; added access and operation GUI SVG visuals to manual feature entries; added dedicated SVG diagrams for keyboard shortcuts and preview mouse operations.
+- Scope: added the topmost Manual Overview category with `What it does`, `Feature list`, and `Workflow` top tabs; replaced generic feature illustrations with committed PNG captures of the actual access GUI and operation GUI for each feature entry; kept inline SVG diagrams only for keyboard shortcuts and preview mouse operations.
 - Automated validation: `npm test` passed with 35 files and 141 tests.
 - Production build: `npm run build` passed.
-- Runtime gate URL: `http://127.0.0.1:4398/thumbnail-generator/?runtime=manual-overview-visuals-20260614`.
+- Runtime gate URL: `http://127.0.0.1:4401/thumbnail-generator/?runtime=manual-real-captures-20260614`.
 - Browser path: Browser plugin connection was unavailable for `iab`, so Playwright local Chrome was used.
 - Runtime checks:
-  - Page identity, primary UI visibility, nonblank canvas render, and console health passed.
-  - Manual opened from the footer with `Overview` as the first left tab and `What it does`, `Feature list`, and `Workflow` as the Overview top tabs.
-  - Overview content showed access/operation GUI visuals with 6 `.manual-gui-svg` elements in the active section.
-  - Shortcut section showed 2 dedicated `.manual-shortcut-svg` diagrams and retained `Ctrl+C` and `Middle-drag` content.
+  - Page identity, primary UI visibility, nonblank canvas render (`1516x956`, sampled colored pixels `74412`), and console health passed.
+  - Manual opened from the header with `Overview` as the first left tab and `What it does`, `Feature list`, and `Workflow` as the Overview top tabs.
+  - Feature sections rendered actual PNG access/operation captures in `.manual-capture-image` elements; the first loaded capture was `/thumbnail-generator/manual-captures/manual-access-left-tabs.png`.
+  - Feature sections no longer rendered `.manual-gui-svg` placeholders.
+  - Shortcut and mouse-operation sections rendered 2 dedicated `.manual-shortcut-svg` diagrams, retained `Ctrl+C`, and rendered no `.manual-capture-image` feature captures.
   - Visible CSV/HTML import controls remain hidden in the current GUI; parser/model coverage is covered by `npm test`.
-  - Layer editing changed the selected text layer name to `Runtime manual overview layer`.
+  - Layer editing changed the selected text layer name to `Runtime manual real captures layer`.
   - WebP export downloaded `729144` bytes.
   - Mobile manual layout had horizontal overflow `0px`.
 - Evidence:
-  - `output/runtime-20260614-manual-overview-visuals/runtime-result.json`
-  - `output/runtime-20260614-manual-overview-visuals/01-initial.png`
-  - `output/runtime-20260614-manual-overview-visuals/02-manual-overview.png`
-  - `output/runtime-20260614-manual-overview-visuals/03-manual-shortcuts.png`
-  - `output/runtime-20260614-manual-overview-visuals/04-layer-edit.png`
-  - `output/runtime-20260614-manual-overview-visuals/05-mobile-manual.png`
+  - `output/runtime-20260614-manual-real-captures/runtime-result.json`
+  - `output/runtime-20260614-manual-real-captures/01-initial.png`
+  - `output/runtime-20260614-manual-real-captures/02-manual-real-captures.png`
+  - `output/runtime-20260614-manual-real-captures/03-shortcut-svg-only.png`
+  - `output/runtime-20260614-manual-real-captures/04-layer-edit.png`
+  - `output/runtime-20260614-manual-real-captures/05-mobile-manual-captures.png`
