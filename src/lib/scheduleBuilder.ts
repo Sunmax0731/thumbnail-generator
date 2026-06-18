@@ -35,6 +35,7 @@ export interface ScheduleBuilderRequest {
   cornerRadius: number;
   strokeWidth: number;
   dailyCircleSize: number;
+  dailyCircleGap: number;
   actionCountMode: ScheduleActionCountMode;
   actionsPerDay: number;
   dailyActionCounts: number[];
@@ -429,14 +430,21 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
   const circleScale = request.dailyCircleSize / 100;
   const landscapeCircleSize = Math.round(420 * circleScale);
   const portraitCircleSize = Math.round(Math.min(width - 260, 650 * circleScale));
+  const circleGapScale = request.dailyCircleGap / 100;
+  const landscapeBaseGap = 220;
+  const portraitBaseGap = 60;
+  const landscapeCircleGap = Math.round(Math.max(24, Math.min(width - landscapeCircleSize * 2 - 72, landscapeBaseGap * circleGapScale)));
+  const portraitCircleGap = Math.round(Math.max(0, portraitBaseGap * circleGapScale));
+  const landscapeLeftX = (width - landscapeCircleSize * 2 - landscapeCircleGap) / 2;
+  const portraitTopY = 300;
   const periodBoxes = portrait
     ? [
-        { x: (width - portraitCircleSize) / 2, y: 300, size: portraitCircleSize },
-        { x: (width - portraitCircleSize) / 2, y: 1010, size: portraitCircleSize },
+        { x: (width - portraitCircleSize) / 2, y: portraitTopY, size: portraitCircleSize },
+        { x: (width - portraitCircleSize) / 2, y: portraitTopY + portraitCircleSize + portraitCircleGap, size: portraitCircleSize },
       ]
     : [
-        { x: width * 0.25 - landscapeCircleSize / 2, y: 398 - landscapeCircleSize / 2, size: landscapeCircleSize },
-        { x: width * 0.75 - landscapeCircleSize / 2, y: 398 - landscapeCircleSize / 2, size: landscapeCircleSize },
+        { x: landscapeLeftX, y: 398 - landscapeCircleSize / 2, size: landscapeCircleSize },
+        { x: landscapeLeftX + landscapeCircleSize + landscapeCircleGap, y: 398 - landscapeCircleSize / 2, size: landscapeCircleSize },
       ];
 
   periodBoxes.forEach((box, index) => {
@@ -483,10 +491,10 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
       const hourFontSize = Math.max(10, request.dateFontSize * (portrait ? 0.46 : 0.4));
       const hourBoxW = portrait ? 48 : 36;
       const hourBoxH = portrait ? 34 : 26;
-      const hourLabels = index === 0 ? Array.from({ length: 12 }, (_, hour) => hour) : Array.from({ length: 13 }, (_, hour) => hour + 12);
+      const hourLabels = index === 0 ? Array.from({ length: 12 }, (_, hour) => hour) : Array.from({ length: 12 }, (_, hour) => hour + 12);
       hourLabels.forEach((hour) => {
-        const labelRadius = hour === 24 ? (portrait ? 1.18 : 1.2) : portrait ? 1.08 : 1.09;
-        const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, timeToClockAngle(formatHourForClock(hour)), labelRadius);
+        const labelRadius = portrait ? 1.08 : 1.09;
+        const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, timeToClockAngle(`${pad(hour)}:00`), labelRadius);
         layers.push(
           text(
             context,
@@ -530,6 +538,7 @@ function sanitizeScheduleRequest(request: ScheduleBuilderRequest): ScheduleBuild
     cornerRadius: Math.min(32, Math.max(0, Math.round(request.cornerRadius || 0))),
     strokeWidth: Math.min(12, Math.max(0, Math.round(request.strokeWidth || 0))),
     dailyCircleSize: clampDailyCircleSize(request.dailyCircleSize),
+    dailyCircleGap: clampDailyCircleGap(request.dailyCircleGap),
     actionsPerDay: clampActionCount(request.actionsPerDay),
     dailyActionCounts: Array.from({ length: 7 }, (_, index) => clampActionCount(request.dailyActionCounts?.[index] ?? request.actionsPerDay)),
     dailyPeriodLabels: normalizeDailyStrings(request.dailyPeriodLabels, defaultDailyPeriodLabels),
@@ -583,6 +592,10 @@ function clampActionCount(value: number): number {
 
 function clampDailyCircleSize(value: number): number {
   return Math.min(120, Math.max(70, Math.round(value || 100)));
+}
+
+function clampDailyCircleGap(value: number): number {
+  return Math.min(160, Math.max(50, Math.round(value || 100)));
 }
 
 function clampFontSize(value: number, fallback: number): number {
@@ -697,10 +710,6 @@ function text(
 
 function pad(value: number): string {
   return String(value).padStart(2, "0");
-}
-
-function formatHourForClock(hour: number): string {
-  return `${pad(hour % 24)}:00`;
 }
 
 const defaultDailyPeriodLabels = ["AM", "PM"];

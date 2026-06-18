@@ -63,6 +63,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms Grid style and Corner radius hidden in Day mode, Circle size and Line width on the same row, schedule dialog/grid vertical overflow `0`, AM labels `0` and `11` present with `12` and `23` absent, PM labels `12`, `13`, and `24` present, PM `12`/`24` labels separated, portrait AM circle center `540.5` on a `1080` canvas, sector angles `270` to `330`, angle edit to `280`, WebP export `214864` bytes, mobile horizontal overflow `0`, and no page/app console errors. Evidence files are under `output/runtime-20260618-daily-hour-ranges/`.
 
+## 2026-06-18 Daily Schedule Spacing And Contrast
+
+All QCDS axes remain A+.
+
+- Quality: A+. Daily PM clock labels now stop at `23`, the Day settings panel uses theme-backed higher-contrast backgrounds, and the new Circle spacing setting controls the circle edge gap by layout orientation while preserving editable sector objects.
+- Cost: A+. The change stays inside existing React state, schedule generation, CSS theme variables, canvas rendering, and tests without adding dependencies, backend behavior, or services.
+- Delivery: A+. `npm test` passed with 35 files and 146 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4426/thumbnail-generator/?runtime=daily-spacing-20260618`.
+- Satisfaction: A+. The requested `24` label removal, Day UI visibility fix, and circle distance control are implemented and verified through generation, layer editing, export, and mobile checks.
+
+Runtime evidence confirms Day action-count, Grid style, and Corner radius controls remain hidden in Day mode; Circle spacing is visible; the Day panel/editor backgrounds are opaque with theme border colors; generated layers include PM `12` through `23` and omit PM `24`; generated canvas is nonblank (`24155` sampled pixels); generated sector Start angle edits to `281`; WebP export is `132102` bytes; mobile horizontal overflow is `0`; and no page/app console errors were reported. Evidence files are under `output/runtime-20260618-daily-spacing/`.
+
 ## 2026-06-14 UI Persistence, Scrollbar Containment, Timeline Grid, And Defaults
 
 All QCDS axes remain A+.

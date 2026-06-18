@@ -27,6 +27,7 @@ const baseRequest: ScheduleBuilderRequest = {
   cornerRadius: 8,
   strokeWidth: 3,
   dailyCircleSize: 100,
+  dailyCircleGap: 100,
   actionCountMode: "uniform",
   actionsPerDay: 3,
   dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
@@ -129,7 +130,8 @@ describe("scheduleBuilder", () => {
     expect(result.layers.some((layer) => layer.name === "Daily AM hour 12")).toBe(false);
     expect(result.layers.some((layer) => layer.name === "Daily AM hour 23")).toBe(false);
     expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily PM hour 12" && layer.text === "12")).toBe(true);
-    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily PM hour 24" && layer.text === "24")).toBe(true);
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily PM hour 23" && layer.text === "23")).toBe(true);
+    expect(result.layers.some((layer) => layer.name === "Daily PM hour 24")).toBe(false);
     expect(labels).toContain("09:00-11:00\nMorning focus");
     expect(result.layers.every((layer) => layer.groupId && layer.groupName)).toBe(true);
   });
@@ -146,11 +148,45 @@ describe("scheduleBuilder", () => {
       "en",
     );
     const amCircle = result.layers.find((layer) => layer.name === "Daily AM circle");
+    const pmCircle = result.layers.find((layer) => layer.name === "Daily PM circle");
 
     expect(result.settings.width).toBe(1080);
     expect(amCircle?.type).toBe("shape");
     expect(amCircle?.width).toBe(715);
     expect(amCircle?.x).toBeCloseTo((1080 - 715) / 2, 4);
+    expect(pmCircle?.type === "shape" && amCircle?.type === "shape" ? pmCircle.y - (amCircle.y + amCircle.height) : undefined).toBe(60);
+  });
+
+  it("applies the daily circle spacing setting to the gap between circles", () => {
+    const compact = buildScheduleTemplate(
+      {
+        ...baseRequest,
+        kind: "day",
+        dailyCircleGap: 50,
+      },
+      defaultOutputSettings,
+      "en",
+    );
+    const expanded = buildScheduleTemplate(
+      {
+        ...baseRequest,
+        kind: "day",
+        dailyCircleGap: 160,
+      },
+      defaultOutputSettings,
+      "en",
+    );
+    const compactAm = compact.layers.find((layer) => layer.name === "Daily AM circle");
+    const compactPm = compact.layers.find((layer) => layer.name === "Daily PM circle");
+    const expandedAm = expanded.layers.find((layer) => layer.name === "Daily AM circle");
+    const expandedPm = expanded.layers.find((layer) => layer.name === "Daily PM circle");
+    const compactGap =
+      compactAm?.type === "shape" && compactPm?.type === "shape" ? compactPm.x - (compactAm.x + compactAm.width) : 0;
+    const expandedGap =
+      expandedAm?.type === "shape" && expandedPm?.type === "shape" ? expandedPm.x - (expandedAm.x + expandedAm.width) : 0;
+
+    expect(compactGap).toBe(110);
+    expect(expandedGap).toBe(352);
   });
 
   it("can hide daily clock hour labels from generated daily schedules", () => {

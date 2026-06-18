@@ -69,7 +69,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
 - The Templates tab exposes generator buttons for schedule, standard thumbnail, vertical thumbnail, and stream waiting screen, while the previous default-template list is not shown.
-- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count where relevant, compact daily AM/PM period/event labels, AM/PM event visibility toggles, optional daily AM `0`-`11` and PM `12`-`24` clock-hour labels, circle size for Day mode, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly, weekly, or daily schedule layers with localized badge text.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count where relevant, compact daily AM/PM period/event labels, AM/PM event visibility toggles, optional daily AM `0`-`11` and PM `12`-`23` clock-hour labels, circle size and circle spacing for Day mode, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly, weekly, or daily schedule layers with localized badge text.
 - The image generator modals open from Templates, provide live previews, five placement patterns per generator, grouped common/title/subtitle/label text controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, vertical thumbnail, and stream waiting layer sets.
 - CSV import updates the canvas/object list.
 - HTML import updates the canvas/object list.
@@ -1688,3 +1688,28 @@ Completed on 2026-06-18 for the daily schedule AM/PM hour-range, portrait center
   - `output/runtime-20260618-daily-hour-ranges/daily-generated-hour-ranges.png`
   - `output/runtime-20260618-daily-hour-ranges/mobile-load.png`
 - CSV/HTML compatibility: generated sectors remain normal shape objects covered by parser/export tests; circle size and hour-range behavior are schedule generator settings.
+
+## Daily Schedule Spacing And Contrast Runtime Gate (2026-06-18)
+
+Completed on 2026-06-18 for the daily schedule spacing, PM hour-label, and Day UI contrast request.
+
+- Scope: removed generated PM `24` hour labels, kept PM labels at `12` through `23`, added the Day schedule Circle spacing setting, applied that setting as the horizontal circle edge gap in landscape layouts and vertical edge gap in portrait layouts, and changed the Day period settings background from translucent styling to theme-backed high-contrast panels.
+- `npm test`: pass. 35 test files, 146 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser runtime evidence: Browser plugin was attempted but `iab` was unavailable, so Playwright local Chrome passed at `http://127.0.0.1:4426/thumbnail-generator/?runtime=daily-spacing-20260618`.
+- Runtime checks:
+  - Day mode still hid Daily actions, Actions per day, Grid style, and Corner radius controls.
+  - Circle spacing control was visible beside the Day style controls.
+  - Day period panel background computed as `rgb(247, 250, 252)` with border `rgb(216, 224, 231)` and opacity `1`; period editor background computed as `rgb(255, 255, 255)` with opacity `1`.
+  - Generated layer names included `Daily PM hour 12` through `Daily PM hour 23`, included `Daily AM hour 0` through `Daily AM hour 11`, and did not include `Daily PM hour 24`.
+  - The generated canvas remained nonblank (`24155` sampled nonblank pixels).
+  - Generated `Daily PM sector` was selected through the grouped layer row and its Adjust Start angle was edited to `281`.
+  - WebP export downloaded with `132102` bytes.
+  - Mobile viewport horizontal overflow was `0`.
+  - Console health: no page/app console errors and no page errors.
+- Evidence:
+  - `output/runtime-20260618-daily-spacing/result.json`
+  - `output/runtime-20260618-daily-spacing/daily-spacing-modal.png`
+  - `output/runtime-20260618-daily-spacing/daily-spacing-generated.png`
+  - `output/runtime-20260618-daily-spacing/mobile-load.png`
+- CSV/HTML compatibility: generated sectors remain normal shape objects covered by parser/export tests; circle spacing and PM hour-label behavior are schedule generator settings.

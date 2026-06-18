@@ -26,7 +26,7 @@
       "label": "Quality",
       "rating": "A+",
       "state": "pass",
-      "summary": "Feature coverage, sector shape editing, daily schedule generation with AM/PM sector circles, compact Day controls, event toggles, AM 0-11 and PM 12-24 clock-hour labels, circle-size control, centered portrait circles, start/end time inputs, and clock-synchronized sector angles, motion presets, text-only and glow/effect motion sections, collapsible bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, PWA manifest/service worker, Chrome extension bridge, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
+      "summary": "Feature coverage, sector shape editing, daily schedule generation with AM/PM sector circles, compact Day controls, event toggles, AM 0-11 and PM 12-23 clock-hour labels, circle-size and circle-spacing controls, centered portrait circles, start/end time inputs, and clock-synchronized sector angles, motion presets, text-only and glow/effect motion sections, collapsible bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, PWA manifest/service worker, Chrome extension bridge, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
       "evidence": [
         "docs/qcds-evaluation.md",
         "docs/qcds-strict-metrics.json",
@@ -84,13 +84,13 @@
   "validation": {
     "npmTest": "pass",
     "npmRunBuild": "pass",
-    "browserRuntimeGate": "pass; Playwright local Chrome gate passed at http://127.0.0.1:4424/thumbnail-generator/?runtime=daily-hour-ranges-20260618",
+    "browserRuntimeGate": "pass; Playwright local Chrome gate passed at http://127.0.0.1:4426/thumbnail-generator/?runtime=daily-spacing-20260618",
     "manualCodeStarterCheck": "repo-side source files added; reload VS Code Code Starter if the view is cached"
   },
   "latestRuntimeGate": {
     "tool": "Playwright local Chrome",
-    "url": "http://127.0.0.1:4424/thumbnail-generator/?runtime=daily-hour-ranges-20260618",
+    "url": "http://127.0.0.1:4426/thumbnail-generator/?runtime=daily-spacing-20260618",
     "date": "2026-06-18",
-    "evidence": "output/runtime-20260618-daily-hour-ranges/"
+    "evidence": "output/runtime-20260618-daily-spacing/"
   }
 }

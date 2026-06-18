@@ -1871,6 +1871,10 @@ button:disabled {
   grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
+.schedule-day-shape-row {
+  align-items: end;
+}
+
 .align-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3570,6 +3574,10 @@ button:disabled {
   display: grid;
   gap: 8px;
   margin-top: 8px;
+  padding: 10px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: var(--panel-soft);
 }
 
 .compact-heading {
@@ -3595,9 +3603,11 @@ button:disabled {
   gap: 6px;
   min-width: 0;
   padding: 8px;
-  border: 1px solid rgba(148, 163, 184, 0.28);
+  border: 1px solid var(--line);
   border-radius: 8px;
-  background: rgba(255, 255, 255, 0.52);
+  background: var(--panel);
+  color: var(--text);
+  box-shadow: 0 1px 0 rgba(15, 23, 42, 0.04);
 }
 
 .daily-period-editor .field {

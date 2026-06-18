@@ -828,6 +828,7 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     cornerRadius: 8,
     strokeWidth: 3,
     dailyCircleSize: 100,
+    dailyCircleGap: 100,
     actionCountMode: "uniform",
     actionsPerDay: 1,
     dailyActionCounts: [1, 1, 1, 1, 1, 1, 1],
@@ -1137,15 +1138,24 @@ function ScheduleBuilderDialog({
                 </select>
               </label>
             ) : null}
-            <div className="field-grid two">
+            <div className={`field-grid ${isDaySchedule ? "three schedule-day-shape-row" : "two"}`}>
               {isDaySchedule ? (
-                <ScheduleSlider
-                  label={t("scheduleBuilder.dailyCircleSize")}
-                  value={draft.dailyCircleSize ?? 100}
-                  min={70}
-                  max={120}
-                  onChange={(value) => setDraft("dailyCircleSize", value)}
-                />
+                <>
+                  <ScheduleSlider
+                    label={t("scheduleBuilder.dailyCircleSize")}
+                    value={draft.dailyCircleSize ?? 100}
+                    min={70}
+                    max={120}
+                    onChange={(value) => setDraft("dailyCircleSize", value)}
+                  />
+                  <ScheduleSlider
+                    label={t("scheduleBuilder.dailyCircleGap")}
+                    value={draft.dailyCircleGap ?? 100}
+                    min={50}
+                    max={160}
+                    onChange={(value) => setDraft("dailyCircleGap", value)}
+                  />
+                </>
               ) : (
                 <ScheduleSlider
                   label={t("scheduleBuilder.cornerRadius")}
