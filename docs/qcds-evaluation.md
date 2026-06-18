@@ -52,6 +52,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms no Day action-count row, no visible `Daily actions` or `Actions per day`, 4 time inputs, 2 event toggles, schedule dialog/grid vertical overflow `0`, AM event hidden with PM event preserved, generated AM/PM hour labels, sector angles `270` to `330`, angle edit to `275`, WebP export `123380` bytes, mobile horizontal overflow `0`, and no page/app console errors. Evidence files are under `output/runtime-20260618-daily-compact-clock/`.
 
+## 2026-06-18 Daily Schedule Hour Ranges And Circle Size
+
+All QCDS axes remain A+.
+
+- Quality: A+. Daily clock labels now split by period, with AM showing `0` through `11` and PM showing `12` through `24`; portrait circles are centered horizontally; and Day mode replaces non-applicable Grid style and Corner radius controls with a circle-size slider paired with Line width.
+- Cost: A+. The change stays within the existing static React/Vite app, schedule generation model, canvas renderer, and test infrastructure without adding dependencies or backend behavior.
+- Delivery: A+. `npm test` passed with 35 files and 145 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4424/thumbnail-generator/?runtime=daily-hour-ranges-20260618`.
+- Satisfaction: A+. The reported overlapping AM/PM hour labels are removed, portrait daily circles are centered, and Day-specific style controls now expose circle size instead of irrelevant grid/corner controls.
+
+Runtime evidence confirms Grid style and Corner radius hidden in Day mode, Circle size and Line width on the same row, schedule dialog/grid vertical overflow `0`, AM labels `0` and `11` present with `12` and `23` absent, PM labels `12`, `13`, and `24` present, PM `12`/`24` labels separated, portrait AM circle center `540.5` on a `1080` canvas, sector angles `270` to `330`, angle edit to `280`, WebP export `214864` bytes, mobile horizontal overflow `0`, and no page/app console errors. Evidence files are under `output/runtime-20260618-daily-hour-ranges/`.
+
 ## 2026-06-14 UI Persistence, Scrollbar Containment, Timeline Grid, And Defaults
 
 All QCDS axes remain A+.

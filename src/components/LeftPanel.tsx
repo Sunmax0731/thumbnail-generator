@@ -827,6 +827,7 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     textColor: "#152033",
     cornerRadius: 8,
     strokeWidth: 3,
+    dailyCircleSize: 100,
     actionCountMode: "uniform",
     actionsPerDay: 1,
     dailyActionCounts: [1, 1, 1, 1, 1, 1, 1],
@@ -1127,21 +1128,33 @@ function ScheduleBuilderDialog({
                 onChange={(value) => setDraft("eventFontSize", value)}
               />
             </div>
-            <label className="field schedule-grid-style-field">
-              <span>{t("scheduleBuilder.gridStyle")}</span>
-              <select value={draft.gridStyle} onChange={(event) => setDraft("gridStyle", event.currentTarget.value as ScheduleBuilderRequest["gridStyle"])}>
-                <option value="cards">{t("scheduleBuilder.gridStyle.cards")}</option>
-                <option value="lines">{t("scheduleBuilder.gridStyle.lines")}</option>
-              </select>
-            </label>
+            {!isDaySchedule ? (
+              <label className="field schedule-grid-style-field">
+                <span>{t("scheduleBuilder.gridStyle")}</span>
+                <select value={draft.gridStyle} onChange={(event) => setDraft("gridStyle", event.currentTarget.value as ScheduleBuilderRequest["gridStyle"])}>
+                  <option value="cards">{t("scheduleBuilder.gridStyle.cards")}</option>
+                  <option value="lines">{t("scheduleBuilder.gridStyle.lines")}</option>
+                </select>
+              </label>
+            ) : null}
             <div className="field-grid two">
-              <ScheduleSlider
-                label={t("scheduleBuilder.cornerRadius")}
-                value={draft.cornerRadius}
-                min={0}
-                max={32}
-                onChange={(value) => setDraft("cornerRadius", value)}
-              />
+              {isDaySchedule ? (
+                <ScheduleSlider
+                  label={t("scheduleBuilder.dailyCircleSize")}
+                  value={draft.dailyCircleSize ?? 100}
+                  min={70}
+                  max={120}
+                  onChange={(value) => setDraft("dailyCircleSize", value)}
+                />
+              ) : (
+                <ScheduleSlider
+                  label={t("scheduleBuilder.cornerRadius")}
+                  value={draft.cornerRadius}
+                  min={0}
+                  max={32}
+                  onChange={(value) => setDraft("cornerRadius", value)}
+                />
+              )}
               <ScheduleSlider
                 label={t("scheduleBuilder.strokeWidth")}
                 value={draft.strokeWidth}
