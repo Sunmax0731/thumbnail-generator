@@ -69,7 +69,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
 - The Templates tab exposes generator buttons for schedule, standard thumbnail, vertical thumbnail, and stream waiting screen, while the previous default-template list is not shown.
-- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count where relevant, daily AM/PM period/event labels, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly, weekly, or daily schedule layers with localized badge text.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count where relevant, compact daily AM/PM period/event labels, AM/PM event visibility toggles, optional daily `0`-`23` clock-hour labels, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly, weekly, or daily schedule layers with localized badge text.
 - The image generator modals open from Templates, provide live previews, five placement patterns per generator, grouped common/title/subtitle/label text controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, vertical thumbnail, and stream waiting layer sets.
 - CSV import updates the canvas/object list.
 - HTML import updates the canvas/object list.
@@ -1632,3 +1632,30 @@ Completed on 2026-06-18 for the daily schedule start/end time input and sector c
   - `output/runtime-20260618-daily-time-sync/desktop-final.png`
   - `output/runtime-20260618-daily-time-sync/mobile-final.png`
 - CSV/HTML compatibility: sector angles remain covered by parser/export tests; the schedule-only end-time setting is stored in generator settings.
+
+## Daily Schedule Compact Clock Runtime Gate (2026-06-18)
+
+Completed on 2026-06-18 for the daily schedule compact-controls, AM/PM event visibility, and clock-hour-label request.
+
+- Scope: hid action-count controls in Day schedule mode, compacted daily period controls with horizontal start/end time rows, added independent AM/PM event visibility toggles, and changed daily time display to generate `0` through `23` hour labels around each circle.
+- `npm test`: pass. 35 test files, 144 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser runtime evidence: Browser plugin was attempted but `iab` was unavailable, so Playwright local Chrome passed at `http://127.0.0.1:4422/thumbnail-generator/?runtime=daily-compact-clock-20260618`.
+- Runtime checks:
+  - Schedule generator opened from Templates, switched to Day schedule, and rendered no `.schedule-action-count-row`, no visible `Daily actions`, and no visible `Actions per day`.
+  - Day controls rendered 4 browser time inputs and 2 AM/PM event visibility toggles.
+  - The schedule dialog and grid had no vertical overflow in the tested desktop viewport (`0`).
+  - The pre-generation preview was nonblank (`9600` sampled colored pixels).
+  - Turning off Show AM plan removed `Daily AM event` while preserving `Daily PM event`.
+  - Generated layers included AM/PM hour labels such as `Daily AM hour 0`, `Daily AM hour 23`, and `Daily PM hour 23`.
+  - Generated AM sector angles remained `270` to `330`, and Start angle edited to `275` in Adjust.
+  - The generated canvas remained nonblank (`9654` nonblank of `9662` sampled pixels).
+  - WebP export downloaded with `123380` bytes.
+  - Mobile viewport horizontal overflow was `0`.
+  - Console health: no page/app console errors and no page errors.
+- Evidence:
+  - `output/runtime-20260618-daily-compact-clock/result.json`
+  - `output/runtime-20260618-daily-compact-clock/daily-compact-modal.png`
+  - `output/runtime-20260618-daily-compact-clock/daily-generated-layers.png`
+  - `output/runtime-20260618-daily-compact-clock/mobile-load.png`
+- CSV/HTML compatibility: sector layers remain normal shape objects covered by parser/export tests; AM/PM visibility and clock-hour generation are schedule generator settings.

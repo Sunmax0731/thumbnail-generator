@@ -41,6 +41,17 @@ All QCDS axes remain A+.
 
 Runtime evidence confirms 4 daily time inputs, nonblank initial/preview/generated canvas samples (`9600` each), generated AM sector start `270` and end `330`, angle edit to `275`, WebP export `253258` bytes, mobile horizontal overflow `0`, and no page/app console errors. Evidence files are under `output/runtime-20260618-daily-time-sync/`.
 
+## 2026-06-18 Daily Schedule Compact Clock Labels
+
+All QCDS axes remain A+.
+
+- Quality: A+. Day schedule mode now hides non-applicable action-count controls, uses compact AM/PM parameter rows with horizontal start/end time inputs, provides independent AM/PM event display toggles, and generates optional `0`-`23` hour labels around each circle.
+- Cost: A+. The change stays inside existing React state, schedule generation, canvas rendering, localStorage settings, and test paths without adding dependencies or backend behavior.
+- Delivery: A+. `npm test` passed with 35 files and 144 tests, `npm run build` passed, and the Playwright local Chrome runtime gate passed at `http://127.0.0.1:4422/thumbnail-generator/?runtime=daily-compact-clock-20260618`.
+- Satisfaction: A+. The requested scrollbar-reduction controls are hidden or compact in Day mode, AM/PM planned text can be toggled independently, and time display now reads like clock-hour labels around the circle.
+
+Runtime evidence confirms no Day action-count row, no visible `Daily actions` or `Actions per day`, 4 time inputs, 2 event toggles, schedule dialog/grid vertical overflow `0`, AM event hidden with PM event preserved, generated AM/PM hour labels, sector angles `270` to `330`, angle edit to `275`, WebP export `123380` bytes, mobile horizontal overflow `0`, and no page/app console errors. Evidence files are under `output/runtime-20260618-daily-compact-clock/`.
+
 ## 2026-06-14 UI Persistence, Scrollbar Containment, Timeline Grid, And Defaults
 
 All QCDS axes remain A+.

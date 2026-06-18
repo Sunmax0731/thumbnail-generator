@@ -41,6 +41,7 @@ export interface ScheduleBuilderRequest {
   dailyTimeLabels: string[];
   dailyEndTimeLabels: string[];
   dailyEventLabels: string[];
+  dailyShowEventLabels: boolean[];
   showTimeLabels: boolean;
   showAdjacentDays: boolean;
   groupLayers: boolean;
@@ -423,6 +424,7 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
   const timeLabels = normalizeDailyTimes(request.dailyTimeLabels, defaultDailyTimeLabels);
   const endTimeLabels = normalizeDailyTimes(request.dailyEndTimeLabels, defaultDailyEndTimeLabels);
   const eventLabels = normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels);
+  const showEventLabels = normalizeDailyBooleans(request.dailyShowEventLabels, defaultDailyShowEventLabels);
   const periodBoxes = portrait
     ? [
         { x: 96, y: 300, size: Math.min(width - 192, 650) },
@@ -454,43 +456,48 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
     );
     layers.push(text(context, `Daily ${periodLabels[index]} label`, box.x, labelY, box.size, portrait ? 58 : 44, periodLabels[index], request.weekdayFontSize * (portrait ? 1.55 : 1.35), request.textColor, "center", 0));
 
-    const eventAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, sectorMidpointAngle(sectorStart, sectorEnd), 0.44);
-    const eventW = portrait ? 290 : 170;
-    const timeText = request.showTimeLabels ? formatTimeRange(timeLabels[index], endTimeLabels[index]) : "";
-    const eventText = request.showTimeLabels ? `${timeText}\n${eventLabels[index]}` : eventLabels[index];
-    layers.push(
-      text(
-        context,
-        `Daily ${periodLabels[index]} event`,
-        eventAnchor.x - eventW / 2,
-        eventAnchor.y - (portrait ? 52 : 38),
-        eventW,
-        portrait ? 104 : 76,
-        eventText,
-        request.eventFontSize * (portrait ? 1.25 : 1.15),
-        request.textColor,
-        "center",
-        0,
-      ),
-    );
-    if (request.showTimeLabels) {
-      const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, sectorStart, 0.72);
+    if (showEventLabels[index]) {
+      const eventAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, sectorMidpointAngle(sectorStart, sectorEnd), 0.44);
+      const eventW = portrait ? 290 : 170;
       layers.push(
         text(
           context,
-          `Daily ${periodLabels[index]} time`,
-          clockAnchor.x - (portrait ? 96 : 72),
-          clockAnchor.y - (portrait ? 26 : 22),
-          portrait ? 192 : 144,
-          portrait ? 52 : 44,
-          timeLabels[index],
-          Math.max(18, request.dateFontSize * 0.72),
-          request.accentColor,
+          `Daily ${periodLabels[index]} event`,
+          eventAnchor.x - eventW / 2,
+          eventAnchor.y - (portrait ? 52 : 38),
+          eventW,
+          portrait ? 104 : 76,
+          `${formatTimeRange(timeLabels[index], endTimeLabels[index])}\n${eventLabels[index]}`,
+          request.eventFontSize * (portrait ? 1.25 : 1.15),
+          request.textColor,
           "center",
           0,
-          0.9,
         ),
       );
+    }
+    if (request.showTimeLabels) {
+      const hourFontSize = Math.max(10, request.dateFontSize * (portrait ? 0.46 : 0.4));
+      const hourBoxW = portrait ? 48 : 36;
+      const hourBoxH = portrait ? 34 : 26;
+      Array.from({ length: 24 }, (_, hour) => hour).forEach((hour) => {
+        const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, timeToClockAngle(`${pad(hour)}:00`), portrait ? 1.08 : 1.09);
+        layers.push(
+          text(
+            context,
+            `Daily ${periodLabels[index]} hour ${hour}`,
+            clockAnchor.x - hourBoxW / 2,
+            clockAnchor.y - hourBoxH / 2,
+            hourBoxW,
+            hourBoxH,
+            String(hour),
+            hourFontSize,
+            request.accentColor,
+            "center",
+            0,
+            0.82,
+          ),
+        );
+      });
     }
   });
 
@@ -522,6 +529,7 @@ function sanitizeScheduleRequest(request: ScheduleBuilderRequest): ScheduleBuild
     dailyTimeLabels: normalizeDailyTimes(request.dailyTimeLabels, defaultDailyTimeLabels),
     dailyEndTimeLabels: normalizeDailyTimes(request.dailyEndTimeLabels, defaultDailyEndTimeLabels),
     dailyEventLabels: normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels),
+    dailyShowEventLabels: normalizeDailyBooleans(request.dailyShowEventLabels, defaultDailyShowEventLabels),
     showTimeLabels: request.showTimeLabels !== false,
     weekendColorMode: sanitizeWeekendColorMode(request.weekendColorMode),
     showBadge: request.kind === "week" ? false : request.showBadge !== false,
@@ -684,6 +692,7 @@ const defaultDailyPeriodLabels = ["AM", "PM"];
 const defaultDailyTimeLabels = ["09:00", "14:00"];
 const defaultDailyEndTimeLabels = ["11:00", "16:00"];
 const defaultDailyEventLabels = ["Morning work", "Collaboration"];
+const defaultDailyShowEventLabels = [true, true];
 
 function normalizeDailyStrings(values: string[] | undefined, fallback: string[]): string[] {
   return Array.from({ length: 2 }, (_, index) => {
@@ -697,6 +706,10 @@ function normalizeDailyTimes(values: string[] | undefined, fallback: string[]): 
     const value = values?.[index]?.trim();
     return parseTimeToMinutes(value) === null ? fallback[index] : formatMinutes(parseTimeToMinutes(value) ?? 0);
   });
+}
+
+function normalizeDailyBooleans(values: boolean[] | undefined, fallback: boolean[]): boolean[] {
+  return Array.from({ length: 2 }, (_, index) => (typeof values?.[index] === "boolean" ? values[index] : fallback[index]));
 }
 
 function parseTimeToMinutes(value: string | undefined): number | null {

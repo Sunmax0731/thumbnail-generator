@@ -33,6 +33,7 @@ const baseRequest: ScheduleBuilderRequest = {
   dailyTimeLabels: ["09:00", "14:00"],
   dailyEndTimeLabels: ["11:00", "16:00"],
   dailyEventLabels: ["Morning work", "Collaboration"],
+  dailyShowEventLabels: [true, true],
   showTimeLabels: true,
   showAdjacentDays: false,
   groupLayers: true,
@@ -101,7 +102,7 @@ describe("scheduleBuilder", () => {
     expect(result.layers.filter((layer) => layer.name.startsWith("Week day 7 action") && layer.type === "shape")).toHaveLength(6);
   });
 
-  it("builds a daily schedule with sector objects and time labels", () => {
+  it("builds a daily schedule with sector objects and clock hour labels", () => {
     const result = buildScheduleTemplate(
       {
         ...baseRequest,
@@ -122,12 +123,13 @@ describe("scheduleBuilder", () => {
     expect(amSector?.type === "shape" ? amSector.shape : undefined).toBe("sector");
     expect(amSector?.type === "shape" ? amSector.sectorStartAngle : undefined).toBe(270);
     expect(amSector?.type === "shape" ? amSector.sectorEndAngle : undefined).toBe(330);
-    expect(labels).toContain("09:00");
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily AM hour 0" && layer.text === "0")).toBe(true);
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily AM hour 23" && layer.text === "23")).toBe(true);
     expect(labels).toContain("09:00-11:00\nMorning focus");
     expect(result.layers.every((layer) => layer.groupId && layer.groupName)).toBe(true);
   });
 
-  it("can hide daily time labels from generated daily schedules", () => {
+  it("can hide daily clock hour labels from generated daily schedules", () => {
     const result = buildScheduleTemplate(
       {
         ...baseRequest,
@@ -142,9 +144,24 @@ describe("scheduleBuilder", () => {
     );
     const labels = result.layers.filter((layer) => layer.type === "text").map((layer) => layer.text);
 
-    expect(result.layers.some((layer) => layer.name === "Daily AM time")).toBe(false);
-    expect(labels).toContain("Morning focus");
-    expect(labels).not.toContain("08:30-10:30\nMorning focus");
+    expect(result.layers.some((layer) => layer.name === "Daily AM hour 8")).toBe(false);
+    expect(labels).toContain("08:30-10:30\nMorning focus");
+  });
+
+  it("can hide AM or PM event labels independently", () => {
+    const result = buildScheduleTemplate(
+      {
+        ...baseRequest,
+        kind: "day",
+        dailyShowEventLabels: [false, true],
+        dailyEventLabels: ["Morning focus", "Collaboration"],
+      },
+      defaultOutputSettings,
+      "en",
+    );
+
+    expect(result.layers.some((layer) => layer.name === "Daily AM event")).toBe(false);
+    expect(result.layers.some((layer) => layer.type === "text" && layer.name === "Daily PM event" && layer.text.includes("Collaboration"))).toBe(true);
   });
 
   it("can render day-only dates and ungrouped generated layers", () => {

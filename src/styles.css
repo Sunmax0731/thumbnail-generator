@@ -3568,29 +3568,33 @@ button:disabled {
 
 .schedule-daily-period-section {
   display: grid;
-  gap: 10px;
-  margin-top: 10px;
+  gap: 8px;
+  margin-top: 8px;
 }
 
 .compact-heading {
-  min-height: 24px;
+  min-height: 22px;
 }
 
 .compact-heading h2 {
   font-size: 0.82rem;
 }
 
+.schedule-clock-toggle {
+  min-height: 30px;
+}
+
 .daily-period-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .daily-period-editor {
   display: grid;
-  gap: 8px;
+  gap: 6px;
   min-width: 0;
-  padding: 10px;
+  padding: 8px;
   border: 1px solid rgba(148, 163, 184, 0.28);
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.52);
@@ -3598,6 +3602,25 @@ button:disabled {
 
 .daily-period-editor .field {
   min-width: 0;
+}
+
+.daily-period-title-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  align-items: end;
+}
+
+.daily-time-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.daily-event-toggle {
+  min-height: 30px;
+  align-content: center;
+  white-space: nowrap;
 }
 
 .schedule-builder-preview {

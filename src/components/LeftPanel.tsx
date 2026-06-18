@@ -834,6 +834,7 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     dailyTimeLabels: ["09:00", "14:00"],
     dailyEndTimeLabels: ["11:00", "16:00"],
     dailyEventLabels: ["Morning work", "Collaboration"],
+    dailyShowEventLabels: [true, true],
     showTimeLabels: true,
     showAdjacentDays: false,
     groupLayers: true,
@@ -916,6 +917,11 @@ function ScheduleBuilderDialog({
     const nextValues = Array.from({ length: 2 }, (_, valueIndex) => draft[key]?.[valueIndex] ?? fallback[valueIndex]);
     nextValues[index] = value;
     updateDraft({ ...draft, [key]: nextValues });
+  };
+  const updateDailyEventVisibility = (index: number, value: boolean) => {
+    const nextValues = Array.from({ length: 2 }, (_, valueIndex) => draft.dailyShowEventLabels?.[valueIndex] ?? true);
+    nextValues[index] = value;
+    updateDraft({ ...draft, dailyShowEventLabels: nextValues });
   };
   const previewTemplate = useMemo(() => buildScheduleTemplate(draft, settings, language), [draft, language, settings]);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -1144,76 +1150,93 @@ function ScheduleBuilderDialog({
                 onChange={(value) => setDraft("strokeWidth", value)}
               />
             </div>
-            <div className="field-grid schedule-action-count-row">
-              <label className={`field schedule-action-mode-field ${isMonthSchedule || isDaySchedule ? "field-disabled" : ""}`}>
-                <span>{t("scheduleBuilder.actionCountMode")}</span>
-                <select
-                  value={draft.actionCountMode}
-                  disabled={isMonthSchedule || isDaySchedule}
-                  onChange={(event) => setDraft("actionCountMode", event.currentTarget.value as ScheduleBuilderRequest["actionCountMode"])}
-                >
-                  <option value="uniform">{t("scheduleBuilder.actionCountMode.uniform")}</option>
-                  <option value="individual">{t("scheduleBuilder.actionCountMode.individual")}</option>
-                </select>
-              </label>
-              <ScheduleSlider
-                label={t("scheduleBuilder.actionsPerDay")}
-                value={draft.actionsPerDay}
-                min={0}
-                max={6}
-                disabled={isDaySchedule}
-                onChange={(value) => setDraft("actionsPerDay", value)}
-              />
-            </div>
+            {!isDaySchedule ? (
+              <div className="field-grid schedule-action-count-row">
+                <label className={`field schedule-action-mode-field ${isMonthSchedule ? "field-disabled" : ""}`}>
+                  <span>{t("scheduleBuilder.actionCountMode")}</span>
+                  <select
+                    value={draft.actionCountMode}
+                    disabled={isMonthSchedule}
+                    onChange={(event) => setDraft("actionCountMode", event.currentTarget.value as ScheduleBuilderRequest["actionCountMode"])}
+                  >
+                    <option value="uniform">{t("scheduleBuilder.actionCountMode.uniform")}</option>
+                    <option value="individual">{t("scheduleBuilder.actionCountMode.individual")}</option>
+                  </select>
+                </label>
+                <ScheduleSlider
+                  label={t("scheduleBuilder.actionsPerDay")}
+                  value={draft.actionsPerDay}
+                  min={0}
+                  max={6}
+                  onChange={(value) => setDraft("actionsPerDay", value)}
+                />
+              </div>
+            ) : null}
             {isDaySchedule ? (
               <section className="schedule-daily-period-section" aria-label={t("scheduleBuilder.dailyPeriodSection")}>
                 <div className="section-heading compact-heading">
                   <CalendarDays size={15} />
                   <h2>{t("scheduleBuilder.dailyPeriodSection")}</h2>
                 </div>
-                <label className="field checkbox-field">
+                <label className="field checkbox-field schedule-clock-toggle">
                   <input type="checkbox" checked={draft.showTimeLabels !== false} onChange={(event) => setDraft("showTimeLabels", event.currentTarget.checked)} />
                   <span>{t("scheduleBuilder.showTimeLabels")}</span>
                 </label>
                 <div className="daily-period-grid">
-                  {[0, 1].map((index) => (
-                    <div className="daily-period-editor" key={index}>
-                      <label className="field">
-                        <span>{t(index === 0 ? "scheduleBuilder.dailyPeriodAm" : "scheduleBuilder.dailyPeriodPm")}</span>
-                        <input
-                          type="text"
-                          value={draft.dailyPeriodLabels?.[index] ?? (index === 0 ? "AM" : "PM")}
-                          onChange={(event) => updateDailyString("dailyPeriodLabels", index, event.currentTarget.value)}
-                        />
-                      </label>
-                      <label className="field">
-                        <span>{t(index === 0 ? "scheduleBuilder.dailyTimeAm" : "scheduleBuilder.dailyTimePm")}</span>
-                        <input
-                          type="time"
-                          step={300}
-                          value={draft.dailyTimeLabels?.[index] ?? (index === 0 ? "09:00" : "14:00")}
-                          onChange={(event) => updateDailyString("dailyTimeLabels", index, event.currentTarget.value)}
-                        />
-                      </label>
-                      <label className="field">
-                        <span>{t(index === 0 ? "scheduleBuilder.dailyEndTimeAm" : "scheduleBuilder.dailyEndTimePm")}</span>
-                        <input
-                          type="time"
-                          step={300}
-                          value={draft.dailyEndTimeLabels?.[index] ?? (index === 0 ? "11:00" : "16:00")}
-                          onChange={(event) => updateDailyString("dailyEndTimeLabels", index, event.currentTarget.value)}
-                        />
-                      </label>
-                      <label className="field">
-                        <span>{t(index === 0 ? "scheduleBuilder.dailyEventAm" : "scheduleBuilder.dailyEventPm")}</span>
-                        <input
-                          type="text"
-                          value={draft.dailyEventLabels?.[index] ?? (index === 0 ? "Morning work" : "Collaboration")}
-                          onChange={(event) => updateDailyString("dailyEventLabels", index, event.currentTarget.value)}
-                        />
-                      </label>
-                    </div>
-                  ))}
+                  {[0, 1].map((index) => {
+                    const isEventVisible = draft.dailyShowEventLabels?.[index] !== false;
+                    return (
+                      <div className="daily-period-editor" key={index}>
+                        <div className="daily-period-title-row">
+                          <label className="field">
+                            <span>{t(index === 0 ? "scheduleBuilder.dailyPeriodAm" : "scheduleBuilder.dailyPeriodPm")}</span>
+                            <input
+                              type="text"
+                              value={draft.dailyPeriodLabels?.[index] ?? (index === 0 ? "AM" : "PM")}
+                              onChange={(event) => updateDailyString("dailyPeriodLabels", index, event.currentTarget.value)}
+                            />
+                          </label>
+                          <label className="field checkbox-field daily-event-toggle">
+                            <input
+                              type="checkbox"
+                              checked={isEventVisible}
+                              onChange={(event) => updateDailyEventVisibility(index, event.currentTarget.checked)}
+                            />
+                            <span>{t(index === 0 ? "scheduleBuilder.showAmEvent" : "scheduleBuilder.showPmEvent")}</span>
+                          </label>
+                        </div>
+                        <div className="daily-time-row">
+                          <label className="field">
+                            <span>{t(index === 0 ? "scheduleBuilder.dailyTimeAm" : "scheduleBuilder.dailyTimePm")}</span>
+                            <input
+                              type="time"
+                              step={300}
+                              value={draft.dailyTimeLabels?.[index] ?? (index === 0 ? "09:00" : "14:00")}
+                              onChange={(event) => updateDailyString("dailyTimeLabels", index, event.currentTarget.value)}
+                            />
+                          </label>
+                          <label className="field">
+                            <span>{t(index === 0 ? "scheduleBuilder.dailyEndTimeAm" : "scheduleBuilder.dailyEndTimePm")}</span>
+                            <input
+                              type="time"
+                              step={300}
+                              value={draft.dailyEndTimeLabels?.[index] ?? (index === 0 ? "11:00" : "16:00")}
+                              onChange={(event) => updateDailyString("dailyEndTimeLabels", index, event.currentTarget.value)}
+                            />
+                          </label>
+                        </div>
+                        <label className={`field ${isEventVisible ? "" : "field-disabled"}`}>
+                          <span>{t(index === 0 ? "scheduleBuilder.dailyEventAm" : "scheduleBuilder.dailyEventPm")}</span>
+                          <input
+                            type="text"
+                            disabled={!isEventVisible}
+                            value={draft.dailyEventLabels?.[index] ?? (index === 0 ? "Morning work" : "Collaboration")}
+                            onChange={(event) => updateDailyString("dailyEventLabels", index, event.currentTarget.value)}
+                          />
+                        </label>
+                      </div>
+                    );
+                  })}
                 </div>
               </section>
             ) : null}

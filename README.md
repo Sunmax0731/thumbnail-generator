@@ -23,7 +23,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store tagged named templates in `localStorage` with dropdown tag filtering.
-- Use the Templates tab generator buttons to create editable monthly, weekly, or daily schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens. Daily schedules can include AM/PM sector circles, start/end time inputs, and optional time labels synchronized to clock positions.
+- Use the Templates tab generator buttons to create editable monthly, weekly, or daily schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens. Daily schedules can include AM/PM sector circles, compact start/end time inputs, independent AM/PM event visibility, and optional `0`-`23` clock-hour labels around each circle.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated objects; settings are saved when objects are generated and can also be saved without generating, then restored after reload.
 - Use the bottom timeline Play/Pause and Reset buttons to preview animations directly in the editor; while playing, object rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.
