@@ -1607,3 +1607,28 @@ Completed on 2026-06-18 for the daily schedule generator, sector shape, and dail
   - `output/runtime-20260618-daily-sector/desktop-final.png`
   - `output/runtime-20260618-daily-sector/mobile-final.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/export compatibility for sector fields is covered by `npm test`.
+
+## Daily Schedule Time Sync Runtime Gate (2026-06-18)
+
+Completed on 2026-06-18 for the daily schedule start/end time input and sector clock-position synchronization request.
+
+- Scope: changed daily start time controls from free text to browser time inputs, added AM/PM end time inputs, synchronized generated sector start/end angles to configured times, and treated sector angles as clock-style degrees where `09:00` maps to `270`.
+- `npm test`: pass. 35 test files, 143 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser runtime evidence: Playwright local Chrome passed at `http://127.0.0.1:4420/thumbnail-generator/?runtime=daily-time-sync-20260618`.
+- Runtime checks:
+  - Primary UI visible and initial canvas nonblank (`9600` sampled colored pixels).
+  - Schedule generator opened from Templates, switched to Day schedule, and rendered four daily `input type="time"` controls.
+  - Daily AM values `09:00` to `11:00` generated sector start angle `270` and end angle `330`.
+  - The pre-generation preview and generated canvas were nonblank (`9600` sampled colored pixels each).
+  - Selecting the generated AM sector exposed angle controls in Adjust, and Start angle edited to `275`.
+  - WebP export downloaded `desktop-thumbnail-1080x1920-2026-06-18T07-31-55-768Z.webp` with `253258` bytes.
+  - Mobile viewport horizontal overflow was `0`.
+  - Console health: no page/app console errors and no page errors.
+- Evidence:
+  - `output/runtime-20260618-daily-time-sync/runtime-result.json`
+  - `output/runtime-20260618-daily-time-sync/desktop-initial.png`
+  - `output/runtime-20260618-daily-time-sync/desktop-daily-preview.png`
+  - `output/runtime-20260618-daily-time-sync/desktop-final.png`
+  - `output/runtime-20260618-daily-time-sync/mobile-final.png`
+- CSV/HTML compatibility: sector angles remain covered by parser/export tests; the schedule-only end-time setting is stored in generator settings.

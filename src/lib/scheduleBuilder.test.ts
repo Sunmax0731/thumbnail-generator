@@ -31,6 +31,7 @@ const baseRequest: ScheduleBuilderRequest = {
   dailyActionCounts: [3, 3, 3, 3, 3, 3, 3],
   dailyPeriodLabels: ["AM", "PM"],
   dailyTimeLabels: ["09:00", "14:00"],
+  dailyEndTimeLabels: ["11:00", "16:00"],
   dailyEventLabels: ["Morning work", "Collaboration"],
   showTimeLabels: true,
   showAdjacentDays: false,
@@ -106,7 +107,8 @@ describe("scheduleBuilder", () => {
         ...baseRequest,
         kind: "day",
         dailyPeriodLabels: ["AM", "PM"],
-        dailyTimeLabels: ["08:30", "20:00"],
+        dailyTimeLabels: ["09:00", "14:00"],
+        dailyEndTimeLabels: ["11:00", "16:00"],
         dailyEventLabels: ["Morning focus", "Collaboration"],
       },
       defaultOutputSettings,
@@ -118,9 +120,10 @@ describe("scheduleBuilder", () => {
     expect(result.name).toBe("2026-06-10 Daily Schedule");
     expect(amSector?.type).toBe("shape");
     expect(amSector?.type === "shape" ? amSector.shape : undefined).toBe("sector");
-    expect(amSector?.type === "shape" ? amSector.sectorStartAngle : undefined).toBe(205);
-    expect(labels).toContain("08:30");
-    expect(labels).toContain("08:30\nMorning focus");
+    expect(amSector?.type === "shape" ? amSector.sectorStartAngle : undefined).toBe(270);
+    expect(amSector?.type === "shape" ? amSector.sectorEndAngle : undefined).toBe(330);
+    expect(labels).toContain("09:00");
+    expect(labels).toContain("09:00-11:00\nMorning focus");
     expect(result.layers.every((layer) => layer.groupId && layer.groupName)).toBe(true);
   });
 
@@ -131,6 +134,7 @@ describe("scheduleBuilder", () => {
         kind: "day",
         showTimeLabels: false,
         dailyTimeLabels: ["08:30", "20:00"],
+        dailyEndTimeLabels: ["10:30", "22:00"],
         dailyEventLabels: ["Morning focus", "Collaboration"],
       },
       defaultOutputSettings,
@@ -140,7 +144,7 @@ describe("scheduleBuilder", () => {
 
     expect(result.layers.some((layer) => layer.name === "Daily AM time")).toBe(false);
     expect(labels).toContain("Morning focus");
-    expect(labels).not.toContain("08:30\nMorning focus");
+    expect(labels).not.toContain("08:30-10:30\nMorning focus");
   });
 
   it("can render day-only dates and ungrouped generated layers", () => {

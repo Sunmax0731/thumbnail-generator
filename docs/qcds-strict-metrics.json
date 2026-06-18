@@ -14,7 +14,7 @@
   ],
   "quality": {
     "rating": "A+",
-    "rationale": "Current app coverage includes the Japanese サムネいる？ title, English ThumbNailed It? title, shared Need it quick? ThumbNailed It! tagline, footer Manual access, Manual per-feature use cases, X-only contact wording, localized Privacy Policy and Terms modals with taller desktop layout, X footer contact using the official X logo SVG path with horizontal no-wrap alignment, GitHub Issues footer link with icon, centered © Sunmax Engineering footer, active-language Animation/アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, motion timeline, existing template/generator/layer/color/Image Lab workflows, sector shape controls and CSV/HTML compatibility, daily schedule generation with AM/PM sector circles and time labels, automated tests, production build, and Playwright local Chrome runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
+    "rationale": "Current app coverage includes the Japanese サムネいる？ title, English ThumbNailed It? title, shared Need it quick? ThumbNailed It! tagline, footer Manual access, Manual per-feature use cases, X-only contact wording, localized Privacy Policy and Terms modals with taller desktop layout, X footer contact using the official X logo SVG path with horizontal no-wrap alignment, GitHub Issues footer link with icon, centered © Sunmax Engineering footer, active-language Animation/アニメ tab label, PWA manifest/service worker, Chrome extension bridge, preview-header Output menu for JPG/PNG/WebP/OBS, top-right edit-state icons with autosave text, motion timeline, existing template/generator/layer/color/Image Lab workflows, sector shape controls and CSV/HTML compatibility, daily schedule generation with AM/PM sector circles, time inputs, end times, and clock-synchronized sector angles, automated tests, production build, and Playwright local Chrome runtime gate. Cross-browser, real-device, browser storage quota, and real OBS setup checks remain future work."
   },
   "cost": {
     "rating": "A+",
@@ -26,7 +26,7 @@
   },
   "satisfaction": {
     "rating": "A+",
-    "rationale": "Requested daily schedule and sector-shape changes passed validation: Day schedule mode renders AM/PM sector circles with time labels, generated sector layers are editable through Adjust start-angle controls, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
+    "rationale": "Requested daily schedule time changes passed validation: Day schedule mode renders AM/PM sector circles with time inputs and end times, 09:00 maps to sector angle 270, generated sector layers are editable through Adjust start-angle controls, WebP export works, mobile overflow is 0, and QCDS evidence is updated. Remaining satisfaction risk is real-device, non-Chromium, storage quota, and real OBS capture behavior."
   },
   "codexWorkDashboard": {
     "status": "passed",
@@ -65,7 +65,7 @@
     "tool": "Playwright local Chrome",
     "browserPluginStatus": "attempted",
     "browserPluginFallbackReason": "Browser plugin client file scripts/browser-client.mjs was missing; Playwright with the local Chrome channel was used for the scripted runtime gate.",
-    "url": "http://127.0.0.1:4418/thumbnail-generator/?runtime=daily-sector-20260618",
+    "url": "http://127.0.0.1:4420/thumbnail-generator/?runtime=daily-time-sync-20260618",
     "publishedUrl": "https://sunmax0731.github.io/thumbnail-generator/",
     "pagesWorkflow": "passed for pushed codex/thumbnail-generator-static-app branch",
     "desktopViewport": "1440x1000",
@@ -74,6 +74,9 @@
       "output/runtime-20260618-daily-sector/desktop-daily-preview.png",
       "output/runtime-20260618-daily-sector/desktop-final.png",
       "output/runtime-20260618-daily-sector/mobile-final.png",
+      "output/runtime-20260618-daily-time-sync/desktop-daily-preview.png",
+      "output/runtime-20260618-daily-time-sync/desktop-final.png",
+      "output/runtime-20260618-daily-time-sync/mobile-final.png",
       "output/runtime-20260614-footer-x-nowrap/02-mobile-footer-x.png",
       "output/runtime-20260614-footer-x-nowrap/01-desktop-footer-x.png",
       "output/runtime-20260614-legal-x-manual-use-cases/01-desktop-initial.png",
@@ -115,6 +118,9 @@
       "sector start angle edit to 210",
       "daily schedule WebP export download",
       "daily schedule mobile no horizontal overflow",
+      "daily schedule four time inputs",
+      "daily 09:00 start maps to 270 degrees",
+      "daily 11:00 end maps to 330 degrees",
       "static legal pages contain no legacy X co-brand text",
       "static legal pages use X-only contact text",
       "no visible app legacy X co-brand text",

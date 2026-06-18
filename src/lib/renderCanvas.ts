@@ -413,7 +413,8 @@ function drawShapeLayer(
 function drawSectorPath(context: CanvasRenderingContext2D, layer: ShapeLayer): void {
   const outerX = Math.max(1, layer.width / 2);
   const outerY = Math.max(1, layer.height / 2);
-  const start = (normalizeAngle(layer.sectorStartAngle) * Math.PI) / 180;
+  const startAngle = normalizeAngle(layer.sectorStartAngle);
+  const start = ((startAngle - 90) * Math.PI) / 180;
   const sweep = normalizeSweep(layer.sectorEndAngle - layer.sectorStartAngle);
   const end = start + (sweep * Math.PI) / 180;
   const innerRatio = clamp(layer.sectorInnerRadius, 0, 95) / 100;

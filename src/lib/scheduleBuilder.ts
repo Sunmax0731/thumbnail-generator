@@ -39,6 +39,7 @@ export interface ScheduleBuilderRequest {
   dailyActionCounts: number[];
   dailyPeriodLabels: string[];
   dailyTimeLabels: string[];
+  dailyEndTimeLabels: string[];
   dailyEventLabels: string[];
   showTimeLabels: boolean;
   showAdjacentDays: boolean;
@@ -419,19 +420,22 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
   ];
 
   const periodLabels = normalizeDailyStrings(request.dailyPeriodLabels, defaultDailyPeriodLabels);
-  const timeLabels = normalizeDailyStrings(request.dailyTimeLabels, defaultDailyTimeLabels);
+  const timeLabels = normalizeDailyTimes(request.dailyTimeLabels, defaultDailyTimeLabels);
+  const endTimeLabels = normalizeDailyTimes(request.dailyEndTimeLabels, defaultDailyEndTimeLabels);
   const eventLabels = normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels);
   const periodBoxes = portrait
     ? [
-        { x: 96, y: 300, size: Math.min(width - 192, 650), sectorStart: 205, sectorEnd: 325 },
-        { x: 96, y: 1010, size: Math.min(width - 192, 650), sectorStart: 10, sectorEnd: 120 },
+        { x: 96, y: 300, size: Math.min(width - 192, 650) },
+        { x: 96, y: 1010, size: Math.min(width - 192, 650) },
       ]
     : [
-        { x: 82, y: 188, size: 420, sectorStart: 205, sectorEnd: 325 },
-        { x: width - 82 - 420, y: 188, size: 420, sectorStart: 0, sectorEnd: 115 },
+        { x: 82, y: 188, size: 420 },
+        { x: width - 82 - 420, y: 188, size: 420 },
       ];
 
   periodBoxes.forEach((box, index) => {
+    const sectorStart = timeToClockAngle(timeLabels[index]);
+    const sectorEnd = timeToSectorEndAngle(timeLabels[index], endTimeLabels[index]);
     const labelY = box.y - (portrait ? 78 : 70);
     const circleStroke = Math.max(2, request.strokeWidth);
     layers.push(
@@ -443,16 +447,16 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
       shape(context, `Daily ${periodLabels[index]} sector`, box.x, box.y, box.size, box.size, request.accentColor, 0, request.textColor, Math.max(1, request.strokeWidth - 1), 1, "sector", {
         fillOpacity: 0.12,
         strokeOpacity: 0.7,
-        sectorStartAngle: box.sectorStart,
-        sectorEndAngle: box.sectorEnd,
+        sectorStartAngle: sectorStart,
+        sectorEndAngle: sectorEnd,
         sectorInnerRadius: 0,
       }),
     );
     layers.push(text(context, `Daily ${periodLabels[index]} label`, box.x, labelY, box.size, portrait ? 58 : 44, periodLabels[index], request.weekdayFontSize * (portrait ? 1.55 : 1.35), request.textColor, "center", 0));
 
-    const eventAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, (box.sectorStart + box.sectorEnd) / 2, 0.44);
+    const eventAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, sectorMidpointAngle(sectorStart, sectorEnd), 0.44);
     const eventW = portrait ? 290 : 170;
-    const timeText = request.showTimeLabels ? timeLabels[index] : "";
+    const timeText = request.showTimeLabels ? formatTimeRange(timeLabels[index], endTimeLabels[index]) : "";
     const eventText = request.showTimeLabels ? `${timeText}\n${eventLabels[index]}` : eventLabels[index];
     layers.push(
       text(
@@ -470,7 +474,7 @@ function createDayLayers(context: BuildContext): ThumbnailLayer[] {
       ),
     );
     if (request.showTimeLabels) {
-      const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, index === 0 ? 180 : 0, 0.72);
+      const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, sectorStart, 0.72);
       layers.push(
         text(
           context,
@@ -515,7 +519,8 @@ function sanitizeScheduleRequest(request: ScheduleBuilderRequest): ScheduleBuild
     actionsPerDay: clampActionCount(request.actionsPerDay),
     dailyActionCounts: Array.from({ length: 7 }, (_, index) => clampActionCount(request.dailyActionCounts?.[index] ?? request.actionsPerDay)),
     dailyPeriodLabels: normalizeDailyStrings(request.dailyPeriodLabels, defaultDailyPeriodLabels),
-    dailyTimeLabels: normalizeDailyStrings(request.dailyTimeLabels, defaultDailyTimeLabels),
+    dailyTimeLabels: normalizeDailyTimes(request.dailyTimeLabels, defaultDailyTimeLabels),
+    dailyEndTimeLabels: normalizeDailyTimes(request.dailyEndTimeLabels, defaultDailyEndTimeLabels),
     dailyEventLabels: normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels),
     showTimeLabels: request.showTimeLabels !== false,
     weekendColorMode: sanitizeWeekendColorMode(request.weekendColorMode),
@@ -677,6 +682,7 @@ function pad(value: number): string {
 
 const defaultDailyPeriodLabels = ["AM", "PM"];
 const defaultDailyTimeLabels = ["09:00", "14:00"];
+const defaultDailyEndTimeLabels = ["11:00", "16:00"];
 const defaultDailyEventLabels = ["Morning work", "Collaboration"];
 
 function normalizeDailyStrings(values: string[] | undefined, fallback: string[]): string[] {
@@ -684,6 +690,50 @@ function normalizeDailyStrings(values: string[] | undefined, fallback: string[])
     const value = values?.[index]?.trim();
     return value ? value.slice(0, 48) : fallback[index];
   });
+}
+
+function normalizeDailyTimes(values: string[] | undefined, fallback: string[]): string[] {
+  return Array.from({ length: 2 }, (_, index) => {
+    const value = values?.[index]?.trim();
+    return parseTimeToMinutes(value) === null ? fallback[index] : formatMinutes(parseTimeToMinutes(value) ?? 0);
+  });
+}
+
+function parseTimeToMinutes(value: string | undefined): number | null {
+  const match = value?.match(/^(\d{1,2}):(\d{2})$/);
+  if (!match) return null;
+  const hour = Number.parseInt(match[1], 10);
+  const minute = Number.parseInt(match[2], 10);
+  if (!Number.isFinite(hour) || !Number.isFinite(minute) || hour < 0 || hour > 23 || minute < 0 || minute > 59) return null;
+  return hour * 60 + minute;
+}
+
+function formatMinutes(minutes: number): string {
+  const normalized = ((Math.round(minutes) % 1440) + 1440) % 1440;
+  return `${String(Math.floor(normalized / 60)).padStart(2, "0")}:${String(normalized % 60).padStart(2, "0")}`;
+}
+
+function timeToClockAngle(value: string): number {
+  const minutes = parseTimeToMinutes(value) ?? 0;
+  return ((minutes % 720) / 720) * 360;
+}
+
+function timeToSectorEndAngle(start: string, end: string): number {
+  const startMinutes = parseTimeToMinutes(start) ?? 0;
+  const endMinutes = parseTimeToMinutes(end) ?? startMinutes + 120;
+  let duration = endMinutes - startMinutes;
+  if (duration <= 0) duration += 1440;
+  const sweep = Math.max(1, Math.min(360, (duration / 720) * 360));
+  return timeToClockAngle(start) + sweep;
+}
+
+function sectorMidpointAngle(start: number, end: number): number {
+  const sweep = ((end - start) % 360 + 360) % 360 || 360;
+  return start + sweep / 2;
+}
+
+function formatTimeRange(start: string, end: string): string {
+  return `${start}-${end}`;
 }
 
 function pointOnEllipse(
@@ -694,7 +744,7 @@ function pointOnEllipse(
   angleDeg: number,
   radiusRatio: number,
 ): { x: number; y: number } {
-  const angle = (angleDeg * Math.PI) / 180;
+  const angle = ((angleDeg - 90) * Math.PI) / 180;
   return {
     x: x + width / 2 + Math.cos(angle) * (width / 2) * radiusRatio,
     y: y + height / 2 + Math.sin(angle) * (height / 2) * radiusRatio,

@@ -832,6 +832,7 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     dailyActionCounts: [1, 1, 1, 1, 1, 1, 1],
     dailyPeriodLabels: ["AM", "PM"],
     dailyTimeLabels: ["09:00", "14:00"],
+    dailyEndTimeLabels: ["11:00", "16:00"],
     dailyEventLabels: ["Morning work", "Collaboration"],
     showTimeLabels: true,
     showAdjacentDays: false,
@@ -903,9 +904,15 @@ function ScheduleBuilderDialog({
     );
     updateDraft({ ...draft, dailyActionCounts: nextCounts });
   };
-  const updateDailyString = (key: "dailyPeriodLabels" | "dailyTimeLabels" | "dailyEventLabels", index: number, value: string) => {
+  const updateDailyString = (key: "dailyPeriodLabels" | "dailyTimeLabels" | "dailyEndTimeLabels" | "dailyEventLabels", index: number, value: string) => {
     const fallback =
-      key === "dailyPeriodLabels" ? ["AM", "PM"] : key === "dailyTimeLabels" ? ["09:00", "14:00"] : ["Morning work", "Collaboration"];
+      key === "dailyPeriodLabels"
+        ? ["AM", "PM"]
+        : key === "dailyTimeLabels"
+          ? ["09:00", "14:00"]
+          : key === "dailyEndTimeLabels"
+            ? ["11:00", "16:00"]
+            : ["Morning work", "Collaboration"];
     const nextValues = Array.from({ length: 2 }, (_, valueIndex) => draft[key]?.[valueIndex] ?? fallback[valueIndex]);
     nextValues[index] = value;
     updateDraft({ ...draft, [key]: nextValues });
@@ -1182,9 +1189,19 @@ function ScheduleBuilderDialog({
                       <label className="field">
                         <span>{t(index === 0 ? "scheduleBuilder.dailyTimeAm" : "scheduleBuilder.dailyTimePm")}</span>
                         <input
-                          type="text"
+                          type="time"
+                          step={300}
                           value={draft.dailyTimeLabels?.[index] ?? (index === 0 ? "09:00" : "14:00")}
                           onChange={(event) => updateDailyString("dailyTimeLabels", index, event.currentTarget.value)}
+                        />
+                      </label>
+                      <label className="field">
+                        <span>{t(index === 0 ? "scheduleBuilder.dailyEndTimeAm" : "scheduleBuilder.dailyEndTimePm")}</span>
+                        <input
+                          type="time"
+                          step={300}
+                          value={draft.dailyEndTimeLabels?.[index] ?? (index === 0 ? "11:00" : "16:00")}
+                          onChange={(event) => updateDailyString("dailyEndTimeLabels", index, event.currentTarget.value)}
                         />
                       </label>
                       <label className="field">

@@ -151,8 +151,8 @@ export function makeShapeLayer(partial: Partial<ShapeLayer> = {}): ShapeLayer {
     strokeWidth: partial.strokeWidth ?? 0,
     strokeOpacity: partial.strokeOpacity ?? 1,
     lineStyle: partial.lineStyle ?? "solid",
-    sectorStartAngle: clampNumber(partial.sectorStartAngle, -360, 720, -90),
-    sectorEndAngle: clampNumber(partial.sectorEndAngle, -360, 720, 30),
+    sectorStartAngle: clampNumber(partial.sectorStartAngle, -360, 720, 0),
+    sectorEndAngle: clampNumber(partial.sectorEndAngle, -360, 720, 90),
     sectorInnerRadius: clampNumber(partial.sectorInnerRadius, 0, 95, 0),
   };
 }

@@ -132,8 +132,8 @@ Shape layers include:
 - `strokeWidth`
 - `strokeOpacity`
 - `lineStyle`: `solid`, `dotted`, `dashed`, or `wave` for line shapes.
-- `sectorStartAngle`: start angle in degrees for sector shapes.
-- `sectorEndAngle`: end angle in degrees for sector shapes.
+- `sectorStartAngle`: start angle in clock-style degrees for sector shapes. `0` is 12 o'clock, `90` is 3 o'clock, `180` is 6 o'clock, and `270` is 9 o'clock.
+- `sectorEndAngle`: end angle in the same clock-style degrees for sector shapes. Values can exceed `360` when the sector crosses 12 o'clock.
 - `sectorInnerRadius`: optional inner radius percentage from `0` to `95`; `0` makes a filled pie slice and higher values make a donut segment.
 
 Wave line rendering uses a smooth quadratic wave path based on stroke width and layer height so the style remains visible in both preview and export.
@@ -167,7 +167,7 @@ Examples:
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
 <div data-layer="shape" data-shape="star" data-corner-radius="18" data-fill="#ffd166"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
-<div data-layer="shape" data-shape="sector" data-sector-start-angle="205" data-sector-end-angle="325" data-sector-inner-radius="0" data-fill="#10b6d7"></div>
+<div data-layer="shape" data-shape="sector" data-sector-start-angle="270" data-sector-end-angle="330" data-sector-inner-radius="0" data-fill="#10b6d7"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
 <div data-layer="text" data-shadow-color="#000000" data-shadow-opacity="45" data-shadow-blur="18" data-shadow-distance="20" data-shadow-angle="135" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="8" data-bevel-opacity="35">DECORATED</div>
 <div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true" data-animation-text="wave" data-animation-effect="glow" data-animation-effect-intensity="70">MOTION</div>
@@ -306,13 +306,13 @@ The beta schedule generator opens in a modal and accepts:
 - Canvas orientation: landscape `1280x720`, portrait `1080x1920`, or the current canvas size.
 - Date inputs: browser calendar-style month/date inputs, weekly start day or daily target date, Sunday/Monday week start for monthly grids, weekday language, and date format (`day` or `month/day`).
 - Style inputs: title, the same font family choices exposed by Adjust, font weight, separate title/weekday/date/plan font-size sliders, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
-- Schedule density inputs: one uniform action count for every day, individual counts for all seven days in weekly schedules, and daily period/event label inputs for day schedules.
+- Schedule density inputs: one uniform action count for every day, individual counts for all seven days in weekly schedules, and daily period/start-time/end-time/event label inputs for day schedules.
 - Output behavior inputs: whether the generated objects should share group metadata.
 - Persistence inputs: Generate objects saves the generator settings before replacing objects, and Save settings stores the settings without generating.
 
 The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid or daily layout style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current Canvas object list with editable text and shape objects, applies the selected output size, selects the top generated object, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules, and `DAY` or a localized date label for daily schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
 
-Daily schedule generation starts with an AM/PM circle layout matching the provided reference direction: two large circle-outline sections labeled AM and PM, editable sector fills inside each circle, editable event text inside each period, and optional standalone time labels. The generator also includes the schedule elements shared by other schedule units: automatic or custom title, selected-date heading, weekday/date context, optional badge, orientation, font, font-size, color, stroke, grouping, live preview, Generate objects, and Save settings controls. The generated AM/PM sectors are normal shape objects with `sectorStartAngle`, `sectorEndAngle`, and `sectorInnerRadius` controls in Adjust.
+Daily schedule generation starts with an AM/PM circle layout matching the provided reference direction: two large circle-outline sections labeled AM and PM, editable sector fills inside each circle, editable event text inside each period, and optional standalone start-time labels. Daily start and end controls use browser time inputs. The generated sector start/end angles synchronize to those times using clock-style degrees, so `09:00` produces a `270` degree sector start at the left side of the circle. The generator also includes the schedule elements shared by other schedule units: automatic or custom title, selected-date heading, weekday/date context, optional badge, orientation, font, font-size, color, stroke, grouping, live preview, Generate objects, and Save settings controls. The generated AM/PM sectors are normal shape objects with `sectorStartAngle`, `sectorEndAngle`, and `sectorInnerRadius` controls in Adjust.
 
 Fresh schedule generator settings default to a weekly portrait canvas with one action slot per day. Saved generator settings still restore the user's last explicitly saved choices.
 
