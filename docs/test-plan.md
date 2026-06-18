@@ -38,7 +38,7 @@
 - Chrome extension bridge helpers respond to `ping`, return the current edit-state snapshot, and validate `applySnapshot` payloads.
 - Default template definitions provide exactly 38 distinct use-case layouts, five each for YouTube, Shorts, Stream, and Cutout, eight Schedule templates, and ten animated Motion templates, with exportable CSV/HTML and supported layer types.
 - Weekly Schedule Landscape and Weekly Schedule Portrait keep Sunday-start weekday labels in `SUN`, `MON`, `TUE`, `WED`, `THU`, `FRI`, `SAT` order.
-- Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, weekly date ranges, weekday language, date format, action counts, month-aware badge labels, separate title/weekday/date/plan font sizes, and grouped/ungrouped layer metadata before generating editable text/shape layers.
+- Beta schedule builder calculates UTC-safe month lengths, weekdays, leap years, Sunday/Monday-start monthly grids, weekly date ranges, daily target dates, weekday language, date format, action counts or daily period/event labels, range-aware badge labels, separate title/weekday/date/plan font sizes, and grouped/ungrouped layer metadata before generating editable text/shape layers.
 - Default template metadata exposes categories and mini-preview colors for guided selection.
 - Layer animation helpers apply fade, slide, pop, pulse, blink, drift, zoom, spin, sway, shake, and breathe transforms, including multiple ordered animation entries, without mutating source layer state.
 - Easing helpers expose linear plus easings.net-style Sine, Quad, Cubic, Quart, Quint, Expo, Circ, Back, Elastic, and Bounce curves.
@@ -69,7 +69,7 @@ The WebApp runtime gate is passed only when Chrome or a headless browser confirm
 - Layers and Colors tabs expose resizable list areas with no overlap or horizontal overflow.
 - Browser templates expose a resizable list area with no overlap or horizontal overflow.
 - The Templates tab exposes generator buttons for schedule, standard thumbnail, vertical thumbnail, and stream waiting screen, while the previous default-template list is not shown.
-- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly or weekly schedule layers with localized badge text.
+- The beta schedule generator modal opens from Templates, displays a beta notice, accepts calendar date, weekday language, date format, uniform/per-day action count where relevant, daily AM/PM period/event labels, preview, grouping, style, Adjust-shared font choices, separate font-size sliders, color settings, settings-only save, and generates editable monthly, weekly, or daily schedule layers with localized badge text.
 - The image generator modals open from Templates, provide live previews, five placement patterns per generator, grouped common/title/subtitle/label text controls, save settings without generating, restore saved settings after reload, and generate editable standard thumbnail, vertical thumbnail, and stream waiting layer sets.
 - CSV import updates the canvas/object list.
 - HTML import updates the canvas/object list.
@@ -1581,3 +1581,29 @@ Completed on 2026-06-15 for the temporary Manual maintenance notice and operatio
   - `output/runtime-20260615-manual-maintenance-note/02-manual-overview-note.png`
   - `output/runtime-20260615-manual-maintenance-note/03-mobile-manual-note.png`
 - CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/model compatibility is covered by `npm test`.
+
+## Daily Schedule Sector Runtime Gate (2026-06-18)
+
+Completed on 2026-06-18 for the daily schedule generator, sector shape, and daily time-label request.
+
+- Scope: added the schedule generator Day schedule mode, daily AM/PM period/time/event inputs, generated AM/PM circle layouts with editable sector shape objects, optional time labels, and sector start/end/inner-radius Adjust controls for existing shape editing.
+- `npm test`: pass. 35 test files, 143 tests.
+- `npm run build`: pass. TypeScript build and Vite production build completed; Vite chunk-size warning remained non-blocking.
+- Browser runtime evidence: Playwright local Chrome passed at `http://127.0.0.1:4418/thumbnail-generator/?runtime=daily-sector-20260618`.
+- Runtime checks:
+  - Primary UI visible and initial canvas nonblank (`9600` sampled colored pixels).
+  - Schedule generator opened from Templates, switched to Day schedule, accepted `2026-06-18`, AM/PM labels, `08:30` and `20:00` time labels, and daily event labels.
+  - The pre-generation preview rendered the AM/PM circle layout with visible sector wedges and time text.
+  - Generate objects created editable layers including `Daily AM sector`.
+  - The generated canvas remained nonblank (`9600` sampled colored pixels).
+  - Selecting the generated sector exposed Start angle controls in Adjust, and the start angle changed to `210`.
+  - WebP export downloaded `desktop-thumbnail-1080x1920-2026-06-18T06-46-28-547Z.webp` with `247884` bytes.
+  - Mobile viewport horizontal overflow was `0`.
+  - Console health: no page/app console errors and no page errors.
+- Evidence:
+  - `output/runtime-20260618-daily-sector/runtime-result.json`
+  - `output/runtime-20260618-daily-sector/desktop-initial.png`
+  - `output/runtime-20260618-daily-sector/desktop-daily-preview.png`
+  - `output/runtime-20260618-daily-sector/desktop-final.png`
+  - `output/runtime-20260618-daily-sector/mobile-final.png`
+- CSV/HTML compatibility: visible CSV/HTML import controls remain hidden in this build; parser/export compatibility for sector fields is covered by `npm test`.

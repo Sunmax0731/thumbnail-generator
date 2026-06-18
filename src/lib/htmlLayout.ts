@@ -105,6 +105,9 @@ export function parseHtmlLayout(htmlText: string, options: LayoutParseOptions): 
           strokeWidth: numberOr(attr(node, "stroke-width"), 0),
           strokeOpacity: clamp(numberOr(attr(node, "stroke-opacity"), 1), 0, 1),
           lineStyle: parseLineStyle(attr(node, "line-style")),
+          sectorStartAngle: numberOr(attr(node, "sector-start-angle"), -90),
+          sectorEndAngle: numberOr(attr(node, "sector-end-angle"), 30),
+          sectorInnerRadius: clamp(numberOr(attr(node, "sector-inner-radius"), 0), 0, 95),
         }),
       ];
     }
@@ -142,6 +145,7 @@ function parseBoolean(input: string, fallback: boolean): boolean {
 function parseShape(input = "") {
   if (
     input === "ellipse" ||
+    input === "sector" ||
     input === "triangle" ||
     input === "diamond" ||
     input === "pentagon" ||

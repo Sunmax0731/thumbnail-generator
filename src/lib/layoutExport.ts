@@ -52,6 +52,9 @@ const csvColumns = [
   "shape",
   "fill",
   "lineStyle",
+  "sectorStartAngle",
+  "sectorEndAngle",
+  "sectorInnerRadius",
   "effect",
   "image",
 ] as const;
@@ -148,6 +151,9 @@ function shapeCsvValue(layer: ShapeLayer, column: string): string | number {
     strokeWidth: round(layer.strokeWidth),
     strokeOpacity: round(layer.strokeOpacity),
     lineStyle: layer.lineStyle,
+    sectorStartAngle: round(layer.sectorStartAngle ?? -90),
+    sectorEndAngle: round(layer.sectorEndAngle ?? 30),
+    sectorInnerRadius: round(layer.sectorInnerRadius ?? 0),
   };
   return map[column] ?? "";
 }
@@ -205,6 +211,9 @@ function layerToHtml(layer: ThumbnailLayer): string {
       ["data-stroke-width", round(layer.strokeWidth)],
       ["data-stroke-opacity", round(layer.strokeOpacity)],
       ["data-line-style", layer.lineStyle],
+      ["data-sector-start-angle", round(layer.sectorStartAngle ?? -90)],
+      ["data-sector-end-angle", round(layer.sectorEndAngle ?? 30)],
+      ["data-sector-inner-radius", round(layer.sectorInnerRadius ?? 0)],
     ])}></div>`;
   }
 

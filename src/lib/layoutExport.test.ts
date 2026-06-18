@@ -50,7 +50,7 @@ describe("layoutExport", () => {
           effectIntensity: 70,
         },
       }),
-      makeShapeLayer({ name: "Rule", shape: "line", lineStyle: "wave", strokeWidth: 12, cornerRadius: 4 }),
+      makeShapeLayer({ name: "Rule", shape: "sector", lineStyle: "wave", strokeWidth: 12, cornerRadius: 4, sectorStartAngle: -45, sectorEndAngle: 135, sectorInnerRadius: 25 }),
     ]);
 
     expect(html).toContain('data-layer="text"');
@@ -70,5 +70,9 @@ describe("layoutExport", () => {
     expect(html).toContain('data-animation-effect="glow"');
     expect(html).toContain('data-animation-effect-intensity="70"');
     expect(html).toContain('data-line-style="wave"');
+    expect(html).toContain('data-shape="sector"');
+    expect(html).toContain('data-sector-start-angle="-45"');
+    expect(html).toContain('data-sector-end-angle="135"');
+    expect(html).toContain('data-sector-inner-radius="25"');
   });
 });

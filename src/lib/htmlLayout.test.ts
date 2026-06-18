@@ -23,7 +23,7 @@ describe("parseHtmlLayout", () => {
     const result = parseHtmlLayout(
       `<section>
         <div data-layer="text" data-group-id="g1" data-group-name="Brand" data-layer-blur="2" data-edge-blur="-3" data-edge-blur-stroke="true" data-shadow-color="#112233" data-shadow-opacity="0.6" data-shadow-blur="12" data-shadow-distance="18" data-shadow-angle="45" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="-5" data-bevel-opacity="0.7" data-writing-mode="vertical" data-letter-spacing="5" data-fill-opacity="0.7" data-stroke-opacity="0.4" data-animation-type="fade" data-animation-duration-ms="900" data-animation-loop="true" data-animation-text="lineReveal" data-animation-effect="shine" data-animation-effect-intensity="55">TIGHT</div>
-        <div data-layer="shape" data-shape="line" data-line-style="dotted" data-corner-radius="18" data-stroke-width="9"></div>
+        <div data-layer="shape" data-shape="sector" data-sector-start-angle="-45" data-sector-end-angle="120" data-sector-inner-radius="30" data-line-style="dotted" data-corner-radius="18" data-stroke-width="9"></div>
       </section>`,
       { baseWidth: 1280, baseHeight: 720 },
     );
@@ -57,7 +57,7 @@ describe("parseHtmlLayout", () => {
         effectIntensity: 55,
       },
     });
-    expect(result.layers[1]).toMatchObject({ type: "shape", shape: "line", lineStyle: "dotted", cornerRadius: 18 });
+    expect(result.layers[1]).toMatchObject({ type: "shape", shape: "sector", lineStyle: "dotted", cornerRadius: 18, sectorStartAngle: -45, sectorEndAngle: 120, sectorInnerRadius: 30 });
   });
 
   it("accepts expanded shape kinds", () => {
@@ -67,10 +67,11 @@ describe("parseHtmlLayout", () => {
         <div data-layer="shape" data-shape="diamond"></div>
         <div data-layer="shape" data-shape="pentagon"></div>
         <div data-layer="shape" data-shape="hexagon"></div>
+        <div data-layer="shape" data-shape="sector"></div>
       </section>`,
       { baseWidth: 1280, baseHeight: 720 },
     );
 
-    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon"]);
+    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon", "sector"]);
   });
 });

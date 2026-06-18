@@ -1,7 +1,7 @@
 import { makeShapeLayer, makeTextLayer } from "./layerFactory";
 import type { OutputSettings, ShapeLayer, TextLayer, ThumbnailLayer } from "./types";
 
-export type ScheduleBuilderKind = "month" | "week";
+export type ScheduleBuilderKind = "month" | "week" | "day";
 export type ScheduleBuilderOrientation = "landscape" | "portrait" | "current";
 export type ScheduleWeekStart = "sunday" | "monday";
 export type ScheduleGridStyle = "cards" | "lines";
@@ -37,6 +37,10 @@ export interface ScheduleBuilderRequest {
   actionCountMode: ScheduleActionCountMode;
   actionsPerDay: number;
   dailyActionCounts: number[];
+  dailyPeriodLabels: string[];
+  dailyTimeLabels: string[];
+  dailyEventLabels: string[];
+  showTimeLabels: boolean;
   showAdjacentDays: boolean;
   groupLayers: boolean;
   weekendColorMode: ScheduleWeekendColorMode;
@@ -95,7 +99,7 @@ export function buildScheduleTemplate(
   return {
     name: groupName,
     settings,
-    layers: request.kind === "week" ? createWeekLayers(context) : createMonthLayers(context),
+    layers: context.request.kind === "day" ? createDayLayers(context) : context.request.kind === "week" ? createWeekLayers(context) : createMonthLayers(context),
   };
 }
 
@@ -402,6 +406,93 @@ function createWeekLayers(context: BuildContext): ThumbnailLayer[] {
   return layers;
 }
 
+function createDayLayers(context: BuildContext): ThumbnailLayer[] {
+  const { request, width, height, portrait, language } = context;
+  const targetDate = addDays(request.year, request.month, request.day, 0);
+  const title = request.title.trim() || buildScheduleName(request, language);
+  const dateLabel = `${formatDateLabel(targetDate, request.dateFormat)} ${weekdayLabels[request.weekdayLanguage][targetDate.weekday]}`;
+  const layers: ThumbnailLayer[] = [
+    shape(context, "Schedule background", 0, 0, width, height, request.backgroundColor, 0, request.backgroundColor, 0),
+    text(context, "Schedule title", portrait ? 72 : 64, portrait ? 72 : 42, portrait ? width - 144 : width * 0.58, portrait ? 112 : 72, title, request.titleFontSize, request.textColor, "left", 0),
+    text(context, "Daily date label", portrait ? 72 : 66, portrait ? 178 : 110, portrait ? width - 144 : width * 0.42, portrait ? 56 : 38, dateLabel, request.dateFontSize, request.textColor, "left", 0, 0.82),
+    ...(request.showBadge ? badge(context, getScheduleBadgeLabel(request), portrait ? width - 300 : width - 280, portrait ? 78 : 48, portrait ? 228 : 188, portrait ? 72 : 52) : []),
+  ];
+
+  const periodLabels = normalizeDailyStrings(request.dailyPeriodLabels, defaultDailyPeriodLabels);
+  const timeLabels = normalizeDailyStrings(request.dailyTimeLabels, defaultDailyTimeLabels);
+  const eventLabels = normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels);
+  const periodBoxes = portrait
+    ? [
+        { x: 96, y: 300, size: Math.min(width - 192, 650), sectorStart: 205, sectorEnd: 325 },
+        { x: 96, y: 1010, size: Math.min(width - 192, 650), sectorStart: 10, sectorEnd: 120 },
+      ]
+    : [
+        { x: 82, y: 188, size: 420, sectorStart: 205, sectorEnd: 325 },
+        { x: width - 82 - 420, y: 188, size: 420, sectorStart: 0, sectorEnd: 115 },
+      ];
+
+  periodBoxes.forEach((box, index) => {
+    const labelY = box.y - (portrait ? 78 : 70);
+    const circleStroke = Math.max(2, request.strokeWidth);
+    layers.push(
+      shape(context, `Daily ${periodLabels[index]} circle`, box.x, box.y, box.size, box.size, request.surfaceColor, 999, request.textColor, circleStroke, 1, "ellipse", {
+        fillOpacity: 0,
+      }),
+    );
+    layers.push(
+      shape(context, `Daily ${periodLabels[index]} sector`, box.x, box.y, box.size, box.size, request.accentColor, 0, request.textColor, Math.max(1, request.strokeWidth - 1), 1, "sector", {
+        fillOpacity: 0.12,
+        strokeOpacity: 0.7,
+        sectorStartAngle: box.sectorStart,
+        sectorEndAngle: box.sectorEnd,
+        sectorInnerRadius: 0,
+      }),
+    );
+    layers.push(text(context, `Daily ${periodLabels[index]} label`, box.x, labelY, box.size, portrait ? 58 : 44, periodLabels[index], request.weekdayFontSize * (portrait ? 1.55 : 1.35), request.textColor, "center", 0));
+
+    const eventAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, (box.sectorStart + box.sectorEnd) / 2, 0.44);
+    const eventW = portrait ? 290 : 170;
+    const timeText = request.showTimeLabels ? timeLabels[index] : "";
+    const eventText = request.showTimeLabels ? `${timeText}\n${eventLabels[index]}` : eventLabels[index];
+    layers.push(
+      text(
+        context,
+        `Daily ${periodLabels[index]} event`,
+        eventAnchor.x - eventW / 2,
+        eventAnchor.y - (portrait ? 52 : 38),
+        eventW,
+        portrait ? 104 : 76,
+        eventText,
+        request.eventFontSize * (portrait ? 1.25 : 1.15),
+        request.textColor,
+        "center",
+        0,
+      ),
+    );
+    if (request.showTimeLabels) {
+      const clockAnchor = pointOnEllipse(box.x, box.y, box.size, box.size, index === 0 ? 180 : 0, 0.72);
+      layers.push(
+        text(
+          context,
+          `Daily ${periodLabels[index]} time`,
+          clockAnchor.x - (portrait ? 96 : 72),
+          clockAnchor.y - (portrait ? 26 : 22),
+          portrait ? 192 : 144,
+          portrait ? 52 : 44,
+          timeLabels[index],
+          Math.max(18, request.dateFontSize * 0.72),
+          request.accentColor,
+          "center",
+          0,
+          0.9,
+        ),
+      );
+    }
+  });
+
+  return layers;
+}
+
 function resolveScheduleSettings(orientation: ScheduleBuilderOrientation, currentSettings: OutputSettings): OutputSettings {
   if (orientation === "portrait") return { ...currentSettings, presetId: "portrait", width: 1080, height: 1920 };
   if (orientation === "landscape") return { ...currentSettings, presetId: "youtube-720", width: 1280, height: 720 };
@@ -423,6 +514,10 @@ function sanitizeScheduleRequest(request: ScheduleBuilderRequest): ScheduleBuild
     strokeWidth: Math.min(12, Math.max(0, Math.round(request.strokeWidth || 0))),
     actionsPerDay: clampActionCount(request.actionsPerDay),
     dailyActionCounts: Array.from({ length: 7 }, (_, index) => clampActionCount(request.dailyActionCounts?.[index] ?? request.actionsPerDay)),
+    dailyPeriodLabels: normalizeDailyStrings(request.dailyPeriodLabels, defaultDailyPeriodLabels),
+    dailyTimeLabels: normalizeDailyStrings(request.dailyTimeLabels, defaultDailyTimeLabels),
+    dailyEventLabels: normalizeDailyStrings(request.dailyEventLabels, defaultDailyEventLabels),
+    showTimeLabels: request.showTimeLabels !== false,
     weekendColorMode: sanitizeWeekendColorMode(request.weekendColorMode),
     showBadge: request.kind === "week" ? false : request.showBadge !== false,
   };
@@ -471,6 +566,7 @@ function clampFontSize(value: number, fallback: number): number {
 }
 
 function getScheduleBadgeLabel(request: ScheduleBuilderRequest): string {
+  if (request.kind === "day") return request.weekdayLanguage === "ja" ? `${request.month}/${request.day}` : "DAY";
   if (request.kind === "week") return request.weekdayLanguage === "ja" ? "週" : "WEEK";
   if (request.weekdayLanguage === "ja") return `${request.month}月`;
   return englishMonthNames[request.month - 1] ?? "MONTH";
@@ -487,6 +583,11 @@ function defaultActionTime(index: number): string {
 const englishMonthNames = ["JAN", "FEB", "MAR", "APR", "MAY", "JUNE", "JULY", "AUG", "SEPT", "OCT", "NOV", "DEC"];
 
 function buildScheduleName(request: ScheduleBuilderRequest, language: "en" | "ja"): string {
+  if (request.kind === "day") {
+    return language === "ja"
+      ? `${request.year}年${request.month}月${request.day}日の予定`
+      : `${request.year}-${pad(request.month)}-${pad(request.day)} Daily Schedule`;
+  }
   if (request.kind === "week") {
     return language === "ja"
       ? `${request.year}年${request.month}月${request.day}日週の予定`
@@ -514,6 +615,8 @@ function shape(
   strokeColor: string,
   strokeWidth: number,
   opacity = 1,
+  shapeKind: ShapeLayer["shape"] = "rect",
+  extra: Partial<ShapeLayer> = {},
 ): ShapeLayer {
   return makeShapeLayer({
     name,
@@ -526,8 +629,10 @@ function shape(
     strokeColor,
     strokeWidth,
     opacity,
+    shape: shapeKind,
     groupId: context.request.groupLayers ? context.groupId : undefined,
     groupName: context.request.groupLayers ? context.groupName : undefined,
+    ...extra,
   });
 }
 
@@ -568,4 +673,30 @@ function text(
 
 function pad(value: number): string {
   return String(value).padStart(2, "0");
+}
+
+const defaultDailyPeriodLabels = ["AM", "PM"];
+const defaultDailyTimeLabels = ["09:00", "14:00"];
+const defaultDailyEventLabels = ["Morning work", "Collaboration"];
+
+function normalizeDailyStrings(values: string[] | undefined, fallback: string[]): string[] {
+  return Array.from({ length: 2 }, (_, index) => {
+    const value = values?.[index]?.trim();
+    return value ? value.slice(0, 48) : fallback[index];
+  });
+}
+
+function pointOnEllipse(
+  x: number,
+  y: number,
+  width: number,
+  height: number,
+  angleDeg: number,
+  radiusRatio: number,
+): { x: number; y: number } {
+  const angle = (angleDeg * Math.PI) / 180;
+  return {
+    x: x + width / 2 + Math.cos(angle) * (width / 2) * radiusRatio,
+    y: y + height / 2 + Math.sin(angle) * (height / 2) * radiusRatio,
+  };
 }

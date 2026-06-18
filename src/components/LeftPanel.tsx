@@ -830,6 +830,10 @@ function createDefaultScheduleDraft(): ScheduleBuilderRequest {
     actionCountMode: "uniform",
     actionsPerDay: 1,
     dailyActionCounts: [1, 1, 1, 1, 1, 1, 1],
+    dailyPeriodLabels: ["AM", "PM"],
+    dailyTimeLabels: ["09:00", "14:00"],
+    dailyEventLabels: ["Morning work", "Collaboration"],
+    showTimeLabels: true,
     showAdjacentDays: false,
     groupLayers: true,
     weekendColorMode: "default",
@@ -874,6 +878,7 @@ function ScheduleBuilderDialog({
   };
   const isMonthSchedule = draft.kind === "month";
   const isWeekSchedule = draft.kind === "week";
+  const isDaySchedule = draft.kind === "day";
 
   const colorTargets = [
     { key: "backgroundColor" as const, label: t("scheduleBuilder.backgroundColor"), value: draft.backgroundColor },
@@ -897,6 +902,13 @@ function ScheduleBuilderDialog({
       countIndex === index ? Number.parseInt(value, 10) || 0 : count,
     );
     updateDraft({ ...draft, dailyActionCounts: nextCounts });
+  };
+  const updateDailyString = (key: "dailyPeriodLabels" | "dailyTimeLabels" | "dailyEventLabels", index: number, value: string) => {
+    const fallback =
+      key === "dailyPeriodLabels" ? ["AM", "PM"] : key === "dailyTimeLabels" ? ["09:00", "14:00"] : ["Morning work", "Collaboration"];
+    const nextValues = Array.from({ length: 2 }, (_, valueIndex) => draft[key]?.[valueIndex] ?? fallback[valueIndex]);
+    nextValues[index] = value;
+    updateDraft({ ...draft, [key]: nextValues });
   };
   const previewTemplate = useMemo(() => buildScheduleTemplate(draft, settings, language), [draft, language, settings]);
   const previewCanvasRef = useRef<HTMLCanvasElement>(null);
@@ -948,6 +960,7 @@ function ScheduleBuilderDialog({
                 <select value={draft.kind} onChange={(event) => setDraft("kind", event.currentTarget.value as ScheduleBuilderRequest["kind"])}>
                   <option value="month">{t("scheduleBuilder.kind.month")}</option>
                   <option value="week">{t("scheduleBuilder.kind.week")}</option>
+                  <option value="day">{t("scheduleBuilder.kind.day")}</option>
                 </select>
               </label>
               <label className="field">
@@ -983,9 +996,13 @@ function ScheduleBuilderDialog({
               </label>
             </div>
             <div className="field-grid two">
-              <label className="field">
+              <label className={`field ${isDaySchedule ? "field-disabled" : ""}`}>
                 <span>{t("scheduleBuilder.weekStartsOn")}</span>
-                <select value={draft.weekStartsOn} onChange={(event) => setDraft("weekStartsOn", event.currentTarget.value as ScheduleBuilderRequest["weekStartsOn"])}>
+                <select
+                  value={draft.weekStartsOn}
+                  disabled={isDaySchedule}
+                  onChange={(event) => setDraft("weekStartsOn", event.currentTarget.value as ScheduleBuilderRequest["weekStartsOn"])}
+                >
                   <option value="sunday">{t("scheduleBuilder.weekStartsOn.sunday")}</option>
                   <option value="monday">{t("scheduleBuilder.weekStartsOn.monday")}</option>
                 </select>
@@ -1009,11 +1026,11 @@ function ScheduleBuilderDialog({
                 <option value="sundaySaturday">{t("scheduleBuilder.weekendColorMode.sundaySaturday")}</option>
               </select>
             </label>
-            <label className={`field checkbox-field ${isWeekSchedule ? "field-disabled" : ""}`}>
+            <label className={`field checkbox-field ${isWeekSchedule || isDaySchedule ? "field-disabled" : ""}`}>
               <input
                 type="checkbox"
-                checked={isWeekSchedule ? false : draft.showAdjacentDays}
-                disabled={isWeekSchedule}
+                checked={isWeekSchedule || isDaySchedule ? false : draft.showAdjacentDays}
+                disabled={isWeekSchedule || isDaySchedule}
                 onChange={(event) => setDraft("showAdjacentDays", event.currentTarget.checked)}
               />
               <span>{t("scheduleBuilder.showAdjacentDays")}</span>
@@ -1121,11 +1138,11 @@ function ScheduleBuilderDialog({
               />
             </div>
             <div className="field-grid schedule-action-count-row">
-              <label className={`field schedule-action-mode-field ${isMonthSchedule ? "field-disabled" : ""}`}>
+              <label className={`field schedule-action-mode-field ${isMonthSchedule || isDaySchedule ? "field-disabled" : ""}`}>
                 <span>{t("scheduleBuilder.actionCountMode")}</span>
                 <select
                   value={draft.actionCountMode}
-                  disabled={isMonthSchedule}
+                  disabled={isMonthSchedule || isDaySchedule}
                   onChange={(event) => setDraft("actionCountMode", event.currentTarget.value as ScheduleBuilderRequest["actionCountMode"])}
                 >
                   <option value="uniform">{t("scheduleBuilder.actionCountMode.uniform")}</option>
@@ -1137,9 +1154,52 @@ function ScheduleBuilderDialog({
                 value={draft.actionsPerDay}
                 min={0}
                 max={6}
+                disabled={isDaySchedule}
                 onChange={(value) => setDraft("actionsPerDay", value)}
               />
             </div>
+            {isDaySchedule ? (
+              <section className="schedule-daily-period-section" aria-label={t("scheduleBuilder.dailyPeriodSection")}>
+                <div className="section-heading compact-heading">
+                  <CalendarDays size={15} />
+                  <h2>{t("scheduleBuilder.dailyPeriodSection")}</h2>
+                </div>
+                <label className="field checkbox-field">
+                  <input type="checkbox" checked={draft.showTimeLabels !== false} onChange={(event) => setDraft("showTimeLabels", event.currentTarget.checked)} />
+                  <span>{t("scheduleBuilder.showTimeLabels")}</span>
+                </label>
+                <div className="daily-period-grid">
+                  {[0, 1].map((index) => (
+                    <div className="daily-period-editor" key={index}>
+                      <label className="field">
+                        <span>{t(index === 0 ? "scheduleBuilder.dailyPeriodAm" : "scheduleBuilder.dailyPeriodPm")}</span>
+                        <input
+                          type="text"
+                          value={draft.dailyPeriodLabels?.[index] ?? (index === 0 ? "AM" : "PM")}
+                          onChange={(event) => updateDailyString("dailyPeriodLabels", index, event.currentTarget.value)}
+                        />
+                      </label>
+                      <label className="field">
+                        <span>{t(index === 0 ? "scheduleBuilder.dailyTimeAm" : "scheduleBuilder.dailyTimePm")}</span>
+                        <input
+                          type="text"
+                          value={draft.dailyTimeLabels?.[index] ?? (index === 0 ? "09:00" : "14:00")}
+                          onChange={(event) => updateDailyString("dailyTimeLabels", index, event.currentTarget.value)}
+                        />
+                      </label>
+                      <label className="field">
+                        <span>{t(index === 0 ? "scheduleBuilder.dailyEventAm" : "scheduleBuilder.dailyEventPm")}</span>
+                        <input
+                          type="text"
+                          value={draft.dailyEventLabels?.[index] ?? (index === 0 ? "Morning work" : "Collaboration")}
+                          onChange={(event) => updateDailyString("dailyEventLabels", index, event.currentTarget.value)}
+                        />
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </section>
+            ) : null}
             {draft.kind === "week" && draft.actionCountMode === "individual" ? (
               <div className="daily-action-grid" aria-label={t("scheduleBuilder.dailyActionCounts")}>
                 {getPreviewWeekDates(draft).map((date, index) => (
@@ -1694,12 +1754,14 @@ function ScheduleSlider({
   value,
   min,
   max,
+  disabled = false,
   onChange,
 }: {
   label: string;
   value: number;
   min: number;
   max: number;
+  disabled?: boolean;
   onChange: (value: number) => void;
 }) {
   const handleChange = (raw: string) => {
@@ -1708,10 +1770,10 @@ function ScheduleSlider({
     onChange(Math.min(max, Math.max(min, parsed)));
   };
   return (
-    <label className="field schedule-slider-field">
+    <label className={`field schedule-slider-field ${disabled ? "field-disabled" : ""}`}>
       <span>{label}</span>
-      <input type="range" min={min} max={max} value={value} onChange={(event) => handleChange(event.currentTarget.value)} />
-      <input type="number" min={min} max={max} value={value} onChange={(event) => handleChange(event.currentTarget.value)} />
+      <input type="range" min={min} max={max} value={value} disabled={disabled} onChange={(event) => handleChange(event.currentTarget.value)} />
+      <input type="number" min={min} max={max} value={value} disabled={disabled} onChange={(event) => handleChange(event.currentTarget.value)} />
     </label>
   );
 }

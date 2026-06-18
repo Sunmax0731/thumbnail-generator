@@ -17,7 +17,7 @@ All layers share:
 - `layerBlur`: whole-layer blur in CSS filter pixels.
 - `edgeBlur`: signed soft edge blur amount. `0` disables edge blur, positive values draw a blurred layer copy behind the layer, and negative values draw the layer through a feathered alpha mask so inner edge softening is visible in preview and export.
 - `edgeBlurStroke`: whether text outlines and shape strokes participate in edge blur. When false, the blur source uses the fill/body so strokes stay sharp.
-- `cornerRadius`: rounded corner radius for image layers and supported shape paths. Rectangles use rounded rectangles; triangle, diamond, pentagon, hexagon, and star shapes use rounded polygon corners.
+- `cornerRadius`: rounded corner radius for image layers and supported shape paths. Rectangles use rounded rectangles; triangle, diamond, pentagon, hexagon, and star shapes use rounded polygon corners. Sector shapes use explicit angle parameters instead of corner rounding.
 - `shadowColor`, `shadowOpacity`, `shadowBlur`, `shadowDistance`, and `shadowAngle`: optional draw-time layer shadow settings. The Adjust UI exposes these parameter controls only while the shadow checkbox is enabled; disabling shadow sets `shadowOpacity` to `0`.
 - `rotateX` and `rotateY`: pseudo-3D plane rotation values in degrees, applied during preview and export rendering.
 - `bevelSize` and `bevelOpacity`: optional bevel overlay settings for image, text, and shape layers. `bevelSize` is signed; positive and negative values reverse the highlight/shadow direction so users can choose the apparent bevel side without adding another field.
@@ -125,13 +125,16 @@ Text layer edit selection rectangles, hit testing, and resize handles use the co
 
 Shape layers include:
 
-- `shape`: `rect`, `ellipse`, `triangle`, `diamond`, `pentagon`, `hexagon`, `star`, or `line`
+- `shape`: `rect`, `ellipse`, `triangle`, `diamond`, `pentagon`, `hexagon`, `star`, `sector`, or `line`
 - `fill`
 - `fillOpacity`
 - `strokeColor`
 - `strokeWidth`
 - `strokeOpacity`
 - `lineStyle`: `solid`, `dotted`, `dashed`, or `wave` for line shapes.
+- `sectorStartAngle`: start angle in degrees for sector shapes.
+- `sectorEndAngle`: end angle in degrees for sector shapes.
+- `sectorInnerRadius`: optional inner radius percentage from `0` to `95`; `0` makes a filled pie slice and higher values make a donut segment.
 
 Wave line rendering uses a smooth quadratic wave path based on stroke width and layer height so the style remains visible in both preview and export.
 
@@ -140,7 +143,7 @@ Wave line rendering uses a smooth quadratic wave path based on stroke width and 
 CSV rows support the following columns:
 
 ```text
-type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,animationText,animationEffect,animationEffectIntensity,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,effect,image
+type,name,x,y,width,height,rotation,opacity,visible,selectable,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shadowColor,shadowOpacity,shadowBlur,shadowDistance,shadowAngle,rotateX,rotateY,bevelSize,bevelOpacity,animationType,animationStartMs,animationDurationMs,animationEasing,animationLoop,animationDirection,animationDistance,animationText,animationEffect,animationEffectIntensity,text,fontSize,fontFamily,fontWeight,color,fillOpacity,strokeColor,strokeWidth,strokeOpacity,align,writingMode,lineHeight,letterSpacing,shape,fill,lineStyle,sectorStartAngle,sectorEndAngle,sectorInnerRadius,effect,image
 ```
 
 Rules:
@@ -149,7 +152,7 @@ Rules:
 - Missing numbers fall back to safe defaults.
 - `effect` accepts semicolon-separated values such as `grayscale=1;blur=4;mosaic=12`.
 - `image` references an imported image name/key or a bundled sample key.
-- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, shadow, pseudo-3D rotation, bevel, `groupId`, `groupName`, `writingMode`, `lineStyle`, and animation columns including text/effect motion columns are optional and fall back to safe defaults.
+- `letterSpacing`, `fillOpacity`, `strokeOpacity`, `layerBlur`, `edgeBlur`, `edgeBlurStroke`, `cornerRadius`, shadow, pseudo-3D rotation, bevel, `groupId`, `groupName`, `writingMode`, `lineStyle`, sector angle/radius columns, and animation columns including text/effect motion columns are optional and fall back to safe defaults.
 - Quoted CSV fields are supported.
 
 ## HTML Layout Schema
@@ -164,6 +167,7 @@ Examples:
 <div data-layer="shape" data-shape="rect" data-x="72" data-y="590" data-width="760" data-height="86" data-fill="#ff3d5a"></div>
 <div data-layer="shape" data-shape="star" data-corner-radius="18" data-fill="#ffd166"></div>
 <div data-layer="shape" data-shape="line" data-line-style="wave" data-stroke-width="12" data-stroke-color="#ffffff"></div>
+<div data-layer="shape" data-shape="sector" data-sector-start-angle="205" data-sector-end-angle="325" data-sector-inner-radius="0" data-fill="#10b6d7"></div>
 <div data-layer="text" data-writing-mode="vertical" data-edge-blur="-8" data-edge-blur-stroke="true">VERT</div>
 <div data-layer="text" data-shadow-color="#000000" data-shadow-opacity="45" data-shadow-blur="18" data-shadow-distance="20" data-shadow-angle="135" data-rotate-x="12" data-rotate-y="-8" data-bevel-size="8" data-bevel-opacity="35">DECORATED</div>
 <div data-layer="text" data-animation-type="breathe" data-animation-duration-ms="1200" data-animation-easing="easeInOutSine" data-animation-direction="none" data-animation-loop="true" data-animation-text="wave" data-animation-effect="glow" data-animation-effect-intensity="70">MOTION</div>
@@ -298,15 +302,17 @@ The Templates tab exposes four generator entry buttons: schedule, standard thumb
 
 The beta schedule generator opens in a modal and accepts:
 
-- Schedule type: monthly or weekly.
+- Schedule type: monthly, weekly, or daily.
 - Canvas orientation: landscape `1280x720`, portrait `1080x1920`, or the current canvas size.
-- Date inputs: browser calendar-style month/date inputs, weekly start day, Sunday/Monday week start for monthly grids, weekday language, and date format (`day` or `month/day`).
+- Date inputs: browser calendar-style month/date inputs, weekly start day or daily target date, Sunday/Monday week start for monthly grids, weekday language, and date format (`day` or `month/day`).
 - Style inputs: title, the same font family choices exposed by Adjust, font weight, separate title/weekday/date/plan font-size sliders, card/line grid style, corner radius, stroke width, background color, cell color, accent color, text color, and adjacent-month date visibility.
-- Schedule density inputs: one uniform action count for every day, or individual counts for all seven days in weekly schedules.
+- Schedule density inputs: one uniform action count for every day, individual counts for all seven days in weekly schedules, and daily period/event label inputs for day schedules.
 - Output behavior inputs: whether the generated objects should share group metadata.
 - Persistence inputs: Generate objects saves the generator settings before replacing objects, and Save settings stores the settings without generating.
 
-The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current Canvas object list with editable text and shape objects, applies the selected output size, selects the top generated object, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+The modal shows a lightweight pre-generation preview that reflects the date labels, weekday language, action counts, colors, font, and grid or daily layout style. On desktop it uses a wider four-column layout so the preview remains beside the input groups instead of increasing vertical height. Generating a schedule replaces the current Canvas object list with editable text and shape objects, applies the selected output size, selects the top generated object, updates the template-name draft, refreshes the internally stored CSV and HTML layout text, and uses a badge label tied to the schedule range (`JUNE`/`6月` for monthly schedules, `WEEK`/`週` for weekly schedules, and `DAY` or a localized date label for daily schedules). The modal displays a beta notice because generated date/layout results may still need manual adjustment before export.
+
+Daily schedule generation starts with an AM/PM circle layout matching the provided reference direction: two large circle-outline sections labeled AM and PM, editable sector fills inside each circle, editable event text inside each period, and optional standalone time labels. The generator also includes the schedule elements shared by other schedule units: automatic or custom title, selected-date heading, weekday/date context, optional badge, orientation, font, font-size, color, stroke, grouping, live preview, Generate objects, and Save settings controls. The generated AM/PM sectors are normal shape objects with `sectorStartAngle`, `sectorEndAngle`, and `sectorInnerRadius` controls in Adjust.
 
 Fresh schedule generator settings default to a weekly portrait canvas with one action slot per day. Saved generator settings still restore the user's last explicitly saved choices.
 

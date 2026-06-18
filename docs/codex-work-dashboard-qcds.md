@@ -34,6 +34,7 @@ Earlier P2 items were already closed in `TODO.md` and their local Issue files. T
 - Browser runtime gate: pass with Playwright headless Chromium after the in-app Browser returned `Browser is not available: iab`.
 - Runtime gate checks covered nonblank canvas render, primary UI visibility, CSV import, HTML import, layer X editing reflected in generated CSV, WebP export download, desktop screenshot, mobile screenshot, and mobile horizontal overflow `0`.
 - Latest follow-up validation on 2026-06-10: `npm test` passed with 27 test files and 103 tests, `npm run build` passed, and Playwright headless Chromium at `http://127.0.0.1:4215/thumbnail-generator/` verified localized template apply confirmation, template-apply preview zoom auto-fit from `94%` to `18%`, browser-template delete confirmation, WebP export, nonblank desktop/mobile canvas renders, and mobile horizontal overflow `0`.
+- Latest schedule/shape validation on 2026-06-18: `npm test` passed with 35 files and 143 tests, `npm run build` passed, and Playwright local Chrome at `http://127.0.0.1:4418/thumbnail-generator/?runtime=daily-sector-20260618` verified Day schedule generation with AM/PM sector circles, time labels, generated sector layer editing, WebP export, nonblank desktop/mobile canvas renders, and mobile horizontal overflow `0`.
 - Evidence screenshots:
   - `docs/assets/runtime-dashboard-qcds-desktop.png`
   - `docs/assets/runtime-dashboard-qcds-mobile.png`

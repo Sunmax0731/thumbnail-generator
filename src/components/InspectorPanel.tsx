@@ -2355,6 +2355,9 @@ function scaleLayerForMotionPreview(layer: ThumbnailLayer, canvasWidth: number, 
       strokeWidth: layer.strokeWidth * scale,
       strokeOpacity: layer.strokeOpacity,
       lineStyle: layer.lineStyle,
+      sectorStartAngle: layer.sectorStartAngle,
+      sectorEndAngle: layer.sectorEndAngle,
+      sectorInnerRadius: layer.sectorInnerRadius,
     };
   }
   return {
@@ -2644,6 +2647,7 @@ function ShapeControls({
         >
           <option value="rect">{t("inspector.rect")}</option>
           <option value="ellipse">{t("inspector.ellipse")}</option>
+          <option value="sector">{t("inspector.sector")}</option>
           <option value="triangle">{t("inspector.triangle")}</option>
           <option value="diamond">{t("inspector.diamond")}</option>
           <option value="pentagon">{t("inspector.pentagon")}</option>
@@ -2668,6 +2672,37 @@ function ShapeControls({
             <option value="wave">{t("inspector.lineWave")}</option>
           </select>
         </label>
+      ) : null}
+      {selected.shape === "sector" ? (
+        <div className="field-grid two">
+          <SliderNumberInput
+            label={t("inspector.sectorStartAngle")}
+            value={selected.sectorStartAngle}
+            min={-360}
+            max={720}
+            step={1}
+            suffix="deg"
+            onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, sectorStartAngle: value } : layer))}
+          />
+          <SliderNumberInput
+            label={t("inspector.sectorEndAngle")}
+            value={selected.sectorEndAngle}
+            min={-360}
+            max={720}
+            step={1}
+            suffix="deg"
+            onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, sectorEndAngle: value } : layer))}
+          />
+          <SliderNumberInput
+            label={t("inspector.sectorInnerRadius")}
+            value={selected.sectorInnerRadius}
+            min={0}
+            max={95}
+            step={1}
+            suffix="%"
+            onChange={(value) => onUpdateLayer(selected.id, (layer) => (layer.type === "shape" ? { ...layer, sectorInnerRadius: value } : layer))}
+          />
+        </div>
       ) : null}
       <div className="field-grid two">
         <ColorEditButton

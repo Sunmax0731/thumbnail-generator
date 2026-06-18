@@ -379,6 +379,8 @@ function drawShapeLayer(
   context.beginPath();
   if (layer.shape === "ellipse") {
     context.ellipse(0, 0, layer.width / 2, layer.height / 2, 0, 0, Math.PI * 2);
+  } else if (layer.shape === "sector") {
+    drawSectorPath(context, layer);
   } else if (layer.shape === "triangle") {
     drawRoundedPolygonPath(context, regularPolygonPoints(layer.width, layer.height, 3, -90), layer.cornerRadius);
   } else if (layer.shape === "diamond") {
@@ -406,6 +408,37 @@ function drawShapeLayer(
     context.stroke();
   }
   context.globalAlpha = baseAlpha;
+}
+
+function drawSectorPath(context: CanvasRenderingContext2D, layer: ShapeLayer): void {
+  const outerX = Math.max(1, layer.width / 2);
+  const outerY = Math.max(1, layer.height / 2);
+  const start = (normalizeAngle(layer.sectorStartAngle) * Math.PI) / 180;
+  const sweep = normalizeSweep(layer.sectorEndAngle - layer.sectorStartAngle);
+  const end = start + (sweep * Math.PI) / 180;
+  const innerRatio = clamp(layer.sectorInnerRadius, 0, 95) / 100;
+
+  context.ellipse(0, 0, outerX, outerY, 0, start, end);
+  if (innerRatio <= 0) {
+    context.lineTo(0, 0);
+  } else {
+    const innerX = outerX * innerRatio;
+    const innerY = outerY * innerRatio;
+    context.lineTo(Math.cos(end) * innerX, Math.sin(end) * innerY);
+    context.ellipse(0, 0, innerX, innerY, 0, end, start, true);
+  }
+  context.closePath();
+}
+
+function normalizeAngle(value: number): number {
+  if (!Number.isFinite(value)) return 0;
+  return ((value % 360) + 360) % 360;
+}
+
+function normalizeSweep(value: number): number {
+  if (!Number.isFinite(value)) return 90;
+  const normalized = ((value % 360) + 360) % 360;
+  return normalized <= 0 ? 360 : Math.max(1, normalized);
 }
 
 function regularPolygonPoints(width: number, height: number, sides: number, startAngleDeg: number): Array<{ x: number; y: number }> {

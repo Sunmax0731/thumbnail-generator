@@ -8,7 +8,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 
 ## What You Can Do
 
-- Compose thumbnails with image, text, and shape objects on the canvas, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, and line shapes.
+- Compose thumbnails with image, text, and shape objects on the canvas, including rectangle, ellipse, triangle, diamond, pentagon, hexagon, star, sector, and line shapes.
 - Add line objects from Quick Add with solid, dotted, dashed, or smooth wave strokes.
 - Import local images from the Assets tab and edit their position, size, rotation, opacity, and simple effects.
 - Tag imported images and reusable group objects, then filter image assets and group objects independently from the Assets tab.
@@ -23,7 +23,7 @@ Repository: <https://github.com/Sunmax0731/thumbnail-generator>
 - Use Delete, Ctrl+C, Ctrl+V, Ctrl+X, Ctrl+D, Ctrl+Z, and Ctrl+Y shortcuts outside text fields and modals.
 - Keep CSV and HTML layout text in saved edit states and templates for compatibility.
 - Save a browser-local work-in-progress state, enable autosave, and store tagged named templates in `localStorage` with dropdown tag filtering.
-- Use the Templates tab generator buttons to create editable schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens.
+- Use the Templates tab generator buttons to create editable monthly, weekly, or daily schedule layouts, standard thumbnails, vertical thumbnails, and stream waiting screens. Daily schedules can include AM/PM sector circles and optional time labels.
 - Generate standard and vertical thumbnail layouts from separate modals, each with five placement patterns, saved content, grouped text controls, color, image-slot, grouping, compact zero-capable letter-spacing controls, common corner radius, and preview settings.
 - Save generator settings separately from generated objects; settings are saved when objects are generated and can also be saved without generating, then restored after reload.
 - Use the bottom timeline Play/Pause and Reset buttons to preview animations directly in the editor; while playing, object rows, inspector controls, canvas edits, and preview object selection are locked until playback is paused.

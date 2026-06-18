@@ -3566,6 +3566,40 @@ button:disabled {
   padding: 0 6px;
 }
 
+.schedule-daily-period-section {
+  display: grid;
+  gap: 10px;
+  margin-top: 10px;
+}
+
+.compact-heading {
+  min-height: 24px;
+}
+
+.compact-heading h2 {
+  font-size: 0.82rem;
+}
+
+.daily-period-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.daily-period-editor {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+  padding: 10px;
+  border: 1px solid rgba(148, 163, 184, 0.28);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.52);
+}
+
+.daily-period-editor .field {
+  min-width: 0;
+}
+
 .schedule-builder-preview {
   display: grid;
   min-height: 240px;

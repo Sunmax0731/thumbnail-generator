@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generatedAt": "2026-06-12T15:45:00.000+09:00",
+  "generatedAt": "2026-06-18T15:50:00.000+09:00",
   "sourceWorkItem": {
     "kind": "issue",
     "title": "QCDS評価のCode Starter可視化",
@@ -26,7 +26,7 @@
       "label": "Quality",
       "rating": "A+",
       "state": "pass",
-      "summary": "Feature coverage, motion presets, text-only and glow/effect motion sections, collapsible bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, PWA manifest/service worker, Chrome extension bridge, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
+      "summary": "Feature coverage, sector shape editing, daily schedule generation with AM/PM sector circles and time labels, motion presets, text-only and glow/effect motion sections, collapsible bottom timeline, Output menu export, top-right edit-state icons with autosave text, OBS preview controls, PWA manifest/service worker, Chrome extension bridge, expanded Motion easing controls, multiple motion sets, selected-object preview, popup-style Motion/OBS preview, template/generator workflows, Colors/Adjust/Image Lab coverage, docs alignment, automated tests, production build, and headless Chromium runtime gate are current.",
       "evidence": [
         "docs/qcds-evaluation.md",
         "docs/qcds-strict-metrics.json",
@@ -48,7 +48,7 @@
       "label": "Delivery",
       "rating": "A+",
       "state": "pass",
-      "summary": "Docs, QCDS evidence, tests, build, runtime gate records, output-menu/timeline/OBS evidence, and GitHub Pages push-trigger evidence are synchronized.",
+      "summary": "Docs, QCDS evidence, tests, build, runtime gate records, daily schedule sector evidence, output-menu/timeline/OBS evidence, and GitHub Pages push-trigger evidence are synchronized.",
       "evidence": [
         "TODO.md",
         "Issues/0063-qcds-code-starter.md",
@@ -59,7 +59,7 @@
       "label": "Satisfaction",
       "rating": "A+",
       "state": "pass",
-      "summary": "Primary editing/export workflows, サムネいる？ title, active-language Animation/アニメ tab label, privacy/terms/contact service footer, PWA install metadata, extension bridge commands, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, collapsible bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
+      "summary": "Primary editing/export workflows, daily schedule generation with time labels, sector parameter editing, サムネいる？ title, active-language Animation/アニメ tab label, privacy/terms/contact service footer, PWA install metadata, extension bridge commands, Output menu JPG/PNG/WebP/OBS choices, top-right edit-state icons, motion presets, text-only/effect motion sections, collapsible bottom timeline, OBS preview hideable controls, template confirmation localization, Schedule templates, expanded Motion controls, mobile layout, issue reporting, analytics tracking, and user-facing documentation are validated.",
       "evidence": [
         "docs/user-guide.md",
         "docs/features.md",
@@ -84,13 +84,13 @@
   "validation": {
     "npmTest": "pass",
     "npmRunBuild": "pass",
-    "browserRuntimeGate": "pass; Playwright headless Chromium gate passed at http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
+    "browserRuntimeGate": "pass; Playwright local Chrome gate passed at http://127.0.0.1:4418/thumbnail-generator/?runtime=daily-sector-20260618",
     "manualCodeStarterCheck": "repo-side source files added; reload VS Code Code Starter if the view is cached"
   },
   "latestRuntimeGate": {
-    "tool": "Playwright headless Chromium",
-    "url": "http://127.0.0.1:4341/thumbnail-generator/?runtime=pwa-extension",
-    "date": "2026-06-12",
-    "evidence": "output/runtime-20260612-pwa-extension/"
+    "tool": "Playwright local Chrome",
+    "url": "http://127.0.0.1:4418/thumbnail-generator/?runtime=daily-sector-20260618",
+    "date": "2026-06-18",
+    "evidence": "output/runtime-20260618-daily-sector/"
   }
 }

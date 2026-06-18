@@ -1,7 +1,7 @@
 import type { TranslationKey } from "./i18n";
 
 export type LayerType = "image" | "text" | "shape";
-export type ShapeKind = "rect" | "ellipse" | "triangle" | "diamond" | "pentagon" | "hexagon" | "star" | "line";
+export type ShapeKind = "rect" | "ellipse" | "sector" | "triangle" | "diamond" | "pentagon" | "hexagon" | "star" | "line";
 export type LineStyle = "solid" | "dotted" | "dashed" | "wave";
 export type TextAlign = "left" | "center" | "right";
 export type TextWritingMode = "horizontal" | "vertical";
@@ -139,6 +139,9 @@ export interface ShapeLayer extends BaseLayer {
   strokeWidth: number;
   strokeOpacity: number;
   lineStyle: LineStyle;
+  sectorStartAngle: number;
+  sectorEndAngle: number;
+  sectorInnerRadius: number;
 }
 
 export type ThumbnailLayer = ImageLayer | TextLayer | ShapeLayer;

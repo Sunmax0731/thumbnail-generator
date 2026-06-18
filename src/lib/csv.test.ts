@@ -46,8 +46,8 @@ text,Title,0,0,400,120,g1,Brand,3,-4,true,0,#112233,0.6,12,18,45,12,-8,-5,0.7,sl
       { baseWidth: 1280, baseHeight: 720 },
     );
     const shapeResult = parseCsvLayout(
-      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shape,lineStyle,strokeWidth
-shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
+      `type,name,x,y,width,height,groupId,groupName,layerBlur,edgeBlur,edgeBlurStroke,cornerRadius,shape,lineStyle,strokeWidth,sectorStartAngle,sectorEndAngle,sectorInnerRadius
+shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,sector,wave,12,-30,110,25`,
       { baseWidth: 1280, baseHeight: 720 },
     );
 
@@ -77,10 +77,13 @@ shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
     });
     expect(shapeResult.layers[0]).toMatchObject({
       type: "shape",
-      shape: "line",
+      shape: "sector",
       lineStyle: "wave",
       cornerRadius: 14,
       strokeWidth: 12,
+      sectorStartAngle: -30,
+      sectorEndAngle: 110,
+      sectorInnerRadius: 25,
     });
     expect(result.layers[0]).toMatchObject({
       shadowColor: "#112233",
@@ -101,10 +104,11 @@ shape,Wave,10,20,500,20,g1,Brand,2,6,false,14,line,wave,12`,
 shape,Star,star
 shape,Diamond,diamond
 shape,Pentagon,pentagon
-shape,Hexagon,hexagon`,
+shape,Hexagon,hexagon
+shape,Sector,sector`,
       { baseWidth: 1280, baseHeight: 720 },
     );
 
-    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon"]);
+    expect(result.layers.map((layer) => (layer.type === "shape" ? layer.shape : ""))).toEqual(["star", "diamond", "pentagon", "hexagon", "sector"]);
   });
 });

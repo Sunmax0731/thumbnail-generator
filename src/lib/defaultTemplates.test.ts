@@ -27,7 +27,7 @@ describe("defaultTemplates", () => {
       expect(layers.every((layer) => layer.visible)).toBe(true);
       expect(layers.every((layer) => ["image", "text", "shape"].includes(layer.type))).toBe(true);
       expect(
-        layers.every((layer) => layer.type !== "shape" || ["rect", "ellipse", "triangle", "diamond", "pentagon", "hexagon", "star", "line"].includes(layer.shape)),
+        layers.every((layer) => layer.type !== "shape" || ["rect", "ellipse", "sector", "triangle", "diamond", "pentagon", "hexagon", "star", "line"].includes(layer.shape)),
       ).toBe(true);
       expect(layersToCsv(layers)).toContain("type,name,x,y");
       expect(layersToHtml(layers)).toContain('data-thumbnail-layout="thumbnail-generator"');

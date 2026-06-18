@@ -113,6 +113,9 @@ export function parseCsvLayout(csvText: string, options: LayoutParseOptions): La
           strokeWidth: numberOr(record.strokeWidth, 0),
           strokeOpacity: clamp(numberOr(record.strokeOpacity, 1), 0, 1),
           lineStyle: parseLineStyle(record.lineStyle),
+          sectorStartAngle: numberOr(record.sectorStartAngle, -90),
+          sectorEndAngle: numberOr(record.sectorEndAngle, 30),
+          sectorInnerRadius: clamp(numberOr(record.sectorInnerRadius, 0), 0, 95),
         }),
       ];
     }
@@ -217,6 +220,7 @@ function parseWritingMode(input = ""): TextWritingMode {
 function parseShape(input = "") {
   if (
     input === "ellipse" ||
+    input === "sector" ||
     input === "triangle" ||
     input === "diamond" ||
     input === "pentagon" ||
